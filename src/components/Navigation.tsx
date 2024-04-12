@@ -23,8 +23,8 @@ const Navigation = () => {
 
   if (!sessionData)
     return (
-      <nav className="fixed left-0 top-0 z-50 flex w-full flex-col items-center justify-between gap-8 bg-transparent p-7 backdrop-blur-md md:flex-row md:gap-0">
-        <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight md:text-4xl dark:text-neutral-100">
+      <nav className="iphone-backdrop fixed left-0 top-0 z-50 flex w-full flex-col items-center justify-between gap-8 bg-transparent p-7 md:flex-row md:gap-0">
+        <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight dark:text-neutral-100 md:text-4xl">
           <Link
             href="/"
             className="hover:text-gray-700 dark:hover:text-gray-300"
@@ -36,7 +36,7 @@ const Navigation = () => {
           </div>
         </div>
         <ul
-          className={`items-right font-montserrat mr-auto flex flex-col gap-8 md:flex-row md:justify-end md:gap-10 dark:text-neutral-100 ${!isOpen && "hidden md:flex"}`}
+          className={`items-right font-montserrat mr-auto flex flex-col gap-8 dark:text-neutral-100 md:flex-row md:justify-end md:gap-10 ${!isOpen && "hidden md:flex"}`}
         >
           <Button
             onClick={() => {
@@ -44,7 +44,7 @@ const Navigation = () => {
               pathOpen("about");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Об игре
           </Button>
@@ -54,7 +54,7 @@ const Navigation = () => {
               pathOpen("rules");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Правила
           </Button>
@@ -64,7 +64,7 @@ const Navigation = () => {
               pathOpen("store");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Магазин
           </Button>
@@ -74,7 +74,7 @@ const Navigation = () => {
               void signIn();
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-0 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-0 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Войти
           </Button>
@@ -84,8 +84,8 @@ const Navigation = () => {
 
   if (sessionData)
     return (
-      <nav className="iphone-backdrop absolute left-0 top-0 z-50 flex w-full flex-col items-center justify-between gap-8 bg-transparent p-7 backdrop-blur-md md:fixed md:flex-row md:gap-0">
-        <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight md:text-4xl dark:text-neutral-100">
+      <nav className="iphone-backdrop absolute left-0 top-0 z-50 flex w-full flex-col items-center justify-between gap-8 bg-transparent p-7 md:fixed md:flex-row md:gap-0">
+        <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight dark:text-neutral-100 md:text-4xl">
           <Link
             href="/"
             className="hover:text-gray-700 dark:hover:text-gray-300"
@@ -97,7 +97,7 @@ const Navigation = () => {
           </div>
         </div>
         <ul
-          className={`items-right font-montserrat mr-auto flex flex-col gap-4 md:flex-row md:justify-end md:gap-4 dark:text-neutral-100 ${!isOpen && "hidden md:flex"}`}
+          className={`items-right font-montserrat mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex-row md:justify-end md:gap-4 ${!isOpen && "hidden md:flex"}`}
         >
           <Button
             onClick={() => {
@@ -105,7 +105,7 @@ const Navigation = () => {
               pathOpen("about");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Об игре
           </Button>
@@ -115,7 +115,7 @@ const Navigation = () => {
               pathOpen("game");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Играть
           </Button>
@@ -125,7 +125,7 @@ const Navigation = () => {
               pathOpen("characters");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Персонажи
           </Button>
@@ -135,7 +135,7 @@ const Navigation = () => {
               pathOpen("rules");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Правила
           </Button>
@@ -145,7 +145,7 @@ const Navigation = () => {
               pathOpen("store");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Магазин
           </Button>
@@ -155,7 +155,7 @@ const Navigation = () => {
               pathOpen("settings");
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 md:hidden dark:hover:text-gray-300"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
           >
             Настройки
           </Button>
@@ -165,7 +165,7 @@ const Navigation = () => {
               void signOut();
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-0 text-red-500 md:hidden"
+            className="font-montserrat w-min min-w-10 border-none px-4 py-0 text-medium text-red-500 md:hidden"
           >
             Выйти
           </Button>
@@ -180,7 +180,7 @@ const Navigation = () => {
                     className: "w-10 h-8",
                     src: sessionData.user.image ?? "",
                   }}
-                  className="font-montserrat text-medium hidden border-none hover:text-gray-300 md:flex"
+                  className="font-montserrat hidden border-none text-medium hover:text-gray-300 md:flex"
                   name={sessionData.user.name}
                 />
               </div>
