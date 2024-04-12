@@ -41,6 +41,7 @@ jobs:
             git pull origin ${GITHUB_REF#refs/heads/main} 
             npm install
             npm run build
+            npm run db:push
             if pm2 list | grep -q $APP_NAME; then
               echo "Restarting application: $APP_NAME"
               pm2 restart $APP_NAME
