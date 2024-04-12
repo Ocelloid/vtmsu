@@ -22,12 +22,12 @@ export default function Home() {
       </Head>
       <main className=" flex min-h-screen flex-col items-center justify-center">
         <div className="container flex flex-col items-center justify-center gap-8 px-4 py-24 text-justify ">
-          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+          <h1 className="flex flex-col items-center justify-center text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             Маскарад
             <br />
             <span className="text-[hsla(0,100%,50%,75%)]">Вампиров</span>
           </h1>
-          Вот уже много лет люди живут в этом мире, не подозревая о том, что
+          Вот уже много веков люди живут в этом мире, не подозревая о том, что
           происходит в их городах после захода солнца. Однако каждый человек
           подсознательно пытается укрыться в своём уютном мирке и вздрагивает,
           видя неясные силуэты проступающие во тьме. После заката город
