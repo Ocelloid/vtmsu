@@ -27,6 +27,10 @@ const Navigation = () => {
         <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight dark:text-neutral-100 md:text-4xl">
           <Link
             href="/"
+            onClick={() => {
+              setIsOpen(false);
+              pathOpen("");
+            }}
             className="hover:text-gray-700 dark:hover:text-gray-300"
           >
             <FaAnkh size={40} />
