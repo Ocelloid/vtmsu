@@ -6,6 +6,9 @@ import { Inter } from "next/font/google";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+import { NextUIProvider } from "@nextui-org/react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import Navigation from "~/components/Navigation";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,11 +20,18 @@ const MyApp: AppType<{ session: Session | null }> = ({
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <main className={`font-sans ${inter.variable}`}>
-        <Component {...pageProps} />
-      </main>
-    </SessionProvider>
+    <NextUIProvider>
+      <NextThemesProvider attribute="class" defaultTheme="dark">
+        <SessionProvider session={session}>
+          <main
+            className={`font-sans ${inter.variable} bg-gradient-to-b from-[#6d0202] to-[#000000]`}
+          >
+            <Component {...pageProps} />
+            <Navigation />
+          </main>
+        </SessionProvider>
+      </NextThemesProvider>
+    </NextUIProvider>
   );
 };
 

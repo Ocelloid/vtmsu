@@ -7,6 +7,7 @@ import {
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import DiscordProvider from "next-auth/providers/discord";
+import YandexProvider from "next-auth/providers/yandex";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -52,6 +53,10 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
+    YandexProvider({
+      clientId: env.YANDEX_CLIENT_ID,
+      clientSecret: env.YANDEX_CLIENT_SECRET,
     }),
     /**
      * ...add more providers here.
