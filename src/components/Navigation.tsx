@@ -84,7 +84,7 @@ const Navigation = () => {
 
   if (sessionData)
     return (
-      <nav className="absolute left-0 top-0 z-50 flex w-full flex-col items-center justify-between gap-8 bg-transparent p-7 backdrop-blur-md md:fixed md:flex-row md:gap-0">
+      <nav className="iphone-backdrop absolute left-0 top-0 z-50 flex w-full flex-col items-center justify-between gap-8 bg-transparent p-7 backdrop-blur-md md:fixed md:flex-row md:gap-0">
         <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight md:text-4xl dark:text-neutral-100">
           <Link
             href="/"
