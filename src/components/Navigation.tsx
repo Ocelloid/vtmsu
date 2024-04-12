@@ -94,10 +94,10 @@ const Navigation = () => {
             href="/"
             className="hover:text-gray-700 dark:hover:text-gray-300"
           >
-            <FaAnkh size={40} />
+            <FaAnkh size={30} />
           </Link>
           <div className="flex md:hidden" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <FaXmark size={40} /> : <FaBars size={40} />}
+            {isOpen ? <FaXmark size={30} /> : <FaBars size={30} />}
           </div>
         </div>
         <ul
