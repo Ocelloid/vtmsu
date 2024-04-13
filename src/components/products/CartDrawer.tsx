@@ -1,7 +1,9 @@
 import { FaShoppingCart } from "react-icons/fa";
 import CartItem from "~/components/products/CartItem";
 import { Button } from "@nextui-org/react";
-import { type Product } from "~/server/api/routers/product";
+import { useCartStore } from "~/stores/useCartStore";
+import useFromStore from "~/hooks/useFromStore";
+import { FaRubleSign } from "react-icons/fa";
 
 interface Props {
   isOpen: boolean;
@@ -9,8 +11,15 @@ interface Props {
 }
 
 const CartDrawer = ({ isOpen, onCartIconClick }: Props) => {
-  const total = 0;
-  const cart: Product[] = [];
+  const cart = useFromStore(useCartStore, (state) => state.cart);
+
+  let total = 0;
+  if (cart) {
+    total = cart.reduce(
+      (acc, product) => acc + product.price * product.quantity!,
+      0,
+    );
+  }
 
   return (
     <div className="relative">
@@ -51,7 +60,10 @@ const CartDrawer = ({ isOpen, onCartIconClick }: Props) => {
               </ul>
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-lg font-bold">Всего:</span>
-                <span className="text-xl font-bold">${total.toFixed(2)}</span>
+                <span className="flex flex-row text-xl font-bold">
+                  {total.toFixed(2)}
+                  <FaRubleSign size={18} className="mt-[.3rem]" />
+                </span>
               </div>
             </section>
           </main>

@@ -94,7 +94,7 @@ const Navigation = () => {
         <Button
           onClick={() => {
             setIsOpen(false);
-            pathOpen("store");
+            pathOpen("shop");
           }}
           variant="bordered"
           className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"

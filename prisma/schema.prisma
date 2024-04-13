@@ -27,18 +27,18 @@ model Post {
 }
 
 model Product {
-  id          Int             @id @default(autoincrement())
-  title       String
-  subtitle    String?
-  description String?         @db.LongText
-  size        String?
-  color       String?
-  stock       Int             @default(0)
-  price       Float
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  images      ProductImage[]
-  inCart      ProductInCart[]
+  id             Int            @id @default(autoincrement())
+  title          String
+  subtitle       String?
+  description    String?        @db.LongText
+  size           String?
+  color          String?
+  colorsAvailabe String?
+  stock          Int            @default(0)
+  price          Float
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  images         ProductImage[]
 }
 
 model ProductImage {
@@ -46,26 +46,6 @@ model ProductImage {
   source    String
   productId Int
   product   Product @relation(fields: [productId], references: [id])
-}
-
-model ProductInCart {
-  id        Int      @id @default(autoincrement())
-  productId Int
-  cartId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  product   Product  @relation(fields: [productId], references: [id])
-  cart      Cart     @relation(fields: [cartId], references: [id])
-}
-
-model Cart {
-  id        Int             @id @default(autoincrement())
-  shopperId String
-  completed Boolean         @default(false)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  shopper   User            @relation(fields: [shopperId], references: [id])
-  products  ProductInCart[]
 }
 
 // Necessary for Next auth
@@ -104,7 +84,6 @@ model User {
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
-  carts         Cart[]
 }
 
 model VerificationToken {
