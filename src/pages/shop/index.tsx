@@ -49,7 +49,21 @@ export default function Shop() {
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
       <main className="flex min-h-screen flex-1 flex-col py-24">
         <div className="container grid grid-cols-2 gap-12 md:grid-cols-3 lg:grid-cols-4">
-          <ProductCard product={product} />
+          <ProductCard
+            product={{ ...product, id: 1, title: product.title + " 1" }}
+          />
+          <ProductCard
+            product={{ ...product, id: 2, title: product.title + " 2" }}
+          />
+          <ProductCard
+            product={{ ...product, id: 3, title: product.title + " 3" }}
+          />
+          <ProductCard
+            product={{ ...product, id: 4, title: product.title + " 4" }}
+          />
+          <ProductCard
+            product={{ ...product, id: 5, title: product.title + " 5" }}
+          />
         </div>
       </main>
     </>
