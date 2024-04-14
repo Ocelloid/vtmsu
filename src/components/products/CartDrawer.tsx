@@ -69,6 +69,7 @@ const CartDrawer = ({ isOpen, onCartIconClick }: Props) => {
             </section>
           </main>
           <FormOrder />
+          <div className="h-24 min-h-24"></div>
         </aside>
       </div>
     </div>
