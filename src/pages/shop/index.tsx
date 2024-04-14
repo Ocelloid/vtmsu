@@ -4,40 +4,32 @@ import ProductCard from "~/components/products/ProductCard";
 import CartDrawer from "~/components/products/CartDrawer";
 import { api } from "~/utils/api";
 import { LoadingPage } from "~/components/Loading";
-import type { Product, ProductImage } from "~/server/api/routers/shop";
+import AddProduct from "~/components/modals/addProduct";
+import { useSession } from "next-auth/react";
 
 export default function Shop() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { data: sessionData } = useSession();
 
-  const images: ProductImage[] = [
-    { id: 1, source: "/tmp/0.jpg", productId: 1 },
-    { id: 2, source: "/tmp/1.jpg", productId: 1 },
-    { id: 3, source: "/tmp/2.jpg", productId: 1 },
-    { id: 4, source: "/tmp/3.jpg", productId: 1 },
-  ];
-
-  const product: Product = {
-    id: 1,
-    title: "Кроссовки",
-    subtitle: "Просто кроссовки",
-    description: "Эти кроссовки такие кроссовки офигеть просто",
-    size: null,
-    color: null,
-    stock: 10,
-    price: 100,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    images: images,
-  };
+  const { data: isAdmin, isLoading: isUserLoading } =
+    api.user.userIsAdmin.useQuery(
+      { id: sessionData?.user.id ?? "" },
+      {
+        enabled: !!sessionData,
+      },
+    );
 
   const handleCartIconClick = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const { data, isLoading } = api.shop.getAllProducts.useQuery();
-
-  if (isLoading) return <LoadingPage />;
-  if (!data) return <div>Что-то пошло не так</div>;
+  const {
+    data: products,
+    isLoading,
+    refetch,
+  } = api.shop.getAllProducts.useQuery();
+  if (isLoading || isUserLoading) return <LoadingPage />;
+  if (!products) return <div>Что-то пошло не так</div>;
 
   return (
     <>
@@ -49,21 +41,11 @@ export default function Shop() {
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
       <main className="flex min-h-screen flex-1 flex-col py-24">
         <div className="container grid grid-cols-2 gap-12 md:grid-cols-3 lg:grid-cols-4">
-          <ProductCard
-            product={{ ...product, id: 1, title: product.title + " 1" }}
-          />
-          <ProductCard
-            product={{ ...product, id: 2, title: product.title + " 2" }}
-          />
-          <ProductCard
-            product={{ ...product, id: 3, title: product.title + " 3" }}
-          />
-          <ProductCard
-            product={{ ...product, id: 4, title: product.title + " 4" }}
-          />
-          <ProductCard
-            product={{ ...product, id: 5, title: product.title + " 5" }}
-          />
+          {!!isAdmin && <AddProduct onClose={refetch} />}
+          {!!products.length &&
+            products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
         </div>
       </main>
     </>

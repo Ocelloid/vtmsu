@@ -1,7 +1,6 @@
-import { FaTrashAlt } from "react-icons/fa";
 import { type Product } from "~/server/api/routers/shop";
 import { useCartStore } from "~/stores/useCartStore";
-import { FaRubleSign } from "react-icons/fa";
+import { FaTrashAlt, FaRubleSign } from "react-icons/fa";
 import Image from "next/image";
 
 export default function CartItem({ product }: { product: Product }) {
@@ -14,9 +13,9 @@ export default function CartItem({ product }: { product: Product }) {
         <Image
           src={product.images[0]?.source ?? ""}
           alt={product.title}
-          width={64}
-          height={64}
-          className="mr-4 h-10 w-10 rounded-full"
+          width={128}
+          height={128}
+          className="mr-4 aspect-square h-16 w-16 rounded-full object-cover"
         />
         <div className="flex flex-col">
           <span className="flex-1 font-bold">{product.title}</span>

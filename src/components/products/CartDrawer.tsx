@@ -4,6 +4,7 @@ import { Button } from "@nextui-org/react";
 import { useCartStore } from "~/stores/useCartStore";
 import useFromStore from "~/hooks/useFromStore";
 import { FaRubleSign } from "react-icons/fa";
+import FormOrder from "~/components/modals/formOrder";
 
 interface Props {
   isOpen: boolean;
@@ -67,6 +68,7 @@ const CartDrawer = ({ isOpen, onCartIconClick }: Props) => {
               </div>
             </section>
           </main>
+          <FormOrder />
         </aside>
       </div>
     </div>

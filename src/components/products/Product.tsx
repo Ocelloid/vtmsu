@@ -3,21 +3,27 @@ import Image from "next/image";
 import { Button } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { LoadingPage } from "~/components/Loading";
-import type { Product, ProductImage } from "~/server/api/routers/shop";
+import type { Product } from "~/server/api/routers/shop";
 import { useCartStore } from "../../stores/useCartStore";
 import { FaRubleSign } from "react-icons/fa";
 import { api } from "~/utils/api";
+import EditProduct from "~/components/modals/editProuct";
+import { useSession } from "next-auth/react";
 
 const Product = () => {
   const addToCart = useCartStore((state) => state.addToCart);
-
+  const { data: sessionData } = useSession();
   const router = useRouter();
   const [activeImg, setActiveImage] = useState("");
   const [amount, setAmount] = useState(1);
 
   const [product, setProduct] = useState<Product>();
   const productId = router.asPath.split("/").splice(-1)[0] ?? 1;
-  const { data, isLoading } = api.shop.getProductById.useQuery(
+  const {
+    data,
+    isLoading,
+    refetch: refetchProduct,
+  } = api.shop.getProductById.useQuery(
     {
       id: Number(productId),
     },
@@ -26,33 +32,20 @@ const Product = () => {
     },
   );
 
-  useEffect(() => {
-    const images: ProductImage[] = [
-      { id: 1, source: "/tmp/0.jpg", productId: Number(productId) },
-      { id: 2, source: "/tmp/1.jpg", productId: Number(productId) },
-      { id: 3, source: "/tmp/2.jpg", productId: Number(productId) },
-      { id: 4, source: "/tmp/3.jpg", productId: Number(productId) },
-    ];
-    const sampleProduct: Product = {
-      id: Number(productId),
-      title: "Кроссовки",
-      subtitle: "Просто кроссовки",
-      description: "Эти кроссовки такие кроссовки офигеть просто",
-      size: null,
-      color: null,
-      stock: 10,
-      price: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      images: images,
-    };
-    setProduct(data ?? sampleProduct);
-    setActiveImage(
-      data?.images[0]?.source ?? sampleProduct.images[0]?.source ?? "",
+  const { data: isAdmin, isLoading: isUserLoading } =
+    api.user.userIsAdmin.useQuery(
+      { id: sessionData?.user.id ?? "" },
+      {
+        enabled: !!sessionData,
+      },
     );
+
+  useEffect(() => {
+    setProduct(data!);
+    setActiveImage(data?.images[0]?.source ?? "");
   }, [data, productId]);
 
-  if (isLoading) return <LoadingPage />;
+  if (isLoading || isUserLoading) return <LoadingPage />;
   if (!product) return <div>Что-то пошло не так</div>;
 
   return (
@@ -73,7 +66,7 @@ const Product = () => {
               height={128}
               key={index}
               src={image.source}
-              className="h-20 w-20 cursor-pointer rounded-md"
+              className="aspect-square h-20 w-20 cursor-pointer rounded-md object-cover"
               onClick={() => setActiveImage(image.source)}
             />
           ))}
@@ -81,19 +74,19 @@ const Product = () => {
       </div>
       <div className="flex flex-col gap-4 md:w-2/4">
         <div>
-          <h1 className="text-3xl font-bold">{product.title}</h1>
+          <h1 className="text-3xl font-bold text-red-100">{product.title}</h1>
           <span className=" font-semibold text-red-600">
             {product.subtitle}
           </span>
         </div>
-        <p className="text-red-200">{product.description}</p>
-        <h6 className="flex flex-row text-2xl font-semibold">
+        <p className="text-red-100">{product.description}</p>
+        <h6 className="flex flex-row text-2xl font-semibold text-red-100">
           {product.price} <FaRubleSign size={20} className="mt-[.3rem]" />
         </h6>
         <div className="flex flex-row items-center gap-12">
           <div className="flex flex-row items-center">
             <button
-              className="rounded-lg bg-gray-200 px-5 py-2 text-3xl text-red-800"
+              className="rounded-lg bg-red-100 px-5 py-2 text-3xl text-red-950"
               onClick={() => setAmount((prev) => (prev > 1 ? prev - 1 : 1))}
             >
               -
@@ -102,7 +95,7 @@ const Product = () => {
               {amount}
             </span>
             <button
-              className="rounded-lg bg-gray-200 px-4 py-2 text-3xl text-red-800"
+              className="rounded-lg bg-red-100 px-4 py-2 text-3xl text-red-950"
               onClick={() => setAmount((prev) => prev + 1)}
             >
               +
@@ -110,11 +103,14 @@ const Product = () => {
           </div>
           <Button
             onClick={() => addToCart({ ...product, quantity: amount })}
-            className="h-full rounded-xl border-1 border-red-800 bg-transparent px-16 py-3 text-2xl font-semibold text-white"
+            className="h-full rounded-lg border-1 border-red-800 bg-transparent px-16 py-3 text-2xl font-semibold text-red-100"
           >
             Добавить
           </Button>
         </div>
+        {!!isAdmin && (
+          <EditProduct product={product} onClose={() => refetchProduct()} />
+        )}
       </div>
     </div>
   );
