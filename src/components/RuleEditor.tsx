@@ -7,7 +7,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import { useState } from "react";
 import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
 
-const MenuBar = () => {
+export const EditorMenuBar = () => {
   const { editor } = useCurrentEditor();
 
   if (!editor) {
@@ -145,7 +145,7 @@ const RuleEditor = () => {
         </Select>
       </div>
       <EditorProvider
-        slotBefore={<MenuBar />}
+        slotBefore={<EditorMenuBar />}
         extensions={extensions}
         content={content}
       >
