@@ -31,7 +31,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           <h6 className="text-xl font-bold">{product.title}</h6>
           <h4 className="text-md font-semibold">{product.subtitle}</h4>
         </div>
-        <div className="max-w-3/4 m-auto mt-1">
+        <div className="max-w-3/4 m-auto mt-1 hidden md:flex">
           <p className="px-1 text-justify text-xs font-normal">
             {product.description}
           </p>
