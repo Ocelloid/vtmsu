@@ -1,13 +1,23 @@
 import { Tab, Tabs } from "@nextui-org/react";
 import Head from "next/head";
-
+import { useSession } from "next-auth/react";
+import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
+import RuleEditor from "~/components/RuleEditor";
 
 export default function Rules() {
-  // const hello = api.post.hello.useQuery({ text: "from tRPC" });
   const { data, isLoading } = api.post.getAll.useQuery();
+  const { data: sessionData } = useSession();
 
-  if (isLoading) return <div>Loading...</div>;
+  const { data: isPersonnel, isLoading: isUserLoading } =
+    api.user.userIsAdmin.useQuery(
+      { id: sessionData?.user.id ?? "" },
+      {
+        enabled: !!sessionData,
+      },
+    );
+
+  if (isLoading || isUserLoading) return <LoadingPage />;
   if (!data) return <div>Something went wrong</div>;
 
   return (
@@ -23,11 +33,10 @@ export default function Rules() {
             aria-label="tabs"
             variant="underlined"
             classNames={{
-              base: "mд-auto",
               tabList:
-                "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                " gap-6 w-full relative rounded-none p-0 border-b border-divider",
               cursor: "w-full bg-[#dc2626]",
-              tab: "first:ml-auto max-w-fit px-0 h-12",
+              tab: "first:ml-auto max-w-fit px-0 h-12 last:mr-auto md:last:mr-0",
             }}
           >
             <Tab
@@ -60,6 +69,18 @@ export default function Rules() {
             >
               <div>РИТУАЛЫ</div>
             </Tab>
+            {!!isPersonnel && (
+              <Tab
+                key="new_rule"
+                title={
+                  <div className="flex items-center space-x-2">
+                    <span className="font-montserrat">Добавить правило</span>
+                  </div>
+                }
+              >
+                <RuleEditor />
+              </Tab>
+            )}
           </Tabs>
         </div>
       </main>

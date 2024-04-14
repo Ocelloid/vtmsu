@@ -10,3 +10,54 @@
   backdrop-filter: blur(10px) contrast(100%);
   -webkit-backdrop-filter: blur(10px) contrast(100%);
 }
+
+.tiptap {
+  min-height: calc(80vh - 12rem);
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  > * + * {
+    margin-top: 0.75em;
+  }
+
+  ul,
+  ol {
+    padding: 0 1rem;
+    list-style-type: circle;
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: 1.1;
+  }
+
+  h1 {
+    font-size: 48px;
+  }
+  h2 {
+    font-size: 32px;
+  }
+  h3 {
+    font-size: 24px;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  blockquote {
+    margin-left: 0;
+    padding-left: 1rem;
+    border-left: 2px solid rgb(255 255 255 / 40%);
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid rgb(255 255 255 / 40%);
+    margin: 2rem 0;
+  }
+}
