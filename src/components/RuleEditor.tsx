@@ -15,7 +15,7 @@ export const EditorMenuBar = () => {
   }
 
   return (
-    <div className="flex flex-row justify-between text-red-300">
+    <div className="grid grid-cols-3 justify-between gap-1 text-red-300 md:grid-cols-12 [&>*]:rounded-md [&>*]:border-1 [&>*]:border-red-100/20">
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -39,38 +39,26 @@ export const EditorMenuBar = () => {
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={editor.isActive("heading", { level: 1 }) ? "is-active" : ""}
       >
         h1
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={editor.isActive("heading", { level: 2 }) ? "is-active" : ""}
       >
         h2
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className={editor.isActive("heading", { level: 3 }) ? "is-active" : ""}
       >
         h3
       </button>
-      <button
-        onClick={() => editor.chain().focus().setParagraph().run()}
-        className={editor.isActive("paragraph") ? "is-active" : ""}
-      >
+      <button onClick={() => editor.chain().focus().setParagraph().run()}>
         p
       </button>
-      <button
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={editor.isActive("bulletList") ? "is-active" : ""}
-      >
+      <button onClick={() => editor.chain().focus().toggleBulletList().run()}>
         список
       </button>
-      <button
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={editor.isActive("blockquote") ? "is-active" : ""}
-      >
+      <button onClick={() => editor.chain().focus().toggleBlockquote().run()}>
         цитата
       </button>
       <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>
@@ -83,7 +71,7 @@ export const EditorMenuBar = () => {
           !editor.can().chain().focus().undo().run() ? "opacity-50" : ""
         }
       >
-        <FaUndoAlt size={8} />
+        <FaUndoAlt size={12} className="mx-auto" />
       </button>
       <button
         onClick={() => editor.chain().focus().redo().run()}
@@ -92,7 +80,7 @@ export const EditorMenuBar = () => {
           !editor.can().chain().focus().redo().run() ? "opacity-50" : ""
         }
       >
-        <FaRedoAlt size={8} />
+        <FaRedoAlt size={12} className="mx-auto" />
       </button>
     </div>
   );
@@ -100,6 +88,7 @@ export const EditorMenuBar = () => {
 
 const RuleEditor = () => {
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("1");
   const [content, setContent] = useState("");
   const categories = [
     { value: 1, label: "Общие правила" },
@@ -124,16 +113,22 @@ const RuleEditor = () => {
 
   return (
     <div className="flex h-full w-full flex-col gap-2">
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-col gap-2 md:flex-row">
         <Input
           variant="underlined"
+          color="warning"
           label="Название"
           placeholder="Введите название правила"
           value={title}
           onValueChange={setTitle}
         />
         <Select
+          color="warning"
           variant="underlined"
+          selectedKeys={[category]}
+          onChange={(e) => {
+            setCategory(!!e.target.value ? e.target.value : category);
+          }}
           label="Выберите категорию"
           className="max-w-xs"
         >
@@ -143,6 +138,13 @@ const RuleEditor = () => {
             </SelectItem>
           ))}
         </Select>
+        <Button
+          color="warning"
+          variant="light"
+          className="h-14 data-[hover=true]:bg-transparent md:w-56"
+        >
+          Добавить
+        </Button>
       </div>
       <EditorProvider
         slotBefore={<EditorMenuBar />}
@@ -151,7 +153,6 @@ const RuleEditor = () => {
       >
         <></>
       </EditorProvider>
-      <Button variant="bordered">Добавить правило</Button>
     </div>
   );
 };
