@@ -58,7 +58,7 @@ const Product = () => {
           src={activeImg}
           className="aspect-square h-full w-full rounded-xl object-cover"
         />
-        <div className="flex h-24 flex-row justify-between gap-4">
+        <div className="flex h-24 flex-row justify-between gap-1 md:gap-4">
           {product.images.map((image, index) => (
             <Image
               alt=""
@@ -83,7 +83,7 @@ const Product = () => {
         <h6 className="flex flex-row text-2xl font-semibold text-red-100">
           {product.price} <FaRubleSign size={20} className="mt-[.3rem]" />
         </h6>
-        <div className="flex flex-row items-center gap-12">
+        <div className="flex flex-row items-center gap-2 md:gap-12">
           <div className="flex flex-row items-center">
             <button
               className="rounded-lg bg-red-100 px-5 py-2 text-3xl text-red-950"

@@ -40,7 +40,7 @@ export default function Shop() {
       </Head>
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
       <main className="flex min-h-screen flex-1 flex-col py-24">
-        <div className="container grid grid-cols-2 gap-12 md:grid-cols-3 lg:grid-cols-4">
+        <div className="container grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-12 lg:grid-cols-4">
           {!!isAdmin && <AddProduct onClose={refetch} />}
           {!!products.length &&
             products.map((product) => (

@@ -9,33 +9,10 @@ import {
   ModalHeader,
 } from "@nextui-org/react";
 import { useState } from "react";
-import { api } from "~/utils/api";
+// import { api } from "~/utils/api";
 import { FaShoppingCart } from "react-icons/fa";
-import type { Product, ProductImage } from "~/server/api/routers/shop";
-import { LoadingSpinner } from "~/components/Loading";
-import { FaRubleSign } from "react-icons/fa";
-
-const sampleImages: ProductImage[] = [
-  { id: 1, source: "/tmp/0.jpg", productId: 1 },
-  { id: 2, source: "/tmp/1.jpg", productId: 1 },
-  { id: 3, source: "/tmp/2.jpg", productId: 1 },
-  { id: 4, source: "/tmp/3.jpg", productId: 1 },
-];
-
-const sampleProduct: Product = {
-  id: 1,
-  title: "Кроссовки",
-  subtitle: "Просто кроссовки",
-  description: "Эти кроссовки такие кроссовки офигеть просто",
-  size: null,
-  color: null,
-  colorsAvailabe: null,
-  stock: 10,
-  price: 100,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  images: sampleImages,
-};
+// import { LoadingSpinner } from "~/components/Loading";
+// import { FaRubleSign } from "react-icons/fa";
 
 const FormOrder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,10 +22,10 @@ const FormOrder = () => {
   //   const { mutate: createMutation, isPending } =
   //     api.shop.createProduct.useMutation();
 
-  const resetForm = () => {
-    setAddress("");
-    setDescription("");
-  };
+  // const resetForm = () => {
+  //   setAddress("");
+  //   setDescription("");
+  // };
 
   const handleFormSubmit = () => {
     // createMutation(
