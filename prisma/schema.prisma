@@ -26,6 +26,18 @@ model Post {
   @@index([name])
 }
 
+model Rule {
+  id          Int      @id @default(autoincrement())
+  name        String
+  link        String
+  categoryId  Int
+  content     String   @db.LongText
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+}
+
 model Product {
   id             Int            @id @default(autoincrement())
   title          String
@@ -86,6 +98,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
+  rules         Rule[]
 }
 
 model VerificationToken {
