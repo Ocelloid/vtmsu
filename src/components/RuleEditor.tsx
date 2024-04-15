@@ -104,7 +104,7 @@ const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
 
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
-    TextStyle.configure({ types: [ListItem.name] }),
+    TextStyle.configure(),
     StarterKit.configure({
       bulletList: {
         keepMarks: true,
