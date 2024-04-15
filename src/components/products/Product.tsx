@@ -8,11 +8,9 @@ import { useCartStore } from "../../stores/useCartStore";
 import { FaRubleSign } from "react-icons/fa";
 import { api } from "~/utils/api";
 import EditProduct from "~/components/modals/editProuct";
-import { useSession } from "next-auth/react";
 
 const Product = () => {
   const addToCart = useCartStore((state) => state.addToCart);
-  const { data: sessionData } = useSession();
   const router = useRouter();
   const [activeImg, setActiveImage] = useState("");
   const [amount, setAmount] = useState(1);
@@ -33,12 +31,7 @@ const Product = () => {
   );
 
   const { data: isAdmin, isLoading: isUserLoading } =
-    api.user.userIsAdmin.useQuery(
-      { id: sessionData?.user.id ?? "" },
-      {
-        enabled: !!sessionData,
-      },
-    );
+    api.user.userIsAdmin.useQuery();
 
   useEffect(() => {
     setProduct(data!);

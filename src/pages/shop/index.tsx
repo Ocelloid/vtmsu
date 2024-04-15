@@ -5,19 +5,12 @@ import CartDrawer from "~/components/products/CartDrawer";
 import { api } from "~/utils/api";
 import { LoadingPage } from "~/components/Loading";
 import AddProduct from "~/components/modals/addProduct";
-import { useSession } from "next-auth/react";
 
 export default function Shop() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { data: sessionData } = useSession();
 
   const { data: isAdmin, isLoading: isUserLoading } =
-    api.user.userIsAdmin.useQuery(
-      { id: sessionData?.user.id ?? "" },
-      {
-        enabled: !!sessionData,
-      },
-    );
+    api.user.userIsAdmin.useQuery();
 
   const handleCartIconClick = () => {
     setIsDrawerOpen(!isDrawerOpen);
