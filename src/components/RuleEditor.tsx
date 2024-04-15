@@ -1,15 +1,18 @@
 import { Input, Select, SelectItem, Button } from "@nextui-org/react";
-import { EditorProvider, useCurrentEditor } from "@tiptap/react";
+import { EditorContent, type Editor, useEditor } from "@tiptap/react";
 import { Color } from "@tiptap/extension-color";
 import StarterKit from "@tiptap/starter-kit";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
-import { useState } from "react";
-import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { api } from "~/utils/api";
+import { translit } from "~/utils/text";
+import { FaUndoAlt, FaRedoAlt, FaRegSave, FaTrashAlt } from "react-icons/fa";
+import { type Rule } from "~/server/api/routers/rule";
+import { useRouter } from "next/router";
+import { LoadingPage } from "~/components/Loading";
 
-export const EditorMenuBar = () => {
-  const { editor } = useCurrentEditor();
-
+export const EditorMenuBar = ({ editor }: { editor: Editor }) => {
   if (!editor) {
     return null;
   }
@@ -86,10 +89,13 @@ export const EditorMenuBar = () => {
   );
 };
 
-const RuleEditor = () => {
+const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
+  const router = useRouter();
+  const [link, setLink] = useState("");
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("1");
+  const [ruleId, setRuleId] = useState("");
   const [content, setContent] = useState("");
+  const [category, setCategory] = useState("1");
   const categories = [
     { value: 1, label: "Общие правила" },
     { value: 2, label: "Дисциплины" },
@@ -111,6 +117,107 @@ const RuleEditor = () => {
     }),
   ];
 
+  const editor = useEditor(
+    {
+      extensions: extensions,
+      content: content,
+    },
+    [content],
+  );
+
+  useEffect(() => {
+    const id = Array.isArray(router.query.ruleId)
+      ? router.query.ruleId[0] ?? ""
+      : router.query.ruleId ?? "";
+    setRuleId(id);
+  }, [router.query.ruleId]);
+
+  const { mutate: createMutation, isPending: isCreatePending } =
+    api.rule.create.useMutation();
+  const { mutate: updateMutation, isPending: isUpdatePending } =
+    api.rule.update.useMutation();
+  const { mutate: deleteMutation, isPending: isDeletePending } =
+    api.rule.delete.useMutation();
+
+  const { data: ruleData, isLoading: isRuleLoading } =
+    api.rule.findById.useQuery({ id: Number(ruleId) }, { enabled: !!ruleId });
+
+  useEffect(() => {
+    if (!!ruleData) {
+      setLink(ruleData.link);
+      setTitle(ruleData.name);
+      setContent(ruleData.content);
+      setCategory(ruleData.categoryId.toString());
+    }
+  }, [ruleData]);
+
+  const isEmpty = () => {
+    return editor?.getHTML() === `<p></p>`;
+  };
+
+  const handleRuleSubmit = () => {
+    const ruleConfirm = confirm("Сохранить правило?");
+    if (ruleConfirm)
+      if (ruleId) {
+        updateMutation(
+          {
+            id: Number(ruleId),
+            name: title,
+            link: link ?? translit(title),
+            content: editor?.getHTML() ?? "",
+            categoryId: Number(category),
+          },
+          {
+            onSuccess: (data) => {
+              setLink("");
+              setTitle("");
+              setCategory("1");
+              editor?.commands.clearContent();
+              onSubmit(data);
+            },
+          },
+        );
+      } else {
+        createMutation(
+          {
+            name: title,
+            link: link ?? translit(title),
+            content: editor?.getHTML() ?? "",
+            categoryId: Number(category),
+          },
+          {
+            onSuccess: (data) => {
+              setLink("");
+              setTitle("");
+              setCategory("1");
+              editor?.commands.clearContent();
+              onSubmit(data);
+            },
+          },
+        );
+      }
+  };
+
+  const handleRuleDelete = () => {
+    const deleteConfirm = confirm("Удалить правило?");
+    if (deleteConfirm)
+      deleteMutation(
+        { id: Number(ruleId) },
+        {
+          onSuccess: () => {
+            setLink("");
+            setTitle("");
+            setCategory("1");
+            editor?.commands.clearContent();
+            onSubmit();
+          },
+        },
+      );
+  };
+
+  if (isRuleLoading || isCreatePending || isUpdatePending || isDeletePending)
+    return <LoadingPage />;
+
   return (
     <div className="flex h-full w-full flex-col gap-2">
       <div className="flex flex-col gap-2 md:flex-row">
@@ -121,6 +228,14 @@ const RuleEditor = () => {
           placeholder="Введите название правила"
           value={title}
           onValueChange={setTitle}
+        />
+        <Input
+          variant="underlined"
+          color="warning"
+          label="Ссылка"
+          placeholder="Введите короткую ссылку"
+          value={link}
+          onValueChange={setLink}
         />
         <Select
           color="warning"
@@ -138,21 +253,30 @@ const RuleEditor = () => {
             </SelectItem>
           ))}
         </Select>
-        <Button
-          color="warning"
-          variant="light"
-          className="h-14 data-[hover=true]:bg-transparent md:w-56"
-        >
-          Добавить
-        </Button>
+        <div className="flex min-w-[8.25rem] flex-row gap-1">
+          <Button
+            isDisabled={!title || !link || isEmpty()}
+            onClick={handleRuleSubmit}
+            color="warning"
+            variant="light"
+            className="h-14 w-full min-w-0 data-[hover=true]:bg-transparent"
+          >
+            <FaRegSave size={32} />
+          </Button>
+          {!!ruleId && (
+            <Button
+              onClick={handleRuleDelete}
+              color="danger"
+              variant="light"
+              className="h-14 w-full min-w-0 data-[hover=true]:bg-transparent"
+            >
+              <FaTrashAlt size={32} />
+            </Button>
+          )}
+        </div>
       </div>
-      <EditorProvider
-        slotBefore={<EditorMenuBar />}
-        extensions={extensions}
-        content={content}
-      >
-        <></>
-      </EditorProvider>
+      <EditorMenuBar editor={editor!} />
+      <EditorContent editor={editor} />
     </div>
   );
 };

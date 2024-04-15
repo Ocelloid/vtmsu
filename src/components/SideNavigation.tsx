@@ -10,19 +10,37 @@ type DefaultSideNavLink = Partial<typeof defaultSideNavLink>;
 const defaultSideNavLink = {
   duration: 1000,
 };
-type SideNavProps = { links: SideNavLink[] };
-type WithSideNavProps = SideNavProps & {
-  children: string | JSX.Element | JSX.Element[];
+
+type SideNavProps = {
+  links: SideNavLink[];
+  onClick?: (link: string) => void;
+  sideNavClass?: string;
+} & DefaultSideNavProps;
+type DefaultSideNavProps = Partial<typeof defaultSideNavProps>;
+const defaultSideNavProps = {
+  sideNavClass: "fixed left-0 top-0 w-64 gap-8 px-4 pt-24",
 };
 
-export default function SideNavigation(props: SideNavProps) {
+type WithSideNavProps = SideNavProps & {
+  children: string | JSX.Element | JSX.Element[];
+  childrenClass?: string;
+} & DefaultWithSideNavProps;
+type DefaultWithSideNavProps = Partial<typeof defaultWithSideNavProps>;
+const defaultWithSideNavProps = {
+  childrenClass: "[&>*]:-mb-16 [&>*]:w-full [&>*]:pt-24 px-4 pb-32 sm:ml-48",
+};
+
+const SideNavigation = (props: SideNavProps) => {
   return (
     <aside
       id="default-sidebar"
-      className="fixed left-0 top-0 z-40 flex h-screen w-64 -translate-x-full flex-col gap-8 px-4 pt-24 transition-transform sm:translate-x-0"
+      className={`${props.sideNavClass} h-screen-translate-x-full z-40 flex flex-col transition-transform sm:translate-x-0`}
     >
       {props.links?.map((link, index) => (
         <Link
+          onClick={() => {
+            if (!!props.onClick) props.onClick(link.section);
+          }}
           key={`sidenavlink_${index}`}
           activeClass="active"
           className="cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
@@ -36,17 +54,29 @@ export default function SideNavigation(props: SideNavProps) {
       ))}
     </aside>
   );
-}
+};
+SideNavigation.defaultProps = defaultSideNavProps;
 
-export function WithSideNavigation(props: WithSideNavProps) {
+export default SideNavigation;
+
+const WithSideNavigation = (props: WithSideNavProps) => {
   return (
     <>
       <div className="flex flex-col">
-        <SideNavigation links={props.links} />
+        <SideNavigation
+          links={props.links}
+          onClick={props.onClick}
+          sideNavClass={props.sideNavClass}
+        />
       </div>
-      <div className="flex max-w-[1280px] flex-col items-center justify-center px-4 pb-32 sm:ml-48 [&>*]:-mb-16 [&>*]:w-full [&>*]:pt-24">
+      <div
+        className={`${props.childrenClass} flex max-w-[1280px] flex-col items-center justify-center`}
+      >
         {props.children}
       </div>
     </>
   );
-}
+};
+WithSideNavigation.defaultProps = defaultWithSideNavProps;
+
+export { WithSideNavigation };

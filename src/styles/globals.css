@@ -21,7 +21,10 @@
   > * + * {
     margin-top: 0.75em;
   }
+}
 
+.tiptap,
+.tiptap-display {
   ul,
   ol {
     padding: 0 1rem;
