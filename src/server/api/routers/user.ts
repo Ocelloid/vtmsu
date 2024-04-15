@@ -1,19 +1,50 @@
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+export type User = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  isAdmin: boolean;
+  isPersonnel: boolean;
+  emailVerified: Date | null;
+  image: string | null;
+};
 
 export const userRouter = createTRPCRouter({
-  userIsAdmin: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({ where: { id: input.id } });
-      return user!.isAdmin;
-    }),
+  getUserList: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+    });
+    const users = await ctx.db.user.findMany();
+    return user?.isAdmin ? users : [];
+  }),
 
-  userIsPersonnel: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({ where: { id: input.id } });
-      return user!.isPersonnel;
+  userIsAdmin: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+    });
+    return user!.isAdmin;
+  }),
+
+  userIsPersonnel: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+    });
+    return user!.isPersonnel;
+  }),
+
+  userRoleChange: protectedProcedure
+    .input(z.object({ id: z.string(), role: z.string(), change: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      const newData =
+        input.role === "admin"
+          ? { isAdmin: input.change }
+          : { isPersonnel: input.change };
+      const user = ctx.db.user.update({
+        where: { id: input.id },
+        data: newData,
+      });
+      return user;
     }),
 });

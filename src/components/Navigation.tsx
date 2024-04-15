@@ -45,7 +45,7 @@ const Navigation = () => {
         </div>
       </div>
       <ul
-        className={`${!isOpen && "hidden"} items-right font-montserrat mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex md:flex-row md:justify-end md:gap-4`}
+        className={`${!isOpen && "hidden"} items-right mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex md:flex-row md:justify-end md:gap-4`}
       >
         <Button
           onClick={() => {
@@ -53,7 +53,7 @@ const Navigation = () => {
             pathOpen("about");
           }}
           variant="bordered"
-          className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+          className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
         >
           Об игре
         </Button>
@@ -65,7 +65,7 @@ const Navigation = () => {
                 pathOpen("game");
               }}
               variant="bordered"
-              className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
             >
               Играть
             </Button>
@@ -75,7 +75,7 @@ const Navigation = () => {
                 pathOpen("characters");
               }}
               variant="bordered"
-              className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
             >
               Персонажи
             </Button>
@@ -87,7 +87,7 @@ const Navigation = () => {
             pathOpen("rules");
           }}
           variant="bordered"
-          className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+          className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
         >
           Правила
         </Button>
@@ -97,7 +97,7 @@ const Navigation = () => {
             pathOpen("shop");
           }}
           variant="bordered"
-          className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300"
+          className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
         >
           Магазин
         </Button>
@@ -109,7 +109,7 @@ const Navigation = () => {
                 pathOpen("admin");
               }}
               variant="bordered"
-              className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
+              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
             >
               Управление
             </Button>
@@ -119,7 +119,7 @@ const Navigation = () => {
                 pathOpen("settings");
               }}
               variant="bordered"
-              className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-2 hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
+              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
             >
               Настройки
             </Button>
@@ -129,7 +129,7 @@ const Navigation = () => {
                 void signOut();
               }}
               variant="bordered"
-              className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-0 text-red-500 md:hidden"
+              className="w-min min-w-10 border-none px-4 py-0 text-medium text-red-500 md:hidden"
             >
               Выйти
             </Button>
@@ -144,7 +144,7 @@ const Navigation = () => {
                       className: "w-10 h-8",
                       src: sessionData.user.image ?? "",
                     }}
-                    className="font-montserrat text-medium hidden border-none hover:text-gray-300 md:flex"
+                    className="hidden border-none text-medium hover:text-gray-300 md:flex"
                     name={sessionData.user.name}
                   />
                 </div>
@@ -154,7 +154,6 @@ const Navigation = () => {
                 disabledKeys={[]}
                 itemClasses={{
                   title: [
-                    "font-montserrat",
                     "text-medium",
                     "dark:hover:text-gray-300",
                     "hover:text-gray-700",
@@ -194,7 +193,7 @@ const Navigation = () => {
               void signIn();
             }}
             variant="bordered"
-            className="font-montserrat text-medium w-min min-w-10 border-none px-4 py-0 hover:text-gray-700 dark:hover:text-gray-300"
+            className="w-min min-w-10 border-none px-4 py-0 text-medium hover:text-gray-700 dark:hover:text-gray-300"
           >
             Войти
           </Button>

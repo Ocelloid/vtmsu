@@ -1,6 +1,5 @@
 import { Tab, Tabs, Button, Tooltip } from "@nextui-org/react";
 import Head from "next/head";
-import { useSession } from "next-auth/react";
 import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
 import RuleEditor from "~/components/RuleEditor";
@@ -14,18 +13,12 @@ export default function Rules() {
   const categoryKeys = ["common", "disciplines", "rituals"];
   const categoryTitles = ["Общие", "Дисциплины", "Ритуалы"];
   const { data, isLoading } = api.post.getAll.useQuery();
-  const { data: sessionData } = useSession();
   const router = useRouter();
   const [category, setCategory] = useState<string>("");
   const [rules, setRules] = useState<Rule[]>([]);
 
   const { data: isPersonnel, isLoading: isUserLoading } =
-    api.user.userIsPersonnel.useQuery(
-      { id: sessionData?.user.id ?? "" },
-      {
-        enabled: !!sessionData,
-      },
-    );
+    api.user.userIsPersonnel.useQuery();
 
   const {
     data: rulesData,
@@ -164,7 +157,7 @@ export default function Rules() {
                 key={cat}
                 title={
                   <div className="flex items-center space-x-2">
-                    <span className="font-montserrat">{categoryTitles[i]}</span>
+                    <span>{categoryTitles[i]}</span>
                   </div>
                 }
               >
@@ -209,7 +202,7 @@ export default function Rules() {
                 key="editor"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span className="font-montserrat">Редактор</span>
+                    <span>Редактор</span>
                   </div>
                 }
               >
