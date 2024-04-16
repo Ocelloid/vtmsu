@@ -190,7 +190,7 @@ export default function Rules() {
                           placement="right"
                         >
                           <h2
-                            className="cursor-pointer pb-2 text-2xl"
+                            className="cursor-pointer pb-2 text-4xl"
                             onClick={() => handleRuleCopy(rule.link)}
                           >
                             {rule.name}
