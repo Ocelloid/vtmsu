@@ -69,7 +69,7 @@ export default function Admin() {
           >
             <Tab
               key={"users"}
-              className="flex flex-col gap-8"
+              className="flex flex-col gap-8 md:gap-2"
               title={
                 <div className="flex items-center space-x-2">
                   <span>Пользователи</span>
