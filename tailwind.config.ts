@@ -12,13 +12,6 @@ export default withUt({
     container: {
       center: true,
       padding: "1rem",
-      screens: {
-        sm: "480px",
-        md: "640px",
-        lg: "860px",
-        xl: "1096px",
-        "2xl": "1280px",
-      },
     },
     extend: {
       fontFamily: {
