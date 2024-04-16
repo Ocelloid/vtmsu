@@ -9,7 +9,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <div
-      className="group mt-16 flex h-80 w-40 cursor-pointer flex-col rounded-2xl bg-red-950 md:w-60"
+      className="group mt-16 flex h-80 w-40 cursor-pointer flex-col rounded-2xl bg-red-950 md:w-56"
       onClick={() => {
         void router.replace(`/shop/${product.id}`);
       }}
@@ -19,7 +19,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           src={product.images[0]?.source ?? ""}
           width={256}
           height={256}
-          className="absolute -top-8 left-1/2 h-auto w-44 -translate-x-1/2 -rotate-6 rounded-2xl duration-300 group-hover:rotate-0 md:w-52"
+          className="absolute -top-8 left-1/2 h-auto w-40 -translate-x-1/2 -rotate-6 rounded-2xl duration-300 group-hover:rotate-0 md:w-48"
           alt="product image"
         />
       </div>

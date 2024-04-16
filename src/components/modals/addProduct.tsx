@@ -158,7 +158,7 @@ const AddProduct = ({ onClose }: { onClose: () => void }) => {
       </Modal>
       <Button
         onClick={() => setIsModalOpen(true)}
-        className="mt-16 h-80 w-40 flex-col gap-0 rounded-2xl bg-red-950 text-2xl text-red-100 md:w-60"
+        className="mt-16 h-80 w-40 flex-col gap-0 rounded-2xl bg-red-950 text-2xl text-red-100 md:w-56"
       >
         <FaPlusCircle size={64} />
         Добавить <br />
