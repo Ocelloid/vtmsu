@@ -69,7 +69,7 @@ export default function Admin() {
           >
             <Tab
               key={"users"}
-              className="flex flex-col gap-2"
+              className="flex flex-col gap-8"
               title={
                 <div className="flex items-center space-x-2">
                   <span>Пользователи</span>
@@ -77,7 +77,7 @@ export default function Admin() {
               }
             >
               {users.map((user) => (
-                <div key={user.id} className="flex flex-row gap-4">
+                <div key={user.id} className="flex flex-col gap-4 md:flex-row">
                   <UserIcon
                     name={user.name}
                     className="mr-auto"
@@ -86,25 +86,27 @@ export default function Admin() {
                       src: user.image ?? "",
                     }}
                   />
-                  <Checkbox
-                    color="warning"
-                    isSelected={user.isPersonnel}
-                    onValueChange={(e) =>
-                      handleUserRoleChange(e, user.id, "personnel")
-                    }
-                  >
-                    Персонал
-                  </Checkbox>
-                  <Checkbox
-                    color="success"
-                    isDisabled={!user.isPersonnel}
-                    isSelected={user.isAdmin}
-                    onValueChange={(e) =>
-                      handleUserRoleChange(e, user.id, "admin")
-                    }
-                  >
-                    Администратор
-                  </Checkbox>
+                  <div className="flex flex-row gap-4">
+                    <Checkbox
+                      color="warning"
+                      isSelected={user.isPersonnel}
+                      onValueChange={(e) =>
+                        handleUserRoleChange(e, user.id, "personnel")
+                      }
+                    >
+                      Персонал
+                    </Checkbox>
+                    <Checkbox
+                      color="success"
+                      isDisabled={!user.isPersonnel}
+                      isSelected={user.isAdmin}
+                      onValueChange={(e) =>
+                        handleUserRoleChange(e, user.id, "admin")
+                      }
+                    >
+                      Администратор
+                    </Checkbox>
+                  </div>
                 </div>
               ))}
             </Tab>
