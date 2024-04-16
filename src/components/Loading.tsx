@@ -37,7 +37,7 @@ export const LoadingPage = () => {
   return (
     <>
       <Head>
-        <title>Загрузка</title>
+        <title>Маскарад Вампиров</title>
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
