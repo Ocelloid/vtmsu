@@ -14,9 +14,22 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import EditorMenu from "~/components/EditorMenu";
 import { EditorContent, useEditor } from "@tiptap/react";
+import Placeholder from "@tiptap/extension-placeholder";
 
 const DefaultEditor = () => {
   const extensions = [
+    Placeholder.configure({
+      // Use a placeholder:
+      placeholder: "Ваш текст",
+      // Use different placeholders depending on the node type:
+      // placeholder: ({ node }) => {
+      //   if (node.type.name === 'heading') {
+      //     return 'What’s the title?'
+      //   }
+
+      //   return 'Can you add some further context?'
+      // },
+    }),
     Text,
     Document,
     Paragraph,

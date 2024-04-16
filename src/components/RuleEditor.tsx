@@ -14,6 +14,7 @@ import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
+import Placeholder from "@tiptap/extension-placeholder";
 import { useState, useEffect } from "react";
 import { FaRegSave, FaTrashAlt, FaImage } from "react-icons/fa";
 import { api } from "~/utils/api";
@@ -37,6 +38,10 @@ const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
   ];
 
   const extensions = [
+    Placeholder.configure({
+      placeholder:
+        "Чтобы добавить в правила большой заголовок, введите 1 пробел",
+    }),
     Text,
     Document,
     Paragraph,
