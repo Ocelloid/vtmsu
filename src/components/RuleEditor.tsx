@@ -20,6 +20,7 @@ export const EditorMenuBar = ({ editor }: { editor: Editor }) => {
   return (
     <div className="grid grid-cols-3 justify-between gap-1 text-red-300 md:grid-cols-12 [&>*]:rounded-md [&>*]:border-1 [&>*]:border-red-100/20">
       <button
+        tabIndex={100}
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
         className={"font-bold"}
@@ -27,6 +28,7 @@ export const EditorMenuBar = ({ editor }: { editor: Editor }) => {
         b
       </button>
       <button
+        tabIndex={101}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         className={"italic"}
@@ -34,6 +36,7 @@ export const EditorMenuBar = ({ editor }: { editor: Editor }) => {
         i
       </button>
       <button
+        tabIndex={102}
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
         className={"line-through"}
@@ -41,33 +44,49 @@ export const EditorMenuBar = ({ editor }: { editor: Editor }) => {
         s
       </button>
       <button
+        tabIndex={102}
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
       >
         h1
       </button>
       <button
+        tabIndex={103}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
         h2
       </button>
       <button
+        tabIndex={104}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
         h3
       </button>
-      <button onClick={() => editor.chain().focus().setParagraph().run()}>
+      <button
+        tabIndex={105}
+        onClick={() => editor.chain().focus().setParagraph().run()}
+      >
         p
       </button>
-      <button onClick={() => editor.chain().focus().toggleBulletList().run()}>
+      <button
+        tabIndex={106}
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+      >
         список
       </button>
-      <button onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+      <button
+        tabIndex={107}
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+      >
         цитата
       </button>
-      <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+      <button
+        tabIndex={108}
+        onClick={() => editor.chain().focus().setHorizontalRule().run()}
+      >
         раздел
       </button>
       <button
+        tabIndex={109}
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().chain().focus().undo().run()}
         className={
@@ -77,6 +96,7 @@ export const EditorMenuBar = ({ editor }: { editor: Editor }) => {
         <FaUndoAlt size={12} className="mx-auto" />
       </button>
       <button
+        tabIndex={110}
         onClick={() => editor.chain().focus().redo().run()}
         disabled={!editor.can().chain().focus().redo().run()}
         className={
@@ -276,7 +296,7 @@ const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
         </div>
       </div>
       <EditorMenuBar editor={editor!} />
-      <EditorContent editor={editor} />
+      <EditorContent tabIndex={4} editor={editor} />
     </div>
   );
 };
