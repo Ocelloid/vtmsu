@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { type Rule } from "~/server/api/routers/rule";
 import { Element, scroller } from "react-scroll";
-import { FaPencilAlt } from "react-icons/fa";
+import { FaPencilAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
 
 export default function Rules() {
   const categoryKeys = ["common", "disciplines", "rituals"];
@@ -19,6 +19,9 @@ export default function Rules() {
 
   const { data: isPersonnel, isLoading: isUserLoading } =
     api.user.userIsPersonnel.useQuery();
+
+  const { mutate: changeOrder, isPending: isOrderLoading } =
+    api.rule.changeOrder.useMutation();
 
   const {
     data: rulesData,
@@ -55,6 +58,23 @@ export default function Rules() {
       },
       undefined,
       { shallow: true },
+    );
+  };
+
+  const handleRuleOrderChange = (rule: Rule, order: string) => {
+    changeOrder(
+      { id: rule.id, order: order },
+      {
+        onSuccess: (data) => {
+          refetch()
+            .then(() => {
+              setTimeout(() => {
+                handleRuleFind(data!);
+              }, 200);
+            })
+            .catch((e) => console.log(e));
+        },
+      },
     );
   };
 
@@ -163,6 +183,7 @@ export default function Rules() {
               >
                 {rules
                   .filter((x) => x.categoryId === i + 1)
+                  .sort((a, b) => a.orderedAs - b.orderedAs)
                   .map((rule) => (
                     <Element key={rule.id} className="section" name={rule.link}>
                       <div className="flex flex-row">
@@ -179,14 +200,37 @@ export default function Rules() {
                           </h2>
                         </Tooltip>
                         {isPersonnel && (
-                          <Button
-                            variant="bordered"
-                            color="warning"
-                            className="ml-auto h-8 w-8 min-w-0 p-0"
-                            onClick={() => handleRuleEdit(rule)}
-                          >
-                            <FaPencilAlt size={16} />
-                          </Button>
+                          <div className="ml-auto flex flex-row gap-2">
+                            <Button
+                              isDisabled={isOrderLoading}
+                              variant="bordered"
+                              color="warning"
+                              className="h-8 w-8 min-w-0 rounded-full p-0"
+                              onClick={() => handleRuleOrderChange(rule, "up")}
+                            >
+                              <FaArrowUp size={16} />
+                            </Button>
+                            <Button
+                              isDisabled={isOrderLoading}
+                              variant="bordered"
+                              color="warning"
+                              className="h-8 w-8 min-w-0 rounded-full p-0"
+                              onClick={() =>
+                                handleRuleOrderChange(rule, "down")
+                              }
+                            >
+                              <FaArrowDown size={16} />
+                            </Button>
+                            <Button
+                              isDisabled={isOrderLoading}
+                              variant="bordered"
+                              color="warning"
+                              className="h-8 w-8 min-w-0 rounded-full p-0"
+                              onClick={() => handleRuleEdit(rule)}
+                            >
+                              <FaPencilAlt size={16} />
+                            </Button>
+                          </div>
                         )}
                       </div>
                       <div

@@ -10,6 +10,7 @@ export type Rule = {
   id: number;
   name: string;
   link: string;
+  orderedAs: number;
   categoryId: number;
   content: string;
 };
@@ -25,11 +26,17 @@ export const ruleRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const categoryOrder = await ctx.db.rule.findFirst({
+        orderBy: { orderedAs: "desc" },
+        select: { orderedAs: true },
+      });
+      const orderedAs = categoryOrder ? categoryOrder.orderedAs + 1 : 1;
       return ctx.db.rule.create({
         data: {
           name: input.name,
           content: input.content,
           link: input.link,
+          orderedAs: orderedAs,
           categoryId: input.categoryId,
           createdById: ctx.session.user.id,
         },
@@ -64,6 +71,45 @@ export const ruleRouter = createTRPCRouter({
       return ctx.db.rule.delete({
         where: { id: input.id },
       });
+    }),
+
+  changeOrder: protectedProcedure
+    .input(z.object({ id: z.number(), order: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const thisRule = await ctx.db.rule.findUnique({
+        where: { id: input.id },
+      });
+      let newRule = thisRule;
+      if (input.order === "up") {
+        const prevRule = await ctx.db.rule.findFirst({
+          where: { orderedAs: { lt: thisRule!.orderedAs } },
+        });
+        if (prevRule) {
+          await ctx.db.rule.update({
+            where: { id: prevRule.id },
+            data: { orderedAs: thisRule!.orderedAs },
+          });
+          newRule = await ctx.db.rule.update({
+            where: { id: input.id },
+            data: { orderedAs: prevRule.orderedAs },
+          });
+        }
+      } else {
+        const nextRule = await ctx.db.rule.findFirst({
+          where: { orderedAs: { gt: thisRule!.orderedAs } },
+        });
+        if (nextRule) {
+          await ctx.db.rule.update({
+            where: { id: nextRule.id },
+            data: { orderedAs: thisRule!.orderedAs },
+          });
+          newRule = await ctx.db.rule.update({
+            where: { id: input.id },
+            data: { orderedAs: nextRule.orderedAs },
+          });
+        }
+      }
+      return newRule;
     }),
 
   findById: publicProcedure

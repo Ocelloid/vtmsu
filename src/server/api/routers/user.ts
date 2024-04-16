@@ -1,4 +1,8 @@
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { z } from "zod";
 
 export type User = {
@@ -20,18 +24,18 @@ export const userRouter = createTRPCRouter({
     return user?.isAdmin ? users : [];
   }),
 
-  userIsAdmin: protectedProcedure.query(async ({ ctx }) => {
+  userIsAdmin: publicProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
-      where: { id: ctx.session.user.id },
+      where: { id: ctx.session ? ctx.session.user.id : "" },
     });
-    return user!.isAdmin;
+    return user ? user.isAdmin : false;
   }),
 
-  userIsPersonnel: protectedProcedure.query(async ({ ctx }) => {
+  userIsPersonnel: publicProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
-      where: { id: ctx.session.user.id },
+      where: { id: ctx.session ? ctx.session.user.id : "" },
     });
-    return user!.isPersonnel;
+    return user ? user.isPersonnel : false;
   }),
 
   userRoleChange: protectedProcedure

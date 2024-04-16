@@ -31,6 +31,7 @@ model Rule {
   name        String
   link        String
   categoryId  Int
+  orderedAs   Int
   content     String   @db.LongText
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
