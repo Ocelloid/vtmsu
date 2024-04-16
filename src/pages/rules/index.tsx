@@ -181,61 +181,70 @@ export default function Rules() {
                 {rules
                   .filter((x) => x.categoryId === cat.value)
                   .sort((a, b) => a.orderedAs - b.orderedAs)
-                  .map((rule) => (
-                    <Element key={rule.id} className="section" name={rule.link}>
-                      <div className="flex flex-row">
-                        <Tooltip
-                          className="rounded-md text-tiny text-default-500"
-                          content={"Скопировать ссылку"}
-                          placement="right"
-                        >
-                          <h2
-                            className={`cursor-pointer pb-2 ${rule.content === "<p> </p>" ? "text-4xl" : "text-2xl"}`}
-                            onClick={() => handleRuleCopy(rule.link)}
+                  .map((rule, i, arr) => {
+                    const isFirst = arr[0]!.orderedAs === rule.orderedAs;
+                    return (
+                      <Element
+                        key={rule.id}
+                        className="section"
+                        name={rule.link}
+                      >
+                        <div className="flex flex-row">
+                          <Tooltip
+                            className="rounded-md text-tiny text-default-500"
+                            content={"Скопировать ссылку"}
+                            placement="right"
                           >
-                            {rule.name}
-                          </h2>
-                        </Tooltip>
-                        {isPersonnel && (
-                          <div className="ml-auto flex flex-row gap-2">
-                            <Button
-                              isDisabled={isOrderLoading}
-                              variant="bordered"
-                              color="warning"
-                              className="h-8 w-8 min-w-0 rounded-full p-0"
-                              onClick={() => handleRuleOrderChange(rule, "up")}
+                            <h2
+                              className={`cursor-pointer pb-2 ${rule.content === "<p> </p>" ? "text-4xl" : "text-2xl"}`}
+                              onClick={() => handleRuleCopy(rule.link)}
                             >
-                              <FaArrowUp size={16} />
-                            </Button>
-                            <Button
-                              isDisabled={isOrderLoading}
-                              variant="bordered"
-                              color="warning"
-                              className="h-8 w-8 min-w-0 rounded-full p-0"
-                              onClick={() =>
-                                handleRuleOrderChange(rule, "down")
-                              }
-                            >
-                              <FaArrowDown size={16} />
-                            </Button>
-                            <Button
-                              isDisabled={isOrderLoading}
-                              variant="bordered"
-                              color="warning"
-                              className="h-8 w-8 min-w-0 rounded-full p-0"
-                              onClick={() => handleRuleEdit(rule)}
-                            >
-                              <FaPencilAlt size={16} />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                      <div
-                        className="tiptap-display pb-8 text-justify"
-                        dangerouslySetInnerHTML={{ __html: rule.content }}
-                      />
-                    </Element>
-                  ))}
+                              {rule.name}
+                            </h2>
+                          </Tooltip>
+                          {isPersonnel && (
+                            <div className="ml-auto flex flex-row gap-2">
+                              <Button
+                                isDisabled={isOrderLoading || isFirst}
+                                variant="bordered"
+                                color="warning"
+                                className="h-8 w-8 min-w-0 rounded-full p-0"
+                                onClick={() =>
+                                  handleRuleOrderChange(rule, "up")
+                                }
+                              >
+                                <FaArrowUp size={16} />
+                              </Button>
+                              <Button
+                                isDisabled={isOrderLoading}
+                                variant="bordered"
+                                color="warning"
+                                className="h-8 w-8 min-w-0 rounded-full p-0"
+                                onClick={() =>
+                                  handleRuleOrderChange(rule, "down")
+                                }
+                              >
+                                <FaArrowDown size={16} />
+                              </Button>
+                              <Button
+                                isDisabled={isOrderLoading}
+                                variant="bordered"
+                                color="warning"
+                                className="h-8 w-8 min-w-0 rounded-full p-0"
+                                onClick={() => handleRuleEdit(rule)}
+                              >
+                                <FaPencilAlt size={16} />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        <div
+                          className="tiptap-display pb-8 text-justify"
+                          dangerouslySetInnerHTML={{ __html: rule.content }}
+                        />
+                      </Element>
+                    );
+                  })}
               </Tab>
             ))}
             {!!isPersonnel && (

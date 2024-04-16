@@ -27,6 +27,7 @@ export const ruleRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const categoryOrder = await ctx.db.rule.findFirst({
+        where: { categoryId: input.categoryId },
         orderBy: { orderedAs: "desc" },
         select: { orderedAs: true },
       });
@@ -81,17 +82,18 @@ export const ruleRouter = createTRPCRouter({
       });
       let newRule = thisRule;
       if (input.order === "up") {
-        const prevRule = await ctx.db.rule.findFirst({
+        const prevRule = await ctx.db.rule.findMany({
           where: { orderedAs: { lt: thisRule!.orderedAs } },
+          take: -1,
         });
-        if (prevRule) {
+        if (prevRule[0]) {
           await ctx.db.rule.update({
-            where: { id: prevRule.id },
+            where: { id: prevRule[0].id },
             data: { orderedAs: thisRule!.orderedAs },
           });
           newRule = await ctx.db.rule.update({
             where: { id: input.id },
-            data: { orderedAs: prevRule.orderedAs },
+            data: { orderedAs: prevRule[0].orderedAs },
           });
         }
       } else {
