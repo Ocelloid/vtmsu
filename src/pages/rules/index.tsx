@@ -10,8 +10,11 @@ import { Element, scroller } from "react-scroll";
 import { FaPencilAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
 
 export default function Rules() {
-  const categoryKeys = ["common", "disciplines", "rituals"];
-  const categoryTitles = ["Общие", "Дисциплины", "Ритуалы"];
+  const categories = [
+    { value: 1, label: "Общие правила" },
+    { value: 2, label: "Дисциплины" },
+    { value: 3, label: "Ритуалы" },
+  ];
   const { data, isLoading } = api.post.getAll.useQuery();
   const router = useRouter();
   const [category, setCategory] = useState<string>("");
@@ -113,18 +116,12 @@ export default function Rules() {
     refetch()
       .then(() => {
         if (rule) {
-          const cat =
-            rule.categoryId == 1
-              ? "common"
-              : rule.categoryId == 2
-                ? "disciplines"
-                : "rituals";
-          setCategory(cat);
+          setCategory(rule.categoryId.toString());
           void router.push(
             {
               pathname: "/rules",
               query: {
-                category: cat,
+                category: rule.categoryId,
                 rule: rule.link,
               },
             },
@@ -132,12 +129,12 @@ export default function Rules() {
             { shallow: true },
           );
         } else {
-          setCategory("common");
+          setCategory("1");
           void router.push(
             {
               pathname: "/rules",
               query: {
-                category: "common",
+                category: "1",
               },
             },
             undefined,
@@ -172,17 +169,17 @@ export default function Rules() {
               tab: "first:ml-auto max-w-fit px-0 h-12 last:mr-auto md:last:mr-0",
             }}
           >
-            {categoryKeys.map((cat, i) => (
+            {categories.map((cat) => (
               <Tab
-                key={cat}
+                key={cat.value}
                 title={
                   <div className="flex items-center space-x-2">
-                    <span>{categoryTitles[i]}</span>
+                    <span>{cat.label}</span>
                   </div>
                 }
               >
                 {rules
-                  .filter((x) => x.categoryId === i + 1)
+                  .filter((x) => x.categoryId === cat.value)
                   .sort((a, b) => a.orderedAs - b.orderedAs)
                   .map((rule) => (
                     <Element key={rule.id} className="section" name={rule.link}>
