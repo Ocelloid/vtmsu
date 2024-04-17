@@ -7,10 +7,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url      = env("DATABASE_URL")
 }
 
@@ -24,6 +20,16 @@ model Post {
   createdById String
 
   @@index([name])
+}
+
+model Char {
+  id          Int      @id @default(autoincrement())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  content     String?  @db.LongText
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
 }
 
 model Rule {
@@ -69,11 +75,11 @@ model Account {
   provider          String
   providerAccountId String
   refresh_token     String? @db.Text
-  access_token      String? // @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? // @db.Text
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -100,6 +106,7 @@ model User {
   sessions      Session[]
   posts         Post[]
   rules         Rule[]
+  characters    Char[]
 }
 
 model VerificationToken {

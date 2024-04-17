@@ -11,7 +11,7 @@ import { FaPencilAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
 
 export default function Rules() {
   const categories = [
-    { value: 1, label: "Общие правила" },
+    { value: 1, label: "Общие" },
     { value: 2, label: "Дисциплины" },
     { value: 3, label: "Ритуалы" },
   ];

@@ -1,17 +1,27 @@
 import Head from "next/head";
-// import { LoadingPage } from "~/components/Loading";
-// import { api } from "~/utils/api";
+import DefaultCard from "~/components/DefaultCard";
 
 export default function Home() {
-  // const { data, isLoading } = api.post.getAll.useQuery();
-
-  // if (isLoading)
-  //   return (
-  //     <div>
-  //       <LoadingPage />
-  //     </div>
-  //   );
-  // if (!data) return <div>Something went wrong</div>;
+  const links = [
+    {
+      title: "Об игре",
+      subtitle: "Информация об игре",
+      to: "/about",
+      image: "/about.png",
+    },
+    {
+      title: "Правила",
+      subtitle: "Как играть",
+      to: "/rules",
+      image: "/rules.png",
+    },
+    {
+      title: "Магазин",
+      subtitle: "Игровой мерч",
+      to: "/shop",
+      image: "/shop.png",
+    },
+  ];
 
   return (
     <>
@@ -21,7 +31,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className=" flex min-h-screen flex-col items-center justify-center">
-        <div className="container flex flex-col items-center justify-center gap-8 px-4 py-24 text-justify ">
+        <div className="container flex flex-col items-center justify-center gap-4 px-4 pt-24 text-justify ">
           <h1 className="flex flex-col items-center justify-center text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             Маскарад
             <span className="text-[hsla(0,100%,50%,75%)]">Вампиров</span>
@@ -53,6 +63,15 @@ export default function Home() {
             Этому миру тьмы и посвящена наша ролевая игра. На ней вы сможете
             погрузиться в него и примерить на себя маску одного из этих существ.
           </p>
+        </div>
+        <div className="container grid grid-cols-1 gap-8 px-4 pb-8 text-justify sm:grid-cols-3 md:pb-2">
+          {links.map((link, i) => (
+            <DefaultCard
+              className="mx-auto h-40 w-52 md:h-36 md:w-60"
+              {...link}
+              key={i}
+            />
+          ))}
         </div>
       </main>
     </>

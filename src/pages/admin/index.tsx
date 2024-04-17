@@ -54,7 +54,7 @@ export default function Admin() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-screen flex-col pt-24">
+      <main className=" flex min-h-screen flex-col pt-20">
         <div className="container flex flex-col px-4">
           <Tabs
             aria-label="tabs"
@@ -109,6 +109,16 @@ export default function Admin() {
                   </div>
                 </div>
               ))}
+            </Tab>
+            <Tab
+              key={"chars"}
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>Персонажи</span>
+                </div>
+              }
+            >
+              Персонажи
             </Tab>
             <Tab
               key={"items"}

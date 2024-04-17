@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useState } from "react";
-import ProductCard from "~/components/products/ProductCard";
+import DefaultCard from "~/components/DefaultCard";
 import CartDrawer from "~/components/products/CartDrawer";
 import { api } from "~/utils/api";
 import { LoadingPage } from "~/components/Loading";
@@ -32,12 +32,20 @@ export default function Shop() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
-      <main className="flex min-h-screen flex-1 flex-col py-24">
+      <main className="flex min-h-screen flex-1 flex-col pt-20">
         <div className="container grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
           {!!isAdmin && <AddProduct onClose={refetch} />}
           {!!products.length &&
             products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <DefaultCard
+                key={product.id}
+                to={`/shop/${product.id}`}
+                image={product.images[0]?.source ?? ""}
+                price={product.price}
+                title={product.title}
+                subtitle={product.subtitle!}
+                description={product.description!}
+              />
             ))}
         </div>
       </main>

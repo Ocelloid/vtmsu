@@ -9,7 +9,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <div
-      className="group mt-16 flex h-80 w-40 cursor-pointer flex-col rounded-2xl bg-red-950 md:w-56"
+      className="group mt-16 flex h-60 w-40 cursor-pointer flex-col rounded-2xl bg-red-950 md:h-80 md:w-56"
       onClick={() => {
         void router.replace(`/shop/${product.id}`);
       }}
