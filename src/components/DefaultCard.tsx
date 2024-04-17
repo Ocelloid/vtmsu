@@ -1,11 +1,11 @@
 import React from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { useRouter } from "next/router";
 import { FaRubleSign } from "react-icons/fa6";
 
 type DefaultCardProps = {
   to?: string;
-  image?: string;
+  image?: string | StaticImageData;
   price?: number;
   title?: string;
   subtitle?: string;

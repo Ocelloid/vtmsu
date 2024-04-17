@@ -1,5 +1,8 @@
 import Head from "next/head";
 import DefaultCard from "~/components/DefaultCard";
+import about from "~/../public/about.png";
+import rules from "~/../public/rules.png";
+import shop from "~/../public/shop.png";
 
 export default function Home() {
   const links = [
@@ -7,19 +10,19 @@ export default function Home() {
       title: "Об игре",
       subtitle: "Информация об игре",
       to: "/about",
-      image: "/about.png",
+      image: about,
     },
     {
       title: "Правила",
       subtitle: "Как играть",
       to: "/rules",
-      image: "/rules.png",
+      image: rules,
     },
     {
       title: "Магазин",
       subtitle: "Игровой мерч",
       to: "/shop",
-      image: "/shop.png",
+      image: shop,
     },
   ];
 
