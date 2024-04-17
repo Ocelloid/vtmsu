@@ -70,7 +70,7 @@ export default function Home() {
         <div className="container grid grid-cols-1 gap-8 px-4 pb-8 text-justify sm:grid-cols-3 md:pb-2">
           {links.map((link, i) => (
             <DefaultCard
-              className="mx-auto h-40 w-52 md:h-36 md:w-60"
+              className="mx-auto h-40 w-52 md:h-36 md:w-56"
               {...link}
               key={i}
             />
