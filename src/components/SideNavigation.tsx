@@ -18,7 +18,7 @@ type SideNavProps = {
 } & DefaultSideNavProps;
 type DefaultSideNavProps = Partial<typeof defaultSideNavProps>;
 const defaultSideNavProps = {
-  sideNavClass: "fixed left-0 top-0 w-64 gap-8 px-4 pt-24",
+  sideNavClass: "hidden fixed sm:flex left-0 top-0 w-52 gap-8 px-4 pt-24",
 };
 
 type WithSideNavProps = SideNavProps & {
@@ -27,7 +27,7 @@ type WithSideNavProps = SideNavProps & {
 } & DefaultWithSideNavProps;
 type DefaultWithSideNavProps = Partial<typeof defaultWithSideNavProps>;
 const defaultWithSideNavProps = {
-  childrenClass: "[&>*]:-mb-16 [&>*]:w-full [&>*]:pt-24 px-4 pb-32 sm:ml-48",
+  childrenClass: "[&>*]:-mb-16 [&>*]:w-full [&>*]:pt-24 px-4 pb-32 sm:ml-52",
 };
 
 const SideNavigation = (props: SideNavProps) => {

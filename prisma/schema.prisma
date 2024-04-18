@@ -23,13 +23,107 @@ model Post {
 }
 
 model Char {
-  id          Int      @id @default(autoincrement())
+  id          Int                  @id @default(autoincrement())
   name        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  content     String?  @db.LongText
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  factionId   Int
+  clanId      Int
+  visible     Boolean              @default(false)
+  age         String?
+  sire        String?
+  childer     String?
+  ambition    String?
+  publicInfo  String?
+  content     String?              @db.LongText
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  createdBy   User                 @relation(fields: [createdById], references: [id])
+  clan        Clan                 @relation(fields: [clanId], references: [id])
+  faction     Faction              @relation(fields: [factionId], references: [id])
+  abilities   CharacterAbilities[]
+  features    CharacterFeatures[]
   createdById String
+}
+
+model ClanInFaction {
+  id        Int     @id @default(autoincrement())
+  factionId Int
+  clanId    Int
+  clan      Clan    @relation(fields: [clanId], references: [id], onDelete: Cascade)
+  faction   Faction @relation(fields: [factionId], references: [id], onDelete: Cascade)
+}
+
+model AbilityAvailable {
+  id        Int     @id @default(autoincrement())
+  abilityId Int
+  clanId    Int
+  clan      Clan    @relation(fields: [clanId], references: [id], onDelete: Cascade)
+  ability   Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+}
+
+model FeatureAvailable {
+  id        Int     @id @default(autoincrement())
+  featureId Int
+  clanId    Int
+  clan      Clan    @relation(fields: [clanId], references: [id], onDelete: Cascade)
+  feature   Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+}
+
+model Clan {
+  id               Int                @id @default(autoincrement())
+  name             String
+  content          String             @db.LongText
+  visibleToPlayer  Boolean            @default(false)
+  Char             Char[]
+  ClanInFaction    ClanInFaction[]
+  AbilityAvailable AbilityAvailable[]
+  FeatureAvailable FeatureAvailable[]
+}
+
+model Faction {
+  id              Int             @id @default(autoincrement())
+  name            String
+  content         String          @db.LongText
+  visibleToPlayer Boolean         @default(false)
+  Char            Char[]
+  ClanInFaction   ClanInFaction[]
+}
+
+model CharacterAbilities {
+  id          Int     @id @default(autoincrement())
+  characterId Int
+  abilityId   Int
+  abilitiy    Ability @relation(fields: [abilityId], references: [id])
+  Char        Char    @relation(fields: [characterId], references: [id])
+}
+
+model Ability {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  content            String               @db.LongText
+  expertise          Boolean
+  visibleToPlayer    Boolean              @default(false)
+  CharacterAbilities CharacterAbilities[]
+  AbilityAvailable   AbilityAvailable[]
+}
+
+model CharacterFeatures {
+  id              Int     @id @default(autoincrement())
+  characterId     Int
+  featureId       Int
+  description     String?
+  visibleToPlayer Boolean @default(false)
+  feature         Feature @relation(fields: [featureId], references: [id])
+  Char            Char    @relation(fields: [characterId], references: [id])
+}
+
+model Feature {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  content           String              @db.LongText
+  cost              Int
+  visibleToPlayer   Boolean             @default(false)
+  CharacterFeatures CharacterFeatures[]
+  FeatureAvailable  FeatureAvailable[]
 }
 
 model Rule {
