@@ -17,7 +17,7 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
-  age?: number | null;
+  age?: string | null;
   sire?: string | null;
   childer?: string | null;
   ambition?: string | null;
