@@ -205,7 +205,7 @@ export default function CharacterEditor({
             ),
             allowedContent: "Изображение (1 Мб)",
           }}
-          className="h-8 w-full cursor-pointer text-white [&>div]:hidden [&>label]:w-full [&>label]:flex-1 [&>label]:gap-2 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:px-4 [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
+          className="h-8 w-full cursor-pointer text-white [&>div]:hidden [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:gap-2 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:pl-4 [&>label]:pr-2 [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
           endpoint="imageUploader"
           onClientUploadComplete={(res) => setImage(res[0]?.url ?? "")}
         />
