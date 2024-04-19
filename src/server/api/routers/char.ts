@@ -17,6 +17,8 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
+  title?: string | null;
+  status?: string | null;
   image?: string | null;
   age?: string | null;
   sire?: string | null;
@@ -111,13 +113,18 @@ export type FeatureAvailable = {
 export const charRouter = createTRPCRouter({
   getCharTraits: protectedProcedure.query(async ({ ctx }) => {
     const features = await ctx.db.feature.findMany({
+      orderBy: { cost: "asc" },
       include: { FeatureAvailable: { include: { clan: true } } },
     });
     const abilities = await ctx.db.ability.findMany({
+      orderBy: { name: "asc" },
       include: { AbilityAvailable: { include: { clan: true } } },
     });
-    const factions = await ctx.db.faction.findMany();
+    const factions = await ctx.db.faction.findMany({
+      orderBy: { name: "desc" },
+    });
     const clans = await ctx.db.clan.findMany({
+      orderBy: { name: "asc" },
       include: {
         ClanInFaction: { include: { faction: true } },
         AbilityAvailable: { include: { ability: true } },
@@ -134,18 +141,22 @@ export const charRouter = createTRPCRouter({
 
   getFeatures: protectedProcedure.query(({ ctx }) => {
     return ctx.db.feature.findMany({
+      orderBy: { cost: "asc" },
       include: { FeatureAvailable: { include: { clan: true } } },
     });
   }),
 
   getAbilities: protectedProcedure.query(({ ctx }) => {
     return ctx.db.ability.findMany({
+      orderBy: { name: "asc" },
       include: { AbilityAvailable: { include: { clan: true } } },
     });
   }),
 
   getFactions: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.faction.findMany();
+    return ctx.db.faction.findMany({
+      orderBy: { name: "desc" },
+    });
   }),
 
   getClans: protectedProcedure.query(({ ctx }) => {
@@ -401,6 +412,8 @@ export const charRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string().min(1),
+        title: z.string().nullish(),
+        status: z.string().nullish(),
         content: z.string().nullish(),
         ambition: z.string().nullish(),
         publicInfo: z.string().nullish(),
@@ -411,7 +424,13 @@ export const charRouter = createTRPCRouter({
         sire: z.string(),
         childer: z.string(),
         abilities: z.array(z.number()),
-        features: z.array(z.number()),
+        features: z.array(
+          z.object({
+            id: z.number(),
+            comment: z.string(),
+            checked: z.boolean(),
+          }),
+        ),
         visible: z.boolean(),
       }),
     )
@@ -421,6 +440,8 @@ export const charRouter = createTRPCRouter({
           clanId: input.clanId,
           factionId: input.factionId,
           name: input.name,
+          title: input.title,
+          status: input.status,
           content: input.content,
           ambition: input.ambition,
           publicInfo: input.publicInfo,
@@ -440,7 +461,7 @@ export const charRouter = createTRPCRouter({
           features: {
             createMany: {
               data: input.features.map((a) => {
-                return { featureId: a };
+                return { featureId: a.id, description: a.comment };
               }),
             },
           },
@@ -459,6 +480,8 @@ export const charRouter = createTRPCRouter({
       z.object({
         id: z.number(),
         name: z.string().min(1),
+        title: z.string().nullish(),
+        status: z.string().nullish(),
         content: z.string().nullish(),
         ambition: z.string().nullish(),
         publicInfo: z.string().nullish(),
@@ -469,7 +492,13 @@ export const charRouter = createTRPCRouter({
         sire: z.string(),
         childer: z.string(),
         abilities: z.array(z.number()),
-        features: z.array(z.number()),
+        features: z.array(
+          z.object({
+            id: z.number(),
+            comment: z.string(),
+            checked: z.boolean(),
+          }),
+        ),
         visible: z.boolean(),
       }),
     )
@@ -480,6 +509,8 @@ export const charRouter = createTRPCRouter({
           clanId: input.clanId,
           factionId: input.factionId,
           name: input.name,
+          title: input.title,
+          status: input.status,
           content: input.content,
           ambition: input.ambition,
           publicInfo: input.publicInfo,
@@ -501,7 +532,7 @@ export const charRouter = createTRPCRouter({
             deleteMany: {},
             createMany: {
               data: input.features.map((a) => {
-                return { featureId: a };
+                return { featureId: a.id, description: a.comment };
               }),
             },
           },
@@ -513,6 +544,12 @@ export const charRouter = createTRPCRouter({
           clan: true,
         },
       });
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.db.char.delete({ where: { id: input.id } });
     }),
 
   getById: publicProcedure

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { type Character } from "~/server/api/routers/char";
 import CharacterEditor from "~/components/editors/CharacterEditor";
-import { FaPencilAlt } from "react-icons/fa";
+import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import default_char from "~/../public/default_char.png";
 import Image from "next/image";
 
@@ -90,24 +90,28 @@ export default function Characters() {
                 {characters.map((character) => (
                   <div
                     key={character.id}
-                    className="flex flex-1 flex-row gap-8"
+                    className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
                   >
-                    <div className="flex flex-col">
+                    <div className="mb-2 flex flex-col sm:mb-0">
                       <Image
-                        className="mt-1 aspect-square h-[160px] w-[160px] rounded-md object-cover"
+                        className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
                         alt="char_photo"
                         src={!!character.image ? character.image : default_char}
-                        height="320"
-                        width="320"
+                        height="640"
+                        width="640"
                       />
                     </div>
-                    <div className="flex flex-1 flex-col">
-                      <p className="text-2xl">{character.name}</p>
-                      <p className="text-sm italic">
+                    <div className="col-span-2 flex flex-1 flex-col">
+                      <div className="flex flex-row">
+                        <p className="mr-auto text-2xl">{character.name}</p>
+                      </div>
+                      <p className="text-xs italic">
                         {character.faction?.name}
                         {" - "}
                         {character.clan?.name}
                       </p>
+                      <p className="text-xs italic">{character.status}</p>
+                      <p className="text-xs italic">{character.title}</p>
                       <div
                         className="tiptap-display pb-8 text-justify"
                         dangerouslySetInnerHTML={{
@@ -131,34 +135,41 @@ export default function Characters() {
                 {myCharacters.map((character) => (
                   <div
                     key={character.id}
-                    className="flex flex-1 flex-row gap-8"
+                    className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
                   >
-                    <div className="flex flex-col">
+                    <div className="mb-2 flex flex-col sm:mb-0">
                       <Image
-                        className="mt-1 aspect-square h-[160px] w-[160px] rounded-md object-cover"
+                        className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
                         alt="char_photo"
                         src={!!character.image ? character.image : default_char}
-                        height="320"
-                        width="320"
+                        height="640"
+                        width="640"
                       />
                     </div>
-                    <div className="flex flex-1 flex-col">
+                    <div className="col-span-2 flex flex-1 flex-col">
                       <div className="flex flex-row">
-                        <p className="text-2xl">{character.name}</p>
+                        <p className="mr-auto text-2xl">{character.name}</p>
+                        {character.visible ? (
+                          <FaEye size={24} className="mr-2 mt-1" />
+                        ) : (
+                          <FaEyeSlash size={24} className="mr-1" />
+                        )}
                         <Button
                           variant="bordered"
                           color="warning"
-                          className="ml-auto h-8 w-8 min-w-0 rounded-full p-0"
+                          className="h-8 w-8 min-w-0 rounded-full p-0"
                           onClick={() => handleEditCharacter(character.id)}
                         >
                           <FaPencilAlt size={16} />
                         </Button>
                       </div>
-                      <p className="text-sm italic">
+                      <p className="text-xs italic">
                         {character.faction?.name}
                         {" - "}
                         {character.clan?.name}
                       </p>
+                      <p className="text-xs italic">{character.status}</p>
+                      <p className="text-xs italic">{character.title}</p>
                       <div
                         className="tiptap-display pb-8 text-justify"
                         dangerouslySetInnerHTML={{
@@ -182,6 +193,13 @@ export default function Characters() {
                 onSuccess={() => {
                   void refetchAll();
                   void refetchMine();
+                  void router.push(
+                    {
+                      pathname: "/characters",
+                    },
+                    undefined,
+                    { shallow: true },
+                  );
                   setSelectedTab("mine");
                 }}
               />

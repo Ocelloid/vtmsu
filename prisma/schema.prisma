@@ -31,6 +31,8 @@ model Char {
   image       String?
   age         String?
   sire        String?
+  title       String?
+  status      String?
   childer     String?
   ambition    String?
   publicInfo  String?
@@ -94,7 +96,7 @@ model CharacterAbilities {
   characterId Int
   abilityId   Int
   abilitiy    Ability @relation(fields: [abilityId], references: [id])
-  Char        Char    @relation(fields: [characterId], references: [id])
+  Char        Char    @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
 model Ability {
@@ -115,7 +117,7 @@ model CharacterFeatures {
   description     String?
   visibleToPlayer Boolean @default(false)
   feature         Feature @relation(fields: [featureId], references: [id])
-  Char            Char    @relation(fields: [characterId], references: [id])
+  Char            Char    @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
 model Feature {
