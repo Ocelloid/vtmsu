@@ -1,5 +1,6 @@
 import { Input, Select, SelectItem, Button } from "@nextui-org/react";
 import { EditorContent, useEditor } from "@tiptap/react";
+import EditorMenu from "~/components/EditorMenu";
 import { Color } from "@tiptap/extension-color";
 import StarterKit from "@tiptap/starter-kit";
 import ListItem from "@tiptap/extension-list-item";
@@ -22,7 +23,6 @@ import { translit } from "~/utils/text";
 import { type Rule } from "~/server/api/routers/rule";
 import { useRouter } from "next/router";
 import { LoadingPage } from "~/components/Loading";
-import EditorMenu from "~/components/EditorMenu";
 
 const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
   const router = useRouter();
@@ -74,6 +74,11 @@ const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
     {
       extensions: extensions,
       content: content,
+      editorProps: {
+        attributes: {
+          class: "min-h-[calc(100vh-18rem)]",
+        },
+      },
     },
     [content],
   );

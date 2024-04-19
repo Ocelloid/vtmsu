@@ -17,17 +17,35 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
+  image?: string | null;
   age?: string | null;
   sire?: string | null;
   childer?: string | null;
   ambition?: string | null;
   publicInfo?: string | null;
   content?: string | null;
-  abilities?: Ability[];
-  features?: Feature[];
+  abilities?: CharacterAbility[];
+  features?: CharacterFeature[];
   clan?: Clan;
   faction?: Faction;
   createdBy?: User;
+};
+
+export type CharacterAbility = {
+  id: number;
+  characterId: number;
+  abilityId: number;
+  ability?: Ability;
+  Char?: Character;
+};
+
+export type CharacterFeature = {
+  id: number;
+  characterId: number;
+  featureId: number;
+  description?: string | null;
+  feature?: Feature;
+  Char?: Character;
 };
 
 export type Faction = {
@@ -42,7 +60,7 @@ export type Clan = {
   name: string;
   content: string;
   visibleToPlayer: boolean;
-  ClanInFaction: ClanInFaction[];
+  ClanInFaction?: ClanInFaction[];
   AbilityAvailable?: AbilityAvailable[];
   FeatureAvailable?: FeatureAvailable[];
 };
@@ -379,8 +397,14 @@ export const charRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1),
         content: z.string().nullish(),
+        ambition: z.string().nullish(),
+        publicInfo: z.string().nullish(),
         clanId: z.number(),
         factionId: z.number(),
+        image: z.string(),
+        age: z.string(),
+        sire: z.string(),
+        childer: z.string(),
         abilities: z.array(z.number()),
         features: z.array(z.number()),
         visible: z.boolean(),
@@ -393,6 +417,12 @@ export const charRouter = createTRPCRouter({
           factionId: input.factionId,
           name: input.name,
           content: input.content,
+          ambition: input.ambition,
+          publicInfo: input.publicInfo,
+          image: input.image,
+          age: input.age,
+          sire: input.sire,
+          childer: input.childer,
           visible: input.visible,
           createdById: ctx.session.user.id,
           abilities: {
@@ -419,12 +449,93 @@ export const charRouter = createTRPCRouter({
       });
     }),
 
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().min(1),
+        content: z.string().nullish(),
+        ambition: z.string().nullish(),
+        publicInfo: z.string().nullish(),
+        clanId: z.number(),
+        factionId: z.number(),
+        image: z.string(),
+        age: z.string(),
+        sire: z.string(),
+        childer: z.string(),
+        abilities: z.array(z.number()),
+        features: z.array(z.number()),
+        visible: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          clanId: input.clanId,
+          factionId: input.factionId,
+          name: input.name,
+          content: input.content,
+          ambition: input.ambition,
+          publicInfo: input.publicInfo,
+          image: input.image,
+          age: input.age,
+          sire: input.sire,
+          childer: input.childer,
+          visible: input.visible,
+          createdById: ctx.session.user.id,
+          abilities: {
+            deleteMany: {},
+            createMany: {
+              data: input.abilities.map((a) => {
+                return { abilityId: a };
+              }),
+            },
+          },
+          features: {
+            deleteMany: {},
+            createMany: {
+              data: input.features.map((a) => {
+                return { featureId: a };
+              }),
+            },
+          },
+        },
+        include: {
+          abilities: true,
+          features: true,
+          faction: true,
+          clan: true,
+        },
+      });
+    }),
+
+  getById: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.char.findUnique({
+        where: { id: input.id },
+        include: {
+          faction: true,
+          clan: true,
+          abilities: { include: { abilitiy: true } },
+          features: { include: { feature: true } },
+        },
+      });
+    }),
+
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.db.char.findMany();
+    return ctx.db.char.findMany({ include: { faction: true, clan: true } });
   }),
 
   getMine: protectedProcedure.query(({ ctx }) => {
     return ctx.db.char.findMany({
+      include: {
+        faction: true,
+        clan: true,
+        abilities: { include: { abilitiy: true } },
+        features: { include: { feature: true } },
+      },
       orderBy: { createdAt: "desc" },
       where: { createdBy: { id: ctx.session.user.id } },
     });

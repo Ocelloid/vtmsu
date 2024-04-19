@@ -2,7 +2,7 @@ import { Tab, Tabs, Button, Tooltip } from "@nextui-org/react";
 import Head from "next/head";
 import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
-import RuleEditor from "~/components/RuleEditor";
+import RuleEditor from "~/components/editors/RuleEditor";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { type Rule } from "~/server/api/routers/rule";

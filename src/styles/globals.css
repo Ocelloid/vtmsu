@@ -20,8 +20,6 @@
 }
 
 .tiptap {
-  min-height: calc(100vh - 18rem);
-
   &:focus-visible {
     outline: none;
   }

@@ -28,6 +28,7 @@ model Char {
   factionId   Int
   clanId      Int
   visible     Boolean              @default(false)
+  image       String?
   age         String?
   sire        String?
   childer     String?
@@ -101,6 +102,7 @@ model Ability {
   name               String
   content            String               @db.LongText
   expertise          Boolean
+  requirementId      Int?
   visibleToPlayer    Boolean              @default(false)
   CharacterAbilities CharacterAbilities[]
   AbilityAvailable   AbilityAvailable[]

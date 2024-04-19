@@ -2,25 +2,39 @@ import { Color } from "@tiptap/extension-color";
 import StarterKit from "@tiptap/starter-kit";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
-import Document from "@tiptap/extension-document";
-import Dropcursor from "@tiptap/extension-dropcursor";
 import Image from "@tiptap/extension-image";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
+import Link from "@tiptap/extension-link";
 import EditorMenu from "~/components/EditorMenu";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { type Editor, EditorContent, useEditor } from "@tiptap/react";
 import Placeholder from "@tiptap/extension-placeholder";
+import { useEffect } from "react";
 
-const DefaultEditor = () => {
+const DefaultEditor = ({
+  initialContent,
+  placeholder,
+  className,
+  onUpdate,
+  tabIndex,
+  editor,
+  label,
+}: {
+  initialContent?: string;
+  placeholder?: string;
+  className?: string;
+  onUpdate?: (arg0: string) => void;
+  tabIndex?: number;
+  editor?: Editor;
+  label?: string;
+}) => {
   const extensions = [
     Placeholder.configure({
       // Use a placeholder:
-      placeholder: "Ваш текст",
+      placeholder: !!placeholder ? placeholder : "Ваш текст",
       // Use different placeholders depending on the node type:
       // placeholder: ({ node }) => {
       //   if (node.type.name === 'heading') {
@@ -30,14 +44,15 @@ const DefaultEditor = () => {
       //   return 'Can you add some further context?'
       // },
     }),
-    Text,
-    Document,
-    Paragraph,
+    Link.configure({
+      validate: (href) => /^https?:\/\//.test(href),
+      openOnClick: true,
+      autolink: true,
+    }),
     TextAlign.configure({
       types: ["heading", "paragraph", "image"],
     }),
     Image,
-    Dropcursor,
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
     TextStyle,
     StarterKit.configure({
@@ -58,14 +73,33 @@ const DefaultEditor = () => {
     TableCell,
   ];
 
-  const editor = useEditor({
+  const defaultEditor = useEditor({
     extensions: extensions,
+    content: initialContent,
+    onUpdate({ editor: updatedEditor }) {
+      if (!!onUpdate) onUpdate(updatedEditor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: !!className ? className : "",
+      },
+    },
   });
+
+  useEffect(() => {
+    editor?.commands.setContent(initialContent!);
+    defaultEditor?.commands.setContent(initialContent!);
+    console.log(editor);
+  }, [editor, defaultEditor, initialContent]);
 
   return (
     <>
-      <EditorMenu editor={editor!} />
-      <EditorContent tabIndex={4} editor={editor} />
+      {label ?? <p className="text-xs">{label}</p>}
+      <EditorMenu editor={!!editor ? editor : defaultEditor!} />
+      <EditorContent
+        tabIndex={!!tabIndex ? tabIndex : 4}
+        editor={!!editor ? editor : defaultEditor!}
+      />
     </>
   );
 };

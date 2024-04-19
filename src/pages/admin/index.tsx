@@ -212,7 +212,7 @@ export default function Admin() {
                               <p className="text-2xl">{trait.name}</p>
                               <p className="text-sm italic">
                                 {cs.type === "Clan" &&
-                                  `${(trait as Clan).ClanInFaction.map((f) => f.faction?.name).join(", ")}`}
+                                  `${(trait as Clan).ClanInFaction!.map((f) => f.faction?.name).join(", ")}`}
                                 {cs.type === "Feature" &&
                                   `${(trait as Feature).cost} `}
                                 {cs.type === "Feature" &&

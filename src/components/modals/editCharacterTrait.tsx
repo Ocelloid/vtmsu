@@ -46,6 +46,8 @@ const EditCharacterTrait = ({
   const [factions, setFactions] = useState<Faction[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
   const [isVisibleToPlayer, setIsVisibleToPlayer] = useState(false);
+  const [isClanSelectOpen, setIsClanSelectOpen] = useState(false);
+  const [isFactionSelectOpen, setIsFactionSelectOpen] = useState(false);
   const editing = !!trait;
 
   const {
@@ -87,7 +89,7 @@ const EditCharacterTrait = ({
       }
       if (traitType === "Clan")
         setfactionIds(
-          (trait as Clan).ClanInFaction.map((v) => v.factionId) ?? [],
+          (trait as Clan).ClanInFaction!.map((v) => v.factionId) ?? [],
         );
     }
   }, [trait, traitType]);
@@ -107,6 +109,8 @@ const EditCharacterTrait = ({
     setTitle("");
     setCost(0);
     setIsModalOpen(false);
+    setIsClanSelectOpen(false);
+    setIsFactionSelectOpen(false);
     if (traitType === "Clan") void refetchFactions();
     if (traitType === "Ability" || traitType === "Feature") void refetchClans();
   };
@@ -309,7 +313,11 @@ const EditCharacterTrait = ({
     <>
       <Modal
         isOpen={isModalOpen}
-        onClose={onClose}
+        onClose={() => {
+          setIsClanSelectOpen(false);
+          setIsFactionSelectOpen(false);
+          onClose();
+        }}
         isDismissable={false}
         isKeyboardDismissDisabled={true}
         onOpenChange={() => setIsModalOpen(!isModalOpen)}
@@ -398,6 +406,10 @@ const EditCharacterTrait = ({
                 variant="underlined"
                 placeholder="Выберите фракции"
                 selectionMode="multiple"
+                isOpen={isFactionSelectOpen}
+                onOpenChange={(open) =>
+                  open !== isFactionSelectOpen && setIsFactionSelectOpen(open)
+                }
                 selectedKeys={factionIds.map((f) => f.toString())}
                 onChange={(e) => {
                   if (!!e.target.value) {
@@ -421,6 +433,10 @@ const EditCharacterTrait = ({
                   variant="underlined"
                   placeholder="Выберите клан"
                   selectionMode="multiple"
+                  isOpen={isClanSelectOpen}
+                  onOpenChange={(open) =>
+                    open !== isClanSelectOpen && setIsClanSelectOpen(open)
+                  }
                   selectedKeys={clanIds.map((f) => f.toString())}
                   onChange={(e) => {
                     if (!!e.target.value) {

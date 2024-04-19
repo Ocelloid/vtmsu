@@ -23,16 +23,40 @@ import {
   FaQuoteLeft,
   FaList,
   FaDivide,
+  FaLink,
+  FaImage,
 } from "react-icons/fa";
 import { type Editor } from "@tiptap/react";
+import React, { useCallback } from "react";
 
 const EditorMenu = ({ editor }: { editor: Editor }) => {
+  const toggleLink = useCallback(() => {
+    const previousUrl = editor.getAttributes("link").href as string;
+    const url = window.prompt("URL", previousUrl);
+    if (url === null) {
+      return;
+    }
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      return;
+    }
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+  }, [editor]);
+
+  const addImage = () => {
+    const url = window.prompt("URL");
+
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
   if (!editor) {
     return null;
   }
 
   return (
-    <div className="grid grid-cols-12 justify-between gap-1 text-red-300 md:grid-cols-[repeat(24,minmax(0,1fr))]">
+    <div className="grid grid-cols-[repeat(13,minmax(0,1fr))] justify-between gap-1 text-red-300 md:grid-cols-[repeat(26,minmax(0,1fr))]">
       <button
         tabIndex={109}
         onClick={() => editor.chain().focus().undo().run()}
@@ -116,6 +140,9 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
       >
         <FaParagraph size={16} className="mx-auto" />
       </button>
+      <button onClick={toggleLink}>
+        <FaLink size={16} className="mx-auto" />
+      </button>
       <button
         tabIndex={106}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -193,6 +220,9 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         className={!editor.can().mergeOrSplit() ? "opacity-50" : ""}
       >
         <AiOutlineMergeCells size={16} className="mx-auto" />
+      </button>
+      <button onClick={addImage}>
+        <FaImage size={16} className="mx-auto" />
       </button>
     </div>
   );
