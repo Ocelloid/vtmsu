@@ -3,8 +3,13 @@ import {
   Select,
   SelectItem,
   Divider,
-  Checkbox,
   Button,
+  Textarea,
+  Accordion,
+  AccordionItem,
+  CheckboxGroup,
+  Checkbox,
+  cn,
 } from "@nextui-org/react";
 import type {
   Faction,
@@ -15,18 +20,18 @@ import type {
 import Image from "next/image";
 import { UploadButton } from "~/utils/uploadthing";
 import DefaultEditor from "~/components/editors/DefaultEditor";
-import {
-  FaRegSave,
-  FaTrashAlt,
-  FaImage,
-  FaArrowDown,
-  FaFile,
-} from "react-icons/fa";
+import { FaRegSave, FaTrashAlt, FaImage, FaFile } from "react-icons/fa";
 import default_char from "~/../public/default_char.png";
-import { LoadingPage } from "~/components/Loading";
+import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
+
+type FeatureWithComment = {
+  id: number;
+  comment: string;
+  checked: boolean;
+};
 
 export default function CharacterEditor({
   onSuccess,
@@ -38,23 +43,29 @@ export default function CharacterEditor({
   const [characterId, setCharacterId] = useState<number>();
   const [factionId, setFactionId] = useState<number>();
   const [clanId, setClanId] = useState<number>();
-  const [abilityIds, setAbilityIds] = useState<Set<string>>(new Set());
-  const [featureIds, setFeatureIds] = useState<Set<string>>(new Set());
-  const [age, setAge] = useState<number>(0);
+  const [abilityIds, setAbilityIds] = useState<number[]>([]);
+  const [featureWithComments, setFeatureWithComments] = useState<
+    FeatureWithComment[]
+  >([]);
+  const [age, setAge] = useState<number>();
+  const [costSum, setCostSum] = useState<number>(0);
   const [image, setImage] = useState<string>("");
   const [sire, setSire] = useState<string>("");
   const [childer, setChilder] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
   const [publicInfo, setPublicInfo] = useState<string>("");
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
   const [ambition, setAmbition] = useState<string>("");
-  const [initialAmbition, setInitialAmbition] = useState<string>("");
+  // const [initialAmbition, setInitialAmbition] = useState<string>("");
   const [quenta, setQuenta] = useState<string>("");
   const [initialQuenta, setInitialQuenta] = useState<string>("");
   const [factions, setFactions] = useState<Faction[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
   const [abilities, setAbilities] = useState<Ability[]>([]);
   const [features, setFeatures] = useState<Feature[]>([]);
+  const [uploading, setUploading] = useState<boolean>(false);
 
   const { data: characterData, isLoading: isCharacterLoading } =
     api.char.getById.useQuery({ id: characterId! }, { enabled: !!characterId });
@@ -68,12 +79,20 @@ export default function CharacterEditor({
   const { mutate: updateMutation, isPending: isCharacterUpdatePending } =
     api.char.update.useMutation();
 
+  const { mutate: deleteMutation, isPending: isCharacterDeletePending } =
+    api.char.delete.useMutation();
+
   useEffect(() => {
     if (!!traitsData) {
       setFactions(traitsData.factions);
       setClans(traitsData.clans);
       setAbilities(traitsData.abilities);
       setFeatures(traitsData.features);
+      setFeatureWithComments(
+        traitsData.features.map((f) => {
+          return { id: f.id, comment: "", checked: false };
+        }),
+      );
     }
   }, [traitsData]);
 
@@ -82,25 +101,34 @@ export default function CharacterEditor({
       setName(characterData.name);
       setFactionId(characterData.factionId);
       setClanId(characterData.clanId);
-      setAbilityIds(
-        new Set(characterData.abilities.map((a) => a.id.toString())),
-      );
-      setFeatureIds(
-        new Set(characterData.features.map((f) => f.id.toString())),
-      );
+      setAbilityIds(characterData.abilities.map((a) => a.id));
+      const cdfs = characterData.features.map((cdf) => {
+        return { id: cdf.featureId, comment: cdf.description!, checked: true };
+      });
+      if (!!traitsData) {
+        setFeatureWithComments(
+          traitsData.features.map((f) => {
+            return cdfs.map((cdf) => cdf.id).includes(f.id)
+              ? cdfs.find((cdf) => cdf.id === f.id)!
+              : { id: f.id, comment: "", checked: false };
+          }),
+        );
+      }
       setAge(Number(characterData.age));
       setImage(characterData.image ?? "");
       setSire(characterData.sire ?? "");
       setChilder(characterData.childer ?? "");
+      setTitle(characterData.title ?? "");
+      setStatus(characterData.status ?? "");
       setInitialPublicInfo(characterData.publicInfo ?? "");
       setPublicInfo(characterData.publicInfo ?? "");
       setVisible(characterData.visible);
-      setInitialAmbition(characterData.ambition ?? "");
+      // setInitialAmbition(characterData.ambition ?? "");
       setAmbition(characterData.ambition ?? "");
       setInitialQuenta(characterData.content ?? "");
       setQuenta(characterData.content ?? "");
     }
-  }, [characterData]);
+  }, [characterData, traitsData]);
 
   useEffect(() => {
     const id = Array.isArray(router.query.character)
@@ -119,14 +147,16 @@ export default function CharacterEditor({
           factionId: factionId!,
           visible: visible,
           image: image,
-          age: age.toString(),
+          age: age ? age.toString() : "",
           sire: sire,
           childer: childer,
+          title: title,
+          status: status,
           ambition: ambition,
           publicInfo: publicInfo,
           content: quenta,
           abilities: [...abilityIds].map((a) => Number(a)),
-          features: [...featureIds].map((a) => Number(a)),
+          features: featureWithComments.filter((fwc) => fwc.checked),
         },
         {
           onSuccess: () => {
@@ -144,14 +174,16 @@ export default function CharacterEditor({
           factionId: factionId!,
           visible: visible,
           image: image,
-          age: age.toString(),
+          age: age ? age.toString() : "",
           sire: sire,
           childer: childer,
+          title: title,
+          status: status,
           ambition: ambition,
           publicInfo: publicInfo,
           content: quenta,
           abilities: [...abilityIds].map((a) => Number(a)),
-          features: [...featureIds].map((a) => Number(a)),
+          features: featureWithComments.filter((fwc) => fwc.checked),
         },
         {
           onSuccess: () => {
@@ -168,48 +200,84 @@ export default function CharacterEditor({
     setName("");
     setFactionId(undefined);
     setClanId(undefined);
-    setAbilityIds(new Set([]));
-    setFeatureIds(new Set([]));
+    setAbilityIds([]);
+    setFeatureWithComments(
+      featureWithComments.map((fwc) => {
+        return { id: fwc.id, comment: "", checked: false };
+      }),
+    );
     setAge(0);
     setImage("");
+    setTitle("");
+    setStatus("");
     setSire("");
     setChilder("");
     setInitialPublicInfo("");
     setVisible(false);
-    setInitialAmbition("");
+    // setInitialAmbition("");
+    setAmbition("");
     setInitialQuenta("");
   };
 
   const handleDeleteCharacter = () => {
-    return;
+    const deleteConfirm = confirm("Вы уверены, что хотите удалить персонажа?");
+    if (!!characterId && deleteConfirm)
+      deleteMutation(
+        { id: characterId },
+        {
+          onSuccess: () => {
+            handleClear();
+            onSuccess();
+            return;
+          },
+        },
+      );
   };
 
   if (
     isTraitsLoading ||
     isCharacterCreatePending ||
     isCharacterUpdatePending ||
+    isCharacterDeletePending ||
     isCharacterLoading
   )
     return <LoadingPage />;
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-2">
+    <div className="mx-auto flex max-w-5xl flex-col">
       <div className="flex flex-row gap-2">
         <UploadButton
           content={{
             button: (
               <>
-                <FaImage size={16} />
+                <FaImage size={16} className="ml-2" />
                 <p className="hidden sm:flex">Изображение</p>
               </>
             ),
             allowedContent: "Изображение (1 Мб)",
           }}
-          className="h-8 w-full cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:gap-2 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:pl-4 [&>label]:pr-2 [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
+          className="h-8 w-full cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
           endpoint="imageUploader"
-          onClientUploadComplete={(res) => setImage(res[0]?.url ?? "")}
+          onUploadBegin={() => setUploading(true)}
+          onClientUploadComplete={(res) => {
+            setImage(res[0]?.url ?? "");
+            setUploading(false);
+          }}
         />
         <Button
+          isDisabled={
+            !name ||
+            !factionId ||
+            !clanId ||
+            !age ||
+            !ambition ||
+            publicInfo === "<p></p>" ||
+            quenta === "<p></p>" ||
+            !!costSum ||
+            !featureWithComments
+              .filter((fwc) => fwc.checked)
+              .reduce((a, b) => a && !!b.comment, true)
+          }
           onClick={handleSaveCharacter}
           variant={"ghost"}
           className="h-8 w-full border-warning hover:!bg-warning/25"
@@ -250,14 +318,18 @@ export default function CharacterEditor({
         )}
       </div>
       <div className="flex flex-row gap-2 sm:gap-4">
-        <div className="flex flex-col">
-          <Image
-            className="mt-2 aspect-square h-[160px] w-[160px] rounded-md object-cover"
-            alt="char_photo"
-            src={!!image ? image : default_char}
-            height="320"
-            width="320"
-          />
+        <div className="flex h-[160px] w-[160px] flex-col items-center justify-center">
+          {uploading ? (
+            <LoadingSpinner width={80} height={80} />
+          ) : (
+            <Image
+              className="mt-2 aspect-square h-[160px] w-[160px] rounded-md object-cover"
+              alt="char_photo"
+              src={!!image ? image : default_char}
+              height="320"
+              width="320"
+            />
+          )}
         </div>
         <div className="flex flex-1 flex-col">
           <Input
@@ -298,7 +370,10 @@ export default function CharacterEditor({
           <Select
             label="Клан"
             variant="underlined"
-            placeholder="Выберите клан"
+            disabled={!factionId}
+            placeholder={
+              !!factionId ? "Выберите клан" : "Сначала выберите фракцию"
+            }
             selectedKeys={!!clanId ? [clanId.toString()] : []}
             onChange={(e) => {
               if (!!e.target.value) {
@@ -331,10 +406,73 @@ export default function CharacterEditor({
             type="number"
             variant="underlined"
             label="Возраст"
-            placeholder="Возраст"
-            value={age.toString()}
+            placeholder="Введите возраст"
+            value={age ? age.toString() : ""}
             onValueChange={(a) => setAge(Number(a))}
           />
+          <Input
+            variant="underlined"
+            label="Статусы"
+            placeholder="Введите статусы через запятую"
+            value={status}
+            onValueChange={setStatus}
+          />
+          <Input
+            variant="underlined"
+            label="Титулы"
+            placeholder="Введите титулы через запятую"
+            value={title}
+            onValueChange={setTitle}
+          />
+        </div>
+      </div>
+      <Checkbox
+        color="warning"
+        size="sm"
+        isSelected={visible}
+        onValueChange={(e) => setVisible(e)}
+      >
+        Другие игроки могут видеть этого персонажа
+      </Checkbox>
+      <div className="flex flex-1 flex-col sm:hidden">
+        <Input
+          type="number"
+          variant="underlined"
+          label="Возраст"
+          placeholder="Введите возраст"
+          value={age ? age.toString() : ""}
+          onValueChange={(a) => setAge(Number(a))}
+        />
+        <Input
+          variant="underlined"
+          label="Статусы"
+          placeholder="Введите статусы через запятую"
+          value={status}
+          onValueChange={setStatus}
+        />
+        <Input
+          variant="underlined"
+          label="Титулы"
+          placeholder="Введите титулы через запятую"
+          value={title}
+          onValueChange={setTitle}
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <DefaultEditor
+          className="min-h-44 sm:min-h-20"
+          onUpdate={setPublicInfo}
+          initialContent={initialPublicInfo}
+          placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
+        />
+        <p className="mx-auto -mb-1 flex flex-row text-xs text-warning">
+          &nbsp;Публичная информация&nbsp;
+        </p>
+        <Divider className="bg-warning" />
+        <p className="mx-auto -mt-1 flex flex-row text-xs text-warning">
+          &nbsp;Тайная информация&nbsp;
+        </p>
+        <div className={"-mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2"}>
           <Input
             variant="underlined"
             label="Сир"
@@ -345,128 +483,180 @@ export default function CharacterEditor({
           <Input
             variant="underlined"
             label="Чайлды"
-            placeholder="Введите имена чайлдов"
+            placeholder="Введите имена чайлдов через запятую"
             value={childer}
             onValueChange={setChilder}
           />
         </div>
       </div>
-      <div className="flex flex-1 flex-col sm:hidden">
-        <Input
-          type="number"
+      <div className="flex flex-col gap-2">
+        {/* <DefaultEditor
+          label="Амбиции"
+          className="min-h-12"
+          onUpdate={setAmbition}
+          initialContent={initialAmbition}
+          placeholder="Введите амбиции и желания вашего персонажа"
+        /> */}
+        <Textarea
           variant="underlined"
-          label="Возраст"
-          placeholder="Возраст"
-          value={age.toString()}
-          onValueChange={(a) => setAge(Number(a))}
+          label="Амбиции и желания"
+          placeholder="Введите амбиции и желания вашего персонажа"
+          value={ambition}
+          onValueChange={setAmbition}
         />
-        <Input
-          variant="underlined"
-          label="Сир"
-          placeholder="Введите имя сира"
-          value={sire}
-          onValueChange={setSire}
-        />
-        <Input
-          variant="underlined"
-          label="Чайлды"
-          placeholder="Введите имена чайлдов"
-          value={childer}
-          onValueChange={setChilder}
+        <DefaultEditor
+          label="Квента"
+          className="min-h-44 sm:min-h-20"
+          onUpdate={setQuenta}
+          initialContent={initialQuenta}
+          placeholder="Введите предысторию персонажа и прочую информацию для мастерской группы"
         />
       </div>
-      <DefaultEditor
-        label="Публичная информация"
-        className="min-h-20"
-        onUpdate={setPublicInfo}
-        initialContent={initialPublicInfo}
-        placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
-      />
-      <Checkbox
-        color="warning"
-        isSelected={visible}
-        onValueChange={(e) => setVisible(e)}
-      >
-        Персонажа видно другим игрокам
-      </Checkbox>
-      <Divider className="bg-red-500/50" />
-      <p className="mx-auto -mt-1 flex flex-row text-xs text-red-500/50">
-        <FaArrowDown />
-        &nbsp;Тайная информация&nbsp;
-        <FaArrowDown />
-      </p>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Select
-          label="Дисциплины"
-          variant="underlined"
-          placeholder="Выберите дисциплины"
-          selectionMode="multiple"
-          selectedKeys={abilityIds}
-          onChange={(e) => setAbilityIds(new Set(e.target.value.split(",")))}
+      <Accordion isCompact>
+        <AccordionItem
+          className="-mx-2"
+          aria-label={"Дисциплины"}
+          title={
+            "Дисциплины" +
+            (!!abilityIds.length ? ` (всего ${abilityIds.length})` : "")
+          }
         >
-          {abilities
-            .filter((a) =>
-              a.AbilityAvailable!.map((aa) => aa.clanId).includes(clanId!),
-            )
-            .map((ability) => (
-              <SelectItem
-                key={ability.id}
-                value={ability.id}
-                textValue={ability.name}
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-small">{ability.name}</span>
-                  <span className="whitespace-normal text-tiny text-default-400">
-                    {ability.content}
-                  </span>
-                </div>
-              </SelectItem>
-            ))}
-        </Select>
-        <Select
-          label="Дополнения"
-          variant="underlined"
-          placeholder="Выберите дополнения"
-          selectionMode="multiple"
-          selectedKeys={featureIds}
-          onChange={(e) => setFeatureIds(new Set(e.target.value.split(",")))}
+          <CheckboxGroup
+            label={
+              !!clanId
+                ? "Выберите дисциплины - не больше трёх"
+                : "Сначала выберите клан"
+            }
+            color="warning"
+            value={abilityIds ? abilityIds.map((a) => a.toString()) : []}
+            onValueChange={(aids) => {
+              if (aids.length < 4)
+                setAbilityIds(aids.map((aid) => Number(aid)));
+            }}
+          >
+            {abilities
+              .filter(
+                (a) =>
+                  a
+                    .AbilityAvailable!.map((aa) => aa.clanId)
+                    .includes(clanId!) &&
+                  (a.requirementId
+                    ? abilityIds.includes(a.requirementId)
+                    : true) &&
+                  a.visibleToPlayer,
+              )
+              .map((ability) => (
+                <Checkbox
+                  key={ability.id}
+                  value={ability.id.toString()}
+                  classNames={{
+                    base: cn(
+                      "flex-row flex flex-1 max-w-full w-full m-0",
+                      "hover:bg-warning/25 items-center justify-start",
+                      "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
+                      "data-[selected=true]:border-warning",
+                    ),
+                    label: "w-full",
+                  }}
+                >
+                  <div className="flex flex-col">
+                    {ability.name}
+                    <p className="whitespace-break-spaces pt-2 text-justify text-xs">
+                      {ability.content}
+                    </p>
+                  </div>
+                </Checkbox>
+              ))}
+          </CheckboxGroup>
+        </AccordionItem>
+        <AccordionItem
+          className="-mx-2"
+          aria-label={"Дополнения"}
+          title={"Дополнения" + (!!costSum ? ` (в сумме ${costSum})` : "")}
         >
-          {features
-            .filter((a) =>
-              a.FeatureAvailable!.map((fa) => fa.clanId).includes(clanId!),
-            )
-            .map((feature) => (
-              <SelectItem
-                key={feature.id}
-                value={feature.id}
-                textValue={feature.name}
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-small">
-                    {feature.cost}&nbsp;{feature.name}
-                  </span>
-                  <span className="whitespace-normal text-tiny text-default-400">
-                    {feature.content}
-                  </span>
-                </div>
-              </SelectItem>
-            ))}
-        </Select>
-      </div>
-      <DefaultEditor
-        label="Амбиции"
-        className="min-h-20"
-        onUpdate={setAmbition}
-        initialContent={initialAmbition}
-        placeholder="Введите амбиции и желания вашего персонажа"
-      />
-      <DefaultEditor
-        label="Квента"
-        className="min-h-20"
-        onUpdate={setQuenta}
-        initialContent={initialQuenta}
-        placeholder="Введите предысторию персонажа и прочую информацию для мастерской группы"
-      />
+          <CheckboxGroup
+            label={!!clanId ? "Выберите дополнения" : "Сначала выберите клан"}
+            color="warning"
+            value={featureWithComments
+              .filter((fwc) => fwc.checked)
+              .map((fwc) => fwc.id.toString())}
+            onValueChange={(fids) => {
+              if (fids.length < 4) {
+                setCostSum(
+                  features
+                    .filter((f) => fids.includes(f.id.toString()))
+                    .reduce((a, b) => a + b.cost, 0),
+                );
+                setFeatureWithComments(
+                  featureWithComments.map((fwc) => {
+                    return {
+                      ...fwc,
+                      checked: fids.includes(fwc.id.toString()),
+                    };
+                  }),
+                );
+              }
+            }}
+          >
+            {features
+              .filter(
+                (f) =>
+                  f
+                    .FeatureAvailable!.map((fa) => fa.clanId)
+                    .includes(clanId!) && f.visibleToPlayer,
+              )
+              .map((feature) => (
+                <>
+                  <Checkbox
+                    key={feature.id}
+                    value={feature.id.toString()}
+                    classNames={{
+                      base: cn(
+                        "flex-row flex flex-1 max-w-full w-full m-0",
+                        "hover:bg-warning/25 items-center justify-start",
+                        "cursor-pointer rounded-lg gap-1 p-2 border-2 border-transparent",
+                        "data-[selected=true]:border-warning",
+                      ),
+                      label: "w-full",
+                    }}
+                  >
+                    <div className="flex flex-col">
+                      {feature.cost > 0 ? `+${feature.cost}` : feature.cost}
+                      &nbsp;{feature.name}
+                      <p className="whitespace-break-spaces pt-1 text-justify text-xs">
+                        {feature.content}
+                      </p>
+                    </div>
+                  </Checkbox>
+                  {featureWithComments.find((fwc) => fwc.id === feature.id)
+                    ?.checked && (
+                    <Input
+                      variant="underlined"
+                      color="warning"
+                      label="Комментарий"
+                      placeholder={`Введите комментарий к дополнению "${feature.name}"`}
+                      onValueChange={(v) => {
+                        setFeatureWithComments(
+                          featureWithComments.map((fwc) => {
+                            return {
+                              id: fwc.id,
+                              checked: fwc.checked,
+                              comment: fwc.id === feature.id ? v : fwc.comment,
+                            };
+                          }),
+                        );
+                      }}
+                      value={
+                        featureWithComments.find((fwc) => fwc.id === feature.id)
+                          ?.comment
+                      }
+                    />
+                  )}
+                </>
+              ))}
+          </CheckboxGroup>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
