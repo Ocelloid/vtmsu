@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { type Character } from "~/server/api/routers/char";
 import CharacterEditor from "~/components/editors/CharacterEditor";
-import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaPencilAlt, FaEye, FaEyeSlash, FaPlus } from "react-icons/fa";
 import default_char from "~/../public/default_char.png";
 import Image from "next/image";
 
@@ -87,6 +87,14 @@ export default function Characters() {
               }
             >
               <div className="flex flex-col gap-2">
+                <Button
+                  variant="ghost"
+                  className="h-8 w-full border-warning text-white hover:!bg-warning/25 hover:text-white"
+                  onClick={() => setSelectedTab("edit")}
+                >
+                  <FaPlus />
+                  Добавить персонажа
+                </Button>
                 {characters.map((character) => (
                   <div
                     key={character.id}
@@ -132,6 +140,14 @@ export default function Characters() {
               }
             >
               <div className="flex flex-col gap-2">
+                <Button
+                  variant="ghost"
+                  className="h-8 w-full border-warning text-white hover:!bg-warning/25 hover:text-white"
+                  onClick={() => setSelectedTab("edit")}
+                >
+                  <FaPlus />
+                  Добавить персонажа
+                </Button>
                 {myCharacters.map((character) => (
                   <div
                     key={character.id}
