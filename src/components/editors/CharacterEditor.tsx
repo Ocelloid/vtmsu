@@ -215,6 +215,7 @@ export default function CharacterEditor({
     setInitialPublicInfo("");
     setVisible(false);
     // setInitialAmbition("");
+    setAmbition("");
     setInitialQuenta("");
   };
 
@@ -264,6 +265,19 @@ export default function CharacterEditor({
           }}
         />
         <Button
+          isDisabled={
+            !name ||
+            !factionId ||
+            !clanId ||
+            !age ||
+            !ambition ||
+            publicInfo === "<p></p>" ||
+            quenta === "<p></p>" ||
+            !!costSum ||
+            !featureWithComments
+              .filter((fwc) => fwc.checked)
+              .reduce((a, b) => a && !!b.comment, true)
+          }
           onClick={handleSaveCharacter}
           variant={"ghost"}
           className="h-8 w-full border-warning hover:!bg-warning/25"
