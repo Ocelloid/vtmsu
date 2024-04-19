@@ -89,7 +89,6 @@ const DefaultEditor = ({
   useEffect(() => {
     editor?.commands.setContent(initialContent!);
     defaultEditor?.commands.setContent(initialContent!);
-    console.log(editor);
   }, [editor, defaultEditor, initialContent]);
 
   return (
