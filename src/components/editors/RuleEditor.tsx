@@ -5,17 +5,14 @@ import { Color } from "@tiptap/extension-color";
 import StarterKit from "@tiptap/starter-kit";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
-import Document from "@tiptap/extension-document";
-import Dropcursor from "@tiptap/extension-dropcursor";
 import Image from "@tiptap/extension-image";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import Placeholder from "@tiptap/extension-placeholder";
+import Link from "@tiptap/extension-link";
 import { useState, useEffect } from "react";
 import { FaRegSave, FaTrashAlt, FaImage } from "react-icons/fa";
 import { api } from "~/utils/api";
@@ -42,14 +39,15 @@ const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
       placeholder:
         "Чтобы добавить в правила большой заголовок, введите 1 пробел",
     }),
-    Text,
-    Document,
-    Paragraph,
+    Link.configure({
+      validate: (href) => /^https?:\/\//.test(href),
+      openOnClick: true,
+      autolink: true,
+    }),
     TextAlign.configure({
       types: ["heading", "paragraph", "image"],
     }),
     Image,
-    Dropcursor,
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
     TextStyle,
     StarterKit.configure({

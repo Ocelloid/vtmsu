@@ -37,6 +37,11 @@
     margin-top: 0.75em;
   }
 
+  a {
+    color: #f5a524;
+    cursor: pointer;
+  }
+
   ul,
   ol {
     padding: 0 1rem;
