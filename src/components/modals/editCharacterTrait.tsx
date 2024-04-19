@@ -41,9 +41,11 @@ const EditCharacterTrait = ({
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [cost, setCost] = useState<number>(0);
+  const [requirement, setRequirement] = useState<number>();
   const [factionIds, setfactionIds] = useState<number[]>([]);
   const [clanIds, setclanIds] = useState<number[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
+  const [abilities, setAbilities] = useState<Ability[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
   const [isVisibleToPlayer, setIsVisibleToPlayer] = useState(false);
   const [isClanSelectOpen, setIsClanSelectOpen] = useState(false);
@@ -70,6 +72,22 @@ const EditCharacterTrait = ({
     setClans(clanData ?? []);
   }, [clanData]);
 
+  const {
+    data: abilityData,
+    isLoading: isAbilitiesLoading,
+    refetch: refetchAbilities,
+  } = api.char.getAbilities.useQuery();
+
+  useEffect(() => {
+    setAbilities(
+      !!abilityData
+        ? abilityData.sort((a, b) =>
+            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+          )
+        : [],
+    );
+  }, [abilityData]);
+
   useEffect(() => {
     if (!!trait) {
       setTitle(trait.name ?? "");
@@ -83,6 +101,7 @@ const EditCharacterTrait = ({
       }
       if (traitType === "Ability") {
         setIsExpert((trait as Ability).expertise ?? false);
+        setRequirement((trait as Ability).requirementId ?? undefined);
         setclanIds(
           (trait as Ability).AbilityAvailable!.map((v) => v.clanId) ?? [],
         );
@@ -112,6 +131,7 @@ const EditCharacterTrait = ({
     setIsClanSelectOpen(false);
     setIsFactionSelectOpen(false);
     if (traitType === "Clan") void refetchFactions();
+    if (traitType === "Ability") void refetchAbilities();
     if (traitType === "Ability" || traitType === "Feature") void refetchClans();
   };
 
@@ -270,6 +290,7 @@ const EditCharacterTrait = ({
             name: title,
             content: content,
             expertise: isExpert,
+            requirementId: requirement,
             visibleToPlayer: isVisibleToPlayer,
             clanIds: clanIds ?? [1],
           });
@@ -279,6 +300,7 @@ const EditCharacterTrait = ({
             name: title,
             content: content,
             expertise: isExpert,
+            requirementId: requirement,
             visibleToPlayer: isVisibleToPlayer,
             clanIds: clanIds ?? [1],
           });
@@ -307,7 +329,8 @@ const EditCharacterTrait = ({
     }
   };
 
-  if (isFactionsLoading || isClansLoading) return <LoadingPage />;
+  if (isFactionsLoading || isClansLoading || isAbilitiesLoading)
+    return <LoadingPage />;
 
   return (
     <>
@@ -426,50 +449,67 @@ const EditCharacterTrait = ({
                 ))}
               </Select>
             )}
-            <div className="flex flex-row">
-              {(traitType === "Ability" || traitType === "Feature") && (
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+              {traitType === "Ability" && (
                 <Select
-                  label="Клан"
+                  label="Требует наличие"
                   variant="underlined"
-                  placeholder="Выберите клан"
-                  selectionMode="multiple"
-                  isOpen={isClanSelectOpen}
-                  onOpenChange={(open) =>
-                    open !== isClanSelectOpen && setIsClanSelectOpen(open)
-                  }
-                  selectedKeys={clanIds.map((f) => f.toString())}
-                  onChange={(e) => {
-                    if (!!e.target.value) {
-                      setclanIds(
-                        e.target.value.split(",").map((s) => Number(s)),
-                      );
-                    }
-                  }}
+                  placeholder="Выберите предыдущую способность"
+                  selectedKeys={requirement ? [requirement.toString()] : []}
+                  onChange={(e) => setRequirement(Number(e.target.value))}
                 >
-                  {clans.map((clan) => (
-                    <SelectItem key={clan.id} value={clan.id}>
-                      {clan.name}
+                  {abilities.map((ability) => (
+                    <SelectItem key={ability.id} value={ability.id}>
+                      {ability.name}
                     </SelectItem>
                   ))}
                 </Select>
               )}
-              {(traitType === "Ability" || traitType === "Feature") && (
-                <Button
-                  variant="light"
-                  color="warning"
-                  onClick={() => {
-                    if (clans.length === clanIds.length) setclanIds([]);
-                    else setclanIds(clans.map((c) => c.id));
-                  }}
-                  className={className + " m-2"}
-                >
-                  {clans.length === clanIds.length ? (
-                    <FaTimes size={16} />
-                  ) : (
-                    <FaCheckDouble size={16} />
-                  )}
-                </Button>
-              )}
+              <div className="flex flex-row">
+                {(traitType === "Ability" || traitType === "Feature") && (
+                  <Select
+                    label="Клан"
+                    variant="underlined"
+                    placeholder="Выберите клан"
+                    selectionMode="multiple"
+                    isOpen={isClanSelectOpen}
+                    onOpenChange={(open) =>
+                      open !== isClanSelectOpen && setIsClanSelectOpen(open)
+                    }
+                    selectedKeys={clanIds.map((f) => f.toString())}
+                    onChange={(e) => {
+                      if (!!e.target.value) {
+                        setclanIds(
+                          e.target.value.split(",").map((s) => Number(s)),
+                        );
+                      }
+                    }}
+                  >
+                    {clans.map((clan) => (
+                      <SelectItem key={clan.id} value={clan.id}>
+                        {clan.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+                {(traitType === "Ability" || traitType === "Feature") && (
+                  <Button
+                    variant="light"
+                    color="warning"
+                    onClick={() => {
+                      if (clans.length === clanIds.length) setclanIds([]);
+                      else setclanIds(clans.map((c) => c.id));
+                    }}
+                    className={className + " m-2"}
+                  >
+                    {clans.length === clanIds.length ? (
+                      <FaTimes size={16} />
+                    ) : (
+                      <FaCheckDouble size={16} />
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
             {traitType === "Ability" && (
               <Checkbox isSelected={isExpert} onValueChange={setIsExpert}>

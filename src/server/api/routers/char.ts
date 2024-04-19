@@ -78,6 +78,7 @@ export type Ability = {
   name: string;
   content: string;
   expertise: boolean;
+  requirementId?: number | null;
   visibleToPlayer: boolean;
   AbilityAvailable?: AbilityAvailable[];
 };
@@ -228,6 +229,7 @@ export const charRouter = createTRPCRouter({
         name: z.string(),
         content: z.string(),
         expertise: z.boolean(),
+        requirementId: z.number().optional(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
       }),
@@ -238,6 +240,7 @@ export const charRouter = createTRPCRouter({
           name: input.name,
           content: input.content,
           expertise: input.expertise,
+          requirementId: input.requirementId,
           visibleToPlayer: input.visibleToPlayer,
           AbilityAvailable: {
             createMany: {
@@ -257,6 +260,7 @@ export const charRouter = createTRPCRouter({
         name: z.string(),
         content: z.string(),
         expertise: z.boolean(),
+        requirementId: z.number().optional(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
       }),
@@ -268,6 +272,7 @@ export const charRouter = createTRPCRouter({
           name: input.name,
           content: input.content,
           expertise: input.expertise,
+          requirementId: input.requirementId,
           visibleToPlayer: input.visibleToPlayer,
           AbilityAvailable: {
             deleteMany: {},

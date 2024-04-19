@@ -38,8 +38,8 @@ export default function CharacterEditor({
   const [characterId, setCharacterId] = useState<number>();
   const [factionId, setFactionId] = useState<number>();
   const [clanId, setClanId] = useState<number>();
-  const [abilityIds, setAbilityIds] = useState<Set<string>>(new Set());
-  const [featureIds, setFeatureIds] = useState<Set<string>>(new Set());
+  const [abilityIds, setAbilityIds] = useState<number[]>([]);
+  const [featureIds, setFeatureIds] = useState<number[]>([]);
   const [age, setAge] = useState<number>(0);
   const [image, setImage] = useState<string>("");
   const [sire, setSire] = useState<string>("");
@@ -82,12 +82,8 @@ export default function CharacterEditor({
       setName(characterData.name);
       setFactionId(characterData.factionId);
       setClanId(characterData.clanId);
-      setAbilityIds(
-        new Set(characterData.abilities.map((a) => a.id.toString())),
-      );
-      setFeatureIds(
-        new Set(characterData.features.map((f) => f.id.toString())),
-      );
+      setAbilityIds(characterData.abilities.map((a) => a.id));
+      setFeatureIds(characterData.features.map((f) => f.id));
       setAge(Number(characterData.age));
       setImage(characterData.image ?? "");
       setSire(characterData.sire ?? "");
@@ -168,8 +164,8 @@ export default function CharacterEditor({
     setName("");
     setFactionId(undefined);
     setClanId(undefined);
-    setAbilityIds(new Set([]));
-    setFeatureIds(new Set([]));
+    setAbilityIds([]);
+    setFeatureIds([]);
     setAge(0);
     setImage("");
     setSire("");
@@ -401,8 +397,12 @@ export default function CharacterEditor({
           variant="underlined"
           placeholder="Выберите дисциплины"
           selectionMode="multiple"
-          selectedKeys={abilityIds}
-          onChange={(e) => setAbilityIds(new Set(e.target.value.split(",")))}
+          selectedKeys={abilityIds.map((f) => f.toString())}
+          onChange={(e) => {
+            if (!!e.target.value) {
+              setAbilityIds(e.target.value.split(",").map((s) => Number(s)));
+            }
+          }}
         >
           {abilities
             .filter((a) =>
@@ -428,8 +428,12 @@ export default function CharacterEditor({
           variant="underlined"
           placeholder="Выберите дополнения"
           selectionMode="multiple"
-          selectedKeys={featureIds}
-          onChange={(e) => setFeatureIds(new Set(e.target.value.split(",")))}
+          selectedKeys={featureIds.map((f) => f.toString())}
+          onChange={(e) => {
+            if (!!e.target.value) {
+              setFeatureIds(e.target.value.split(",").map((s) => Number(s)));
+            }
+          }}
         >
           {features
             .filter((a) =>
