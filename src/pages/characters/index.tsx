@@ -16,10 +16,16 @@ export default function Characters() {
   const [selectedTab, setSelectedTab] = useState("all");
   const router = useRouter();
 
-  const { data: characterData, isLoading: isCharactersLoading } =
-    api.char.getAll.useQuery();
-  const { data: myCharacterData, isLoading: isMyCharactersLoading } =
-    api.char.getMine.useQuery();
+  const {
+    data: characterData,
+    isLoading: isCharactersLoading,
+    refetch: refetchAll,
+  } = api.char.getAll.useQuery();
+  const {
+    data: myCharacterData,
+    isLoading: isMyCharactersLoading,
+    refetch: refetchMine,
+  } = api.char.getMine.useQuery();
   useEffect(() => {
     setCharacters(
       !!characterData ? characterData.filter((c) => c.visible) : [],
@@ -172,7 +178,13 @@ export default function Characters() {
                 </div>
               }
             >
-              <CharacterEditor onSuccess={() => setSelectedTab("mine")} />
+              <CharacterEditor
+                onSuccess={() => {
+                  void refetchAll();
+                  void refetchMine();
+                  setSelectedTab("mine");
+                }}
+              />
             </Tab>
           </Tabs>
         </div>

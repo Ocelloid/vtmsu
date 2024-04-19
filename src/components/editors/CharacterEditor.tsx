@@ -56,8 +56,6 @@ export default function CharacterEditor({
   const [abilities, setAbilities] = useState<Ability[]>([]);
   const [features, setFeatures] = useState<Feature[]>([]);
 
-  console.log(abilityIds, abilities);
-
   const { data: characterData, isLoading: isCharacterLoading } =
     api.char.getById.useQuery({ id: characterId! }, { enabled: !!characterId });
 
@@ -95,9 +93,12 @@ export default function CharacterEditor({
       setSire(characterData.sire ?? "");
       setChilder(characterData.childer ?? "");
       setInitialPublicInfo(characterData.publicInfo ?? "");
+      setPublicInfo(characterData.publicInfo ?? "");
       setVisible(characterData.visible);
       setInitialAmbition(characterData.ambition ?? "");
+      setAmbition(characterData.ambition ?? "");
       setInitialQuenta(characterData.content ?? "");
+      setQuenta(characterData.content ?? "");
     }
   }, [characterData]);
 
