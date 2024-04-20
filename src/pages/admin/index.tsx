@@ -19,6 +19,7 @@ import type {
   Feature,
 } from "~/server/api/routers/char";
 import { FaPencilAlt, FaPlusCircle, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 type characterTraitsType = {
   label: string;
@@ -27,6 +28,7 @@ type characterTraitsType = {
 }[];
 
 export default function Admin() {
+  const { data: sessionData } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [characterTraits, setCharacterTraits] = useState<characterTraitsType>([
     { label: "Фракции", type: "Faction", list: [] },
@@ -36,21 +38,21 @@ export default function Admin() {
   ]);
 
   const { data: isPersonnel, isLoading: isUserPersonnelLoading } =
-    api.user.userIsPersonnel.useQuery();
+    api.user.userIsPersonnel.useQuery(undefined, { enabled: !!sessionData });
   const { data: isAdmin, isLoading: isUserAdminLoading } =
-    api.user.userIsAdmin.useQuery();
+    api.user.userIsAdmin.useQuery(undefined, { enabled: !!sessionData });
   const { mutate: changeRole, isPending: isRoleChanging } =
     api.user.userRoleChange.useMutation();
   const {
     data: userList,
     isLoading: isUserListLoading,
     refetch: refetchUserList,
-  } = api.user.getUserList.useQuery();
+  } = api.user.getUserList.useQuery(undefined, { enabled: !!sessionData });
   const {
     data: charTraitsData,
     isLoading: isCharTraitsLoading,
     refetch: refetchTraits,
-  } = api.char.getCharTraits.useQuery();
+  } = api.char.getCharTraits.useQuery(undefined, { enabled: !!sessionData });
 
   useEffect(() => {
     setUsers(userList ?? []);
@@ -110,6 +112,12 @@ export default function Admin() {
     isRoleChanging
   )
     return <LoadingPage />;
+  if (!sessionData)
+    return (
+      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
+        Войдите, чтобы увидеть эту страницу
+      </div>
+    );
   if (!isPersonnel) return <div className="m-auto">403</div>;
 
   return (

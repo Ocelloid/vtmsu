@@ -1,12 +1,19 @@
 import Head from "next/head";
+import { useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
 
 export default function Game() {
-  // const hello = api.post.hello.useQuery({ text: "from tRPC" });
+  const { data: sessionData } = useSession();
   const { data, isLoading } = api.post.getAll.useQuery();
 
   if (isLoading) return <div>Loading...</div>;
+  if (!sessionData)
+    return (
+      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
+        Войдите, чтобы увидеть эту страницу
+      </div>
+    );
   if (!data) return <div>Something went wrong</div>;
 
   return (
