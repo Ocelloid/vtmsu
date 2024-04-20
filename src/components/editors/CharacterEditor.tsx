@@ -243,6 +243,38 @@ export default function CharacterEditor({
   )
     return <LoadingPage />;
 
+  const isInvalid =
+    !name ||
+    !factionId ||
+    !clanId ||
+    !age ||
+    !ambition ||
+    !publicInfo ||
+    publicInfo === "<p></p>" ||
+    !quenta ||
+    quenta === "<p></p>" ||
+    !!costSum ||
+    !featureWithComments
+      .filter((fwc) => fwc.checked)
+      .reduce((a, b) => a && !!b.comment, true);
+
+  const invalidFields = [
+    !name ? "имя" : undefined,
+    !factionId ? "фракцию" : undefined,
+    !clanId ? "клан" : undefined,
+    !age ? "возраст" : undefined,
+    !ambition ? "амбиции" : undefined,
+    !publicInfo || publicInfo === "<p></p>"
+      ? "публичную информацию"
+      : undefined,
+    !quenta || quenta === "<p></p>" ? "квенту" : undefined,
+    !featureWithComments
+      .filter((fwc) => fwc.checked)
+      .reduce((a, b) => a && !!b.comment, true)
+      ? "комментарии к дополнениям"
+      : undefined,
+  ];
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col">
       <div className="flex flex-row gap-2">
@@ -256,7 +288,7 @@ export default function CharacterEditor({
             ),
             allowedContent: "Изображение (1 Мб)",
           }}
-          className="h-8 w-full cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
+          className="h-8 w-full max-w-[160px] cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
           endpoint="imageUploader"
           onUploadBegin={() => setUploading(true)}
           onClientUploadComplete={(res) => {
@@ -265,19 +297,7 @@ export default function CharacterEditor({
           }}
         />
         <Button
-          isDisabled={
-            !name ||
-            !factionId ||
-            !clanId ||
-            !age ||
-            !ambition ||
-            publicInfo === "<p></p>" ||
-            quenta === "<p></p>" ||
-            !!costSum ||
-            !featureWithComments
-              .filter((fwc) => fwc.checked)
-              .reduce((a, b) => a && !!b.comment, true)
-          }
+          isDisabled={isInvalid}
           onClick={handleSaveCharacter}
           variant={"ghost"}
           className="h-8 w-full border-warning hover:!bg-warning/25"
@@ -317,6 +337,16 @@ export default function CharacterEditor({
           </Button>
         )}
       </div>
+      {isInvalid && (
+        <div className="flex flex-1 flex-grow py-1 text-center text-xs text-warning/50">
+          <p className="mx-auto">
+            {invalidFields.filter((i) => !!i) && "Введите "}
+            {invalidFields.filter((i) => !!i).join(", ")}
+            {invalidFields.filter((i) => !!i) && ". "}
+            {!!costSum && "Сумма долнений долна быть равна нулю."}
+          </p>
+        </div>
+      )}
       <div className="flex flex-row gap-2 sm:gap-4">
         <div className="flex h-[160px] w-[160px] flex-col items-center justify-center">
           {uploading ? (
@@ -347,6 +377,13 @@ export default function CharacterEditor({
             onChange={(e) => {
               if (!!e.target.value) {
                 setFactionId(Number(e.target.value));
+                setClanId(undefined);
+                setAbilityIds([]);
+                setFeatureWithComments(
+                  featureWithComments.map((fwc) => {
+                    return { id: fwc.id, comment: "", checked: false };
+                  }),
+                );
               }
             }}
           >
@@ -359,8 +396,10 @@ export default function CharacterEditor({
                   textValue={faction.name}
                 >
                   <div className="flex flex-col">
-                    <div className="text-small">{faction.name}</div>
-                    <div className="whitespace-normal text-tiny text-default-400">
+                    <div className="text-small text-red-100">
+                      {faction.name}
+                    </div>
+                    <div className="whitespace-normal text-tiny text-red-100">
                       {faction.content}
                     </div>
                   </div>
@@ -378,6 +417,12 @@ export default function CharacterEditor({
             onChange={(e) => {
               if (!!e.target.value) {
                 setClanId(Number(e.target.value));
+                setAbilityIds([]);
+                setFeatureWithComments(
+                  featureWithComments.map((fwc) => {
+                    return { id: fwc.id, comment: "", checked: false };
+                  }),
+                );
               }
             }}
           >
@@ -392,8 +437,8 @@ export default function CharacterEditor({
               .map((clan) => (
                 <SelectItem key={clan.id} value={clan.id} textValue={clan.name}>
                   <div className="flex flex-col gap-1">
-                    <span className="text-small">{clan.name}</span>
-                    <span className="whitespace-normal text-tiny text-default-400">
+                    <span className="text-small text-red-100">{clan.name}</span>
+                    <span className="whitespace-normal text-tiny text-red-100">
                       {clan.content}
                     </span>
                   </div>
@@ -428,11 +473,11 @@ export default function CharacterEditor({
       </div>
       <Checkbox
         color="warning"
-        size="sm"
+        // size="sm"
         isSelected={visible}
         onValueChange={(e) => setVisible(e)}
       >
-        Другие игроки могут видеть этого персонажа
+        Персонаж виден другим игрокам
       </Checkbox>
       <div className="flex flex-1 flex-col sm:hidden">
         <Input
@@ -465,11 +510,11 @@ export default function CharacterEditor({
           initialContent={initialPublicInfo}
           placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
         />
-        <p className="mx-auto -mb-1 flex flex-row text-xs text-warning">
+        <p className="mx-auto -mb-1 flex flex-row text-xs text-warning/50">
           &nbsp;Публичная информация&nbsp;
         </p>
-        <Divider className="bg-warning" />
-        <p className="mx-auto -mt-1 flex flex-row text-xs text-warning">
+        <Divider className="bg-warning/50" />
+        <p className="mx-auto -mt-1 flex flex-row text-xs text-warning/50">
           &nbsp;Тайная информация&nbsp;
         </p>
         <div className={"-mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2"}>
@@ -581,21 +626,19 @@ export default function CharacterEditor({
               .filter((fwc) => fwc.checked)
               .map((fwc) => fwc.id.toString())}
             onValueChange={(fids) => {
-              if (fids.length < 4) {
-                setCostSum(
-                  features
-                    .filter((f) => fids.includes(f.id.toString()))
-                    .reduce((a, b) => a + b.cost, 0),
-                );
-                setFeatureWithComments(
-                  featureWithComments.map((fwc) => {
-                    return {
-                      ...fwc,
-                      checked: fids.includes(fwc.id.toString()),
-                    };
-                  }),
-                );
-              }
+              setCostSum(
+                features
+                  .filter((f) => fids.includes(f.id.toString()))
+                  .reduce((a, b) => a + b.cost, 0),
+              );
+              setFeatureWithComments(
+                featureWithComments.map((fwc) => {
+                  return {
+                    ...fwc,
+                    checked: fids.includes(fwc.id.toString()),
+                  };
+                }),
+              );
             }}
           >
             {features
