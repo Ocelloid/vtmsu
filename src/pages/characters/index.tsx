@@ -8,9 +8,11 @@ import { type Character } from "~/server/api/routers/char";
 import CharacterEditor from "~/components/editors/CharacterEditor";
 import { FaPencilAlt, FaEye, FaEyeSlash, FaPlus } from "react-icons/fa";
 import default_char from "~/../public/default_char.png";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 export default function Characters() {
+  const { data: sessionData } = useSession();
   const [characters, setCharacters] = useState<Character[]>([]);
   const [myCharacters, setMyCharacters] = useState<Character[]>([]);
   const [selectedTab, setSelectedTab] = useState("all");
@@ -20,18 +22,19 @@ export default function Characters() {
     data: characterData,
     isLoading: isCharactersLoading,
     refetch: refetchAll,
-  } = api.char.getAll.useQuery();
+  } = api.char.getAll.useQuery(undefined, { enabled: !!sessionData });
   const {
     data: myCharacterData,
     isLoading: isMyCharactersLoading,
     refetch: refetchMine,
-  } = api.char.getMine.useQuery();
+  } = api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
+
   useEffect(() => {
     setCharacters(
       !!characterData ? characterData.filter((c) => c.visible) : [],
     );
     setMyCharacters(myCharacterData ?? []);
-  }, [characterData, myCharacterData]);
+  }, [characterData, myCharacterData, sessionData]);
 
   const handleEditCharacter = (cid: number) => {
     setSelectedTab("edit");
@@ -46,6 +49,12 @@ export default function Characters() {
   };
 
   if (isCharactersLoading || isMyCharactersLoading) return <LoadingPage />;
+  if (!sessionData)
+    return (
+      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
+        Войдите, чтобы увидеть эту страницу
+      </div>
+    );
   if (!characterData) return <div>Something went wrong</div>;
 
   return (
@@ -89,46 +98,52 @@ export default function Characters() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className="h-8 w-full border-warning text-white hover:!bg-warning/25 hover:text-white"
+                  className="w-90 mx-auto h-8 border-warning text-white hover:!bg-warning/25 hover:text-white"
                   onClick={() => setSelectedTab("edit")}
                 >
                   <FaPlus />
                   Добавить персонажа
                 </Button>
-                {characters.map((character) => (
-                  <div
-                    key={character.id}
-                    className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
-                  >
-                    <div className="mb-2 flex flex-col sm:mb-0">
-                      <Image
-                        className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
-                        alt="char_photo"
-                        src={!!character.image ? character.image : default_char}
-                        height="640"
-                        width="640"
-                      />
-                    </div>
-                    <div className="col-span-2 flex flex-1 flex-col">
-                      <div className="flex flex-row">
-                        <p className="mr-auto text-2xl">{character.name}</p>
+                <div className="grid grid-cols-1 gap-2 xl:grid-cols-2 2xl:grid-cols-3">
+                  {characters.map((character) => (
+                    <div
+                      key={character.id}
+                      className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
+                    >
+                      <div className="mb-2 flex flex-col sm:mb-0">
+                        <Image
+                          className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
+                          alt="char_photo"
+                          src={
+                            !!character.image ? character.image : default_char
+                          }
+                          height="640"
+                          width="640"
+                        />
                       </div>
-                      <p className="text-xs italic">
-                        {character.faction?.name}
-                        {" - "}
-                        {character.clan?.name}
-                      </p>
-                      <p className="text-xs italic">{character.status}</p>
-                      <p className="text-xs italic">{character.title}</p>
-                      <div
-                        className="tiptap-display pb-8 text-justify"
-                        dangerouslySetInnerHTML={{
-                          __html: character.publicInfo!,
-                        }}
-                      />
+                      <div className="col-span-2 flex flex-1 flex-col">
+                        <div className="flex flex-row">
+                          <p className="mr-auto break-all text-2xl">
+                            {character.name}
+                          </p>
+                        </div>
+                        <p className="text-xs italic">
+                          {character.faction?.name}
+                          {" - "}
+                          {character.clan?.name}
+                        </p>
+                        <p className="text-xs italic">{character.status}</p>
+                        <p className="text-xs italic">{character.title}</p>
+                        <div
+                          className="tiptap-display pb-8 text-justify"
+                          dangerouslySetInnerHTML={{
+                            __html: character.publicInfo!,
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </Tab>
             <Tab
@@ -142,59 +157,65 @@ export default function Characters() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className="h-8 w-full border-warning text-white hover:!bg-warning/25 hover:text-white"
+                  className="w-90 mx-auto h-8 border-warning text-white hover:!bg-warning/25 hover:text-white"
                   onClick={() => setSelectedTab("edit")}
                 >
                   <FaPlus />
                   Добавить персонажа
                 </Button>
-                {myCharacters.map((character) => (
-                  <div
-                    key={character.id}
-                    className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
-                  >
-                    <div className="mb-2 flex flex-col sm:mb-0">
-                      <Image
-                        className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
-                        alt="char_photo"
-                        src={!!character.image ? character.image : default_char}
-                        height="640"
-                        width="640"
-                      />
-                    </div>
-                    <div className="col-span-2 flex flex-1 flex-col">
-                      <div className="flex flex-row">
-                        <p className="mr-auto text-2xl">{character.name}</p>
-                        {character.visible ? (
-                          <FaEye size={24} className="mr-2 mt-1" />
-                        ) : (
-                          <FaEyeSlash size={24} className="mr-1" />
-                        )}
-                        <Button
-                          variant="bordered"
-                          color="warning"
-                          className="h-8 w-8 min-w-0 rounded-full p-0"
-                          onClick={() => handleEditCharacter(character.id)}
-                        >
-                          <FaPencilAlt size={16} />
-                        </Button>
+                <div className="grid grid-cols-1 gap-2 xl:grid-cols-2 2xl:grid-cols-3">
+                  {myCharacters.map((character) => (
+                    <div
+                      key={character.id}
+                      className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
+                    >
+                      <div className="mb-2 flex flex-col sm:mb-0">
+                        <Image
+                          className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
+                          alt="char_photo"
+                          src={
+                            !!character.image ? character.image : default_char
+                          }
+                          height="640"
+                          width="640"
+                        />
                       </div>
-                      <p className="text-xs italic">
-                        {character.faction?.name}
-                        {" - "}
-                        {character.clan?.name}
-                      </p>
-                      <p className="text-xs italic">{character.status}</p>
-                      <p className="text-xs italic">{character.title}</p>
-                      <div
-                        className="tiptap-display pb-8 text-justify"
-                        dangerouslySetInnerHTML={{
-                          __html: character.publicInfo!,
-                        }}
-                      />
+                      <div className="col-span-2 flex flex-1 flex-col">
+                        <div className="flex flex-row">
+                          <p className="mr-auto break-all text-2xl">
+                            {character.name}
+                          </p>
+                          {character.visible ? (
+                            <FaEye size={24} className="mr-2 mt-1 min-w-8" />
+                          ) : (
+                            <FaEyeSlash size={24} className="mr-1 min-w-8" />
+                          )}
+                          <Button
+                            variant="light"
+                            color="warning"
+                            className="h-8 w-8 min-w-8 rounded-full p-0"
+                            onClick={() => handleEditCharacter(character.id)}
+                          >
+                            <FaPencilAlt size={16} />
+                          </Button>
+                        </div>
+                        <p className="text-xs italic">
+                          {character.faction?.name}
+                          {" - "}
+                          {character.clan?.name}
+                        </p>
+                        <p className="text-xs italic">{character.status}</p>
+                        <p className="text-xs italic">{character.title}</p>
+                        <div
+                          className="tiptap-display pb-8 text-justify"
+                          dangerouslySetInnerHTML={{
+                            __html: character.publicInfo!,
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </Tab>
             <Tab
