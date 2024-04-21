@@ -127,6 +127,13 @@ export default function Characters() {
                             {character.name}
                           </p>
                         </div>
+                        {character.playerName && character.playerContact && (
+                          <p className="text-xs font-bold">
+                            {character.playerName}
+                            {" - "}
+                            {character.playerContact}
+                          </p>
+                        )}
                         <p className="text-xs italic">
                           {character.faction?.name}
                           {" - "}
