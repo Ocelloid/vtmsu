@@ -11,11 +11,13 @@ import {
   User,
 } from "@nextui-org/react";
 import { useRouter } from "next/router";
+import { api } from "~/utils/api";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const { data: sessionData } = useSession();
+  const { data: isPersonnel } = api.user.userIsPersonnel.useQuery();
   const pathOpen = (pathname: string) => {
     void router.replace(`/${pathname}`);
   };
@@ -103,16 +105,18 @@ const Navigation = () => {
         </Button>
         {!!sessionData && (
           <>
-            <Button
-              onClick={() => {
-                setIsOpen(false);
-                pathOpen("admin");
-              }}
-              variant="bordered"
-              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
-            >
-              Управление
-            </Button>
+            {isPersonnel && (
+              <Button
+                onClick={() => {
+                  setIsOpen(false);
+                  pathOpen("admin");
+                }}
+                variant="bordered"
+                className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
+              >
+                Управление
+              </Button>
+            )}
             <Button
               onClick={() => {
                 setIsOpen(false);
@@ -151,7 +155,7 @@ const Navigation = () => {
               </DropdownTrigger>
               <DropdownMenu
                 aria-label="acconut_actions"
-                disabledKeys={[]}
+                disabledKeys={!isPersonnel ? ["admin"] : []}
                 itemClasses={{
                   title: [
                     "text-medium",
