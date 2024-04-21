@@ -1,10 +1,15 @@
 import Head from "next/head";
 
-type LoadingProps = { width?: number; height?: number } & DefaultLoadingProps;
+type LoadingProps = {
+  width?: number;
+  height?: number;
+  className?: string;
+} & DefaultLoadingProps;
 type DefaultLoadingProps = Partial<typeof defaultLoadingProps>;
 const defaultLoadingProps = {
   width: 40,
   height: 40,
+  className: "",
 };
 
 export const LoadingSpinner = (props: LoadingProps) => {
@@ -12,7 +17,7 @@ export const LoadingSpinner = (props: LoadingProps) => {
     <div role="status" className="text-center">
       <svg
         aria-hidden="true"
-        className="animate-spin fill-red-600 text-gray-200 dark:text-gray-600"
+        className={`${props.className} animate-spin fill-red-600 text-gray-200 dark:text-gray-600`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

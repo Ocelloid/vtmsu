@@ -8,7 +8,7 @@ await import("./src/env.js");
 const config = {
   reactStrictMode: true,
   images: {
-    domains: ["utfs.io"],
+    domains: ["utfs.io", "cdn.discordapp.com"],
   },
 
   /**
