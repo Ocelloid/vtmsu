@@ -202,6 +202,10 @@ model User {
   isPersonnel   Boolean   @default(false)
   emailVerified DateTime?
   image         String?
+  phone         String?
+  vk            String?
+  tg            String?
+  discord       String?
   accounts      Account[]
   sessions      Session[]
   posts         Post[]

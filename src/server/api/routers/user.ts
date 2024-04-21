@@ -16,6 +16,49 @@ export type User = {
 };
 
 export const userRouter = createTRPCRouter({
+  changePP: protectedProcedure
+    .input(z.object({ pp: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { image: input.pp },
+      });
+      return user;
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        email: z.string().optional(),
+        phone: z.string().optional(),
+        vk: z.string().optional(),
+        tg: z.string().optional(),
+        discord: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: {
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+          vk: input.vk,
+          tg: input.tg,
+          discord: input.discord,
+        },
+      });
+      return user;
+    }),
+
+  getCurrent: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+    });
+    return user;
+  }),
+
   getUserList: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },

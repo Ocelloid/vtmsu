@@ -67,13 +67,15 @@ const Product = () => {
       </div>
       <div className="flex flex-col gap-4 md:w-2/4">
         <div>
-          <h1 className="text-3xl font-bold text-red-100">{product.title}</h1>
+          <h1 className="text-3xl font-bold text-black dark:text-red-100">
+            {product.title}
+          </h1>
           <span className=" font-semibold text-red-600">
             {product.subtitle}
           </span>
         </div>
-        <p className="text-red-100">{product.description}</p>
-        <h6 className="flex flex-row text-2xl font-semibold text-red-100">
+        <p className="text-black dark:text-red-100">{product.description}</p>
+        <h6 className="flex flex-row text-2xl font-semibold text-black dark:text-red-100">
           {product.price} <FaRubleSign size={20} className="mt-[.3rem]" />
         </h6>
         <div className="flex flex-row items-center gap-2 md:gap-12">
@@ -96,7 +98,7 @@ const Product = () => {
           </div>
           <Button
             onClick={() => addToCart({ ...product, quantity: amount })}
-            className="h-full rounded-lg border-1 border-red-800 bg-transparent px-16 py-3 text-2xl font-semibold text-red-100"
+            className="h-full rounded-lg border-1 border-red-800 bg-transparent px-16 py-3 text-2xl font-semibold text-black dark:text-red-100"
           >
             Добавить
           </Button>

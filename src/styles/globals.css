@@ -37,9 +37,12 @@
     margin-top: 0.75em;
   }
 
+  .is-editor-empty:first-child::before {
+    @apply text-[#877880] dark:text-slate-300;
+  }
+
   a {
-    color: #f5a524;
-    cursor: pointer;
+    @apply cursor-pointer text-blue-800 dark:text-warning;
   }
 
   ul,

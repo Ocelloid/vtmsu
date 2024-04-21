@@ -43,7 +43,7 @@ const CartDrawer = ({ isOpen, onCartIconClick }: Props) => {
         </div>
       </div>
       <div
-        className={`fixed right-0 top-[5.4rem] z-50 h-full w-[19rem] transform bg-red-950 bg-opacity-90 text-white transition duration-700 ease-in-out md:top-24 ${
+        className={`fixed right-0 top-[5.4rem] z-50 h-full w-[19rem] transform bg-red-200 bg-opacity-90 text-white transition duration-700 ease-in-out dark:bg-red-950 md:top-24 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{

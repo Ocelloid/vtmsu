@@ -62,7 +62,7 @@ const AddProduct = ({ onClose }: { onClose: () => void }) => {
         backdrop="blur"
         classNames={{
           body: "py-6",
-          base: "bg-red-950 bg-opacity-95 text-neutral-100",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-neutral-100",
           closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
         }}
       >
@@ -158,7 +158,7 @@ const AddProduct = ({ onClose }: { onClose: () => void }) => {
       </Modal>
       <Button
         onClick={() => setIsModalOpen(true)}
-        className="mt-16 h-60 w-40 flex-col gap-0 rounded-2xl bg-red-950 text-2xl text-red-100 md:h-80 md:w-56"
+        className="mt-16 h-60 w-40 flex-col gap-0 rounded-2xl bg-red-200 text-2xl text-black dark:bg-red-950 dark:text-red-100 md:h-80 md:w-56"
       >
         <FaPlusCircle size={64} />
         Добавить <br />

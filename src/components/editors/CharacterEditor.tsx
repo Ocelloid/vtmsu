@@ -2,6 +2,8 @@ import {
   Input,
   Select,
   SelectItem,
+  Autocomplete,
+  AutocompleteItem,
   // Divider,
   Button,
   Textarea,
@@ -33,6 +35,12 @@ type FeatureWithComment = {
   checked: boolean;
 };
 
+type SelectContact = {
+  label: string;
+  value: string;
+  description: string;
+};
+
 export default function CharacterEditor({
   onSuccess,
 }: {
@@ -56,6 +64,8 @@ export default function CharacterEditor({
   const [title, setTitle] = useState<string>("");
   const [playerName, setPlayerName] = useState<string>("");
   const [playerContact, setPlayerContact] = useState<string>("");
+  const [playerContactKey, setPlayerContactKey] = useState<string>("");
+  const [contactSelect, setContactSelect] = useState<SelectContact[]>([]);
   const [publicInfo, setPublicInfo] = useState<string>("");
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
@@ -68,6 +78,9 @@ export default function CharacterEditor({
   const [abilities, setAbilities] = useState<Ability[]>([]);
   const [features, setFeatures] = useState<Feature[]>([]);
   const [uploading, setUploading] = useState<boolean>(false);
+
+  const { data: userData, isLoading: isUserLoading } =
+    api.user.getCurrent.useQuery();
 
   const { data: characterData, isLoading: isCharacterLoading } =
     api.char.getById.useQuery({ id: characterId! }, { enabled: !!characterId });
@@ -85,7 +98,7 @@ export default function CharacterEditor({
     api.char.delete.useMutation();
 
   useEffect(() => {
-    if (!!traitsData) {
+    if (!!traitsData && !!userData) {
       setFactions(traitsData.factions);
       setClans(traitsData.clans);
       setAbilities(traitsData.abilities);
@@ -95,11 +108,36 @@ export default function CharacterEditor({
           return { id: f.id, comment: "", checked: false };
         }),
       );
+      setPlayerName(userData.name ?? "");
+      const pS = [];
+      if (userData.phone)
+        pS.push({
+          label: "телефон: " + userData.phone,
+          value: "phone",
+          description: "",
+        });
+      if (userData.email)
+        pS.push({
+          label: "email: " + userData.email,
+          value: "email",
+          description: "",
+        });
+      if (userData.vk)
+        pS.push({ label: "ВК: " + userData.vk, value: "vk", description: "" });
+      if (userData.tg)
+        pS.push({ label: "TG: " + userData.tg, value: "tg", description: "" });
+      if (userData.discord)
+        pS.push({
+          label: "Discord: " + userData.discord,
+          value: "discord",
+          description: "",
+        });
+      setContactSelect(pS);
     }
-  }, [traitsData]);
+  }, [traitsData, userData]);
 
   useEffect(() => {
-    if (!!characterData) {
+    if (!!characterData && !!traitsData && !!userData) {
       setName(characterData.name);
       setFactionId(characterData.factionId);
       setClanId(characterData.clanId);
@@ -107,15 +145,15 @@ export default function CharacterEditor({
       const cdfs = characterData.features.map((cdf) => {
         return { id: cdf.featureId, comment: cdf.description!, checked: true };
       });
-      if (!!traitsData) {
-        setFeatureWithComments(
-          traitsData.features.map((f) => {
-            return cdfs.map((cdf) => cdf.id).includes(f.id)
-              ? cdfs.find((cdf) => cdf.id === f.id)!
-              : { id: f.id, comment: "", checked: false };
-          }),
-        );
-      }
+      setFeatureWithComments(
+        traitsData.features.map((f) => {
+          return cdfs.map((cdf) => cdf.id).includes(f.id)
+            ? cdfs.find((cdf) => cdf.id === f.id)!
+            : { id: f.id, comment: "", checked: false };
+        }),
+      );
+      setPlayerName(userData.name ?? "");
+      setPlayerContact(userData.phone ? userData.phone : userData.email ?? "");
       setAge(Number(characterData.age));
       setImage(characterData.image ?? "");
       setSire(characterData.sire ?? "");
@@ -129,8 +167,32 @@ export default function CharacterEditor({
       setAmbition(characterData.ambition ?? "");
       setInitialQuenta(characterData.content ?? "");
       setQuenta(characterData.content ?? "");
+      const pS = [];
+      if (userData.phone)
+        pS.push({
+          label: "телефон: " + userData.phone,
+          value: "phone",
+          description: "",
+        });
+      if (userData.email)
+        pS.push({
+          label: "email: " + userData.email,
+          value: "email",
+          description: "",
+        });
+      if (userData.vk)
+        pS.push({ label: "ВК: " + userData.vk, value: "vk", description: "" });
+      if (userData.tg)
+        pS.push({ label: "TG: " + userData.tg, value: "tg", description: "" });
+      if (userData.discord)
+        pS.push({
+          label: "Discord: " + userData.discord,
+          value: "discord",
+          description: "",
+        });
+      setContactSelect(pS);
     }
-  }, [characterData, traitsData]);
+  }, [characterData, traitsData, userData]);
 
   useEffect(() => {
     const id = Array.isArray(router.query.character)
@@ -239,6 +301,7 @@ export default function CharacterEditor({
   };
 
   if (
+    isUserLoading ||
     isTraitsLoading ||
     isCharacterCreatePending ||
     isCharacterUpdatePending ||
@@ -408,10 +471,10 @@ export default function CharacterEditor({
                     textValue={faction.name}
                   >
                     <div className="flex flex-col">
-                      <div className="text-small text-red-100">
+                      <div className="text-small dark:text-red-100">
                         {faction.name}
                       </div>
-                      <div className="whitespace-normal text-tiny text-red-100">
+                      <div className="whitespace-normal text-tiny dark:text-red-100">
                         {faction.content}
                       </div>
                     </div>
@@ -453,10 +516,10 @@ export default function CharacterEditor({
                     textValue={clan.name}
                   >
                     <div className="flex flex-col gap-1">
-                      <span className="text-small text-red-100">
+                      <span className="text-small dark:text-red-100">
                         {clan.name}
                       </span>
-                      <span className="whitespace-normal text-tiny text-red-100">
+                      <span className="whitespace-normal text-tiny dark:text-red-100">
                         {clan.content}
                       </span>
                     </div>
@@ -480,13 +543,32 @@ export default function CharacterEditor({
               value={playerName}
               onValueChange={setPlayerName}
             />
-            <Input
+
+            <Autocomplete
+              label="Способ связи"
+              placeholder="Введите способ связи"
+              variant="underlined"
+              defaultItems={contactSelect}
+              allowsCustomValue={true}
+              selectedKey={playerContactKey}
+              onSelectionChange={(k) =>
+                setPlayerContactKey(!!k ? k.toString() : "")
+              }
+              onInputChange={setPlayerContact}
+            >
+              {(item) => (
+                <AutocompleteItem key={item.value}>
+                  {item.label}
+                </AutocompleteItem>
+              )}
+            </Autocomplete>
+            {/* <Input
               variant="underlined"
               label="Контакт игрока"
               placeholder="Введите предпочитаемый способ связи"
               value={playerContact}
               onValueChange={setPlayerContact}
-            />
+            /> */}
             <Input
               variant="underlined"
               label="Статусы"
@@ -629,9 +711,9 @@ export default function CharacterEditor({
                     classNames={{
                       base: cn(
                         "flex-row flex flex-1 max-w-full w-full m-0",
-                        "hover:bg-warning/25 items-center justify-start",
+                        "hover:bg-success/25 dark:hover:bg-danger/25 items-center justify-start",
                         "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
-                        "data-[selected=true]:border-warning",
+                        "data-[selected=true]:border-success dark:data-[selected=true]:border-warning",
                       ),
                       label: "w-full",
                     }}

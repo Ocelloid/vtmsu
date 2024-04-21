@@ -30,7 +30,7 @@ const DefaultCard = ({
 
   return (
     <div
-      className={`${className} group mt-16 flex cursor-pointer flex-col rounded-2xl bg-red-950`}
+      className={`${className} group mt-16 flex cursor-pointer flex-col rounded-2xl bg-red-200 dark:bg-red-950`}
       onClick={() => {
         if (!!to) void router.replace(to);
       }}
