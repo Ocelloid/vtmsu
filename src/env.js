@@ -26,6 +26,8 @@ export const env = createEnv({
     DISCORD_CLIENT_SECRET: z.string(),
     YANDEX_CLIENT_ID: z.string(),
     YANDEX_CLIENT_SECRET: z.string(),
+    VK_CLIENT_ID: z.string(),
+    VK_CLIENT_SECRET: z.string(),
   },
 
   /**
@@ -50,6 +52,8 @@ export const env = createEnv({
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
     YANDEX_CLIENT_ID: process.env.YANDEX_CLIENT_ID,
     YANDEX_CLIENT_SECRET: process.env.YANDEX_CLIENT_SECRET,
+    VK_CLIENT_ID: process.env.VK_CLIENT_ID,
+    VK_CLIENT_SECRET: process.env.VK_CLIENT_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
