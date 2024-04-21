@@ -84,6 +84,7 @@ export const ruleRouter = createTRPCRouter({
       if (input.order === "up") {
         const prevRule = await ctx.db.rule.findMany({
           where: { orderedAs: { lt: thisRule!.orderedAs } },
+          orderBy: { orderedAs: "asc" },
           take: -1,
         });
         if (prevRule[0]) {
@@ -99,6 +100,7 @@ export const ruleRouter = createTRPCRouter({
       } else {
         const nextRule = await ctx.db.rule.findFirst({
           where: { orderedAs: { gt: thisRule!.orderedAs } },
+          orderBy: { orderedAs: "asc" },
         });
         if (nextRule) {
           await ctx.db.rule.update({

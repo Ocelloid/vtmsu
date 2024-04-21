@@ -183,6 +183,8 @@ export default function Rules() {
                   .sort((a, b) => a.orderedAs - b.orderedAs)
                   .map((rule, i, arr) => {
                     const isFirst = arr[0]!.orderedAs === rule.orderedAs;
+                    const isLast =
+                      arr[arr.length - 1]!.orderedAs === rule.orderedAs;
                     return (
                       <Element
                         key={rule.id}
@@ -206,7 +208,7 @@ export default function Rules() {
                             <div className="ml-auto flex flex-row gap-2">
                               <Button
                                 isDisabled={isOrderLoading || isFirst}
-                                variant="bordered"
+                                variant="light"
                                 color="warning"
                                 className="h-8 w-8 min-w-0 rounded-full p-0"
                                 onClick={() =>
@@ -216,8 +218,8 @@ export default function Rules() {
                                 <FaArrowUp size={16} />
                               </Button>
                               <Button
-                                isDisabled={isOrderLoading}
-                                variant="bordered"
+                                isDisabled={isOrderLoading || isLast}
+                                variant="light"
                                 color="warning"
                                 className="h-8 w-8 min-w-0 rounded-full p-0"
                                 onClick={() =>
@@ -228,7 +230,7 @@ export default function Rules() {
                               </Button>
                               <Button
                                 isDisabled={isOrderLoading}
-                                variant="bordered"
+                                variant="light"
                                 color="warning"
                                 className="h-8 w-8 min-w-0 rounded-full p-0"
                                 onClick={() => handleRuleEdit(rule)}
