@@ -59,7 +59,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
   }
 
   return (
-    <div className="grid grid-cols-[repeat(14,minmax(0,1fr))] justify-between gap-1 text-red-300 md:grid-cols-[repeat(28,minmax(0,1fr))]">
+    <div className="grid grid-cols-[repeat(14,minmax(0,1fr))] justify-between gap-1 dark:text-red-300 md:grid-cols-[repeat(28,minmax(0,1fr))]">
       <Tooltip
         className="rounded-md text-tiny text-default-500"
         content={"Отменить"}

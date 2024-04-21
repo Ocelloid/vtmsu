@@ -471,10 +471,10 @@ export default function CharacterEditor({
                     textValue={faction.name}
                   >
                     <div className="flex flex-col">
-                      <div className="text-small text-red-100">
+                      <div className="text-small dark:text-red-100">
                         {faction.name}
                       </div>
-                      <div className="whitespace-normal text-tiny text-red-100">
+                      <div className="whitespace-normal text-tiny dark:text-red-100">
                         {faction.content}
                       </div>
                     </div>
@@ -516,10 +516,10 @@ export default function CharacterEditor({
                     textValue={clan.name}
                   >
                     <div className="flex flex-col gap-1">
-                      <span className="text-small text-red-100">
+                      <span className="text-small dark:text-red-100">
                         {clan.name}
                       </span>
-                      <span className="whitespace-normal text-tiny text-red-100">
+                      <span className="whitespace-normal text-tiny dark:text-red-100">
                         {clan.content}
                       </span>
                     </div>
@@ -711,9 +711,9 @@ export default function CharacterEditor({
                     classNames={{
                       base: cn(
                         "flex-row flex flex-1 max-w-full w-full m-0",
-                        "hover:bg-warning/25 items-center justify-start",
+                        "hover:bg-success/25 dark:hover:bg-danger/25 items-center justify-start",
                         "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
-                        "data-[selected=true]:border-warning",
+                        "data-[selected=true]:border-success dark:data-[selected=true]:border-warning",
                       ),
                       label: "w-full",
                     }}

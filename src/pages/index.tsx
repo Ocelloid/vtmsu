@@ -35,9 +35,9 @@ export default function Home() {
       </Head>
       <main className=" flex min-h-screen flex-col items-center justify-center">
         <div className="container flex flex-col items-center justify-center gap-4 px-4 pt-24 text-justify ">
-          <h1 className="flex flex-col items-center justify-center text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+          <h1 className="flex flex-col items-center justify-center text-5xl font-extrabold tracking-tight text-black dark:text-white sm:text-[5rem]">
             Маскарад
-            <span className="text-[hsla(0,100%,50%,75%)]">Вампиров</span>
+            <span className="text-red-600">Вампиров</span>
           </h1>
           <p>
             Вот уже много веков люди живут в этом мире, не подозревая о том, что

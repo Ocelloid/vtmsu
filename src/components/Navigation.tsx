@@ -61,16 +61,18 @@ const Navigation = () => {
         </Button>
         {!!sessionData && (
           <>
-            <Button
-              onClick={() => {
-                setIsOpen(false);
-                pathOpen("game");
-              }}
-              variant="bordered"
-              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
-            >
-              Играть
-            </Button>
+            {isPersonnel && (
+              <Button
+                onClick={() => {
+                  setIsOpen(false);
+                  pathOpen("game");
+                }}
+                variant="bordered"
+                className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Играть
+              </Button>
+            )}
             <Button
               onClick={() => {
                 setIsOpen(false);

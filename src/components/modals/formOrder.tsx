@@ -58,7 +58,7 @@ const FormOrder = () => {
         backdrop="blur"
         classNames={{
           body: "py-6",
-          base: "bg-red-950 bg-opacity-95 text-neutral-100",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-neutral-100",
           closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
         }}
       >
@@ -102,7 +102,7 @@ const FormOrder = () => {
       </Modal>
       <Button
         onClick={() => setIsModalOpen(true)}
-        className="flex w-full flex-row gap-0 rounded-none bg-transparent text-red-100"
+        className="flex w-full flex-row gap-0 rounded-none bg-transparent text-black dark:text-red-100"
       >
         <FaShoppingCart size={24} />
         &nbsp; Оформить заказ

@@ -98,7 +98,7 @@ export default function Characters() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className="w-90 mx-auto h-8 border-warning text-white hover:!bg-warning/25 hover:text-white"
+                  className="w-90 mx-auto h-8 border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white"
                   onClick={() => setSelectedTab("edit")}
                 >
                   <FaPlus />
@@ -164,7 +164,7 @@ export default function Characters() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className="w-90 mx-auto h-8 border-warning text-white hover:!bg-warning/25 hover:text-white"
+                  className="w-90 mx-auto h-8 border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white"
                   onClick={() => setSelectedTab("edit")}
                 >
                   <FaPlus />
@@ -200,7 +200,7 @@ export default function Characters() {
                           <Button
                             variant="light"
                             color="warning"
-                            className="h-8 w-8 min-w-8 rounded-full p-0"
+                            className="h-8 w-8 min-w-8 rounded-full p-0 text-black dark:text-warning"
                             onClick={() => handleEditCharacter(character.id)}
                           >
                             <FaPencilAlt size={16} />

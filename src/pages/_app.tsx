@@ -22,7 +22,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <SessionProvider session={session}>
           <main
-            className={`font-sans ${inter.variable} bg-gradient-to-b from-[#6d0202] to-[#000000]`}
+            className={`font-sans ${inter.variable} bg-gradient-to-b from-red-100 to-red-400 dark:from-red-800 dark:to-black`}
           >
             <Component {...pageProps} />
             <Navigation />

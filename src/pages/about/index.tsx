@@ -215,7 +215,7 @@ export default function About() {
             лидера. Во фракции 7 свободных мест. Отдельно общую вводную по
             шабашу вы можете прочитать в группе игры.
           </Element>
-          <Element className="section" name="links">
+          <Element className="section pb-4" name="links">
             <p className="pb-4 text-3xl">Ссылки</p>
             Следующие ссылки, группы и серверы используются для официальной
             связи между игроками, с мастерской группой и регистрации на игре:

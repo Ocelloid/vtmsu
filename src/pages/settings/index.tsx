@@ -1,14 +1,16 @@
 import Head from "next/head";
 import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { Input, Divider, Button } from "@nextui-org/react";
-import { FaImage } from "react-icons/fa";
+import { Input, Switch, Divider, Button } from "@nextui-org/react";
+import { FaImage, FaSun, FaMoon } from "react-icons/fa";
 import Image from "next/image";
 import { UploadButton } from "~/utils/uploadthing";
 import { api } from "~/utils/api";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
+import { useTheme } from "next-themes";
 
 export default function Settings() {
+  const { theme, setTheme } = useTheme();
   const { data: sessionData, update: updateSession } = useSession();
   const [uploading, setUploading] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>("");
@@ -232,8 +234,19 @@ export default function Settings() {
               </div>
             </div>
           </div>
-          <Divider className="bg-warning/50" />
-          Настройки сайта
+          <Divider className="my-2 bg-warning/50" />
+          <Switch
+            isSelected={theme === "light"}
+            onValueChange={(value) => {
+              setTheme(value ? "light" : "dark");
+            }}
+            size="md"
+            color="success"
+            startContent={<FaSun />}
+            endContent={<FaMoon />}
+          >
+            {theme === "light" ? "Светлая тема" : "Тёмная тема"}
+          </Switch>
         </div>
       </main>
     </>
