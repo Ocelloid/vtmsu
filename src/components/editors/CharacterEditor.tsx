@@ -2,6 +2,8 @@ import {
   Input,
   Select,
   SelectItem,
+  Autocomplete,
+  AutocompleteItem,
   // Divider,
   Button,
   Textarea,
@@ -33,6 +35,12 @@ type FeatureWithComment = {
   checked: boolean;
 };
 
+type SelectContact = {
+  label: string;
+  value: string;
+  description: string;
+};
+
 export default function CharacterEditor({
   onSuccess,
 }: {
@@ -56,6 +64,8 @@ export default function CharacterEditor({
   const [title, setTitle] = useState<string>("");
   const [playerName, setPlayerName] = useState<string>("");
   const [playerContact, setPlayerContact] = useState<string>("");
+  const [playerContactKey, setPlayerContactKey] = useState<string>("");
+  const [contactSelect, setContactSelect] = useState<SelectContact[]>([]);
   const [publicInfo, setPublicInfo] = useState<string>("");
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
@@ -99,7 +109,30 @@ export default function CharacterEditor({
         }),
       );
       setPlayerName(userData.name ?? "");
-      setPlayerContact(userData.phone ? userData.phone : userData.email ?? "");
+      const pS = [];
+      if (userData.phone)
+        pS.push({
+          label: "телефон: " + userData.phone,
+          value: "phone",
+          description: "",
+        });
+      if (userData.email)
+        pS.push({
+          label: "email: " + userData.email,
+          value: "email",
+          description: "",
+        });
+      if (userData.vk)
+        pS.push({ label: "ВК: " + userData.vk, value: "vk", description: "" });
+      if (userData.tg)
+        pS.push({ label: "TG: " + userData.tg, value: "tg", description: "" });
+      if (userData.discord)
+        pS.push({
+          label: "Discord: " + userData.discord,
+          value: "discord",
+          description: "",
+        });
+      setContactSelect(pS);
     }
   }, [traitsData, userData]);
 
@@ -134,6 +167,30 @@ export default function CharacterEditor({
       setAmbition(characterData.ambition ?? "");
       setInitialQuenta(characterData.content ?? "");
       setQuenta(characterData.content ?? "");
+      const pS = [];
+      if (userData.phone)
+        pS.push({
+          label: "телефон: " + userData.phone,
+          value: "phone",
+          description: "",
+        });
+      if (userData.email)
+        pS.push({
+          label: "email: " + userData.email,
+          value: "email",
+          description: "",
+        });
+      if (userData.vk)
+        pS.push({ label: "ВК: " + userData.vk, value: "vk", description: "" });
+      if (userData.tg)
+        pS.push({ label: "TG: " + userData.tg, value: "tg", description: "" });
+      if (userData.discord)
+        pS.push({
+          label: "Discord: " + userData.discord,
+          value: "discord",
+          description: "",
+        });
+      setContactSelect(pS);
     }
   }, [characterData, traitsData, userData]);
 
@@ -486,13 +543,32 @@ export default function CharacterEditor({
               value={playerName}
               onValueChange={setPlayerName}
             />
-            <Input
+
+            <Autocomplete
+              label="Способ связи"
+              placeholder="Введите способ связи"
+              variant="underlined"
+              defaultItems={contactSelect}
+              allowsCustomValue={true}
+              selectedKey={playerContactKey}
+              onSelectionChange={(k) =>
+                setPlayerContactKey(!!k ? k.toString() : "")
+              }
+              onInputChange={setPlayerContact}
+            >
+              {(item) => (
+                <AutocompleteItem key={item.value}>
+                  {item.label}
+                </AutocompleteItem>
+              )}
+            </Autocomplete>
+            {/* <Input
               variant="underlined"
               label="Контакт игрока"
               placeholder="Введите предпочитаемый способ связи"
               value={playerContact}
               onValueChange={setPlayerContact}
-            />
+            /> */}
             <Input
               variant="underlined"
               label="Статусы"

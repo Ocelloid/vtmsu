@@ -32,12 +32,22 @@ export const userRouter = createTRPCRouter({
         name: z.string().optional(),
         email: z.string().optional(),
         phone: z.string().optional(),
+        vk: z.string().optional(),
+        tg: z.string().optional(),
+        discord: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const user = ctx.db.user.update({
         where: { id: ctx.session.user.id },
-        data: { name: input.name, email: input.email, phone: input.phone },
+        data: {
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+          vk: input.vk,
+          tg: input.tg,
+          discord: input.discord,
+        },
       });
       return user;
     }),

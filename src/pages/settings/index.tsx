@@ -14,6 +14,9 @@ export default function Settings() {
   const [userName, setUserName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
   const [userPhone, setUserPhone] = useState<string>("");
+  const [userVK, setUserVK] = useState<string>("");
+  const [userTG, setUserTG] = useState<string>("");
+  const [userDiscord, setUserDiscord] = useState<string>("");
   const { mutate: changePP } = api.user.changePP.useMutation();
   const { mutate: update } = api.user.update.useMutation();
   const {
@@ -43,6 +46,9 @@ export default function Settings() {
       setUserName(sessionData.user.name ?? "");
       setUserEmail(sessionData.user.email ?? "");
       setUserPhone(userData.phone ?? "");
+      setUserVK(userData.vk ?? "");
+      setUserTG(userData.tg ?? "");
+      setUserDiscord(userData.discord ?? "");
     }
   }, [sessionData, userData]);
 
@@ -51,12 +57,22 @@ export default function Settings() {
       setUserName(sessionData.user.name ?? "");
       setUserEmail(sessionData.user.email ?? "");
       setUserPhone(userData.phone ?? "");
+      setUserVK(userData.vk ?? "");
+      setUserTG(userData.tg ?? "");
+      setUserDiscord(userData.discord ?? "");
     }
   };
 
   const handleUpdate = () => {
     update(
-      { name: userName, email: userEmail, phone: userPhone },
+      {
+        name: userName,
+        email: userEmail,
+        phone: userPhone,
+        vk: userVK,
+        tg: userTG,
+        discord: userDiscord,
+      },
       {
         onSuccess: () => {
           void updateSession();
@@ -95,7 +111,10 @@ export default function Settings() {
   const isChanged =
     userName !== sessionData.user.name ||
     userEmail !== sessionData.user.email ||
-    userPhone !== userData.phone;
+    userPhone !== userData.phone ||
+    userVK !== userData.vk ||
+    userTG !== userData.tg ||
+    userDiscord !== userData.discord;
 
   return (
     <>
@@ -123,70 +142,94 @@ export default function Settings() {
           Отмена
         </Button>
         <div className="container mt-24 flex flex-1 flex-col gap-2 lg:max-w-screen-lg">
-          <div className="flex flex-row gap-2">
-            <div
-              className={`flex min-h-[128px] min-w-[128px] max-w-[128px] flex-col items-center`}
-            >
-              <div className="my-auto flex flex-row">
-                {uploading ? (
-                  <LoadingSpinner width={64} height={64} />
-                ) : (
-                  <Image
-                    alt="pp"
-                    src={sessionData.user.image ?? ""}
-                    width={256}
-                    height={256}
-                  />
-                )}
+          <div className="flex flex-col">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
+              <div className="flex flex-col items-center justify-center">
+                <div className="my-auto flex flex-row">
+                  {uploading ? (
+                    <LoadingSpinner width={64} height={64} />
+                  ) : (
+                    <Image
+                      alt="pp"
+                      src={sessionData.user.image ?? ""}
+                      width={256}
+                      height={256}
+                    />
+                  )}
+                </div>
+                <UploadButton
+                  content={{
+                    button: (
+                      <>
+                        <FaImage size={16} />
+                        <p className="text-xs">Сменить</p>
+                      </>
+                    ),
+                    allowedContent: "Изображение (1 Мб)",
+                  }}
+                  className="h-8 w-full max-w-[160px] cursor-pointer pt-2 text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
+                  endpoint="imageUploader"
+                  onUploadBegin={() => setUploading(true)}
+                  onClientUploadComplete={(res) =>
+                    handleChangeProfilePic(res[0]?.url ?? "")
+                  }
+                />
               </div>
-              <UploadButton
-                content={{
-                  button: (
-                    <>
-                      <FaImage size={16} />
-                      <p className="text-xs">Сменить</p>
-                    </>
-                  ),
-                  allowedContent: "Изображение (1 Мб)",
-                }}
-                className="h-8 w-full max-w-[160px] cursor-pointer pt-2 text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
-                endpoint="imageUploader"
-                onUploadBegin={() => setUploading(true)}
-                onClientUploadComplete={(res) =>
-                  handleChangeProfilePic(res[0]?.url ?? "")
-                }
-              />
-            </div>
-            <div className="flex flex-1 flex-grow flex-col">
-              <Input
-                variant="underlined"
-                label="Имя игрока"
-                placeholder="Введите имя"
-                isInvalid={!userName}
-                color={!userName ? "danger" : "success"}
-                value={userName}
-                onValueChange={setUserName}
-              />
-              <Input
-                type="email"
-                variant="underlined"
-                label="Электронная почта"
-                placeholder="Введите электронную почту"
-                isInvalid={isEmailInvalid}
-                color={isEmailInvalid ? "danger" : "success"}
-                value={userEmail}
-                onValueChange={setUserEmail}
-              />
-              <Input
-                type="phone"
-                variant="underlined"
-                label="Телефон"
-                placeholder="Введите телефон"
-                isInvalid={isPhoneInvalid}
-                color={isPhoneInvalid ? "danger" : "success"}
-                value={userPhone}
-                onValueChange={setUserPhone}
-              />
+              <div className="flex flex-1 flex-grow flex-col sm:col-span-2">
+                <Input
+                  variant="underlined"
+                  label="Имя игрока"
+                  placeholder="Введите имя"
+                  isInvalid={!userName}
+                  color={!userName ? "danger" : "success"}
+                  value={userName}
+                  onValueChange={setUserName}
+                />
+                <Input
+                  type="email"
+                  variant="underlined"
+                  label="Электронная почта"
+                  placeholder="Введите электронную почту"
+                  isInvalid={isEmailInvalid}
+                  color={isEmailInvalid ? "danger" : "success"}
+                  value={userEmail}
+                  onValueChange={setUserEmail}
+                />
+                <Input
+                  type="phone"
+                  variant="underlined"
+                  label="Телефон"
+                  placeholder="Введите телефон"
+                  isInvalid={isPhoneInvalid}
+                  color={isPhoneInvalid ? "danger" : "success"}
+                  value={userPhone}
+                  onValueChange={setUserPhone}
+                />
+              </div>
+              <div className="col-span-2 flex flex-1 flex-grow flex-col">
+                <Input
+                  variant="underlined"
+                  label="ВКонтакте"
+                  placeholder="Введите страницу ВКонтакте"
+                  value={userVK}
+                  onValueChange={setUserVK}
+                />
+                <Input
+                  variant="underlined"
+                  label="Telegram"
+                  placeholder="Введите ник в Telegram"
+                  value={userTG}
+                  onValueChange={setUserTG}
+                />
+                <Input
+                  type="phone"
+                  variant="underlined"
+                  label="Discord"
+                  placeholder="Введите хэндл в Discord"
+                  value={userDiscord}
+                  onValueChange={setUserDiscord}
+                />
+              </div>
             </div>
           </div>
           <Divider className="bg-warning/50" />
