@@ -6,8 +6,10 @@ import RuleEditor from "~/components/editors/RuleEditor";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { type Rule } from "~/server/api/routers/rule";
+import { type Ability } from "~/server/api/routers/char";
 import { Element, scroller } from "react-scroll";
 import { FaPencilAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { translit } from "~/utils/text";
 
 export default function Rules() {
   const categories = [
@@ -15,10 +17,10 @@ export default function Rules() {
     { value: 2, label: "Дисциплины" },
     { value: 3, label: "Ритуалы" },
   ];
-  const { data, isLoading } = api.post.getAll.useQuery();
   const router = useRouter();
   const [category, setCategory] = useState<string>("");
   const [rules, setRules] = useState<Rule[]>([]);
+  const [abilities, setAbilities] = useState<Ability[]>([]);
 
   const { data: isPersonnel, isLoading: isUserLoading } =
     api.user.userIsPersonnel.useQuery();
@@ -31,9 +33,13 @@ export default function Rules() {
     isLoading: isRulesLoading,
     refetch,
   } = api.rule.getAll.useQuery();
+  const { data: abilityData, isLoading: isAbilityLoading } =
+    api.char.getAbilities.useQuery();
 
   useEffect(() => {
     setRules(rulesData ?? []);
+    setAbilities(abilityData ?? []);
+
     const ruleTo = Array.isArray(router.query.rule)
       ? router.query.rule[0] ?? ""
       : router.query.rule ?? "";
@@ -50,7 +56,7 @@ export default function Rules() {
           offset: -96,
         });
       }, 200);
-  }, [rulesData, router.query]);
+  }, [rulesData, abilityData, router.query]);
 
   const handleCategoryChange = (e: string) => {
     setCategory(e);
@@ -145,8 +151,8 @@ export default function Rules() {
       .catch((e) => console.log(e));
   };
 
-  if (isLoading || isUserLoading || isRulesLoading) return <LoadingPage />;
-  if (!data) return <div>Something went wrong</div>;
+  if (isUserLoading || isRulesLoading || isAbilityLoading)
+    return <LoadingPage />;
 
   return (
     <>
@@ -241,9 +247,39 @@ export default function Rules() {
                           )}
                         </div>
                         <div
-                          className="tiptap-display pb-8 text-justify"
+                          className="tiptap-display pb-4 text-justify"
                           dangerouslySetInnerHTML={{ __html: rule.content }}
                         />
+                      </Element>
+                    );
+                  })}
+                {cat.value === 2 &&
+                  abilities.map((ability) => {
+                    return (
+                      <Element
+                        key={ability.id}
+                        className="section"
+                        name={translit(ability.name)}
+                      >
+                        <div className="flex flex-row">
+                          <Tooltip
+                            className="rounded-md text-tiny text-default-500"
+                            content={"Скопировать ссылку"}
+                            placement="right"
+                          >
+                            <h2
+                              className={`cursor-pointer pb-2 text-2xl`}
+                              onClick={() =>
+                                handleRuleCopy(translit(ability.name))
+                              }
+                            >
+                              {ability.name}
+                            </h2>
+                          </Tooltip>
+                        </div>
+                        <div className="tiptap-display whitespace-break-spaces pb-4 text-justify">
+                          {ability.content}
+                        </div>
                       </Element>
                     );
                   })}

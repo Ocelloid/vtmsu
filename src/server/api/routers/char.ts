@@ -141,27 +141,27 @@ export const charRouter = createTRPCRouter({
     };
   }),
 
-  getFeatures: protectedProcedure.query(({ ctx }) => {
+  getFeatures: publicProcedure.query(({ ctx }) => {
     return ctx.db.feature.findMany({
       orderBy: { cost: "asc" },
       include: { FeatureAvailable: { include: { clan: true } } },
     });
   }),
 
-  getAbilities: protectedProcedure.query(({ ctx }) => {
+  getAbilities: publicProcedure.query(({ ctx }) => {
     return ctx.db.ability.findMany({
       orderBy: { name: "asc" },
       include: { AbilityAvailable: { include: { clan: true } } },
     });
   }),
 
-  getFactions: protectedProcedure.query(({ ctx }) => {
+  getFactions: publicProcedure.query(({ ctx }) => {
     return ctx.db.faction.findMany({
       orderBy: { name: "desc" },
     });
   }),
 
-  getClans: protectedProcedure.query(({ ctx }) => {
+  getClans: publicProcedure.query(({ ctx }) => {
     return ctx.db.clan.findMany({
       include: {
         ClanInFaction: { include: { faction: true } },
