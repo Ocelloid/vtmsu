@@ -69,6 +69,9 @@ export default function CharacterEditor({
   const [features, setFeatures] = useState<Feature[]>([]);
   const [uploading, setUploading] = useState<boolean>(false);
 
+  const { data: userData, isLoading: isUserLoading } =
+    api.user.getCurrent.useQuery();
+
   const { data: characterData, isLoading: isCharacterLoading } =
     api.char.getById.useQuery({ id: characterId! }, { enabled: !!characterId });
 
@@ -85,7 +88,7 @@ export default function CharacterEditor({
     api.char.delete.useMutation();
 
   useEffect(() => {
-    if (!!traitsData) {
+    if (!!traitsData && !!userData) {
       setFactions(traitsData.factions);
       setClans(traitsData.clans);
       setAbilities(traitsData.abilities);
@@ -95,11 +98,13 @@ export default function CharacterEditor({
           return { id: f.id, comment: "", checked: false };
         }),
       );
+      setPlayerName(userData.name ?? "");
+      setPlayerContact(userData.phone ? userData.phone : userData.email ?? "");
     }
-  }, [traitsData]);
+  }, [traitsData, userData]);
 
   useEffect(() => {
-    if (!!characterData) {
+    if (!!characterData && !!traitsData && !!userData) {
       setName(characterData.name);
       setFactionId(characterData.factionId);
       setClanId(characterData.clanId);
@@ -107,15 +112,15 @@ export default function CharacterEditor({
       const cdfs = characterData.features.map((cdf) => {
         return { id: cdf.featureId, comment: cdf.description!, checked: true };
       });
-      if (!!traitsData) {
-        setFeatureWithComments(
-          traitsData.features.map((f) => {
-            return cdfs.map((cdf) => cdf.id).includes(f.id)
-              ? cdfs.find((cdf) => cdf.id === f.id)!
-              : { id: f.id, comment: "", checked: false };
-          }),
-        );
-      }
+      setFeatureWithComments(
+        traitsData.features.map((f) => {
+          return cdfs.map((cdf) => cdf.id).includes(f.id)
+            ? cdfs.find((cdf) => cdf.id === f.id)!
+            : { id: f.id, comment: "", checked: false };
+        }),
+      );
+      setPlayerName(userData.name ?? "");
+      setPlayerContact(userData.phone ? userData.phone : userData.email ?? "");
       setAge(Number(characterData.age));
       setImage(characterData.image ?? "");
       setSire(characterData.sire ?? "");
@@ -130,7 +135,7 @@ export default function CharacterEditor({
       setInitialQuenta(characterData.content ?? "");
       setQuenta(characterData.content ?? "");
     }
-  }, [characterData, traitsData]);
+  }, [characterData, traitsData, userData]);
 
   useEffect(() => {
     const id = Array.isArray(router.query.character)
@@ -239,6 +244,7 @@ export default function CharacterEditor({
   };
 
   if (
+    isUserLoading ||
     isTraitsLoading ||
     isCharacterCreatePending ||
     isCharacterUpdatePending ||
