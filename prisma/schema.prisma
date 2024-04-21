@@ -23,28 +23,30 @@ model Post {
 }
 
 model Char {
-  id          Int                  @id @default(autoincrement())
-  name        String
-  factionId   Int
-  clanId      Int
-  visible     Boolean              @default(false)
-  image       String?
-  age         String?
-  sire        String?
-  title       String?
-  status      String?
-  childer     String?
-  ambition    String?
-  publicInfo  String?
-  content     String?              @db.LongText
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  createdBy   User                 @relation(fields: [createdById], references: [id])
-  clan        Clan                 @relation(fields: [clanId], references: [id])
-  faction     Faction              @relation(fields: [factionId], references: [id])
-  abilities   CharacterAbilities[]
-  features    CharacterFeatures[]
-  createdById String
+  id            Int                  @id @default(autoincrement())
+  name          String
+  factionId     Int
+  clanId        Int
+  visible       Boolean              @default(false)
+  playerName    String?
+  playerContact String?
+  image         String?
+  age           String?
+  sire          String?
+  title         String?
+  status        String?
+  childer       String?
+  ambition      String?
+  publicInfo    String?
+  content       String?              @db.LongText
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  createdBy     User                 @relation(fields: [createdById], references: [id])
+  clan          Clan                 @relation(fields: [clanId], references: [id])
+  faction       Faction              @relation(fields: [factionId], references: [id])
+  abilities     CharacterAbilities[]
+  features      CharacterFeatures[]
+  createdById   String
 }
 
 model ClanInFaction {

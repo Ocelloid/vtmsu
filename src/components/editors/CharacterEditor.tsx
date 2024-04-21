@@ -2,7 +2,7 @@ import {
   Input,
   Select,
   SelectItem,
-  Divider,
+  // Divider,
   Button,
   Textarea,
   Accordion,
@@ -54,6 +54,8 @@ export default function CharacterEditor({
   const [childer, setChilder] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const [playerName, setPlayerName] = useState<string>("");
+  const [playerContact, setPlayerContact] = useState<string>("");
   const [publicInfo, setPublicInfo] = useState<string>("");
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
@@ -250,6 +252,8 @@ export default function CharacterEditor({
     !factionId ||
     !clanId ||
     !age ||
+    !playerName ||
+    !playerContact ||
     !ambition ||
     !publicInfo ||
     publicInfo === "<p></p>" ||
@@ -261,10 +265,12 @@ export default function CharacterEditor({
       .reduce((a, b) => a && !!b.comment, true);
 
   const invalidFields = [
-    !name ? "имя" : undefined,
+    !name ? "имя персонажа" : undefined,
     !factionId ? "фракцию" : undefined,
     !clanId ? "клан" : undefined,
     !age ? "возраст" : undefined,
+    !playerName ? "имя игрока" : undefined,
+    !playerContact ? "способ связи" : undefined,
     !ambition ? "амбиции" : undefined,
     !publicInfo || publicInfo === "<p></p>"
       ? "публичную информацию"
@@ -341,7 +347,7 @@ export default function CharacterEditor({
           )}
         </div>
 
-        <div className="flex flex-1 flex-grow pb-1 text-center text-xs text-warning">
+        <div className="-mx-5 flex flex-1 flex-grow px-1 pb-1 text-center text-xs text-warning">
           {isInvalid && (
             <p className="mx-auto">
               {invalidFields.filter((i) => !!i) && "Введите "}
@@ -353,8 +359,8 @@ export default function CharacterEditor({
         </div>
       </div>
       <div className="flex flex-col">
-        <div className="flex flex-row gap-2 sm:gap-4">
-          <div className="flex h-[160px] w-[160px] flex-col items-center justify-center">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
+          <div className="flex flex-col items-center justify-center">
             {uploading ? (
               <LoadingSpinner width={80} height={80} />
             ) : (
@@ -367,10 +373,10 @@ export default function CharacterEditor({
               />
             )}
           </div>
-          <div className="flex flex-1 flex-col">
+          <div className="col-span-1 flex flex-1 flex-col sm:col-span-2">
             <Input
               variant="underlined"
-              label="Имя"
+              label="Имя персонажа"
               placeholder="Введите имя персонажа"
               value={name}
               onValueChange={setName}
@@ -457,8 +463,6 @@ export default function CharacterEditor({
                   </SelectItem>
                 ))}
             </Select>
-          </div>
-          <div className="hidden flex-1 flex-col sm:flex">
             <Input
               type="number"
               variant="underlined"
@@ -466,6 +470,22 @@ export default function CharacterEditor({
               placeholder="Введите возраст"
               value={age ? age.toString() : ""}
               onValueChange={(a) => setAge(Number(a))}
+            />
+          </div>
+          <div className="col-span-2 flex-1 flex-col sm:col-span-3 sm:flex md:col-span-2">
+            <Input
+              variant="underlined"
+              label="Имя игрока"
+              placeholder="Введите имя игрока"
+              value={playerName}
+              onValueChange={setPlayerName}
+            />
+            <Input
+              variant="underlined"
+              label="Контакт игрока"
+              placeholder="Введите предпочитаемый способ связи"
+              value={playerContact}
+              onValueChange={setPlayerContact}
             />
             <Input
               variant="underlined"
@@ -485,13 +505,13 @@ export default function CharacterEditor({
         </div>
         <Checkbox
           color="warning"
-          // size="sm"
+          size="sm"
           isSelected={visible}
           onValueChange={(e) => setVisible(e)}
         >
           Персонаж виден другим игрокам
         </Checkbox>
-        <div className="flex flex-1 flex-col sm:hidden">
+        {/* <div className="flex flex-1 flex-col sm:hidden">
           <Input
             type="number"
             variant="underlined"
@@ -514,7 +534,7 @@ export default function CharacterEditor({
             value={title}
             onValueChange={setTitle}
           />
-        </div>
+        </div> */}
         <div className="flex flex-col gap-2">
           <DefaultEditor
             className="min-h-44 sm:min-h-20"
@@ -522,13 +542,13 @@ export default function CharacterEditor({
             initialContent={initialPublicInfo}
             placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
           />
-          <p className="mx-auto -mb-1 flex flex-row text-xs text-warning/50">
+          {/* <p className="mx-auto -mb-1 flex flex-row text-xs text-warning/50">
             &nbsp;Публичная информация&nbsp;
           </p>
           <Divider className="bg-warning/50" />
           <p className="mx-auto -mt-1 flex flex-row text-xs text-warning/50">
             &nbsp;Тайная информация&nbsp;
-          </p>
+          </p> */}
           <div className={"-mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2"}>
             <Input
               variant="underlined"
