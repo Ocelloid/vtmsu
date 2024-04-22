@@ -202,6 +202,7 @@ model User {
   isPersonnel   Boolean   @default(false)
   emailVerified DateTime?
   image         String?
+  background    String?
   phone         String?
   vk            String?
   tg            String?

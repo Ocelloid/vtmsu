@@ -8,8 +8,8 @@ export default function CartItem({ product }: { product: Product }) {
   const updateProduct = useCartStore((state) => state.updateProduct);
 
   return (
-    <li className="mb-2 flex items-center justify-between  gap-4 p-4 shadow-md">
-      <div className="flex items-center">
+    <li className="mb-2 flex items-center justify-between gap-4 p-4 shadow-md">
+      <div className="flex w-[200px] max-w-[200px] items-center">
         <Image
           src={product.images[0]?.source ?? ""}
           alt={product.title}
@@ -56,7 +56,7 @@ export default function CartItem({ product }: { product: Product }) {
       <div>
         <button
           title="Remove Item"
-          className="ml-4 text-red-500 hover:text-red-600"
+          className="text-red-500 hover:text-red-600"
           onClick={() => removeFromCart(product)}
         >
           <FaTrashAlt size={18} />

@@ -1,31 +1,65 @@
 import Head from "next/head";
 import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { Input, Switch, Divider, Button } from "@nextui-org/react";
+import {
+  Input,
+  Switch,
+  Divider,
+  Button,
+  RadioGroup,
+  Radio,
+} from "@nextui-org/react";
 import { FaImage, FaSun, FaMoon } from "react-icons/fa";
 import Image from "next/image";
 import { UploadButton } from "~/utils/uploadthing";
 import { api } from "~/utils/api";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useTheme } from "next-themes";
+import { clans, factions } from "~/assets";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
   const { data: sessionData, update: updateSession } = useSession();
   const [uploading, setUploading] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>("");
+  const [bgSelected, setBgSelected] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
   const [userPhone, setUserPhone] = useState<string>("");
   const [userVK, setUserVK] = useState<string>("");
   const [userTG, setUserTG] = useState<string>("");
   const [userDiscord, setUserDiscord] = useState<string>("");
   const { mutate: changePP } = api.user.changePP.useMutation();
+  const { mutate: updateBG } = api.user.updateBG.useMutation();
   const { mutate: update } = api.user.update.useMutation();
+
+  const clanKeys = Object.keys(clans);
+  const factionKeys = Object.keys(factions);
+
+  const clanSelection = Object.values(clans).map((clan, i) => {
+    if (theme === "light" && !clanKeys[i]?.includes("_white"))
+      return { value: clanKeys[i] ?? "", image: clan };
+    if (theme === "dark" && clanKeys[i]?.includes("_white"))
+      return { value: clanKeys[i] ?? "", image: clan };
+    else return undefined;
+  });
+
+  const factionSelection = Object.values(factions).map((faction, i) => {
+    if (theme === "light" && !factionKeys[i]?.includes("_white"))
+      return { value: factionKeys[i] ?? "", image: faction };
+    if (theme === "dark" && factionKeys[i]?.includes("_white"))
+      return { value: factionKeys[i] ?? "", image: faction };
+    else return undefined;
+  });
+
+  const bgSelection = [...factionSelection, ...clanSelection].filter(
+    (x) => x !== undefined,
+  );
+
   const {
     data: userData,
     isLoading: isUserLoading,
     refetch: refetchUser,
-  } = api.user.getCurrent.useQuery();
+  } = api.user.getCurrent.useQuery(undefined, { enabled: !!sessionData });
 
   const validateEmail = (value: string) =>
     value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
@@ -45,24 +79,45 @@ export default function Settings() {
 
   useEffect(() => {
     if (!!sessionData && !!userData) {
+      const bg = userData.background as string;
       setUserName(sessionData.user.name ?? "");
       setUserEmail(sessionData.user.email ?? "");
       setUserPhone(userData.phone ?? "");
       setUserVK(userData.vk ?? "");
       setUserTG(userData.tg ?? "");
       setUserDiscord(userData.discord ?? "");
+      setBgSelected(bg + (theme === "dark" ? "_white" : ""));
     }
-  }, [sessionData, userData]);
+  }, [sessionData, userData, theme]);
 
   const handleClear = () => {
     if (!!sessionData && !!userData) {
+      const bg = userData.background as string;
       setUserName(sessionData.user.name ?? "");
       setUserEmail(sessionData.user.email ?? "");
       setUserPhone(userData.phone ?? "");
       setUserVK(userData.vk ?? "");
       setUserTG(userData.tg ?? "");
       setUserDiscord(userData.discord ?? "");
+      setBgSelected(bg + (theme === "dark" ? "_white" : ""));
     }
+  };
+
+  const handleUpdateBG = (bgs: string) => {
+    updateBG(
+      {
+        bg: bgs.includes("_white") ? bgs.replace("_white", "") : bgs,
+      },
+      {
+        onSuccess: () => {
+          setBgSelected(bgs);
+          setTimeout(() => {
+            void updateSession();
+            void refetchUser();
+          }, 500);
+        },
+      },
+    );
   };
 
   const handleUpdate = () => {
@@ -147,12 +202,13 @@ export default function Settings() {
           <div className="flex flex-col">
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
               <div className="flex flex-col items-center justify-center">
-                <div className="my-auto flex flex-row">
+                <div className="max my-auto flex w-[128px] flex-row">
                   {uploading ? (
                     <LoadingSpinner width={64} height={64} />
                   ) : (
                     <Image
                       alt="pp"
+                      className="rounded-full"
                       src={sessionData.user.image ?? ""}
                       width={256}
                       height={256}
@@ -163,13 +219,18 @@ export default function Settings() {
                   content={{
                     button: (
                       <>
-                        <FaImage size={16} />
-                        <p className="text-xs">Сменить</p>
+                        <FaImage
+                          size={16}
+                          className="text-black dark:text-white"
+                        />
+                        <p className="text-xs text-black dark:text-white">
+                          Сменить
+                        </p>
                       </>
                     ),
                     allowedContent: "Изображение (1 Мб)",
                   }}
-                  className="h-8 w-full max-w-[160px] cursor-pointer pt-2 dark:text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25 [&>label]:dark:border-white"
+                  className="h-8 w-full max-w-[160px] cursor-pointer pt-2 [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-black [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25 [&>label]:dark:border-white"
                   endpoint="imageUploader"
                   onUploadBegin={() => setUploading(true)}
                   onClientUploadComplete={(res) =>
@@ -241,12 +302,37 @@ export default function Settings() {
               setTheme(value ? "light" : "dark");
             }}
             size="md"
-            color="success"
+            color="danger"
             startContent={<FaSun />}
             endContent={<FaMoon />}
           >
             {theme === "light" ? "Светлая тема" : "Тёмная тема"}
           </Switch>
+
+          <RadioGroup
+            label="Фон"
+            orientation="horizontal"
+            color="danger"
+            value={bgSelected}
+            onValueChange={handleUpdateBG}
+          >
+            {bgSelection.map((bg) => (
+              <Radio
+                value={bg!.value}
+                key={bg!.value}
+                className={
+                  "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center"
+                }
+              >
+                <Image
+                  alt="clan"
+                  src={bg!.image}
+                  height="64"
+                  className="mx-auto"
+                />
+              </Radio>
+            ))}
+          </RadioGroup>
         </div>
       </main>
     </>

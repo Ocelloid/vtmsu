@@ -184,7 +184,7 @@ const Navigation = () => {
                   key="exit"
                   className="text-danger"
                   color="danger"
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/", redirect: true })}
                 >
                   Выйти
                 </DropdownItem>
@@ -196,7 +196,10 @@ const Navigation = () => {
           <Button
             onClick={() => {
               setIsOpen(false);
-              void signIn();
+              void signIn(undefined, {
+                callbackUrl: "/settings",
+                redirect: true,
+              });
             }}
             variant="bordered"
             className="w-min min-w-10 border-none px-4 py-0 text-medium hover:text-gray-700 dark:hover:text-gray-300"

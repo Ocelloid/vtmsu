@@ -7,6 +7,7 @@ import "~/styles/globals.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import Navigation from "~/components/Navigation";
+import BGImage from "~/components/BGImage";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,9 +22,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <NextUIProvider>
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <SessionProvider session={session}>
-          <main
-            className={`font-sans ${inter.variable} bg-gradient-to-b from-red-100 to-red-400 dark:from-red-800 dark:to-black`}
-          >
+          <main className={`font-sans ${inter.variable}`}>
+            <BGImage />
             <Component {...pageProps} />
             <Navigation />
           </main>
