@@ -147,7 +147,8 @@ const Navigation = () => {
                     avatarProps={{
                       isBordered: true,
                       size: "sm",
-                      className: "w-10 h-8",
+                      className:
+                        "w-8 h-8 bg-red-500 ring-offset-red-500 dark:ring-offset-background-red-500",
                       src: sessionData.user.image ?? "",
                     }}
                     className="hidden border-none text-medium hover:text-gray-300 md:flex"

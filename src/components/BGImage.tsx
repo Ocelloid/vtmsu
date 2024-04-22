@@ -57,7 +57,7 @@ const BGImage = () => {
         <LoadingPage />
       ) : (
         <Image
-          className="mx-auto my-auto mt-32 max-w-80"
+          className="mx-auto my-auto mt-32 max-w-80 sm:max-w-96"
           height={640}
           alt="bg"
           src={

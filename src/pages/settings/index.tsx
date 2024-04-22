@@ -15,7 +15,7 @@ import { UploadButton } from "~/utils/uploadthing";
 import { api } from "~/utils/api";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useTheme } from "next-themes";
-import { clans, factions } from "~/assets";
+import { clans, factions, other } from "~/assets";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
@@ -206,13 +206,22 @@ export default function Settings() {
                   {uploading ? (
                     <LoadingSpinner width={64} height={64} />
                   ) : (
-                    <Image
-                      alt="pp"
-                      className="rounded-full"
-                      src={sessionData.user.image ?? ""}
-                      width={256}
-                      height={256}
-                    />
+                    <>
+                      <Image
+                        alt="pp"
+                        className="absolute -ml-1 -mt-1 w-[136px] rounded-full"
+                        src={other.circle_red}
+                        width={256}
+                        height={256}
+                      />
+                      <Image
+                        alt="pp"
+                        className="rounded-full p-1"
+                        src={sessionData.user.image ?? ""}
+                        width={256}
+                        height={256}
+                      />
+                    </>
                   )}
                 </div>
                 <UploadButton
@@ -295,7 +304,7 @@ export default function Settings() {
               </div>
             </div>
           </div>
-          <Divider className="my-2 bg-warning/50" />
+          <Divider className="my-2 bg-danger/50" />
           <Switch
             isSelected={theme === "light"}
             onValueChange={(value) => {
@@ -321,7 +330,7 @@ export default function Settings() {
                 value={bg!.value}
                 key={bg!.value}
                 className={
-                  "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center"
+                  "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
                 }
               >
                 <Image
