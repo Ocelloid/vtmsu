@@ -458,9 +458,9 @@ export default function CharacterEditor({
           )}
         </div>
       </div>
-      <div className="flex flex-col">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
-          <div className="flex flex-col items-center justify-center">
+      <div className="-mx-4 flex flex-col sm:mx-0">
+        <div className="grid grid-cols-5 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
+          <div className="col-span-2 flex flex-col items-center justify-center sm:col-span-1">
             {uploading ? (
               <LoadingSpinner width={80} height={80} />
             ) : (
@@ -473,7 +473,7 @@ export default function CharacterEditor({
               />
             )}
           </div>
-          <div className="col-span-1 flex flex-1 flex-col sm:col-span-2">
+          <div className="col-span-3 flex flex-1 flex-col sm:col-span-2 md:col-span-2">
             <Input
               variant="underlined"
               label="Имя персонажа"
@@ -516,7 +516,7 @@ export default function CharacterEditor({
               )}
             </Autocomplete>
           </div>
-          <div className="col-span-2 flex-1 flex-col sm:col-span-3 sm:flex md:col-span-2">
+          <div className="col-span-5 flex-1 flex-col sm:col-span-3 sm:flex md:col-span-2">
             <Select
               label="Фракция"
               variant="underlined"
