@@ -1,0 +1,15 @@
+export { default as animalism } from "./Animalism-rombo.png";
+export { default as auspex } from "./Auspex-rombo.png";
+export { default as celerity } from "./Celerity-rombo.png";
+export { default as dementation } from "./Dementation-rombo.png";
+export { default as dominate } from "./Dominate-rombo.png";
+export { default as fortitude } from "./Fortitude-rombo.png";
+export { default as necromancy } from "./Necromancy-rombo.png";
+export { default as obfuscate } from "./Obfuscate-rombo.png";
+export { default as oblivion } from "./Oblivion-rombo.png";
+export { default as potence } from "./Potence-rombo.png";
+export { default as presence } from "./Presence-rombo.png";
+export { default as protean } from "./Protean-rombo.png";
+export { default as thaumaturgy } from "./Thaumaturgy-rombo.png";
+export { default as alchemy } from "./Thinblood_alchemy.png";
+export { default as viscissitude } from "./Viscissitude-rombo.png";
