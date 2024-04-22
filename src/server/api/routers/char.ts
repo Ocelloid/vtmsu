@@ -56,6 +56,7 @@ export type Faction = {
   id: number;
   name: string;
   content: string;
+  icon?: string | null;
   visibleToPlayer: boolean;
 };
 

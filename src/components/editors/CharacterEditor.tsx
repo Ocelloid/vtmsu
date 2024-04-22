@@ -28,7 +28,12 @@ import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
-import { disciplines } from "~/assets";
+import {
+  disciplines,
+  clans as clan_icons,
+  factions as faction_icons,
+} from "~/assets";
+import { useTheme } from "next-themes";
 
 type FeatureWithComment = {
   id: number;
@@ -47,10 +52,37 @@ export default function CharacterEditor({
 }: {
   onSuccess: () => void;
 }) {
+  const { theme } = useTheme();
+
   const discKeys = Object.keys(disciplines);
   const discIcons = Object.values(disciplines).map((disc, i) => {
     return { value: disc, key: discKeys[i] };
   });
+
+  const clanKeys = Object.keys(clan_icons);
+  const clanSelection = Object.values(clan_icons).map((clan, i) => {
+    if (theme === "light" && !clanKeys[i]?.includes("_white"))
+      return { key: clanKeys[i] ?? "", value: clan };
+    if (theme === "dark" && clanKeys[i]?.includes("_white"))
+      return { key: clanKeys[i] ?? "", value: clan };
+    else return undefined;
+  });
+
+  const factionKeys = Object.keys(faction_icons);
+  const factionSelection = Object.values(faction_icons).map((faction, i) => {
+    if (theme === "light" && !factionKeys[i]?.includes("_white"))
+      return { key: factionKeys[i] ?? "", value: faction };
+    if (theme === "dark" && factionKeys[i]?.includes("_white"))
+      return { key: factionKeys[i] ?? "", value: faction };
+    else return undefined;
+  });
+
+  const icons = [...discIcons, ...clanSelection, ...factionSelection].filter(
+    (i) => !!i,
+  );
+  const defaultIcon =
+    theme === "light" ? faction_icons._ankh : faction_icons._ankh_white;
+
   const router = useRouter();
   const [name, setName] = useState<string>("");
   const [characterId, setCharacterId] = useState<number>();
@@ -449,6 +481,42 @@ export default function CharacterEditor({
               value={name}
               onValueChange={setName}
             />
+            <Input
+              type="number"
+              variant="underlined"
+              label="Возраст персонажа"
+              placeholder="Введите возраст"
+              value={age ? age.toString() : ""}
+              onValueChange={(a) => setAge(Number(a))}
+            />
+            <Input
+              variant="underlined"
+              label="Имя игрока"
+              placeholder="Введите имя игрока"
+              value={playerName}
+              onValueChange={setPlayerName}
+            />
+
+            <Autocomplete
+              label="Способ связи"
+              placeholder="Введите способ связи"
+              variant="underlined"
+              defaultItems={contactSelect}
+              allowsCustomValue={true}
+              selectedKey={playerContactKey}
+              onSelectionChange={(k) =>
+                setPlayerContactKey(!!k ? k.toString() : "")
+              }
+              onInputChange={setPlayerContact}
+            >
+              {(item) => (
+                <AutocompleteItem key={item.value}>
+                  {item.label}
+                </AutocompleteItem>
+              )}
+            </Autocomplete>
+          </div>
+          <div className="col-span-2 flex-1 flex-col sm:col-span-3 sm:flex md:col-span-2">
             <Select
               label="Фракция"
               variant="underlined"
@@ -475,12 +543,26 @@ export default function CharacterEditor({
                     value={faction.id}
                     textValue={faction.name}
                   >
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-1">
                       <div className="text-small dark:text-red-100">
                         {faction.name}
                       </div>
-                      <div className="whitespace-normal text-tiny dark:text-red-100">
-                        {faction.content}
+                      <div className="flex flex-row gap-1">
+                        <Image
+                          alt="icon"
+                          className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
+                          src={
+                            !!faction.icon
+                              ? icons.find((di) => di!.key === faction.icon)
+                                  ?.value ?? ""
+                              : defaultIcon
+                          }
+                          height={128}
+                          width={128}
+                        />
+                        <span className="whitespace-normal text-tiny dark:text-red-100">
+                          {faction.content}
+                        </span>
                       </div>
                     </div>
                   </SelectItem>
@@ -525,56 +607,27 @@ export default function CharacterEditor({
                       <span className="text-small dark:text-red-100">
                         {clan.name}
                       </span>
-                      <span className="whitespace-normal text-tiny dark:text-red-100">
-                        {clan.content}
-                      </span>
+                      <div className="flex flex-row gap-1">
+                        <Image
+                          alt="icon"
+                          className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
+                          src={
+                            !!clan.icon
+                              ? icons.find((di) => di!.key === clan.icon)
+                                  ?.value ?? ""
+                              : defaultIcon
+                          }
+                          height={128}
+                          width={128}
+                        />
+                        <span className="whitespace-normal text-tiny dark:text-red-100">
+                          {clan.content}
+                        </span>
+                      </div>
                     </div>
                   </SelectItem>
                 ))}
             </Select>
-            <Input
-              type="number"
-              variant="underlined"
-              label="Возраст"
-              placeholder="Введите возраст"
-              value={age ? age.toString() : ""}
-              onValueChange={(a) => setAge(Number(a))}
-            />
-          </div>
-          <div className="col-span-2 flex-1 flex-col sm:col-span-3 sm:flex md:col-span-2">
-            <Input
-              variant="underlined"
-              label="Имя игрока"
-              placeholder="Введите имя игрока"
-              value={playerName}
-              onValueChange={setPlayerName}
-            />
-
-            <Autocomplete
-              label="Способ связи"
-              placeholder="Введите способ связи"
-              variant="underlined"
-              defaultItems={contactSelect}
-              allowsCustomValue={true}
-              selectedKey={playerContactKey}
-              onSelectionChange={(k) =>
-                setPlayerContactKey(!!k ? k.toString() : "")
-              }
-              onInputChange={setPlayerContact}
-            >
-              {(item) => (
-                <AutocompleteItem key={item.value}>
-                  {item.label}
-                </AutocompleteItem>
-              )}
-            </Autocomplete>
-            {/* <Input
-              variant="underlined"
-              label="Контакт игрока"
-              placeholder="Введите предпочитаемый способ связи"
-              value={playerContact}
-              onValueChange={setPlayerContact}
-            /> */}
             <Input
               variant="underlined"
               label="Статусы"
