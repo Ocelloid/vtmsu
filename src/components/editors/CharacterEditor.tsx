@@ -392,7 +392,7 @@ export default function CharacterEditor({
               button: (
                 <>
                   <FaImage size={16} className="ml-2" />
-                  <p className="hidden sm:flex">Изображение</p>
+                  <p className="hidden text-sm sm:flex">{`Фото (до 4 Мб)`}</p>
                 </>
               ),
               allowedContent: "Изображение (1 Мб)",
@@ -413,7 +413,7 @@ export default function CharacterEditor({
             isDisabled={isInvalid}
             onClick={handleSaveCharacter}
             variant={"ghost"}
-            className="h-8 w-full border-warning hover:!bg-warning/25"
+            className="h-8 w-full border-warning text-sm hover:!bg-warning/25"
           >
             <FaRegSave size={16} />
             <p className="hidden sm:flex">Сохранить</p>

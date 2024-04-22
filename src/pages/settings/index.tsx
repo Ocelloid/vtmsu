@@ -235,8 +235,8 @@ export default function Settings() {
                           size={16}
                           className="text-black dark:text-white"
                         />
-                        <p className="text-xs text-black dark:text-white">
-                          Сменить
+                        <p className="text-sm text-black dark:text-white">
+                          {`Фото (до 4 Мб)`}
                         </p>
                       </>
                     ),
