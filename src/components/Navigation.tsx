@@ -27,20 +27,16 @@ const Navigation = () => {
       <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight dark:text-neutral-100 md:text-4xl">
         <Link
           href={
-            router.asPath.split("/").length < 3
-              ? "/"
-              : router.asPath.split("/").slice(0, -1).join("/")
+            !!router.query.pid
+              ? router.asPath.split("/").slice(0, -1).join("/")
+              : "/"
           }
           onClick={() => {
             setIsOpen(false);
           }}
           className="hover:text-gray-700 dark:hover:text-gray-300"
         >
-          {router.asPath.split("/").length < 3 ? (
-            <FaAnkh size={30} />
-          ) : (
-            <FaArrowLeft size={30} />
-          )}
+          {router.query.pid ? <FaArrowLeft size={30} /> : <FaAnkh size={30} />}
         </Link>
         <div className="flex md:hidden" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <FaXmark size={30} /> : <FaBars size={30} />}

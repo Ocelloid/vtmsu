@@ -16,7 +16,8 @@ const Product = () => {
   const [amount, setAmount] = useState(1);
 
   const [product, setProduct] = useState<Product>();
-  const productId = router.asPath.split("/").splice(-1)[0] ?? 1;
+  const productId = router.query.pid;
+
   const {
     data,
     isLoading,

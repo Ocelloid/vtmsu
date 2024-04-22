@@ -577,7 +577,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.char.delete({ where: { id: input.id } });
     }),
 
-  getById: publicProcedure
+  getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(({ ctx, input }) => {
       return ctx.db.char.findUnique({
@@ -587,6 +587,55 @@ export const charRouter = createTRPCRouter({
           clan: true,
           abilities: { include: { abilitiy: true } },
           features: { include: { feature: true } },
+        },
+      });
+    }),
+
+  getPrivateDataById: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.char.findFirst({
+        where: { AND: { id: input.id, createdById: ctx.session.user.id } },
+        select: {
+          createdAt: true,
+          updatedAt: true,
+          id: true,
+          factionId: true,
+          clanId: true,
+          visible: true,
+          createdById: true,
+          name: true,
+          age: true,
+          sire: true,
+          childer: true,
+          ambition: true,
+          content: true,
+        },
+      });
+    }),
+
+  getPublicDataById: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.char.findUnique({
+        where: { id: input.id },
+        select: {
+          createdAt: true,
+          updatedAt: true,
+          id: true,
+          factionId: true,
+          clanId: true,
+          visible: true,
+          createdById: true,
+          name: true,
+          playerName: true,
+          playerContact: true,
+          image: true,
+          title: true,
+          status: true,
+          publicInfo: true,
+          faction: true,
+          clan: true,
         },
       });
     }),
