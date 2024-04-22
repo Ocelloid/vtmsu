@@ -25,7 +25,12 @@ import type {
 import Image from "next/image";
 import { LoadingPage } from "~/components/Loading";
 import { FaTrashAlt, FaCheckDouble, FaTimes } from "react-icons/fa";
-import { disciplines } from "~/assets";
+import {
+  disciplines,
+  clans as clan_icons,
+  factions as faction_icons,
+} from "~/assets";
+import { useTheme } from "next-themes";
 
 const EditCharacterTrait = ({
   onClose,
@@ -40,6 +45,7 @@ const EditCharacterTrait = ({
   className?: string;
   children?: string | JSX.Element | JSX.Element[] | (string | JSX.Element)[];
 }) => {
+  const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExpert, setIsExpert] = useState(false);
   const [content, setContent] = useState("");
@@ -57,11 +63,35 @@ const EditCharacterTrait = ({
   const [icon, setIcon] = useState<string>("");
   const editing = !!trait;
 
-  const keys = Object.keys(disciplines);
+  const abilityKeys = Object.keys(disciplines);
 
-  const iconsSelection = Object.values(disciplines)
+  const iconsAbilitySelection = Object.values(disciplines)
     .map((disc, i) => {
-      return { value: keys[i] ?? "", image: disc };
+      return { value: abilityKeys[i] ?? "", image: disc };
+    })
+    .filter((x) => x !== undefined);
+
+  const clanKeys = Object.keys(clan_icons);
+
+  const iconsClanSelection = Object.values(clan_icons)
+    .map((clan, i) => {
+      if (theme === "light" && !clanKeys[i]?.includes("_white"))
+        return { value: clanKeys[i] ?? "", image: clan };
+      if (theme === "dark" && clanKeys[i]?.includes("_white"))
+        return { value: clanKeys[i] ?? "", image: clan };
+      else return undefined;
+    })
+    .filter((x) => x !== undefined);
+
+  const factionKeys = Object.keys(faction_icons);
+
+  const iconsFactionSelection = Object.values(faction_icons)
+    .map((clan, i) => {
+      if (theme === "light" && !factionKeys[i]?.includes("_white"))
+        return { value: factionKeys[i] ?? "", image: clan };
+      if (theme === "dark" && factionKeys[i]?.includes("_white"))
+        return { value: factionKeys[i] ?? "", image: clan };
+      else return undefined;
     })
     .filter((x) => x !== undefined);
 
@@ -268,6 +298,7 @@ const EditCharacterTrait = ({
       case "Faction":
         if (!editing) {
           createFaction({
+            icon: icon,
             name: title,
             content: content,
             visibleToPlayer: isVisibleToPlayer,
@@ -275,6 +306,7 @@ const EditCharacterTrait = ({
         } else {
           updateFaction({
             id: trait.id ?? "",
+            icon: icon,
             name: title,
             content: content,
             visibleToPlayer: isVisibleToPlayer,
@@ -284,6 +316,7 @@ const EditCharacterTrait = ({
       case "Clan":
         if (!editing) {
           createClan({
+            icon: icon,
             name: title,
             content: content,
             factionIds: factionIds ?? [1],
@@ -292,6 +325,7 @@ const EditCharacterTrait = ({
         } else {
           updateClan({
             id: trait.id ?? "",
+            icon: icon,
             name: title,
             content: content,
             factionIds: factionIds ?? [1],
@@ -536,7 +570,7 @@ const EditCharacterTrait = ({
                 value={icon}
                 onValueChange={setIcon}
               >
-                {iconsSelection.map((is) => (
+                {iconsAbilitySelection.map((is) => (
                   <Radio
                     value={is.value}
                     key={is.value}
@@ -547,6 +581,84 @@ const EditCharacterTrait = ({
                     <Image
                       alt="clan"
                       src={is.image}
+                      height="32"
+                      className="mx-auto"
+                    />
+                  </Radio>
+                ))}
+              </RadioGroup>
+            )}
+            {traitType === "Clan" && (
+              <RadioGroup
+                label="Иконка"
+                orientation="horizontal"
+                color="danger"
+                value={icon}
+                onValueChange={setIcon}
+              >
+                {iconsClanSelection.map((is) => (
+                  <Radio
+                    value={is!.value}
+                    key={is!.value}
+                    className={
+                      "flex min-w-16 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
+                    }
+                  >
+                    <Image
+                      alt="clan"
+                      src={is!.image}
+                      height="32"
+                      className="mx-auto"
+                    />
+                  </Radio>
+                ))}
+              </RadioGroup>
+            )}
+            {traitType === "Faction" && (
+              <RadioGroup
+                label="Иконка"
+                orientation="horizontal"
+                color="danger"
+                value={icon}
+                onValueChange={setIcon}
+              >
+                {iconsFactionSelection.map((is) => (
+                  <Radio
+                    value={is!.value}
+                    key={is!.value}
+                    className={
+                      "flex min-w-16 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
+                    }
+                  >
+                    <Image
+                      alt="clan"
+                      src={is!.image}
+                      height="32"
+                      className="mx-auto"
+                    />
+                  </Radio>
+                ))}
+              </RadioGroup>
+            )}
+            {traitType === "Clan" && (
+              <RadioGroup
+                label="Фракция"
+                orientation="horizontal"
+                color="danger"
+                value={icon}
+                onValueChange={setIcon}
+              >
+                {iconsFactionSelection.map((is) => (
+                  <Radio
+                    value={is!.value}
+                    key={is!.value}
+                    className={
+                      "flex min-w-16 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
+                    }
+                  >
+                    <Image
+                      alt="clan"
+                      src={is!.image}
                       height="32"
                       className="mx-auto"
                     />

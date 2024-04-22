@@ -11,7 +11,7 @@ const BGImage = () => {
   const { data: sessionData } = useSession();
   const defaultBackground =
     theme === "light" ? factions._ankh : factions._ankh_white;
-  const [background, setBackground] = useState<string>("");
+  const [background, setBackground] = useState<string>("_ankh");
   const clanKeys = Object.keys(clans);
   const factionKeys = Object.keys(factions);
   const clanSelection = Object.values(clans).map((clan, i) => {
@@ -42,7 +42,7 @@ const BGImage = () => {
 
   useEffect(() => {
     if (!!userData) {
-      const bg = userData.background as string;
+      const bg = userData.background!;
       setBackground(bg + (theme === "dark" ? "_white" : ""));
     }
   }, [userData, theme]);
@@ -50,6 +50,8 @@ const BGImage = () => {
   useEffect(() => {
     if (!!sessionData) void refetchUser();
   }, [sessionData, refetchUser]);
+
+  console.log(defaultBackground);
 
   return (
     <div className="fixed -z-50 h-screen w-screen bg-gradient-to-b from-red-100 to-red-400 dark:from-red-800 dark:to-black [&>*]:opacity-10">

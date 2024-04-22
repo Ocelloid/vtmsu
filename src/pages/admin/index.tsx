@@ -21,7 +21,8 @@ import type {
 import { FaPencilAlt, FaPlusCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { disciplines } from "~/assets";
+import { disciplines, factions, clans } from "~/assets";
+import { useTheme } from "next-themes";
 
 type characterTraitsType = {
   label: string;
@@ -30,10 +31,31 @@ type characterTraitsType = {
 }[];
 
 export default function Admin() {
+  const { theme } = useTheme();
   const discKeys = Object.keys(disciplines);
   const discIcons = Object.values(disciplines).map((disc, i) => {
     return { value: disc, key: discKeys[i] };
   });
+  const clanKeys = Object.keys(clans);
+  const clanSelection = Object.values(clans).map((clan, i) => {
+    if (theme === "light" && !clanKeys[i]?.includes("_white"))
+      return { key: clanKeys[i] ?? "", value: clan };
+    if (theme === "dark" && clanKeys[i]?.includes("_white"))
+      return { key: clanKeys[i] ?? "", value: clan };
+    else return undefined;
+  });
+  const factionKeys = Object.keys(factions);
+  const factionSelection = Object.values(factions).map((faction, i) => {
+    if (theme === "light" && !factionKeys[i]?.includes("_white"))
+      return { key: factionKeys[i] ?? "", value: faction };
+    if (theme === "dark" && factionKeys[i]?.includes("_white"))
+      return { key: factionKeys[i] ?? "", value: faction };
+    else return undefined;
+  });
+  const icons = [...discIcons, ...clanSelection, ...factionSelection].filter(
+    (i) => !!i,
+  );
+  const defaultIcon = theme === "light" ? factions._ankh : factions._ankh_white;
   const { data: sessionData } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [characterTraits, setCharacterTraits] = useState<characterTraitsType>([
@@ -222,23 +244,23 @@ export default function Admin() {
                       {cs.list.map((trait) => (
                         <div key={trait.id} className="flex flex-col">
                           <div className="flex flex-row">
-                            {cs.type === "Ability" && (
+                            {cs.type !== "Feature" && (
                               <Image
                                 alt="icon"
-                                className="max-h-12 max-w-12"
+                                className="mr-2 max-h-12 max-w-12 object-contain"
                                 src={
                                   !!(trait as Ability).icon
-                                    ? discIcons.find(
+                                    ? icons.find(
                                         (di) =>
-                                          di.key === (trait as Ability).icon,
+                                          di!.key === (trait as Ability).icon,
                                       )?.value ?? ""
-                                    : ""
+                                    : defaultIcon
                                 }
                                 height={128}
                                 width={128}
                               />
                             )}
-                            <div className="ml-2 mr-auto flex flex-col">
+                            <div className="mr-auto flex flex-col">
                               <p className="text-2xl">{trait.name}</p>
                               <p className="text-sm italic">
                                 {cs.type === "Clan" &&

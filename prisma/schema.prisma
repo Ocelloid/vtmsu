@@ -78,6 +78,7 @@ model Clan {
   name             String
   content          String             @db.LongText
   visibleToPlayer  Boolean            @default(false)
+  icon             String?
   Char             Char[]
   ClanInFaction    ClanInFaction[]
   AbilityAvailable AbilityAvailable[]
@@ -87,6 +88,7 @@ model Clan {
 model Faction {
   id              Int             @id @default(autoincrement())
   name            String
+  icon            String?
   content         String          @db.LongText
   visibleToPlayer Boolean         @default(false)
   Char            Char[]

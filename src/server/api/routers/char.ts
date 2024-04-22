@@ -63,6 +63,7 @@ export type Clan = {
   id: number;
   name: string;
   content: string;
+  icon?: string | null;
   visibleToPlayer: boolean;
   ClanInFaction?: ClanInFaction[];
   AbilityAvailable?: AbilityAvailable[];
@@ -315,6 +316,7 @@ export const charRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         content: z.string(),
+        icon: z.string().optional(),
         visibleToPlayer: z.boolean(),
       }),
     )
@@ -322,6 +324,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.faction.create({
         data: {
           name: input.name,
+          icon: input.icon,
           content: input.content,
           visibleToPlayer: input.visibleToPlayer,
         },
@@ -334,6 +337,7 @@ export const charRouter = createTRPCRouter({
         id: z.number(),
         name: z.string(),
         content: z.string(),
+        icon: z.string().optional(),
         visibleToPlayer: z.boolean(),
       }),
     )
@@ -342,6 +346,7 @@ export const charRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+          icon: input.icon,
           content: input.content,
           visibleToPlayer: input.visibleToPlayer,
         },
@@ -359,6 +364,7 @@ export const charRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         content: z.string(),
+        icon: z.string().optional(),
         factionIds: z.array(z.number().nullish()),
         visibleToPlayer: z.boolean(),
       }),
@@ -367,6 +373,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.clan.create({
         data: {
           name: input.name,
+          icon: input.icon,
           content: input.content,
           visibleToPlayer: input.visibleToPlayer,
           ClanInFaction: {
@@ -386,6 +393,7 @@ export const charRouter = createTRPCRouter({
         id: z.number(),
         name: z.string(),
         content: z.string(),
+        icon: z.string().optional(),
         factionIds: z.array(z.number().nullish()),
         visibleToPlayer: z.boolean(),
       }),
@@ -395,6 +403,7 @@ export const charRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+          icon: input.icon,
           content: input.content,
           visibleToPlayer: input.visibleToPlayer,
           ClanInFaction: {
