@@ -201,7 +201,7 @@ export default function Rules() {
                           <Tooltip
                             className="rounded-md text-tiny text-default-500"
                             content={"Скопировать ссылку"}
-                            placement="right"
+                            placement="top"
                           >
                             <h2
                               className={`cursor-pointer pb-2 ${rule.content === "<p> </p>" ? "text-4xl" : "text-2xl"}`}
@@ -265,7 +265,7 @@ export default function Rules() {
                           <Tooltip
                             className="rounded-md text-tiny text-default-500"
                             content={"Скопировать ссылку"}
-                            placement="right"
+                            placement="top"
                           >
                             <h2
                               className={`cursor-pointer pb-2 text-2xl`}
