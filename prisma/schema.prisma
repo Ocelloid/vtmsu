@@ -36,9 +36,10 @@ model Char {
   title         String?
   status        String?
   childer       String?
+  comment       String?              @db.LongText
   verified      Boolean?             @default(false)
   ambition      String?              @db.LongText
-  publicInfo    String?
+  publicInfo    String?              @db.LongText
   content       String?              @db.LongText
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt

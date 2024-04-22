@@ -17,6 +17,7 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
+  verified?: boolean | null;
   playerName?: string | null;
   playerContact?: string | null;
   title?: string | null;
@@ -466,6 +467,7 @@ export const charRouter = createTRPCRouter({
           publicInfo: input.publicInfo,
           playerName: input.playerName,
           playerContact: input.playerContact,
+          verified: false,
           image: input.image,
           age: input.age,
           sire: input.sire,
@@ -539,6 +541,7 @@ export const charRouter = createTRPCRouter({
           content: input.content,
           ambition: input.ambition,
           publicInfo: input.publicInfo,
+          verified: false,
           image: input.image,
           age: input.age,
           sire: input.sire,
@@ -568,6 +571,24 @@ export const charRouter = createTRPCRouter({
           faction: true,
           clan: true,
         },
+      });
+    }),
+
+  comment: protectedProcedure
+    .input(z.object({ id: z.number(), comment: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: { comment: input.comment },
+      });
+    }),
+
+  verify: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: { verified: true },
       });
     }),
 
@@ -610,6 +631,7 @@ export const charRouter = createTRPCRouter({
           childer: true,
           ambition: true,
           content: true,
+          verified: true,
         },
       });
     }),

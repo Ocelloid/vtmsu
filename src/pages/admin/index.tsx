@@ -1,77 +1,22 @@
 import Head from "next/head";
-import {
-  Tabs,
-  Tab,
-  User as UserIcon,
-  Checkbox,
-  Accordion,
-  AccordionItem,
-} from "@nextui-org/react";
+import { Tabs, Tab, User as UserIcon, Checkbox } from "@nextui-org/react";
 import { LoadingPage } from "~/components/Loading";
-import EditCharacterTrait from "~/components/modals/editCharacterTrait";
-import { useState, useEffect } from "react";
-import { api } from "~/utils/api";
 import type { User } from "~/server/api/routers/user";
-import type {
-  Faction,
-  Clan,
-  Ability,
-  Feature,
-} from "~/server/api/routers/char";
-import { FaPencilAlt, FaPlusCircle, FaEye, FaEyeSlash } from "react-icons/fa";
+import type { Character } from "~/server/api/routers/char";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
-import { disciplines, factions, clans } from "~/assets";
-import { useTheme } from "next-themes";
-
-type characterTraitsType = {
-  label: string;
-  type: string;
-  list: Faction[] | Clan[] | Ability[] | Feature[];
-}[];
+import { api } from "~/utils/api";
+import CharacterTraits from "~/components/CharacterTraits";
+import { Accordion, AccordionItem } from "@nextui-org/react";
+import CharacterSheet from "~/pages/characters/[pid]";
 
 export default function Admin() {
-  const { theme } = useTheme();
-  const discKeys = Object.keys(disciplines);
-  const discIcons = Object.values(disciplines).map((disc, i) => {
-    return { value: disc, key: discKeys[i] };
-  });
-  const clanKeys = Object.keys(clans);
-  const clanSelection = Object.values(clans)
-    .map((clan, i) => {
-      if (theme === "light" && !clanKeys[i]?.includes("_white"))
-        return { key: clanKeys[i] ?? "", value: clan };
-      if (theme === "dark" && clanKeys[i]?.includes("_white"))
-        return { key: clanKeys[i]?.replace("_white", "") ?? "", value: clan };
-      else return undefined;
-    })
-    .filter((x) => !!x);
-  const factionKeys = Object.keys(factions);
-  const factionSelection = Object.values(factions)
-    .map((faction, i) => {
-      if (theme === "light" && !factionKeys[i]?.includes("_white"))
-        return { key: factionKeys[i] ?? "", value: faction };
-      if (theme === "dark" && factionKeys[i]?.includes("_white"))
-        return {
-          key: factionKeys[i]?.replace("_white", "") ?? "",
-          value: faction,
-        };
-      else return undefined;
-    })
-    .filter((x) => !!x);
-  console.log(clanSelection);
-  const icons = [...discIcons, ...clanSelection, ...factionSelection].filter(
-    (i) => !!i,
-  );
-  const defaultIcon = theme === "light" ? factions._ankh : factions._ankh_white;
   const { data: sessionData } = useSession();
   const [users, setUsers] = useState<User[]>([]);
-  const [characterTraits, setCharacterTraits] = useState<characterTraitsType>([
-    { label: "Фракции", type: "Faction", list: [] },
-    { label: "Кланы", type: "Clan", list: [] },
-    { label: "Способности", type: "Ability", list: [] },
-    { label: "Дополнения", type: "Feature", list: [] },
-  ]);
+  const [chars, setChars] = useState<Character[]>([]);
+  const [selectedChars, setSelectedChars] = useState<Set<number | string>>(
+    new Set([]),
+  );
 
   const { data: isPersonnel, isLoading: isUserPersonnelLoading } =
     api.user.userIsPersonnel.useQuery(undefined, { enabled: !!sessionData });
@@ -85,45 +30,10 @@ export default function Admin() {
     refetch: refetchUserList,
   } = api.user.getUserList.useQuery(undefined, { enabled: !!sessionData });
   const {
-    data: charTraitsData,
-    isLoading: isCharTraitsLoading,
-    refetch: refetchTraits,
-  } = api.char.getCharTraits.useQuery(undefined, { enabled: !!sessionData });
-
-  useEffect(() => {
-    setUsers(userList ?? []);
-    setCharacterTraits([
-      {
-        label: "Фракции",
-        type: "Faction",
-        list:
-          charTraitsData?.factions.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
-      },
-      {
-        label: "Кланы",
-        type: "Clan",
-        list:
-          charTraitsData?.clans.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
-      },
-      {
-        label: "Способности",
-        type: "Ability",
-        list:
-          charTraitsData?.abilities.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
-      },
-      {
-        label: "Дополнения",
-        type: "Feature",
-        list: charTraitsData?.features.sort((a, b) => a.cost - b.cost) ?? [],
-      },
-    ]);
-  }, [userList, charTraitsData]);
+    data: charList,
+    isLoading: isCharListLoading,
+    refetch: refetchCharList,
+  } = api.char.getAll.useQuery(undefined, { enabled: isPersonnel });
 
   const handleUserRoleChange = (e: boolean, id: string, role: string) => {
     if (role === "admin" && !e && users.filter((x) => x.isAdmin).length < 2)
@@ -140,11 +50,16 @@ export default function Admin() {
     return;
   };
 
+  useEffect(() => {
+    setUsers(userList ?? []);
+    setChars(charList ?? []);
+  }, [userList, charList]);
+
   if (
-    isCharTraitsLoading ||
     isUserPersonnelLoading ||
     isUserAdminLoading ||
     isUserListLoading ||
+    isCharListLoading ||
     isRoleChanging
   )
     return <LoadingPage />;
@@ -227,7 +142,21 @@ export default function Admin() {
                 </div>
               }
             >
-              Персонажи
+              <Accordion
+                isCompact
+                selectedKeys={selectedChars}
+                onSelectionChange={(keys) => setSelectedChars(new Set(keys))}
+              >
+                {chars.map((char) => (
+                  <AccordionItem
+                    key={char.id}
+                    aria-label={char.name}
+                    title={char.name}
+                  >
+                    <CharacterSheet charId={char.id} />
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </Tab>
             <Tab
               key={"char_traits"}
@@ -237,75 +166,7 @@ export default function Admin() {
                 </div>
               }
             >
-              <Accordion isCompact>
-                {characterTraits.map((cs, i) => (
-                  <AccordionItem key={i} aria-label={cs.label} title={cs.label}>
-                    <div className="flex flex-col gap-4 pb-4">
-                      <EditCharacterTrait
-                        traitType={cs.type}
-                        onClose={refetchTraits}
-                        className="w-full text-black dark:text-white"
-                      >
-                        <FaPlusCircle size={12} />
-                        Добавить
-                      </EditCharacterTrait>
-                      {cs.list.map((trait) => (
-                        <div key={trait.id} className="flex flex-col">
-                          <div className="flex flex-row">
-                            {cs.type !== "Feature" && (
-                              <Image
-                                alt="icon"
-                                className="mr-2 max-h-12 max-w-12 object-contain"
-                                src={
-                                  !!(trait as Ability).icon
-                                    ? icons.find(
-                                        (di) =>
-                                          di!.key === (trait as Ability).icon,
-                                      )?.value ?? ""
-                                    : defaultIcon
-                                }
-                                height={128}
-                                width={128}
-                              />
-                            )}
-                            <div className="mr-auto flex flex-col">
-                              <p className="text-2xl">{trait.name}</p>
-                              <p className="text-sm italic">
-                                {cs.type === "Clan" &&
-                                  `${(trait as Clan).ClanInFaction!.map((f) => f.faction?.name).join(", ")}`}
-                                {cs.type === "Feature" &&
-                                  `${(trait as Feature).cost} `}
-                                {cs.type === "Feature" &&
-                                  `${(trait as Feature).FeatureAvailable?.map((a) => a.clan?.name).join(", ")}`}
-                                {cs.type === "Ability" &&
-                                  `${(trait as Ability).AbilityAvailable?.map((a) => a.clan?.name).join(", ")}`}
-                                {cs.type === "Ability" &&
-                                  `${(trait as Ability).expertise ? " - Экспертная" : ""}`}
-                              </p>
-                            </div>
-                            {trait.visibleToPlayer ? (
-                              <FaEye size={24} className="mr-2" />
-                            ) : (
-                              <FaEyeSlash size={24} className="mr-2" />
-                            )}
-                            <EditCharacterTrait
-                              trait={trait}
-                              traitType={cs.type}
-                              onClose={refetchTraits}
-                              className="-mt-2 h-10 w-10 min-w-10 rounded-full p-0 text-black dark:text-white"
-                            >
-                              <FaPencilAlt size={16} />
-                            </EditCharacterTrait>
-                          </div>
-                          <p className="whitespace-break-spaces text-sm">
-                            {trait.content}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+              <CharacterTraits />
             </Tab>
             <Tab
               key={"items"}
