@@ -151,7 +151,7 @@ const Navigation = () => {
                         "w-8 h-8 max-h-8 max-w-8 min-w-8 min-h-8 bg-red-500 ring-offset-red-500 dark:ring-offset-background-red-500",
                       src: sessionData.user.image ?? "",
                     }}
-                    className="hidden border-none text-medium hover:text-gray-300 md:flex"
+                    className="hidden border-none text-medium hover:text-red-900 dark:hover:text-red-400 md:flex"
                     name={sessionData.user.name}
                   />
                 </div>

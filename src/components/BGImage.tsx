@@ -18,7 +18,7 @@ const BGImage = () => {
     if (theme === "light" && !clanKeys[i]?.includes("_white"))
       return { value: clanKeys[i] ?? "", image: clan };
     if (theme === "dark" && clanKeys[i]?.includes("_white"))
-      return { value: clanKeys[i] ?? "", image: clan };
+      return { value: clanKeys[i]?.replace("_white", "") ?? "", image: clan };
     else return undefined;
   });
 
@@ -26,7 +26,10 @@ const BGImage = () => {
     if (theme === "light" && !factionKeys[i]?.includes("_white"))
       return { value: factionKeys[i] ?? "", image: faction };
     if (theme === "dark" && factionKeys[i]?.includes("_white"))
-      return { value: factionKeys[i] ?? "", image: faction };
+      return {
+        value: factionKeys[i]?.replace("_white", "") ?? "",
+        image: faction,
+      };
     else return undefined;
   });
 
@@ -43,7 +46,7 @@ const BGImage = () => {
   useEffect(() => {
     if (!!userData) {
       const bg = userData.background!;
-      setBackground(bg + (theme === "dark" ? "_white" : ""));
+      setBackground(bg);
     }
   }, [userData, theme]);
 

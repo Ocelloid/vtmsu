@@ -37,21 +37,29 @@ export default function Admin() {
     return { value: disc, key: discKeys[i] };
   });
   const clanKeys = Object.keys(clans);
-  const clanSelection = Object.values(clans).map((clan, i) => {
-    if (theme === "light" && !clanKeys[i]?.includes("_white"))
-      return { key: clanKeys[i] ?? "", value: clan };
-    if (theme === "dark" && clanKeys[i]?.includes("_white"))
-      return { key: clanKeys[i] ?? "", value: clan };
-    else return undefined;
-  });
+  const clanSelection = Object.values(clans)
+    .map((clan, i) => {
+      if (theme === "light" && !clanKeys[i]?.includes("_white"))
+        return { key: clanKeys[i] ?? "", value: clan };
+      if (theme === "dark" && clanKeys[i]?.includes("_white"))
+        return { key: clanKeys[i]?.replace("_white", "") ?? "", value: clan };
+      else return undefined;
+    })
+    .filter((x) => !!x);
   const factionKeys = Object.keys(factions);
-  const factionSelection = Object.values(factions).map((faction, i) => {
-    if (theme === "light" && !factionKeys[i]?.includes("_white"))
-      return { key: factionKeys[i] ?? "", value: faction };
-    if (theme === "dark" && factionKeys[i]?.includes("_white"))
-      return { key: factionKeys[i] ?? "", value: faction };
-    else return undefined;
-  });
+  const factionSelection = Object.values(factions)
+    .map((faction, i) => {
+      if (theme === "light" && !factionKeys[i]?.includes("_white"))
+        return { key: factionKeys[i] ?? "", value: faction };
+      if (theme === "dark" && factionKeys[i]?.includes("_white"))
+        return {
+          key: factionKeys[i]?.replace("_white", "") ?? "",
+          value: faction,
+        };
+      else return undefined;
+    })
+    .filter((x) => !!x);
+  console.log(clanSelection);
   const icons = [...discIcons, ...clanSelection, ...factionSelection].filter(
     (i) => !!i,
   );
@@ -236,7 +244,7 @@ export default function Admin() {
                       <EditCharacterTrait
                         traitType={cs.type}
                         onClose={refetchTraits}
-                        className="w-full"
+                        className="w-full text-black dark:text-white"
                       >
                         <FaPlusCircle size={12} />
                         Добавить
@@ -284,7 +292,7 @@ export default function Admin() {
                               trait={trait}
                               traitType={cs.type}
                               onClose={refetchTraits}
-                              className="-mt-2 h-10 w-10 min-w-10 rounded-full p-0"
+                              className="-mt-2 h-10 w-10 min-w-10 rounded-full p-0 text-black dark:text-white"
                             >
                               <FaPencilAlt size={16} />
                             </EditCharacterTrait>

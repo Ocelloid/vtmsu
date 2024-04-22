@@ -64,7 +64,7 @@ export default function CharacterEditor({
     if (theme === "light" && !clanKeys[i]?.includes("_white"))
       return { key: clanKeys[i] ?? "", value: clan };
     if (theme === "dark" && clanKeys[i]?.includes("_white"))
-      return { key: clanKeys[i] ?? "", value: clan };
+      return { key: clanKeys[i]?.replace("_white", "") ?? "", value: clan };
     else return undefined;
   });
 
@@ -73,7 +73,10 @@ export default function CharacterEditor({
     if (theme === "light" && !factionKeys[i]?.includes("_white"))
       return { key: factionKeys[i] ?? "", value: faction };
     if (theme === "dark" && factionKeys[i]?.includes("_white"))
-      return { key: factionKeys[i] ?? "", value: faction };
+      return {
+        key: factionKeys[i]?.replace("_white", "") ?? "",
+        value: faction,
+      };
     else return undefined;
   });
 
@@ -178,7 +181,7 @@ export default function CharacterEditor({
       setName(characterData.name);
       setFactionId(characterData.factionId);
       setClanId(characterData.clanId);
-      setAbilityIds(characterData.abilities.map((a) => a.id));
+      setAbilityIds(characterData.abilities.map((a) => a.abilityId));
       const cdfs = characterData.features.map((cdf) => {
         return { id: cdf.featureId, comment: cdf.description!, checked: true };
       });

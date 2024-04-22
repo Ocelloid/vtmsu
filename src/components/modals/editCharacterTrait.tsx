@@ -78,7 +78,7 @@ const EditCharacterTrait = ({
       if (theme === "light" && !clanKeys[i]?.includes("_white"))
         return { value: clanKeys[i] ?? "", image: clan };
       if (theme === "dark" && clanKeys[i]?.includes("_white"))
-        return { value: clanKeys[i] ?? "", image: clan };
+        return { value: clanKeys[i]?.replace("_white", "") ?? "", image: clan };
       else return undefined;
     })
     .filter((x) => x !== undefined);
@@ -90,7 +90,10 @@ const EditCharacterTrait = ({
       if (theme === "light" && !factionKeys[i]?.includes("_white"))
         return { value: factionKeys[i] ?? "", image: clan };
       if (theme === "dark" && factionKeys[i]?.includes("_white"))
-        return { value: factionKeys[i] ?? "", image: clan };
+        return {
+          value: factionKeys[i]?.replace("_white", "") ?? "",
+          image: clan,
+        };
       else return undefined;
     })
     .filter((x) => x !== undefined);
@@ -150,10 +153,13 @@ const EditCharacterTrait = ({
           (trait as Ability).AbilityAvailable!.map((v) => v.clanId) ?? [],
         );
       }
-      if (traitType === "Clan")
+      if (traitType === "Faction") setIcon((trait as Faction).icon ?? "");
+      if (traitType === "Clan") {
+        setIcon((trait as Clan).icon ?? "");
         setfactionIds(
           (trait as Clan).ClanInFaction!.map((v) => v.factionId) ?? [],
         );
+      }
     }
   }, [trait, traitType]);
 
@@ -298,7 +304,7 @@ const EditCharacterTrait = ({
       case "Faction":
         if (!editing) {
           createFaction({
-            icon: icon,
+            icon: icon.replace("_white", ""),
             name: title,
             content: content,
             visibleToPlayer: isVisibleToPlayer,
@@ -306,7 +312,7 @@ const EditCharacterTrait = ({
         } else {
           updateFaction({
             id: trait.id ?? "",
-            icon: icon,
+            icon: icon.replace("_white", ""),
             name: title,
             content: content,
             visibleToPlayer: isVisibleToPlayer,
@@ -316,7 +322,7 @@ const EditCharacterTrait = ({
       case "Clan":
         if (!editing) {
           createClan({
-            icon: icon,
+            icon: icon.replace("_white", ""),
             name: title,
             content: content,
             factionIds: factionIds ?? [1],
@@ -325,7 +331,7 @@ const EditCharacterTrait = ({
         } else {
           updateClan({
             id: trait.id ?? "",
-            icon: icon,
+            icon: icon.replace("_white", ""),
             name: title,
             content: content,
             factionIds: factionIds ?? [1],
@@ -336,7 +342,7 @@ const EditCharacterTrait = ({
       case "Ability":
         if (!editing) {
           createAbility({
-            icon: icon,
+            icon: icon.replace("_white", ""),
             name: title,
             content: content,
             expertise: isExpert,
@@ -347,7 +353,7 @@ const EditCharacterTrait = ({
         } else {
           updateAbility({
             id: trait.id ?? "",
-            icon: icon,
+            icon: icon.replace("_white", ""),
             name: title,
             content: content,
             expertise: isExpert,

@@ -108,7 +108,7 @@ export default function Characters() {
                   {characters.map((character) => (
                     <div
                       key={character.id}
-                      className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
+                      className="grid grid-cols-1 rounded-md bg-red-950/50 p-2 text-default dark:text-white sm:grid-cols-3 sm:gap-4"
                     >
                       <div className="mb-2 flex flex-col sm:mb-0">
                         <Image
@@ -174,7 +174,7 @@ export default function Characters() {
                   {myCharacters.map((character) => (
                     <div
                       key={character.id}
-                      className="grid grid-cols-1 sm:grid-cols-3 sm:gap-4"
+                      className="grid grid-cols-1 rounded-md bg-red-950/50 p-2 text-default dark:text-white sm:grid-cols-3 sm:gap-4"
                     >
                       <div className="mb-2 flex flex-col sm:mb-0">
                         <Image
@@ -200,7 +200,7 @@ export default function Characters() {
                           <Button
                             variant="light"
                             color="warning"
-                            className="h-8 w-8 min-w-8 rounded-full p-0 text-black dark:text-warning"
+                            className="h-8 w-8 min-w-8 rounded-full p-0 text-default dark:text-warning"
                             onClick={() => handleEditCharacter(character.id)}
                           >
                             <FaPencilAlt size={16} />
