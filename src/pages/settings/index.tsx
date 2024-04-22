@@ -79,7 +79,7 @@ export default function Settings() {
 
   useEffect(() => {
     if (!!sessionData && !!userData) {
-      const bg = userData.background as string;
+      const bg = userData.background!;
       setUserName(sessionData.user.name ?? "");
       setUserEmail(sessionData.user.email ?? "");
       setUserPhone(userData.phone ?? "");
@@ -92,7 +92,7 @@ export default function Settings() {
 
   const handleClear = () => {
     if (!!sessionData && !!userData) {
-      const bg = userData.background as string;
+      const bg = userData.background!;
       setUserName(sessionData.user.name ?? "");
       setUserEmail(sessionData.user.email ?? "");
       setUserPhone(userData.phone ?? "");

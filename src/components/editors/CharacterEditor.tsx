@@ -28,6 +28,7 @@ import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
+import { disciplines } from "~/assets";
 
 type FeatureWithComment = {
   id: number;
@@ -46,6 +47,10 @@ export default function CharacterEditor({
 }: {
   onSuccess: () => void;
 }) {
+  const discKeys = Object.keys(disciplines);
+  const discIcons = Object.values(disciplines).map((disc, i) => {
+    return { value: disc, key: discKeys[i] };
+  });
   const router = useRouter();
   const [name, setName] = useState<string>("");
   const [characterId, setCharacterId] = useState<number>();
@@ -348,7 +353,7 @@ export default function CharacterEditor({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col">
-      <div className="sticky top-[5.3rem] -mx-5 -mt-2 flex flex-col bg-black/50 px-5 sm:top-24 sm:rounded-xl">
+      <div className="sticky top-[5.3rem] z-30 -mx-5 -mt-2 flex flex-col bg-black/50 px-5 sm:top-24 sm:rounded-xl">
         <div className="flex w-full flex-row gap-2 pb-1 pt-2">
           <UploadButton
             content={{
@@ -492,6 +497,7 @@ export default function CharacterEditor({
               onChange={(e) => {
                 if (!!e.target.value) {
                   setClanId(Number(e.target.value));
+                  setCostSum(0);
                   setAbilityIds([]);
                   setFeatureWithComments(
                     featureWithComments.map((fwc) => {
@@ -683,13 +689,31 @@ export default function CharacterEditor({
             <CheckboxGroup
               label={
                 !!clanId
-                  ? "Выберите дисциплины - не больше трёх"
+                  ? `Выберите дисциплины - не больше ${
+                      featureWithComments
+                        .filter((fwc) => fwc.checked)
+                        .map((fwc) => fwc.id)
+                        .includes(
+                          features.find((f) => f.name === "Способный ученик")!
+                            .id,
+                        )
+                        ? "четырёх"
+                        : "трёх"
+                    }`
                   : "Сначала выберите клан"
               }
               color="warning"
               value={abilityIds ? abilityIds.map((a) => a.toString()) : []}
               onValueChange={(aids) => {
-                if (aids.length < 4)
+                const maxDisc = featureWithComments
+                  .filter((fwc) => fwc.checked)
+                  .map((fwc) => fwc.id)
+                  .includes(
+                    features.find((f) => f.name === "Способный ученик")!.id,
+                  )
+                  ? 4
+                  : 3;
+                if (aids.length <= maxDisc)
                   setAbilityIds(aids.map((aid) => Number(aid)));
               }}
             >
@@ -706,6 +730,27 @@ export default function CharacterEditor({
                 )
                 .map((ability) => (
                   <Checkbox
+                    isDisabled={
+                      abilities
+                        .filter((a) => abilityIds.includes(a.id))
+                        .map((a) => a.requirementId)
+                        .includes(Number(ability.id)) ||
+                      (abilities
+                        .filter((a) => !abilityIds.includes(a.id))
+                        .map((a) => a.id)
+                        .includes(Number(ability.id)) &&
+                        abilityIds.length >
+                          (featureWithComments
+                            .filter((fwc) => fwc.checked)
+                            .map((fwc) => fwc.id)
+                            .includes(
+                              features.find(
+                                (f) => f.name === "Способный ученик",
+                              )!.id,
+                            )
+                            ? 3
+                            : 2))
+                    }
                     key={ability.id}
                     value={ability.id.toString()}
                     classNames={{
@@ -719,7 +764,21 @@ export default function CharacterEditor({
                     }}
                   >
                     <div className="flex flex-col">
-                      {ability.name}
+                      <div className="flex flex-row items-center gap-2 text-xl">
+                        <Image
+                          alt="disc"
+                          className="max-h-12 max-w-12"
+                          src={
+                            !!ability.icon
+                              ? discIcons.find((di) => di.key === ability.icon)
+                                  ?.value ?? ""
+                              : ""
+                          }
+                          height={128}
+                          width={128}
+                        />{" "}
+                        {ability.name}
+                      </div>
                       <p className="whitespace-break-spaces pt-2 text-justify text-xs">
                         {ability.content}
                       </p>
@@ -767,6 +826,10 @@ export default function CharacterEditor({
                     <Checkbox
                       key={feature.id}
                       value={feature.id.toString()}
+                      isDisabled={
+                        feature.name === "Способный ученик" &&
+                        abilityIds.length > 3
+                      }
                       classNames={{
                         base: cn(
                           "flex-row flex flex-1 max-w-full w-full m-0",

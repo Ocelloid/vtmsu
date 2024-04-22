@@ -20,6 +20,8 @@ import type {
 } from "~/server/api/routers/char";
 import { FaPencilAlt, FaPlusCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { disciplines } from "~/assets";
 
 type characterTraitsType = {
   label: string;
@@ -28,6 +30,10 @@ type characterTraitsType = {
 }[];
 
 export default function Admin() {
+  const discKeys = Object.keys(disciplines);
+  const discIcons = Object.values(disciplines).map((disc, i) => {
+    return { value: disc, key: discKeys[i] };
+  });
   const { data: sessionData } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [characterTraits, setCharacterTraits] = useState<characterTraitsType>([
@@ -216,7 +222,23 @@ export default function Admin() {
                       {cs.list.map((trait) => (
                         <div key={trait.id} className="flex flex-col">
                           <div className="flex flex-row">
-                            <div className="mr-auto flex flex-col">
+                            {cs.type === "Ability" && (
+                              <Image
+                                alt="icon"
+                                className="max-h-12 max-w-12"
+                                src={
+                                  !!(trait as Ability).icon
+                                    ? discIcons.find(
+                                        (di) =>
+                                          di.key === (trait as Ability).icon,
+                                      )?.value ?? ""
+                                    : ""
+                                }
+                                height={128}
+                                width={128}
+                              />
+                            )}
+                            <div className="ml-2 mr-auto flex flex-col">
                               <p className="text-2xl">{trait.name}</p>
                               <p className="text-sm italic">
                                 {cs.type === "Clan" &&

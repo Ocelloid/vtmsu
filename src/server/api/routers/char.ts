@@ -80,6 +80,7 @@ export type ClanInFaction = {
 export type Ability = {
   id: number;
   name: string;
+  icon?: string | null;
   content: string;
   expertise: boolean;
   requirementId?: number | null;
@@ -242,6 +243,7 @@ export const charRouter = createTRPCRouter({
         name: z.string(),
         content: z.string(),
         expertise: z.boolean(),
+        icon: z.string().optional(),
         requirementId: z.number().optional(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
@@ -251,6 +253,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.ability.create({
         data: {
           name: input.name,
+          icon: input.icon,
           content: input.content,
           expertise: input.expertise,
           requirementId: input.requirementId,
@@ -273,6 +276,7 @@ export const charRouter = createTRPCRouter({
         name: z.string(),
         content: z.string(),
         expertise: z.boolean(),
+        icon: z.string().optional(),
         requirementId: z.number().optional(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
@@ -283,6 +287,7 @@ export const charRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+          icon: input.icon,
           content: input.content,
           expertise: input.expertise,
           requirementId: input.requirementId,

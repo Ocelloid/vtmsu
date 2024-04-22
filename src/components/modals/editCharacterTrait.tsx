@@ -10,6 +10,8 @@ import {
   Checkbox,
   Select,
   SelectItem,
+  RadioGroup,
+  Radio,
 } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
@@ -20,8 +22,10 @@ import type {
   Ability,
   Feature,
 } from "~/server/api/routers/char";
+import Image from "next/image";
 import { LoadingPage } from "~/components/Loading";
 import { FaTrashAlt, FaCheckDouble, FaTimes } from "react-icons/fa";
+import { disciplines } from "~/assets";
 
 const EditCharacterTrait = ({
   onClose,
@@ -50,7 +54,16 @@ const EditCharacterTrait = ({
   const [isVisibleToPlayer, setIsVisibleToPlayer] = useState(false);
   const [isClanSelectOpen, setIsClanSelectOpen] = useState(false);
   const [isFactionSelectOpen, setIsFactionSelectOpen] = useState(false);
+  const [icon, setIcon] = useState<string>("");
   const editing = !!trait;
+
+  const keys = Object.keys(disciplines);
+
+  const iconsSelection = Object.values(disciplines)
+    .map((disc, i) => {
+      return { value: keys[i] ?? "", image: disc };
+    })
+    .filter((x) => x !== undefined);
 
   const {
     data: factionData,
@@ -100,6 +113,7 @@ const EditCharacterTrait = ({
         );
       }
       if (traitType === "Ability") {
+        setIcon((trait as Ability).icon ?? "");
         setIsExpert((trait as Ability).expertise ?? false);
         setRequirement((trait as Ability).requirementId ?? undefined);
         setclanIds(
@@ -126,6 +140,7 @@ const EditCharacterTrait = ({
     setclanIds([]);
     setContent("");
     setTitle("");
+    setIcon("");
     setCost(0);
     setIsModalOpen(false);
     setIsClanSelectOpen(false);
@@ -287,6 +302,7 @@ const EditCharacterTrait = ({
       case "Ability":
         if (!editing) {
           createAbility({
+            icon: icon,
             name: title,
             content: content,
             expertise: isExpert,
@@ -297,6 +313,7 @@ const EditCharacterTrait = ({
         } else {
           updateAbility({
             id: trait.id ?? "",
+            icon: icon,
             name: title,
             content: content,
             expertise: isExpert,
@@ -511,6 +528,32 @@ const EditCharacterTrait = ({
                 )}
               </div>
             </div>
+            {traitType === "Ability" && (
+              <RadioGroup
+                label="Иконка"
+                orientation="horizontal"
+                color="danger"
+                value={icon}
+                onValueChange={setIcon}
+              >
+                {iconsSelection.map((is) => (
+                  <Radio
+                    value={is.value}
+                    key={is.value}
+                    className={
+                      "flex min-w-16 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
+                    }
+                  >
+                    <Image
+                      alt="clan"
+                      src={is.image}
+                      height="32"
+                      className="mx-auto"
+                    />
+                  </Radio>
+                ))}
+              </RadioGroup>
+            )}
             {traitType === "Ability" && (
               <Checkbox isSelected={isExpert} onValueChange={setIsExpert}>
                 Экспертная
