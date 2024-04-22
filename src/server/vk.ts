@@ -41,7 +41,7 @@ export default function VK<P extends Record<string, any> = VkProfile>(
         return { tokens };
       },
     },
-    userinfo: `https://api.vk.com/method/users.get?fields=photo_100&v=${apiVersion}`,
+    userinfo: `https://api.vk.com/method/users.get?fields=photo_200&v=${apiVersion}`,
     profile(result: P) {
       const profile = result.response?.[0] ?? {};
 
@@ -49,7 +49,7 @@ export default function VK<P extends Record<string, any> = VkProfile>(
         id: profile.id,
         name: [profile.first_name, profile.last_name].filter(Boolean).join(" "),
         email: null,
-        image: profile.photo_100,
+        image: profile.photo_200,
       };
     },
     options,
