@@ -181,12 +181,15 @@ export default function Settings() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-1 flex-col">
+        <div
+          className={`${isChanged ? "" : "opacity-0"} fixed inset-x-0 bottom-0 z-20 h-36 w-full bg-black/75`}
+        />
         <Button
           color="success"
           variant="ghost"
           isDisabled={isPhoneInvalid || isEmailInvalid || !userName}
           onClick={() => handleUpdate()}
-          className={`${isChanged ? "" : "opacity-0"} container fixed inset-x-0 bottom-20 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
+          className={`${isChanged ? "" : "opacity-0"} container fixed inset-x-0 bottom-20 z-30 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
         >
           Сохранить
         </Button>
@@ -194,7 +197,7 @@ export default function Settings() {
           color="danger"
           variant="ghost"
           onClick={() => handleClear()}
-          className={`${isChanged ? "" : "opacity-0"} container fixed inset-x-0 bottom-7 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
+          className={`${isChanged ? "" : "opacity-0"} container fixed inset-x-0 bottom-7 z-30 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
         >
           Отмена
         </Button>
