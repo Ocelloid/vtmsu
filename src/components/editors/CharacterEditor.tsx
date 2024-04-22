@@ -399,8 +399,12 @@ export default function CharacterEditor({
             }}
             className="h-8 w-full max-w-[160px] cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
             endpoint="imageUploader"
-            onUploadBegin={() => setUploading(true)}
+            onUploadBegin={() => {
+              console.log("uploading...");
+              setUploading(true);
+            }}
             onClientUploadComplete={(res) => {
+              console.log("uploaded");
               setImage(res[0]?.url ?? "");
               setUploading(false);
             }}
@@ -652,30 +656,6 @@ export default function CharacterEditor({
         >
           Персонаж виден другим игрокам
         </Checkbox>
-        {/* <div className="flex flex-1 flex-col sm:hidden">
-          <Input
-            type="number"
-            variant="underlined"
-            label="Возраст"
-            placeholder="Введите возраст"
-            value={age ? age.toString() : ""}
-            onValueChange={(a) => setAge(Number(a))}
-          />
-          <Input
-            variant="underlined"
-            label="Статусы"
-            placeholder="Введите статусы через запятую"
-            value={status}
-            onValueChange={setStatus}
-          />
-          <Input
-            variant="underlined"
-            label="Титулы"
-            placeholder="Введите титулы через запятую"
-            value={title}
-            onValueChange={setTitle}
-          />
-        </div> */}
         <div className="flex flex-col gap-2">
           <DefaultEditor
             className="min-h-44 sm:min-h-20"
@@ -683,13 +663,6 @@ export default function CharacterEditor({
             initialContent={initialPublicInfo}
             placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
           />
-          {/* <p className="mx-auto -mb-1 flex flex-row text-xs text-warning/50">
-            &nbsp;Публичная информация&nbsp;
-          </p>
-          <Divider className="bg-warning/50" />
-          <p className="mx-auto -mt-1 flex flex-row text-xs text-warning/50">
-            &nbsp;Тайная информация&nbsp;
-          </p> */}
           <div className={"-mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2"}>
             <Input
               variant="underlined"
@@ -708,13 +681,6 @@ export default function CharacterEditor({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          {/* <DefaultEditor
-          label="Амбиции"
-          className="min-h-12"
-          onUpdate={setAmbition}
-          initialContent={initialAmbition}
-          placeholder="Введите амбиции и желания вашего персонажа"
-        /> */}
           <Textarea
             variant="underlined"
             label="Амбиции и желания"
