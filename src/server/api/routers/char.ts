@@ -638,7 +638,7 @@ export const charRouter = createTRPCRouter({
       const user = await ctx.db.user.findUnique({
         where: { id: ctx.session.user.id },
       });
-      const whereData = user?.isPersonnel
+      const whereData = user?.isAdmin
         ? { id: input.id }
         : { id: input.id, createdById: ctx.session.user.id };
       const char = await ctx.db.char.findFirst({
@@ -655,9 +655,15 @@ export const charRouter = createTRPCRouter({
 
   getPrivateDataById: protectedProcedure
     .input(z.object({ id: z.number() }))
-    .query(({ ctx, input }) => {
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: { id: ctx.session.user.id },
+      });
+      const whereData = user?.isAdmin
+        ? { id: input.id }
+        : { id: input.id, createdById: ctx.session.user.id };
       return ctx.db.char.findFirst({
-        where: { AND: { id: input.id, createdById: ctx.session.user.id } },
+        where: whereData,
         select: {
           createdAt: true,
           updatedAt: true,

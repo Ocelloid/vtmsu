@@ -187,7 +187,7 @@ export default function Settings() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-1 flex-col">
+      <main className="flex min-h-screen flex-1 flex-col sm:pb-4">
         <div
           className={`${isChanged ? "" : "opacity-0"} fixed inset-x-0 bottom-0 z-20 h-36 w-full bg-black/75`}
         />
@@ -208,7 +208,7 @@ export default function Settings() {
         >
           Отмена
         </Button>
-        <div className="container mt-24 flex flex-1 flex-col gap-2 pb-4 lg:max-w-screen-lg">
+        <div className="container mt-24 flex flex-1 flex-col gap-2 bg-white/75 py-2 dark:bg-red-950/50 sm:rounded-lg lg:max-w-screen-lg">
           <div className="flex flex-col">
             <span className="pb-2 text-xl text-default-600">Контакты</span>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
@@ -317,6 +317,7 @@ export default function Settings() {
           </div>
           <Divider className="my-2 bg-danger/50" />
           <span className="pb-2 text-xl text-default-600">Внешний вид</span>
+          <span className="text-foreground-500">Выберите тему</span>
           <Switch
             isSelected={theme === "light"}
             onValueChange={(value) => {
@@ -348,6 +349,7 @@ export default function Settings() {
               }
             > */}
           <RadioGroup
+            label="Выберите фон"
             orientation="horizontal"
             color="danger"
             value={bgSelected}
