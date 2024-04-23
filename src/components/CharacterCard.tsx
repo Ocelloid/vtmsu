@@ -130,7 +130,7 @@ const CharacterCard = ({
                 {character.verified ? (
                   <VscVerified size={24} className="mt-1 text-success" />
                 ) : character.pending ? (
-                  <VscUnverified size={24} className="mt-1 text-secondary" />
+                  <VscUnverified size={24} className="mt-1 text-white" />
                 ) : (
                   <VscWarning size={24} className="mt-1 text-danger" />
                 )}
