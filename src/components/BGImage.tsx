@@ -54,8 +54,6 @@ const BGImage = () => {
     if (!!sessionData) void refetchUser();
   }, [sessionData, refetchUser]);
 
-  console.log(defaultBackground);
-
   return (
     <div className="fixed -z-50 h-screen w-screen bg-gradient-to-b from-red-100 to-red-400 dark:from-red-800 dark:to-black [&>*]:opacity-10">
       {isUserLoading ? (

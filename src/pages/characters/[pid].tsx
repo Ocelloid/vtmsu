@@ -137,8 +137,6 @@ const CharacterSheet = ({
   )
     return <LoadingPage />;
 
-  console.log(privateChar?.abilities);
-
   return (
     <>
       <Head>
@@ -439,6 +437,9 @@ const CharacterSheet = ({
                       &nbsp;{f.feature?.name}
                       <p className="whitespace-break-spaces pt-1 text-justify text-xs">
                         {f.feature?.content}
+                      </p>
+                      <p className="whitespace-break-spaces pt-1 text-justify text-xs italic">
+                        Комменатрий:&nbsp;{f.description ?? ""}
                       </p>
                     </div>
                   ))}

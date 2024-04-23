@@ -420,11 +420,9 @@ export default function CharacterEditor({
             className="h-8 w-full max-w-[160px] cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
             endpoint="imageUploader"
             onUploadBegin={() => {
-              console.log("uploading...");
               setUploading(true);
             }}
             onClientUploadComplete={(res) => {
-              console.log("uploaded");
               setImage(res[0]?.url ?? "");
               setUploading(false);
             }}
