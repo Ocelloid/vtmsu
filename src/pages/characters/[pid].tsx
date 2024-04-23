@@ -17,6 +17,7 @@ import {
 } from "@nextui-org/react";
 import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
+import { disciplines } from "~/assets";
 import { api } from "~/utils/api";
 import Image from "next/image";
 import Head from "next/head";
@@ -28,6 +29,10 @@ const CharacterSheet = ({
   charId?: number;
   onChange?: () => void;
 }) => {
+  const discKeys = Object.keys(disciplines);
+  const discIcons = Object.values(disciplines).map((disc, i) => {
+    return { value: disc, key: discKeys[i] };
+  });
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: sessionData } = useSession();
@@ -86,9 +91,11 @@ const CharacterSheet = ({
 
   useEffect(() => {
     if (!!publicData && !!sessionData) {
-      setPrivateVer(publicData.createdById === sessionData.user.id);
+      setPrivateVer(
+        publicData.createdById === sessionData.user.id || isPersonnel,
+      );
     }
-  }, [publicData, sessionData, setPrivateVer]);
+  }, [publicData, sessionData, isPersonnel, setPrivateVer]);
 
   const handleDeny = () => {
     const deny = confirm("Вернуть персонажа на доработку?");
@@ -130,6 +137,8 @@ const CharacterSheet = ({
   )
     return <LoadingPage />;
 
+  console.log(privateChar?.abilities);
+
   return (
     <>
       <Head>
@@ -153,7 +162,7 @@ const CharacterSheet = ({
       </Modal>
       <main className={`mx-auto flex max-w-5xl flex-1 flex-col gap-2 sm:pb-2`}>
         <div
-          className={`container flex flex-col gap-2 rounded-none bg-red-950/50 p-2 sm:rounded-lg ${!!charId ? "" : "mt-24"}`}
+          className={`container flex flex-col gap-2 rounded-none bg-red-100 p-2 pb-4 dark:bg-red-950/50 sm:rounded-lg ${!!charId ? "" : "mt-24"}`}
         >
           {isPersonnel && (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
@@ -185,10 +194,10 @@ const CharacterSheet = ({
           {(!!privateChar || isPersonnel) && (
             <div className="flex flex-1 flex-col gap-2">
               <div
-                className={`container grid grid-cols-1 justify-evenly gap-4 rounded-lg bg-black/50 py-2 ${publicChar.verified ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
+                className={`container grid grid-cols-1 justify-evenly gap-4 rounded-lg bg-white/50 py-2 dark:bg-black/50 ${publicChar.verified ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
               >
                 {publicChar.verified && (
-                  <div className="flex flex-row items-center justify-center gap-2 text-white">
+                  <div className="flex flex-row items-center justify-center gap-2 text-black dark:text-white">
                     {publicChar.visible ? (
                       <FaEye size={32} />
                     ) : (
@@ -222,7 +231,7 @@ const CharacterSheet = ({
                 <Button
                   variant="light"
                   color="warning"
-                  className="text-md text-default dark:text-warning"
+                  className="text-md text-black dark:text-warning"
                   onClick={() => {
                     void router.push(
                       {
@@ -378,8 +387,8 @@ const CharacterSheet = ({
                 />
               </div>
             )}
-            <span className="text-sm text-default-600">
-              Публичная информация:
+            <span className="text-2xl text-default-600">
+              Публичная информация
             </span>
             <div
               className="tiptap-display text-justify"
@@ -389,13 +398,51 @@ const CharacterSheet = ({
             />
             {!!privateChar && (
               <div className="flex flex-col">
-                <span className="text-sm text-default-600">Квента:</span>
+                <span className="text-2xl text-default-600">Квента</span>
                 <div
                   className="tiptap-display text-justify"
                   dangerouslySetInnerHTML={{
                     __html: privateChar.content!,
                   }}
                 />
+                <div className="flex flex-col gap-2 pt-4">
+                  <span className="text-2xl text-default-600">Дисциплины</span>
+                  {privateChar.abilities?.map((a) => (
+                    <div key={a.abilityId} className="flex flex-col">
+                      <div className="flex flex-row items-center gap-2 text-xl">
+                        <Image
+                          alt="disc"
+                          className="max-h-12 max-w-12"
+                          src={
+                            !!a.abilitiy?.icon
+                              ? discIcons.find(
+                                  (di) => di.key === a.abilitiy?.icon,
+                                )?.value ?? ""
+                              : ""
+                          }
+                          height={128}
+                          width={128}
+                        />{" "}
+                        {a.abilitiy?.name}
+                      </div>
+                      <p className="whitespace-break-spaces pt-2 text-justify text-xs">
+                        {a.abilitiy?.content}
+                      </p>
+                    </div>
+                  ))}
+                  <span className="text-2xl text-default-600">Дополнения</span>
+                  {privateChar.features?.map((f) => (
+                    <div className="flex flex-col" key={f.featureId}>
+                      {(f.feature?.cost ?? 0) > 0
+                        ? `+${f.feature?.cost}`
+                        : f.feature?.cost}
+                      &nbsp;{f.feature?.name}
+                      <p className="whitespace-break-spaces pt-1 text-justify text-xs">
+                        {f.feature?.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

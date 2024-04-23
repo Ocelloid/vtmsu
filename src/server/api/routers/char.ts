@@ -42,7 +42,7 @@ export type CharacterAbility = {
   id: number;
   characterId: number;
   abilityId: number;
-  ability?: Ability;
+  abilitiy?: Ability;
   Char?: Character;
 };
 
@@ -673,6 +673,8 @@ export const charRouter = createTRPCRouter({
           ambition: true,
           content: true,
           comment: true,
+          abilities: { include: { abilitiy: true } },
+          features: { include: { feature: true } },
         },
       });
     }),
