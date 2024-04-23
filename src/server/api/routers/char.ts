@@ -582,7 +582,6 @@ export const charRouter = createTRPCRouter({
           sire: input.sire,
           childer: input.childer,
           visible: input.visible,
-          createdById: ctx.session.user.id,
           abilities: {
             deleteMany: {},
             createMany: {
@@ -636,8 +635,14 @@ export const charRouter = createTRPCRouter({
   getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: { id: ctx.session.user.id },
+      });
+      const whereData = user?.isPersonnel
+        ? { id: input.id }
+        : { id: input.id, createdById: ctx.session.user.id };
       const char = await ctx.db.char.findFirst({
-        where: { id: input.id, createdById: ctx.session.user.id },
+        where: { ...whereData },
         include: {
           faction: true,
           clan: true,

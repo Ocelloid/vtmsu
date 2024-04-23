@@ -188,7 +188,7 @@ const CharacterSheet = ({
                 className={`container grid grid-cols-1 justify-evenly gap-4 rounded-lg bg-black/50 py-2 ${publicChar.verified ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
               >
                 {publicChar.verified && (
-                  <div className="flex flex-row items-center justify-center gap-2">
+                  <div className="flex flex-row items-center justify-center gap-2 text-white">
                     {publicChar.visible ? (
                       <FaEye size={32} />
                     ) : (
@@ -283,7 +283,7 @@ const CharacterSheet = ({
                 <Tooltip
                   className="w-80 rounded-md text-justify text-tiny text-black dark:text-white"
                   content={publicChar.faction?.content}
-                  placement="bottom"
+                  placement="top"
                   closeDelay={2000}
                   isOpen={factionIsOpen}
                   onOpenChange={(open) => setFactionIsOpen(open)}
