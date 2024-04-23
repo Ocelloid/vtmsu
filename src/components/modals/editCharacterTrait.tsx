@@ -646,32 +646,6 @@ const EditCharacterTrait = ({
                 ))}
               </RadioGroup>
             )}
-            {traitType === "Clan" && (
-              <RadioGroup
-                label="Фракция"
-                orientation="horizontal"
-                color="danger"
-                value={icon}
-                onValueChange={setIcon}
-              >
-                {iconsFactionSelection.map((is) => (
-                  <Radio
-                    value={is!.value}
-                    key={is!.value}
-                    className={
-                      "flex min-w-16 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
-                    }
-                  >
-                    <Image
-                      alt="clan"
-                      src={is!.image}
-                      height="32"
-                      className="mx-auto"
-                    />
-                  </Radio>
-                ))}
-              </RadioGroup>
-            )}
             {traitType === "Ability" && (
               <Checkbox isSelected={isExpert} onValueChange={setIsExpert}>
                 Экспертная
