@@ -14,6 +14,7 @@ import {
   ModalBody,
   Button,
   useDisclosure,
+  Divider,
 } from "@nextui-org/react";
 import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
@@ -394,6 +395,7 @@ const CharacterSheet = ({
                 __html: publicChar.publicInfo!,
               }}
             />
+            <Divider className="mb-2 mt-3 bg-danger" />
             {!!privateChar && (
               <div className="flex flex-col">
                 <span className="text-2xl text-default-600">Квента</span>
