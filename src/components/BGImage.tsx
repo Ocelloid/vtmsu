@@ -55,7 +55,9 @@ const BGImage = () => {
   }, [sessionData, refetchUser]);
 
   return (
-    <div className="fixed -z-50 h-screen w-screen bg-gradient-to-b from-red-100 to-red-950 dark:from-red-800 dark:to-black [&>*]:opacity-10">
+    <div
+      className={`fixed -z-50 h-screen w-screen bg-gradient-to-b from-red-100 to-red-950 dark:from-red-800 dark:to-black ${theme === "light" ? "[&>*]:opacity-20" : "[&>*]:opacity-10"}`}
+    >
       {isUserLoading ? (
         <LoadingPage />
       ) : (

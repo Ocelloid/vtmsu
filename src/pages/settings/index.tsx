@@ -8,8 +8,8 @@ import {
   Button,
   RadioGroup,
   Radio,
-  // Accordion,
-  // AccordionItem,
+  Accordion,
+  AccordionItem,
 } from "@nextui-org/react";
 import { FaImage, FaSun, FaMoon } from "react-icons/fa";
 import Image from "next/image";
@@ -60,7 +60,7 @@ export default function Settings() {
     (x) => x !== undefined,
   );
 
-  // const defaultImage = theme === "dark" ? factions._ankh_white : factions._ankh;
+  const defaultImage = theme === "dark" ? factions._ankh_white : factions._ankh;
 
   const {
     data: userData,
@@ -189,14 +189,14 @@ export default function Settings() {
       </Head>
       <main className="flex min-h-screen flex-1 flex-col sm:pb-4">
         <div
-          className={`${isChanged ? "" : "opacity-0"} fixed inset-x-0 bottom-0 z-20 h-36 w-full bg-black/75`}
+          className={`${isChanged ? "bottom-0 z-20" : "-bottom-36 opacity-0"} fixed inset-x-0 h-36 w-full bg-black/75`}
         />
         <Button
           color="success"
           variant="ghost"
           isDisabled={isPhoneInvalid || isEmailInvalid || !userName}
           onClick={() => handleUpdate()}
-          className={`${isChanged ? "" : "opacity-0"} container fixed inset-x-0 bottom-20 z-30 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
+          className={`${isChanged ? "bottom-20 z-30" : "-bottom-36 opacity-0"} container fixed inset-x-0 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
         >
           Сохранить
         </Button>
@@ -204,7 +204,7 @@ export default function Settings() {
           color="danger"
           variant="ghost"
           onClick={() => handleClear()}
-          className={`${isChanged ? "" : "opacity-0"} container fixed inset-x-0 bottom-7 z-30 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
+          className={`${isChanged ? "bottom-7 z-30" : "-bottom-36 opacity-0"} container fixed inset-x-0 mx-auto max-w-80 transition-all duration-1000 lg:max-w-screen-lg`}
         >
           Отмена
         </Button>
@@ -330,7 +330,7 @@ export default function Settings() {
           >
             {theme === "light" ? "Светлая тема" : "Тёмная тема"}
           </Switch>
-          {/* <Accordion isCompact>
+          <Accordion isCompact>
             <AccordionItem
               aria-label={"Фон"}
               title={"Фон"}
@@ -347,33 +347,33 @@ export default function Settings() {
                   }
                 />
               }
-            > */}
-          <RadioGroup
-            label="Выберите фон"
-            orientation="horizontal"
-            color="danger"
-            value={bgSelected}
-            onValueChange={handleUpdateBG}
-          >
-            {bgSelection.map((bg) => (
-              <Radio
-                value={bg!.value}
-                key={bg!.value}
-                className={
-                  "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
-                }
+            >
+              <RadioGroup
+                label="Выберите фон"
+                orientation="horizontal"
+                color="danger"
+                value={bgSelected}
+                onValueChange={handleUpdateBG}
               >
-                <Image
-                  alt="clan"
-                  src={bg!.image}
-                  height="64"
-                  className="mx-auto"
-                />
-              </Radio>
-            ))}
-          </RadioGroup>
-          {/* </AccordionItem>
-          </Accordion> */}
+                {bgSelection.map((bg) => (
+                  <Radio
+                    value={bg!.value}
+                    key={bg!.value}
+                    className={
+                      "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
+                    }
+                  >
+                    <Image
+                      alt="clan"
+                      src={bg!.image}
+                      height="64"
+                      className="mx-auto"
+                    />
+                  </Radio>
+                ))}
+              </RadioGroup>
+            </AccordionItem>
+          </Accordion>
         </div>
       </main>
     </>
