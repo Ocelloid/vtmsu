@@ -203,7 +203,7 @@ export default function CharacterEditor({
         }),
       );
       setPlayerName(userData.name ?? "");
-      setPlayerContact(userData.phone ? userData.phone : userData.email ?? "");
+      setPlayerContact(characterData.playerContact ?? "");
       setAge(Number(characterData.age));
       setImage(characterData.image ?? "");
       setSire(characterData.sire ?? "");
@@ -241,6 +241,9 @@ export default function CharacterEditor({
           description: "",
         });
       setContactSelect(pS);
+      setPlayerContactKey(
+        pS.find((c) => c.label === characterData.playerContact)?.value ?? "",
+      );
     }
   }, [characterData, traitsData, userData, router]);
 

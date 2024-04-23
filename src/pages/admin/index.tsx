@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 import CharacterTraits from "~/components/CharacterTraits";
-import { Accordion, AccordionItem } from "@nextui-org/react";
+import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import CharacterSheet from "~/pages/characters/[pid]";
 
 export default function Admin() {
@@ -157,7 +157,7 @@ export default function Admin() {
                         {char.verified ? (
                           <VscVerified size={24} className="text-success" />
                         ) : char.pending ? (
-                          <VscUnverified size={24} className="text-primary" />
+                          <VscUnverified size={24} className="text-secondary" />
                         ) : (
                           <VscWarning size={24} className="text-danger" />
                         )}
@@ -202,6 +202,26 @@ export default function Admin() {
               }
             >
               Виртуальный АХЧ
+            </Tab>
+            <Tab
+              key={"economy"}
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>Экономика</span>
+                </div>
+              }
+            >
+              Экономика
+            </Tab>
+            <Tab
+              key={"hunt"}
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>Охота</span>
+                </div>
+              }
+            >
+              Охота
             </Tab>
             <Tab
               key={"tasks"}

@@ -61,7 +61,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
   return (
     <div className="grid grid-cols-[repeat(14,minmax(0,1fr))] justify-between gap-1 dark:text-red-300 md:grid-cols-[repeat(28,minmax(0,1fr))]">
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Отменить"}
         placement="bottom"
       >
@@ -77,7 +77,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Повторно выполнить"}
         placement="bottom"
       >
@@ -93,7 +93,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Выровнять по левому краю"}
         placement="bottom"
       >
@@ -104,7 +104,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Выровнять по центру"}
         placement="bottom"
       >
@@ -115,7 +115,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Выровнять по правому краю"}
         placement="bottom"
       >
@@ -126,7 +126,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Выровнять по всей ширине"}
         placement="bottom"
       >
@@ -137,7 +137,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Жирный"}
         placement="bottom"
       >
@@ -150,7 +150,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Курсив"}
         placement="bottom"
       >
@@ -163,7 +163,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Зачёркнутый"}
         placement="bottom"
       >
@@ -176,7 +176,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Заголовок 1"}
         placement="bottom"
       >
@@ -190,7 +190,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Заголовок 2"}
         placement="bottom"
       >
@@ -204,7 +204,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Заголовок 3"}
         placement="bottom"
       >
@@ -218,7 +218,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Обычный параграф"}
         placement="bottom"
       >
@@ -230,7 +230,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Ссылка"}
         placement="bottom"
       >
@@ -239,7 +239,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Список"}
         placement="bottom"
       >
@@ -251,7 +251,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Цитата"}
         placement="bottom"
       >
@@ -263,7 +263,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Разделитель"}
         placement="bottom"
       >
@@ -275,7 +275,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Добавить таблицу"}
         placement="bottom"
       >
@@ -292,7 +292,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Удалить таблицу"}
         placement="bottom"
       >
@@ -305,7 +305,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Вставить столбец слева"}
         placement="bottom"
       >
@@ -318,7 +318,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Вставить столбец справа"}
         placement="bottom"
       >
@@ -331,7 +331,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Удалить столбец"}
         placement="bottom"
       >
@@ -344,7 +344,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Вставить строку сверху"}
         placement="bottom"
       >
@@ -357,7 +357,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Вставить строку снизу"}
         placement="bottom"
       >
@@ -370,7 +370,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Удалить строку"}
         placement="bottom"
       >
@@ -383,7 +383,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Заголовок таблицы"}
         placement="bottom"
       >
@@ -396,7 +396,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Объединить/разделить ячейки"}
         placement="bottom"
       >
@@ -409,7 +409,7 @@ const EditorMenu = ({ editor }: { editor: Editor }) => {
         </button>
       </Tooltip>
       <Tooltip
-        className="rounded-md text-tiny text-default-500"
+        className="rounded-md text-tiny text-black dark:text-white"
         content={"Добавить изображение"}
         placement="bottom"
       >

@@ -4,7 +4,17 @@ import { useSession } from "next-auth/react";
 import { LoadingPage } from "~/components/Loading";
 import type { Character } from "~/server/api/routers/char";
 import default_char from "~/../public/default_char.png";
-import { Input, Tooltip, Textarea, Button } from "@nextui-org/react";
+import {
+  Input,
+  Tooltip,
+  Textarea,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Button,
+  useDisclosure,
+} from "@nextui-org/react";
 import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import { api } from "~/utils/api";
@@ -19,6 +29,7 @@ const CharacterSheet = ({
   onChange?: () => void;
 }) => {
   const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: sessionData } = useSession();
   const [comment, setComment] = useState<string>("");
   const [publicChar, setPublicChar] = useState<Character>();
@@ -126,11 +137,23 @@ const CharacterSheet = ({
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main
-        className={`mx-auto flex min-h-screen max-w-5xl flex-1 flex-col gap-2`}
-      >
+      <Modal size={"full"} isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>Фото персонажа</ModalHeader>
+          <ModalBody>
+            <Image
+              src={!!publicChar.image ? publicChar.image : default_char}
+              className="max-h-[90vh] object-contain"
+              alt="char_img"
+              height={2048}
+              width={2048}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <main className={`mx-auto flex max-w-5xl flex-1 flex-col gap-2 sm:pb-2`}>
         <div
-          className={`container flex flex-col gap-2 rounded-lg bg-red-950/50 p-2 ${!!charId ? "" : "mt-24"}`}
+          className={`container flex flex-col gap-2 rounded-none bg-red-950/50 p-2 sm:rounded-lg ${!!charId ? "" : "mt-24"}`}
         >
           {isPersonnel && (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
@@ -143,7 +166,7 @@ const CharacterSheet = ({
                 Отказать
               </Button>
               <Textarea
-                className="col-span-3"
+                className="sm:col-span-3"
                 variant="underlined"
                 label="Комменатрий к персонажу"
                 placeholder="Введите комментарий к персонажу"
@@ -159,6 +182,63 @@ const CharacterSheet = ({
               </Button>
             </div>
           )}
+          {(!!privateChar || isPersonnel) && (
+            <div className="flex flex-1 flex-col gap-2">
+              <div
+                className={`container grid grid-cols-1 justify-evenly gap-4 rounded-lg bg-black/50 py-2 ${publicChar.verified ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
+              >
+                {publicChar.verified && (
+                  <div className="flex flex-row items-center justify-center gap-2">
+                    {publicChar.visible ? (
+                      <FaEye size={32} />
+                    ) : (
+                      <FaEyeSlash size={32} />
+                    )}
+                    <span>
+                      {publicChar.visible
+                        ? "Виден игрокам"
+                        : "Не виден игрокам"}
+                    </span>
+                  </div>
+                )}
+                <div
+                  className={`flex flex-row items-center justify-center gap-2 ${publicChar.verified ? "text-success" : publicChar.pending ? "text-secondary" : "text-danger"}`}
+                >
+                  {publicChar.verified ? (
+                    <VscVerified size={32} className="text-success" />
+                  ) : publicChar.pending ? (
+                    <VscUnverified size={32} className="text-secondary" />
+                  ) : (
+                    <VscWarning size={32} className="text-danger" />
+                  )}
+                  <span>
+                    {publicChar.verified
+                      ? "Верифицирован"
+                      : publicChar.pending
+                        ? "В ожидании"
+                        : "Отказан"}
+                  </span>
+                </div>
+                <Button
+                  variant="light"
+                  color="warning"
+                  className="text-md text-default dark:text-warning"
+                  onClick={() => {
+                    void router.push(
+                      {
+                        pathname: "/characters",
+                        query: { character: characterId },
+                      },
+                      undefined,
+                      { shallow: true },
+                    );
+                  }}
+                >
+                  <FaPencilAlt size={24} /> Редактировать
+                </Button>
+              </div>
+            </div>
+          )}
           <div className="flex flex-1 flex-col gap-2">
             {!isPersonnel && !!privateChar?.comment && (
               <Textarea
@@ -171,10 +251,12 @@ const CharacterSheet = ({
             )}
             <div className="grid grid-cols-1 flex-row gap-2 sm:grid-cols-2">
               <Image
+                onClick={onOpen}
                 src={!!publicChar.image ? publicChar.image : default_char}
                 alt="char_img"
-                className="flex max-h-[21rem] min-w-0 flex-shrink object-contain"
+                className="flex min-w-0 max-w-full flex-shrink cursor-pointer object-contain sm:max-h-[21rem]"
                 height={1024}
+                width={1024}
               />
               <div className="flex w-full flex-1 flex-grow flex-col [&>*]:flex [&>*]:w-full">
                 <Input
@@ -305,75 +387,18 @@ const CharacterSheet = ({
                 __html: publicChar.publicInfo!,
               }}
             />
-          </div>
-          {(!!privateChar || isPersonnel) && (
-            <div className="flex flex-1 flex-col gap-2">
-              {!!privateChar && (
-                <div className="flex flex-col">
-                  <span className="text-sm text-default-600">Квента:</span>
-                  <div
-                    className="tiptap-display text-justify"
-                    dangerouslySetInnerHTML={{
-                      __html: privateChar.content!,
-                    }}
-                  />
-                </div>
-              )}
-              <div
-                className={`container grid grid-cols-1 justify-evenly gap-4 rounded-lg bg-black/50 py-2 ${publicChar.verified ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
-              >
-                {publicChar.verified && (
-                  <div className="flex flex-row items-center justify-center gap-2">
-                    {publicChar.visible ? (
-                      <FaEye size={32} />
-                    ) : (
-                      <FaEyeSlash size={32} />
-                    )}
-                    <span>
-                      {publicChar.visible
-                        ? "Виден игрокам"
-                        : "Не виден игрокам"}
-                    </span>
-                  </div>
-                )}
+            {!!privateChar && (
+              <div className="flex flex-col">
+                <span className="text-sm text-default-600">Квента:</span>
                 <div
-                  className={`flex flex-row items-center justify-center gap-2 ${publicChar.verified ? "text-success" : publicChar.pending ? "text-primary" : "text-danger"}`}
-                >
-                  {publicChar.verified ? (
-                    <VscVerified size={32} className="text-success" />
-                  ) : publicChar.pending ? (
-                    <VscUnverified size={32} className="text-primary" />
-                  ) : (
-                    <VscWarning size={32} className="text-danger" />
-                  )}
-                  <span>
-                    {publicChar.verified
-                      ? "Верифицирован"
-                      : publicChar.pending
-                        ? "В ожидании"
-                        : "Отказан"}
-                  </span>
-                </div>
-                <Button
-                  variant="light"
-                  color="warning"
-                  className="text-md text-default dark:text-warning"
-                  onClick={() => {
-                    void router.push(
-                      {
-                        pathname: "/characters",
-                        query: { character: characterId },
-                      },
-                      undefined,
-                      { shallow: true },
-                    );
+                  className="tiptap-display text-justify"
+                  dangerouslySetInnerHTML={{
+                    __html: privateChar.content!,
                   }}
-                >
-                  <FaPencilAlt size={24} /> Редактировать
-                </Button>
+                />
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </main>
     </>

@@ -530,6 +530,38 @@ export const charRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.id },
+        include: { abilities: true, features: true },
+      });
+      const abilitiesChanged =
+        char?.abilities
+          .map((a) => a.id)
+          .every((v) => input.abilities.includes(v)) &&
+        input.abilities.every((v) =>
+          char?.abilities.map((a) => a.id).includes(v),
+        );
+      const featuresChanged =
+        char?.features
+          .map((a) => a.id)
+          .every((v) => input.features.map((f) => f.id).includes(v)) &&
+        input.features
+          .map((f) => f.id)
+          .every((v) => char?.abilities.map((a) => a.id).includes(v));
+      const shouldVerify =
+        char?.clanId !== input.clanId ||
+        char.factionId !== input.factionId ||
+        char.title !== input.title ||
+        char.status !== input.status ||
+        char.content !== input.content ||
+        char.ambition !== input.ambition ||
+        char.age !== input.age ||
+        char.sire !== input.sire ||
+        char.childer !== input.childer ||
+        char.name !== input.name ||
+        abilitiesChanged! ||
+        featuresChanged! ||
+        char.pending;
       return ctx.db.char.update({
         where: { id: input.id },
         data: {
@@ -543,7 +575,8 @@ export const charRouter = createTRPCRouter({
           content: input.content,
           ambition: input.ambition,
           publicInfo: input.publicInfo,
-          pending: true,
+          pending: shouldVerify,
+          verified: !shouldVerify,
           image: input.image,
           age: input.age,
           sire: input.sire,
