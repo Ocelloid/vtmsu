@@ -8,6 +8,8 @@ import {
   Button,
   RadioGroup,
   Radio,
+  Accordion,
+  AccordionItem,
 } from "@nextui-org/react";
 import { FaImage, FaSun, FaMoon } from "react-icons/fa";
 import Image from "next/image";
@@ -57,6 +59,8 @@ export default function Settings() {
   const bgSelection = [...factionSelection, ...clanSelection].filter(
     (x) => x !== undefined,
   );
+
+  const defaultImage = theme === "dark" ? factions._ankh_white : factions._ankh;
 
   const {
     data: userData,
@@ -204,8 +208,9 @@ export default function Settings() {
         >
           Отмена
         </Button>
-        <div className="container mt-24 flex flex-1 flex-col gap-2 lg:max-w-screen-lg">
+        <div className="container mt-24 flex flex-1 flex-col gap-2 pb-4 lg:max-w-screen-lg">
           <div className="flex flex-col">
+            <span className="pb-2 text-xl text-default-600">Контакты</span>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
               <div className="flex flex-col items-center justify-center">
                 <div className="max my-auto flex w-[128px] flex-row">
@@ -311,6 +316,7 @@ export default function Settings() {
             </div>
           </div>
           <Divider className="my-2 bg-danger/50" />
+          <span className="pb-2 text-xl text-default-600">Внешний вид</span>
           <Switch
             isSelected={theme === "light"}
             onValueChange={(value) => {
@@ -323,31 +329,49 @@ export default function Settings() {
           >
             {theme === "light" ? "Светлая тема" : "Тёмная тема"}
           </Switch>
-
-          <RadioGroup
-            label="Фон"
-            orientation="horizontal"
-            color="danger"
-            value={bgSelected}
-            onValueChange={handleUpdateBG}
-          >
-            {bgSelection.map((bg) => (
-              <Radio
-                value={bg!.value}
-                key={bg!.value}
-                className={
-                  "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
-                }
-              >
+          <Accordion isCompact>
+            <AccordionItem
+              aria-label={"Фон"}
+              title={"Фон"}
+              subtitle="Сменить фоновое изображение"
+              startContent={
                 <Image
-                  alt="clan"
-                  src={bg!.image}
-                  height="64"
-                  className="mx-auto"
+                  alt="current_background"
+                  className="-ml-2 max-h-8 max-w-8 object-contain"
+                  src={
+                    bgSelected
+                      ? bgSelection?.find((bgs) => bgs?.value === bgSelected)
+                          ?.image ?? ""
+                      : defaultImage
+                  }
                 />
-              </Radio>
-            ))}
-          </RadioGroup>
+              }
+            >
+              <RadioGroup
+                orientation="horizontal"
+                color="danger"
+                value={bgSelected}
+                onValueChange={handleUpdateBG}
+              >
+                {bgSelection.map((bg) => (
+                  <Radio
+                    value={bg!.value}
+                    key={bg!.value}
+                    className={
+                      "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
+                    }
+                  >
+                    <Image
+                      alt="clan"
+                      src={bg!.image}
+                      height="64"
+                      className="mx-auto"
+                    />
+                  </Radio>
+                ))}
+              </RadioGroup>
+            </AccordionItem>
+          </Accordion>
         </div>
       </main>
     </>
