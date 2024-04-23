@@ -668,7 +668,10 @@ export const charRouter = createTRPCRouter({
     }),
 
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.db.char.findMany({ include: { faction: true, clan: true } });
+    return ctx.db.char.findMany({
+      orderBy: { pending: "desc" },
+      include: { faction: true, clan: true },
+    });
   }),
 
   getMine: protectedProcedure.query(({ ctx }) => {

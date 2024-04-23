@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { Tabs, Tab, User as UserIcon, Checkbox } from "@nextui-org/react";
+import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import { LoadingPage } from "~/components/Loading";
 import type { User } from "~/server/api/routers/user";
 import type { Character } from "~/server/api/routers/char";
@@ -151,7 +152,18 @@ export default function Admin() {
                   <AccordionItem
                     key={char.id}
                     aria-label={char.name}
-                    title={char.name}
+                    title={
+                      <div className="flex flex-row gap-1">
+                        {char.verified ? (
+                          <VscVerified size={24} className="text-success" />
+                        ) : char.pending ? (
+                          <VscUnverified size={24} className="text-primary" />
+                        ) : (
+                          <VscWarning size={24} className="text-danger" />
+                        )}
+                        {char.name}
+                      </div>
+                    }
                   >
                     <CharacterSheet
                       charId={char.id}
