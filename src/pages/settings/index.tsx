@@ -8,8 +8,8 @@ import {
   Button,
   RadioGroup,
   Radio,
-  Accordion,
-  AccordionItem,
+  // Accordion,
+  // AccordionItem,
 } from "@nextui-org/react";
 import { FaImage, FaSun, FaMoon } from "react-icons/fa";
 import Image from "next/image";
@@ -60,7 +60,7 @@ export default function Settings() {
     (x) => x !== undefined,
   );
 
-  const defaultImage = theme === "dark" ? factions._ankh_white : factions._ankh;
+  // const defaultImage = theme === "dark" ? factions._ankh_white : factions._ankh;
 
   const {
     data: userData,
@@ -329,7 +329,7 @@ export default function Settings() {
           >
             {theme === "light" ? "Светлая тема" : "Тёмная тема"}
           </Switch>
-          <Accordion isCompact>
+          {/* <Accordion isCompact>
             <AccordionItem
               aria-label={"Фон"}
               title={"Фон"}
@@ -346,32 +346,32 @@ export default function Settings() {
                   }
                 />
               }
-            >
-              <RadioGroup
-                orientation="horizontal"
-                color="danger"
-                value={bgSelected}
-                onValueChange={handleUpdateBG}
+            > */}
+          <RadioGroup
+            orientation="horizontal"
+            color="danger"
+            value={bgSelected}
+            onValueChange={handleUpdateBG}
+          >
+            {bgSelection.map((bg) => (
+              <Radio
+                value={bg!.value}
+                key={bg!.value}
+                className={
+                  "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
+                }
               >
-                {bgSelection.map((bg) => (
-                  <Radio
-                    value={bg!.value}
-                    key={bg!.value}
-                    className={
-                      "flex min-w-32 [&>div]:flex-1 [&>div]:justify-center [&>span]:border-black [&>span]:dark:border-white"
-                    }
-                  >
-                    <Image
-                      alt="clan"
-                      src={bg!.image}
-                      height="64"
-                      className="mx-auto"
-                    />
-                  </Radio>
-                ))}
-              </RadioGroup>
-            </AccordionItem>
-          </Accordion>
+                <Image
+                  alt="clan"
+                  src={bg!.image}
+                  height="64"
+                  className="mx-auto"
+                />
+              </Radio>
+            ))}
+          </RadioGroup>
+          {/* </AccordionItem>
+          </Accordion> */}
         </div>
       </main>
     </>

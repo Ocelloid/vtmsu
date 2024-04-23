@@ -9,6 +9,7 @@ import {
   WithSideNavigation,
   type SideNavLink,
 } from "~/components/SideNavigation";
+import Link from "next/link";
 
 export default function About() {
   const links: SideNavLink[] = [
@@ -62,7 +63,6 @@ export default function About() {
           <Element className="section" name="entry_fee">
             <p className="pb-4 text-3xl">Взнос</p>
             <ul>
-              <li>&bull; Апрель 1750 рублей</li>
               <li>&bull; Май 2000</li>
               <li>&bull; Июнь 2250</li>
               <li>&bull; Июль 2500</li>
@@ -128,17 +128,31 @@ export default function About() {
             управления людьми - эта роль для вас.
             <p className="p-4 text-2xl">Бруха</p>
             <p className="pl-4">
-              Глава клана: Матвей Фурман. В клане осталось 2 свободных места.
+              Клан воинов-поэтов, которые рады возможности высказать свои мысли,
+              а затем подкрепить их делом. Проклятая ярость заставляет сородичей
+              закипать, и лучше не оказываться у них на пути в этот момент.
+              Глава клана: Матвей Фурман.
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_brujah"
+            >
+              Подробнее в книге клана
+            </Link>
             <p className="p-4 text-2xl">Малкавиан</p>
             <p className="pl-4">
               Это клан безумных Сородичей, к которым страшно поворачиваться
               спиной - а придётся - ведь для невидимки спина у тебя везде.
               Другие сородичи испытывают к ним отвращение и страх. Они с трудом
               справляются со своими тёмными зависимостями. Старейшина клана -
-              нарколог, доктор Тоторович (Роман Новиков). В клане осталось 1
-              свободное место.
+              нарколог, доктор Тоторович (Роман Новиков).
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_malkavian"
+            >
+              Подробнее в книге клана
+            </Link>
             <p className="p-4 text-2xl">Носферату</p>
             <p className="pl-4">
               <Image alt="nosferatu" src={nosferatu} />
@@ -146,20 +160,44 @@ export default function About() {
               Это клан, внешний вид членов которого полностью отражает суть
               уродства окружающего вас мира Тьмы, поэтому, они с радостью готовы
               вам помочь в любых ваших не благих начинаниях. Старейшина Карл
-              Модерах (Александр Кравчун). В клане нет свободных мест.
+              Модерах (Александр Кравчун).
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_nosferatu"
+            >
+              Подробнее в книге клана
+            </Link>
             <p className="p-4 text-2xl">Вентру</p>
             <p className="pl-4">
-              Это клан сородичей - аристократов. Они гордятся своим великим
-              прошлым и стремятся обеспечить себе великое будущее. Старейшина
-              клана Алиса Гладких. В клане осталось 3 свободных места.
+              Вечность - это не просто сила. Сила составляет только одну часть
+              мира Вентру, хотя это чрезвычайно важная часть. Вампиры из клана
+              Вентру понимают, что сила имеет ценность только как средство
+              достижения цели, а не сама цель. Таким образом, они используют
+              свои огромные ресурсы, чтобы расширить свое влияние, все время
+              наблюдая и выжидая подходящего момента – подходящего момента для
+              удара. Ибо в этом мире есть вещи и похуже вампиров, и вентру
+              знают, что они - единственная надежда. Старейшина клана Алиса
+              Гладких.
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_ventrue"
+            >
+              Подробнее в книге клана
+            </Link>
             <p className="p-4 text-2xl">Ассамит</p>
             <p className="pl-4">
               Это клан восточных сородичей, с которых совсем недавно было снято
               проклятье и которые стремятся возродить былое величие. Места
               старейшины клана свободно, всего в клане 6 свободных мест.
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_assamite"
+            >
+              Подробнее в книге клана
+            </Link>
             <p className="p-4 text-2xl">Гангрел</p>
             <p className="pl-4">
               Это клан звероподобных Сородичей, которым открыты секреты природы.
@@ -167,6 +205,12 @@ export default function About() {
               Старейшина остался в её составе. Место старейшины клана свободно,
               всего в клане 6 свободных мест.
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_gangrel"
+            >
+              Подробнее в книге клана
+            </Link>
             <p className="p-4 text-2xl">Тореадор</p>
             <p className="pl-4">
               Этот клан стремится сохранить чувство прекрасного в своём мёртвом
@@ -174,12 +218,23 @@ export default function About() {
               совершено несколько нападений. Место старейшины клана свободно,
               всего в клане 6 свободных мест.
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_toreador"
+            >
+              Подробнее в книге клана
+            </Link>
             <p className="p-4 text-2xl">Тремер</p>
             <p className="pl-4">
               Это сородичи, посвятившие свою вечность исследованию сокрытой
-              изнанки этого мира. Старейшина клана Роман Любин, всего в клане 4
-              свободных места.
+              изнанки этого мира. Старейшина клана Роман Любин.
             </p>
+            <Link
+              className="pl-4 text-xs underline"
+              href="https://wod.su/vampire/book/clanbook_tremere"
+            >
+              Подробнее в книге клана
+            </Link>
           </Element>
           <Element className="section" name="anarchs">
             <p className="pb-4 text-3xl">Анархи</p>

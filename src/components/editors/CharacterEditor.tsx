@@ -8,7 +8,7 @@ import {
   AccordionItem,
   CheckboxGroup,
   Checkbox,
-  Link,
+  // Link,
   cn,
 } from "@nextui-org/react";
 import type {
@@ -21,7 +21,7 @@ import Image from "next/image";
 import { UploadButton } from "~/utils/uploadthing";
 import DefaultEditor from "~/components/editors/DefaultEditor";
 import { FaRegSave, FaTrashAlt, FaImage, FaFile } from "react-icons/fa";
-import { VscWarning } from "react-icons/vsc";
+// import { VscWarning } from "react-icons/vsc";
 import default_char from "~/../public/default_char.png";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect } from "react";
@@ -107,7 +107,7 @@ export default function CharacterEditor({
   const [publicInfo, setPublicInfo] = useState<string>("");
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
-  const [noContact, setNoContact] = useState<boolean>(false);
+  // const [noContact, setNoContact] = useState<boolean>(false);
   const [ambition, setAmbition] = useState<string>("");
   // const [initialAmbition, setInitialAmbition] = useState<string>("");
   const [quenta, setQuenta] = useState<string>("");
@@ -149,6 +149,18 @@ export default function CharacterEditor({
       );
       setPlayerName(userData.name ?? "");
       const pS = [];
+      pS.push({
+        label: "Не пользуется техникой",
+        value: "anachronism",
+        description:
+          "С этим персонажем нет возможности связаться с помощью современной техники.",
+      });
+      pS.push({
+        label: "Не идёт на контакт",
+        value: "antisocial",
+        description:
+          "Этот персонаж принципиально не желает, чтобы с ним выходили на связь.",
+      });
       if (userData.phone)
         pS.push({
           label: "телефон: " + userData.phone,
@@ -173,7 +185,7 @@ export default function CharacterEditor({
         });
       setContactSelect(pS);
       setPlayerContact(pS[0]?.label ?? "");
-      if (!pS.length) setNoContact(true);
+      // if (!pS.length) setNoContact(true);
     }
   }, [traitsData, userData]);
 
@@ -218,6 +230,18 @@ export default function CharacterEditor({
       setInitialQuenta(characterData.content ?? "");
       setQuenta(characterData.content ?? "");
       const pS = [];
+      pS.push({
+        label: "Не пользуется техникой",
+        value: "anachronism",
+        description:
+          "С этим персонажем нет возможности связаться с помощью современной техники.",
+      });
+      pS.push({
+        label: "Не идёт на контакт",
+        value: "antisocial",
+        description:
+          "Этот персонаж принципиально не желает, чтобы с ним выходили на связь.",
+      });
       if (userData.phone)
         pS.push({
           label: "телефон: " + userData.phone,
@@ -242,7 +266,7 @@ export default function CharacterEditor({
         });
       setContactSelect(pS);
       setPlayerContact(characterData.playerContact ?? pS[0]?.label ?? "");
-      if (!pS.length) setNoContact(true);
+      // if (!pS.length) setNoContact(true);
     }
   }, [characterData, traitsData, userData, router]);
 
@@ -402,30 +426,30 @@ export default function CharacterEditor({
       : undefined,
   ];
 
-  if (noContact)
-    return (
-      <div className="mx-auto flex min-h-96 flex-col items-center justify-center text-center">
-        <Link
-          onClick={() =>
-            router.push(
-              {
-                pathname: `/settings`,
-              },
-              undefined,
-              { shallow: true },
-            )
-          }
-          className="flex max-w-96 cursor-pointer flex-row gap-2 rounded-lg bg-red-950 p-4"
-        >
-          <VscWarning size={32} className="text-warning" />
-          <span className="max-w-60 text-white">
-            Перед созданием персонажа вам нужно зайти в настройки и заполнить
-            хотя бы один способ связи
-          </span>
-          <VscWarning size={32} className="text-warning" />
-        </Link>
-      </div>
-    );
+  // if (noContact)
+  //   return (
+  //     <div className="mx-auto flex min-h-96 flex-col items-center justify-center text-center">
+  //       <Link
+  //         onClick={() =>
+  //           router.push(
+  //             {
+  //               pathname: `/settings`,
+  //             },
+  //             undefined,
+  //             { shallow: true },
+  //           )
+  //         }
+  //         className="flex max-w-96 cursor-pointer flex-row gap-2 rounded-lg bg-red-950 p-4"
+  //       >
+  //         <VscWarning size={32} className="text-warning" />
+  //         <span className="max-w-60 text-white">
+  //           Перед созданием персонажа вам нужно зайти в настройки и заполнить
+  //           хотя бы один способ связи
+  //         </span>
+  //         <VscWarning size={32} className="text-warning" />
+  //       </Link>
+  //     </div>
+  //   );
 
   return (
     <div className="-mx-5 flex max-w-5xl flex-col bg-white/75 px-5 dark:bg-red-950/50 sm:mx-auto sm:rounded-lg sm:px-2">
