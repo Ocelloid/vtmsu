@@ -47,6 +47,8 @@ export default function Rules() {
       ? router.query.category[0] ?? ""
       : router.query.category ?? "";
 
+    setCategory(catTo);
+
     if (catTo !== "editor")
       setTimeout(() => {
         scroller.scrollTo(ruleTo, {

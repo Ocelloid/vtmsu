@@ -153,7 +153,10 @@ export default function Admin() {
                     aria-label={char.name}
                     title={char.name}
                   >
-                    <CharacterSheet charId={char.id} />
+                    <CharacterSheet
+                      charId={char.id}
+                      onChange={refetchCharList}
+                    />
                   </AccordionItem>
                 ))}
               </Accordion>

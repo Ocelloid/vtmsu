@@ -17,6 +17,8 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
+  comment?: string | null;
+  pending?: boolean | null;
   verified?: boolean | null;
   playerName?: string | null;
   playerContact?: string | null;
@@ -467,7 +469,7 @@ export const charRouter = createTRPCRouter({
           publicInfo: input.publicInfo,
           playerName: input.playerName,
           playerContact: input.playerContact,
-          verified: false,
+          pending: true,
           image: input.image,
           age: input.age,
           sire: input.sire,
@@ -541,7 +543,7 @@ export const charRouter = createTRPCRouter({
           content: input.content,
           ambition: input.ambition,
           publicInfo: input.publicInfo,
-          verified: false,
+          pending: true,
           image: input.image,
           age: input.age,
           sire: input.sire,
@@ -574,21 +576,21 @@ export const charRouter = createTRPCRouter({
       });
     }),
 
-  comment: protectedProcedure
+  deny: protectedProcedure
     .input(z.object({ id: z.number(), comment: z.string() }))
     .mutation(({ ctx, input }) => {
       return ctx.db.char.update({
         where: { id: input.id },
-        data: { comment: input.comment },
+        data: { comment: input.comment, verified: false, pending: false },
       });
     }),
 
-  verify: protectedProcedure
-    .input(z.object({ id: z.number() }))
+  allow: protectedProcedure
+    .input(z.object({ id: z.number(), comment: z.string() }))
     .mutation(({ ctx, input }) => {
       return ctx.db.char.update({
         where: { id: input.id },
-        data: { verified: true },
+        data: { comment: input.comment, verified: true, pending: false },
       });
     }),
 
@@ -600,9 +602,9 @@ export const charRouter = createTRPCRouter({
 
   getById: protectedProcedure
     .input(z.object({ id: z.number() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.char.findUnique({
-        where: { id: input.id },
+    .query(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findFirst({
+        where: { id: input.id, createdById: ctx.session.user.id },
         include: {
           faction: true,
           clan: true,
@@ -610,6 +612,7 @@ export const charRouter = createTRPCRouter({
           features: { include: { feature: true } },
         },
       });
+      return char ?? "404";
     }),
 
   getPrivateDataById: protectedProcedure
@@ -631,7 +634,7 @@ export const charRouter = createTRPCRouter({
           childer: true,
           ambition: true,
           content: true,
-          verified: true,
+          comment: true,
         },
       });
     }),
@@ -657,6 +660,8 @@ export const charRouter = createTRPCRouter({
           status: true,
           publicInfo: true,
           faction: true,
+          verified: true,
+          pending: true,
           clan: true,
         },
       });

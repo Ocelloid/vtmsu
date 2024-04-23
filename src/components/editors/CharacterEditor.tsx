@@ -177,6 +177,16 @@ export default function CharacterEditor({
   }, [traitsData, userData]);
 
   useEffect(() => {
+    if (characterData === "404") {
+      void router.push(
+        {
+          pathname: `/characters/`,
+        },
+        undefined,
+        { shallow: true },
+      );
+      return;
+    }
     if (!!characterData && !!traitsData && !!userData) {
       setName(characterData.name);
       setFactionId(characterData.factionId);
@@ -232,7 +242,7 @@ export default function CharacterEditor({
         });
       setContactSelect(pS);
     }
-  }, [characterData, traitsData, userData]);
+  }, [characterData, traitsData, userData, router]);
 
   useEffect(() => {
     const id = Array.isArray(router.query.character)
@@ -442,7 +452,7 @@ export default function CharacterEditor({
                 handleClear();
                 void router.push(
                   {
-                    pathname: "/characters",
+                    pathname: `/characters/`,
                   },
                   undefined,
                   { shallow: true },
@@ -661,7 +671,7 @@ export default function CharacterEditor({
           isSelected={visible}
           onValueChange={(e) => setVisible(e)}
         >
-          Персонаж виден другим игрокам
+          Виден другим игрокам
         </Checkbox>
         <div className="flex flex-col gap-2">
           <DefaultEditor

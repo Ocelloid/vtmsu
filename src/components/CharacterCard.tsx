@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import type { Character } from "~/server/api/routers/char";
 import default_char from "~/../public/default_char.png";
@@ -38,11 +39,18 @@ const CharacterCard = ({
       </div>
       <div className="relative col-span-2 flex flex-1 flex-col">
         {!!handleEditCharacter && (
-          <div className="absolute bottom-0 right-0 flex flex-row">
-            {character.visible ? (
-              <FaEye size={24} className="mr-2 mt-1 min-w-8" />
+          <div className="absolute bottom-0 right-0 flex flex-row items-center">
+            {character.visible && character.verified ? (
+              <FaEye size={16} className="min-w-8" />
             ) : (
-              <FaEyeSlash size={24} className="mr-1 min-w-8" />
+              character.verified && <FaEyeSlash size={16} className="min-w-8" />
+            )}
+            {character.verified ? (
+              <VscVerified size={24} className="text-success" />
+            ) : character.pending ? (
+              <VscUnverified size={24} className="text-primary" />
+            ) : (
+              <VscWarning size={24} className="text-danger" />
             )}
             <Button
               variant="light"

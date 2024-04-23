@@ -30,10 +30,17 @@ export default function Characters() {
 
   useEffect(() => {
     setCharacters(
-      !!characterData ? characterData.filter((c) => c.visible) : [],
+      !!characterData
+        ? characterData.filter((c) => c.visible && c.verified)
+        : [],
     );
     setMyCharacters(myCharacterData ?? []);
-  }, [characterData, myCharacterData, sessionData]);
+
+    const character = Array.isArray(router.query.character)
+      ? router.query.character[0] ?? ""
+      : router.query.character ?? "";
+    if (character) setSelectedTab("edit");
+  }, [characterData, myCharacterData, sessionData, router.query]);
 
   const handleEditCharacter = (cid: number) => {
     setSelectedTab("edit");
