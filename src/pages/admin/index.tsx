@@ -84,7 +84,7 @@ export default function Admin() {
           <Tabs
             aria-label="tabs"
             variant="underlined"
-            disabledKeys={isAdmin ? [] : ["1"]}
+            disabledKeys={isAdmin ? [] : ["users", "chars", "char_traits"]}
             classNames={{
               tabList:
                 "gap-6 w-full relative rounded-none p-0 border-b border-divider",
