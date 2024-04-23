@@ -161,7 +161,7 @@ const CharacterSheet = ({
       </Modal>
       <main className={`mx-auto flex max-w-5xl flex-1 flex-col gap-2 sm:pb-2`}>
         <div
-          className={`container flex flex-col gap-2 rounded-none bg-red-100 p-2 pb-4 dark:bg-red-950/50 sm:rounded-lg ${!!charId ? "" : "mt-24"}`}
+          className={`container flex flex-col gap-2 rounded-none bg-white/75 p-2 pb-4 dark:bg-red-950/50 sm:rounded-lg ${!!charId ? "" : "mt-24"}`}
         >
           {isPersonnel && (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">

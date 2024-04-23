@@ -428,8 +428,8 @@ export default function CharacterEditor({
     );
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col">
-      <div className="sticky top-[5.3rem] z-30 -mx-5 -mt-2 flex flex-col bg-black/50 px-5 sm:top-24 sm:rounded-xl">
+    <div className="-mx-5 flex max-w-5xl flex-col bg-white/75 px-5 dark:bg-red-950/50 sm:mx-auto sm:rounded-lg sm:px-2">
+      <div className="sticky top-[5.3rem] z-30 -mx-5 flex flex-col bg-black/50 px-5 sm:top-24 sm:-mx-2 sm:rounded-lg">
         <div className="flex w-full flex-row gap-2 pb-1 pt-2">
           <UploadButton
             content={{

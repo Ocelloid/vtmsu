@@ -91,6 +91,7 @@ export default function Characters() {
                 "gap-6 w-full relative rounded-none p-0 border-b border-divider",
               cursor: "w-full bg-[#dc2626]",
               tab: "first:ml-auto max-w-fit px-0 h-12 last:mr-auto md:last:mr-0",
+              panel: " py-0 pt-3 pb-0",
             }}
           >
             <Tab
