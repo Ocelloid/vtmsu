@@ -2,15 +2,13 @@ import {
   Input,
   Select,
   SelectItem,
-  Autocomplete,
-  AutocompleteItem,
-  // Divider,
   Button,
   Textarea,
   Accordion,
   AccordionItem,
   CheckboxGroup,
   Checkbox,
+  Link,
   cn,
 } from "@nextui-org/react";
 import type {
@@ -23,6 +21,7 @@ import Image from "next/image";
 import { UploadButton } from "~/utils/uploadthing";
 import DefaultEditor from "~/components/editors/DefaultEditor";
 import { FaRegSave, FaTrashAlt, FaImage, FaFile } from "react-icons/fa";
+import { VscWarning } from "react-icons/vsc";
 import default_char from "~/../public/default_char.png";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect } from "react";
@@ -104,11 +103,11 @@ export default function CharacterEditor({
   const [title, setTitle] = useState<string>("");
   const [playerName, setPlayerName] = useState<string>("");
   const [playerContact, setPlayerContact] = useState<string>("");
-  const [playerContactKey, setPlayerContactKey] = useState<string>("");
   const [contactSelect, setContactSelect] = useState<SelectContact[]>([]);
   const [publicInfo, setPublicInfo] = useState<string>("");
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
+  const [noContact, setNoContact] = useState<boolean>(false);
   const [ambition, setAmbition] = useState<string>("");
   // const [initialAmbition, setInitialAmbition] = useState<string>("");
   const [quenta, setQuenta] = useState<string>("");
@@ -173,6 +172,8 @@ export default function CharacterEditor({
           description: "",
         });
       setContactSelect(pS);
+      setPlayerContact(pS[0]?.label ?? "");
+      if (!pS.length) setNoContact(true);
     }
   }, [traitsData, userData]);
 
@@ -203,7 +204,6 @@ export default function CharacterEditor({
         }),
       );
       setPlayerName(userData.name ?? "");
-      setPlayerContact(characterData.playerContact ?? "");
       setAge(Number(characterData.age));
       setImage(characterData.image ?? "");
       setSire(characterData.sire ?? "");
@@ -241,9 +241,8 @@ export default function CharacterEditor({
           description: "",
         });
       setContactSelect(pS);
-      setPlayerContactKey(
-        pS.find((c) => c.label === characterData.playerContact)?.value ?? "",
-      );
+      setPlayerContact(characterData.playerContact ?? pS[0]?.label ?? "");
+      if (!pS.length) setNoContact(true);
     }
   }, [characterData, traitsData, userData, router]);
 
@@ -403,6 +402,31 @@ export default function CharacterEditor({
       : undefined,
   ];
 
+  if (noContact)
+    return (
+      <div className="mx-auto flex min-h-96 flex-col items-center justify-center text-center">
+        <Link
+          onClick={() =>
+            router.push(
+              {
+                pathname: `/settings`,
+              },
+              undefined,
+              { shallow: true },
+            )
+          }
+          className="flex max-w-96 cursor-pointer flex-row gap-2 rounded-lg bg-red-950 p-4"
+        >
+          <VscWarning size={32} className="text-warning" />
+          <span className="max-w-60 text-white">
+            Перед созданием персонажа вам нужно зайти в настройки и заполнить
+            хотя бы один способ связи
+          </span>
+          <VscWarning size={32} className="text-warning" />
+        </Link>
+      </div>
+    );
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col">
       <div className="sticky top-[5.3rem] z-30 -mx-5 -mt-2 flex flex-col bg-black/50 px-5 sm:top-24 sm:rounded-xl">
@@ -519,24 +543,27 @@ export default function CharacterEditor({
               onValueChange={setPlayerName}
             />
 
-            <Autocomplete
+            <Select
               label="Способ связи"
               placeholder="Введите способ связи"
               variant="underlined"
-              defaultItems={contactSelect}
-              allowsCustomValue={true}
-              selectedKey={playerContactKey}
-              onSelectionChange={(k) =>
-                setPlayerContactKey(!!k ? k.toString() : "")
+              selectedKeys={[playerContact]}
+              onChange={(e) =>
+                setPlayerContact(
+                  !!e.target.value ? e.target.value : playerContact,
+                )
               }
-              onInputChange={setPlayerContact}
             >
-              {(item) => (
-                <AutocompleteItem key={item.value}>
+              {contactSelect.map((item) => (
+                <SelectItem
+                  key={item.label}
+                  value={item.label}
+                  textValue={item.label}
+                >
                   {item.label}
-                </AutocompleteItem>
-              )}
-            </Autocomplete>
+                </SelectItem>
+              ))}
+            </Select>
           </div>
           <div className="col-span-5 flex-1 flex-col sm:col-span-3 sm:flex md:col-span-2">
             <Select
