@@ -351,6 +351,10 @@ export default function Settings() {
               <RadioGroup
                 label="Выберите фон"
                 orientation="horizontal"
+                classNames={{
+                  wrapper:
+                    "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 overflow-hidden",
+                }}
                 color="danger"
                 value={bgSelected}
                 onValueChange={handleUpdateBG}
