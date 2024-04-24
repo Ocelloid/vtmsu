@@ -33,12 +33,7 @@ import {
   factions as faction_icons,
 } from "~/assets";
 import { useTheme } from "next-themes";
-
-type FeatureWithComment = {
-  id: number;
-  comment: string;
-  checked: boolean;
-};
+import { useCharacterStore } from "~/stores/useCharacterStore";
 
 type SelectContact = {
   label: string;
@@ -52,6 +47,15 @@ export default function CharacterEditor({
   onSuccess: () => void;
 }) {
   const { theme } = useTheme();
+  const updateCharacterStore = useCharacterStore((state) => state.update);
+  const setFeaturesStore = useCharacterStore((state) => state.setFeatures);
+  const setAbilitiesStore = useCharacterStore((state) => state.setAbilities);
+  const clearStore = useCharacterStore((state) => state.clear);
+  const characterStore = useCharacterStore((state) => state.character);
+  const abilitiesStore = useCharacterStore((state) => state.abilityIds);
+  const featuresStore = useCharacterStore(
+    (state) => state.featuresWithComments,
+  );
 
   const discKeys = Object.keys(disciplines);
   const discIcons = Object.values(disciplines).map((disc, i) => {
@@ -90,10 +94,6 @@ export default function CharacterEditor({
   const [characterId, setCharacterId] = useState<number>();
   const [factionId, setFactionId] = useState<number>();
   const [clanId, setClanId] = useState<number>();
-  const [abilityIds, setAbilityIds] = useState<number[]>([]);
-  const [featureWithComments, setFeatureWithComments] = useState<
-    FeatureWithComment[]
-  >([]);
   const [age, setAge] = useState<number>();
   const [costSum, setCostSum] = useState<number>(0);
   const [image, setImage] = useState<string>("");
@@ -142,12 +142,34 @@ export default function CharacterEditor({
       setClans(traitsData.clans);
       setAbilities(traitsData.abilities);
       setFeatures(traitsData.features);
-      setFeatureWithComments(
-        traitsData.features.map((f) => {
-          return { id: f.id, comment: "", checked: false };
-        }),
+      const fwc = traitsData.features.map((f) => {
+        return {
+          id: f.id,
+          comment: "",
+          checked: featuresStore.find((fs) => fs.id === f.id)?.checked ?? false,
+        };
+      });
+      if (!featuresStore.length) setFeaturesStore(fwc);
+      setName(!!characterStore.name ? characterStore.name : "");
+      setFactionId(
+        !!characterStore.factionId ? characterStore.factionId : undefined,
       );
-      setPlayerName(userData.name ?? "");
+      setClanId(!!characterStore.clanId ? characterStore.clanId : undefined);
+      setStatus(characterStore.status ?? "");
+      setTitle(characterStore.title ?? "");
+      setVisible(characterStore.visible ?? false);
+      setPublicInfo(characterStore.publicInfo ?? "");
+      setInitialPublicInfo(characterStore.publicInfo ?? "");
+      setSire(characterStore.sire ?? "");
+      setChilder(characterStore.childer ?? "");
+      setAmbition(characterStore.ambition ?? "");
+      setQuenta(characterStore.content ?? "");
+      setInitialQuenta(characterStore.content ?? "");
+      setAge(!!characterStore.age ? Number(characterStore.age) : undefined);
+      setImage(characterStore.image ?? "");
+      if (!characterStore.name)
+        updateCharacterStore({ playerName: userData.name ?? "" });
+      setPlayerName(characterStore.playerName ?? userData.name ?? "");
       const pS = [];
       pS.push({
         label: "Не пользуется техникой",
@@ -184,10 +206,42 @@ export default function CharacterEditor({
           description: "",
         });
       setContactSelect(pS);
-      setPlayerContact(pS[0]?.label ?? "");
+      if (!characterStore.playerContact)
+        updateCharacterStore({
+          playerContact: pS[0]?.label ?? "",
+        });
+      setPlayerContact(characterStore.playerContact ?? pS[0]?.label ?? "");
+      if (
+        features.filter((f) =>
+          featuresStore
+            .filter((fs) => fs.checked)
+            .map((fs) => fs.id)
+            .includes(f.id),
+        ).length > 0
+      )
+        setCostSum(
+          features
+            .filter((f) =>
+              featuresStore
+                .filter((fs) => fs.checked)
+                .map((fs) => fs.id)
+                .includes(f.id),
+            )
+            .map((ff) => ff.cost)
+            .reduce((a, b) => a + b),
+        );
       // if (!pS.length) setNoContact(true);
     }
-  }, [traitsData, userData]);
+  }, [
+    features,
+    traitsData,
+    userData,
+    featuresStore,
+    characterStore,
+    abilitiesStore,
+    setFeaturesStore,
+    updateCharacterStore,
+  ]);
 
   useEffect(() => {
     if (characterData === "404") {
@@ -201,34 +255,33 @@ export default function CharacterEditor({
       return;
     }
     if (!!characterData && !!traitsData && !!userData) {
-      setName(characterData.name);
-      setFactionId(characterData.factionId);
-      setClanId(characterData.clanId);
-      setAbilityIds(characterData.abilities.map((a) => a.abilityId));
+      setName(characterStore.name ?? characterData.name);
+      setFactionId(characterStore.factionId ?? characterData.factionId);
+      setClanId(characterStore.clanId ?? characterData.clanId);
       const cdfs = characterData.features.map((cdf) => {
         return { id: cdf.featureId, comment: cdf.description!, checked: true };
       });
-      setFeatureWithComments(
-        traitsData.features.map((f) => {
-          return cdfs.map((cdf) => cdf.id).includes(f.id)
-            ? cdfs.find((cdf) => cdf.id === f.id)!
-            : { id: f.id, comment: "", checked: false };
-        }),
+      if (!featuresStore.length) setFeaturesStore(cdfs);
+      setPlayerName(characterStore.name ?? userData.name ?? "");
+      if (!characterStore.name)
+        updateCharacterStore({ playerName: userData.name ?? "" });
+      setAge(Number(characterStore.age ?? characterData.age));
+      setImage(characterStore.image ?? characterData.image ?? "");
+      setSire(characterStore.sire ?? characterData.sire ?? "");
+      setChilder(characterStore.childer ?? characterData.childer ?? "");
+      setTitle(characterStore.title ?? characterData.title ?? "");
+      setStatus(characterStore.status ?? characterData.status ?? "");
+      setInitialPublicInfo(
+        characterStore.publicInfo ?? characterData.publicInfo ?? "",
       );
-      setPlayerName(userData.name ?? "");
-      setAge(Number(characterData.age));
-      setImage(characterData.image ?? "");
-      setSire(characterData.sire ?? "");
-      setChilder(characterData.childer ?? "");
-      setTitle(characterData.title ?? "");
-      setStatus(characterData.status ?? "");
-      setInitialPublicInfo(characterData.publicInfo ?? "");
-      setPublicInfo(characterData.publicInfo ?? "");
-      setVisible(characterData.visible);
+      setPublicInfo(
+        characterStore.publicInfo ?? characterData.publicInfo ?? "",
+      );
+      setVisible(characterStore.visible ?? characterData.visible);
       // setInitialAmbition(characterData.ambition ?? "");
-      setAmbition(characterData.ambition ?? "");
-      setInitialQuenta(characterData.content ?? "");
-      setQuenta(characterData.content ?? "");
+      setAmbition(characterStore.ambition ?? characterData.ambition ?? "");
+      setInitialQuenta(characterStore.content ?? characterData.content ?? "");
+      setQuenta(characterStore.content ?? characterData.content ?? "");
       const pS = [];
       pS.push({
         label: "Не пользуется техникой",
@@ -265,10 +318,49 @@ export default function CharacterEditor({
           description: "",
         });
       setContactSelect(pS);
-      setPlayerContact(characterData.playerContact ?? pS[0]?.label ?? "");
+      setPlayerContact(
+        characterStore.playerContact ??
+          characterData.playerContact ??
+          pS[0]?.label ??
+          "",
+      );
+      if (!characterStore.playerContact)
+        updateCharacterStore({
+          playerContact: characterData.playerContact ?? pS[0]?.label ?? "",
+        });
+      if (
+        features.filter((f) =>
+          featuresStore
+            .filter((fs) => fs.checked)
+            .map((fs) => fs.id)
+            .includes(f.id),
+        ).length > 0
+      )
+        setCostSum(
+          features
+            .filter((f) =>
+              featuresStore
+                .filter((fs) => fs.checked)
+                .map((fs) => fs.id)
+                .includes(f.id),
+            )
+            .map((ff) => ff.cost)
+            .reduce((a, b) => a + b),
+        );
       // if (!pS.length) setNoContact(true);
     }
-  }, [characterData, traitsData, userData, router]);
+  }, [
+    characterData,
+    traitsData,
+    userData,
+    characterStore,
+    abilitiesStore,
+    featuresStore,
+    setFeaturesStore,
+    updateCharacterStore,
+    router,
+    features,
+  ]);
 
   useEffect(() => {
     const id = Array.isArray(router.query.character)
@@ -297,8 +389,8 @@ export default function CharacterEditor({
           ambition: ambition,
           publicInfo: publicInfo,
           content: quenta,
-          abilities: [...abilityIds].map((a) => Number(a)),
-          features: featureWithComments.filter((fwc) => fwc.checked),
+          abilities: abilitiesStore,
+          features: featuresStore.filter((fwc) => fwc.checked),
         },
         {
           onSuccess: () => {
@@ -326,8 +418,8 @@ export default function CharacterEditor({
           ambition: ambition,
           publicInfo: publicInfo,
           content: quenta,
-          abilities: [...abilityIds].map((a) => Number(a)),
-          features: featureWithComments.filter((fwc) => fwc.checked),
+          abilities: abilitiesStore,
+          features: featuresStore.filter((fwc) => fwc.checked),
         },
         {
           onSuccess: () => {
@@ -344,18 +436,14 @@ export default function CharacterEditor({
     setName("");
     setFactionId(undefined);
     setClanId(undefined);
-    setAbilityIds([]);
-    setFeatureWithComments(
-      featureWithComments.map((fwc) => {
-        return { id: fwc.id, comment: "", checked: false };
-      }),
-    );
     setAge(0);
     setImage("");
     setTitle("");
     setStatus("");
     setSire("");
     setChilder("");
+    setPlayerName("");
+    setPlayerContact("");
     setInitialPublicInfo("");
     setPublicInfo("");
     setVisible(false);
@@ -363,6 +451,8 @@ export default function CharacterEditor({
     setAmbition("");
     setInitialQuenta("");
     setQuenta("");
+    setCostSum(0);
+    clearStore();
   };
 
   const handleDeleteCharacter = () => {
@@ -398,12 +488,12 @@ export default function CharacterEditor({
     !playerName ||
     !playerContact ||
     !ambition ||
-    !publicInfo ||
-    publicInfo === "<p></p>" ||
-    !quenta ||
-    quenta === "<p></p>" ||
+    !characterStore.publicInfo ||
+    characterStore.publicInfo === "<p></p>" ||
+    !characterStore.content ||
+    characterStore.content === "<p></p>" ||
     !!costSum ||
-    !featureWithComments
+    !featuresStore
       .filter((fwc) => fwc.checked)
       .reduce((a, b) => a && !!b.comment, true);
 
@@ -415,16 +505,40 @@ export default function CharacterEditor({
     !playerName ? "имя игрока" : undefined,
     !playerContact ? "способ связи" : undefined,
     !ambition ? "амбиции" : undefined,
-    !publicInfo || publicInfo === "<p></p>"
+    !characterStore.publicInfo || characterStore.publicInfo === "<p></p>"
       ? "публичную информацию"
       : undefined,
-    !quenta || quenta === "<p></p>" ? "квенту" : undefined,
-    !featureWithComments
+    !characterStore.content || characterStore.content === "<p></p>"
+      ? "квенту"
+      : undefined,
+    !featuresStore
       .filter((fwc) => fwc.checked)
       .reduce((a, b) => a && !!b.comment, true)
       ? "комментарии к дополнениям"
       : undefined,
   ];
+
+  const storeChanged =
+    !!characterStore.name ||
+    !!characterStore.age ||
+    (!!characterStore.playerName &&
+      characterStore.playerName !== userData?.name) ||
+    (!!characterStore.playerContact &&
+      characterStore.playerContact !== contactSelect[0]?.label) ||
+    !!characterStore.factionId ||
+    !!characterStore.clanId ||
+    !!characterStore.status ||
+    !!characterStore.title ||
+    characterStore.visible ||
+    !!characterStore.publicInfo ||
+    !!characterStore.sire ||
+    !!characterStore.childer ||
+    !!characterStore.ambition ||
+    !!characterStore.content ||
+    !!featuresStore.filter((fs) => fs.checked).length ||
+    !!abilitiesStore.length;
+
+  console.log(characterStore, featuresStore, abilitiesStore, storeChanged);
 
   // if (noContact)
   //   return (
@@ -471,6 +585,7 @@ export default function CharacterEditor({
               setUploading(true);
             }}
             onClientUploadComplete={(res) => {
+              updateCharacterStore({ image: res[0]?.url ?? "" });
               setImage(res[0]?.url ?? "");
               setUploading(false);
             }}
@@ -493,6 +608,19 @@ export default function CharacterEditor({
             >
               <FaTrashAlt size={16} />
               <p className="hidden sm:flex">Удалить</p>
+            </Button>
+          )}
+          {!characterId && storeChanged && (
+            <Button
+              onClick={() => {
+                handleClear();
+              }}
+              variant={"ghost"}
+              color="primary"
+              className="h-8 w-full text-white hover:!bg-primary/25"
+            >
+              <FaFile size={16} />
+              <p className="hidden sm:flex">Очистить</p>
             </Button>
           )}
           {!!characterId && (
@@ -549,7 +677,10 @@ export default function CharacterEditor({
               label="Имя персонажа"
               placeholder="Введите имя персонажа"
               value={name}
-              onValueChange={setName}
+              onValueChange={(s) => {
+                setName(s);
+                updateCharacterStore({ name: s });
+              }}
             />
             <Input
               type="number"
@@ -557,14 +688,20 @@ export default function CharacterEditor({
               label="Возраст персонажа"
               placeholder="Введите возраст"
               value={age ? age.toString() : ""}
-              onValueChange={(a) => setAge(Number(a))}
+              onValueChange={(a) => {
+                setAge(Number(a));
+                updateCharacterStore({ age: Number(a) });
+              }}
             />
             <Input
               variant="underlined"
               label="Имя игрока"
               placeholder="Введите имя игрока"
               value={playerName}
-              onValueChange={setPlayerName}
+              onValueChange={(s) => {
+                setPlayerName(s);
+                updateCharacterStore({ playerName: s });
+              }}
             />
 
             <Select
@@ -572,11 +709,16 @@ export default function CharacterEditor({
               placeholder="Введите способ связи"
               variant="underlined"
               selectedKeys={[playerContact]}
-              onChange={(e) =>
+              onChange={(e) => {
+                updateCharacterStore({
+                  playerContact: !!e.target.value
+                    ? e.target.value
+                    : playerContact,
+                });
                 setPlayerContact(
                   !!e.target.value ? e.target.value : playerContact,
-                )
-              }
+                );
+              }}
             >
               {contactSelect.map((item) => (
                 <SelectItem
@@ -597,14 +739,18 @@ export default function CharacterEditor({
               selectedKeys={!!factionId ? [factionId.toString()] : []}
               onChange={(e) => {
                 if (!!e.target.value) {
-                  setFactionId(Number(e.target.value));
-                  setClanId(undefined);
-                  setAbilityIds([]);
-                  setFeatureWithComments(
-                    featureWithComments.map((fwc) => {
+                  updateCharacterStore({
+                    factionId: Number(e.target.value),
+                    clanId: undefined,
+                  });
+                  setAbilitiesStore([]);
+                  setFeaturesStore(
+                    featuresStore.map((fwc) => {
                       return { id: fwc.id, comment: "", checked: false };
                     }),
                   );
+                  setFactionId(Number(e.target.value));
+                  setClanId(undefined);
                 }
               }}
             >
@@ -651,14 +797,15 @@ export default function CharacterEditor({
               selectedKeys={!!clanId ? [clanId.toString()] : []}
               onChange={(e) => {
                 if (!!e.target.value) {
-                  setClanId(Number(e.target.value));
-                  setCostSum(0);
-                  setAbilityIds([]);
-                  setFeatureWithComments(
-                    featureWithComments.map((fwc) => {
+                  updateCharacterStore({ clanId: Number(e.target.value) });
+                  setAbilitiesStore([]);
+                  setFeaturesStore(
+                    featuresStore.map((fwc) => {
                       return { id: fwc.id, comment: "", checked: false };
                     }),
                   );
+                  setClanId(Number(e.target.value));
+                  setCostSum(0);
                 }
               }}
             >
@@ -706,14 +853,20 @@ export default function CharacterEditor({
               label="Статусы"
               placeholder="Введите статусы через запятую"
               value={status}
-              onValueChange={setStatus}
+              onValueChange={(a) => {
+                setStatus(a);
+                updateCharacterStore({ status: a });
+              }}
             />
             <Input
               variant="underlined"
               label="Титулы"
               placeholder="Введите титулы через запятую"
               value={title}
-              onValueChange={setTitle}
+              onValueChange={(a) => {
+                setTitle(a);
+                updateCharacterStore({ title: a });
+              }}
             />
           </div>
         </div>
@@ -728,7 +881,9 @@ export default function CharacterEditor({
         <div className="flex flex-col gap-2">
           <DefaultEditor
             className="min-h-44 sm:min-h-20"
-            onUpdate={setPublicInfo}
+            onUpdate={(a) => {
+              updateCharacterStore({ publicInfo: a });
+            }}
             initialContent={initialPublicInfo}
             placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
           />
@@ -738,14 +893,20 @@ export default function CharacterEditor({
               label="Сир"
               placeholder="Введите имя сира"
               value={sire}
-              onValueChange={setSire}
+              onValueChange={(a) => {
+                setSire(a);
+                updateCharacterStore({ sire: a });
+              }}
             />
             <Input
               variant="underlined"
               label="Чайлды"
               placeholder="Введите имена чайлдов через запятую"
               value={childer}
-              onValueChange={setChilder}
+              onValueChange={(a) => {
+                setChilder(a);
+                updateCharacterStore({ childer: a });
+              }}
             />
           </div>
         </div>
@@ -755,13 +916,18 @@ export default function CharacterEditor({
             label="Амбиции и желания"
             placeholder="Введите амбиции и желания вашего персонажа"
             value={ambition}
-            onValueChange={setAmbition}
+            onValueChange={(a) => {
+              setAmbition(a);
+              updateCharacterStore({ ambition: a });
+            }}
           />
           <DefaultEditor
             label="Квента"
             className="min-h-44 sm:min-h-20"
-            onUpdate={setQuenta}
             initialContent={initialQuenta}
+            onUpdate={(a) => {
+              updateCharacterStore({ content: a });
+            }}
             placeholder="Введите предысторию персонажа и прочую информацию для мастерской группы"
           />
         </div>
@@ -771,14 +937,16 @@ export default function CharacterEditor({
             aria-label={"Дисциплины"}
             title={
               "Дисциплины" +
-              (!!abilityIds.length ? ` (всего ${abilityIds.length})` : "")
+              (!!abilitiesStore.length
+                ? ` (всего ${abilitiesStore.length})`
+                : "")
             }
           >
             <CheckboxGroup
               label={
                 !!clanId
                   ? `Выберите дисциплины - не больше ${
-                      featureWithComments
+                      featuresStore
                         .filter((fwc) => fwc.checked)
                         .map((fwc) => fwc.id)
                         .includes(
@@ -791,9 +959,11 @@ export default function CharacterEditor({
                   : "Сначала выберите клан"
               }
               color="warning"
-              value={abilityIds ? abilityIds.map((a) => a.toString()) : []}
+              value={
+                abilitiesStore ? abilitiesStore.map((a) => a.toString()) : []
+              }
               onValueChange={(aids) => {
-                const maxDisc = featureWithComments
+                const maxDisc = featuresStore
                   .filter((fwc) => fwc.checked)
                   .map((fwc) => fwc.id)
                   .includes(
@@ -801,8 +971,9 @@ export default function CharacterEditor({
                   )
                   ? 4
                   : 3;
-                if (aids.length <= maxDisc)
-                  setAbilityIds(aids.map((aid) => Number(aid)));
+                if (aids.length <= maxDisc) {
+                  setAbilitiesStore(aids.map((aid) => Number(aid)));
+                }
               }}
             >
               {abilities
@@ -812,7 +983,7 @@ export default function CharacterEditor({
                       .AbilityAvailable!.map((aa) => aa.clanId)
                       .includes(clanId!) &&
                     (a.requirementId
-                      ? abilityIds.includes(a.requirementId)
+                      ? abilitiesStore.includes(a.requirementId)
                       : true) &&
                     a.visibleToPlayer,
                 )
@@ -820,15 +991,15 @@ export default function CharacterEditor({
                   <Checkbox
                     isDisabled={
                       abilities
-                        .filter((a) => abilityIds.includes(a.id))
+                        .filter((a) => abilitiesStore.includes(a.id))
                         .map((a) => a.requirementId)
                         .includes(Number(ability.id)) ||
                       (abilities
-                        .filter((a) => !abilityIds.includes(a.id))
+                        .filter((a) => !abilitiesStore.includes(a.id))
                         .map((a) => a.id)
                         .includes(Number(ability.id)) &&
-                        abilityIds.length >
-                          (featureWithComments
+                        abilitiesStore.length >
+                          (featuresStore
                             .filter((fwc) => fwc.checked)
                             .map((fwc) => fwc.id)
                             .includes(
@@ -883,7 +1054,7 @@ export default function CharacterEditor({
             <CheckboxGroup
               label={!!clanId ? "Выберите дополнения" : "Сначала выберите клан"}
               color="warning"
-              value={featureWithComments
+              value={featuresStore
                 .filter((fwc) => fwc.checked)
                 .map((fwc) => fwc.id.toString())}
               onValueChange={(fids) => {
@@ -892,8 +1063,8 @@ export default function CharacterEditor({
                     .filter((f) => fids.includes(f.id.toString()))
                     .reduce((a, b) => a + b.cost, 0),
                 );
-                setFeatureWithComments(
-                  featureWithComments.map((fwc) => {
+                setFeaturesStore(
+                  featuresStore.map((fwc) => {
                     return {
                       ...fwc,
                       checked: fids.includes(fwc.id.toString()),
@@ -916,7 +1087,7 @@ export default function CharacterEditor({
                       value={feature.id.toString()}
                       isDisabled={
                         feature.name === "Способный ученик" &&
-                        abilityIds.length > 3
+                        abilitiesStore.length > 3
                       }
                       classNames={{
                         base: cn(
@@ -936,7 +1107,7 @@ export default function CharacterEditor({
                         </p>
                       </div>
                     </Checkbox>
-                    {featureWithComments.find((fwc) => fwc.id === feature.id)
+                    {featuresStore.find((fwc) => fwc.id === feature.id)
                       ?.checked && (
                       <Input
                         variant="underlined"
@@ -944,8 +1115,8 @@ export default function CharacterEditor({
                         label="Комментарий"
                         placeholder={`Введите комментарий к дополнению "${feature.name}"`}
                         onValueChange={(v) => {
-                          setFeatureWithComments(
-                            featureWithComments.map((fwc) => {
+                          setFeaturesStore(
+                            featuresStore.map((fwc) => {
                               return {
                                 id: fwc.id,
                                 checked: fwc.checked,
@@ -956,9 +1127,8 @@ export default function CharacterEditor({
                           );
                         }}
                         value={
-                          featureWithComments.find(
-                            (fwc) => fwc.id === feature.id,
-                          )?.comment
+                          featuresStore.find((fwc) => fwc.id === feature.id)
+                            ?.comment
                         }
                       />
                     )}
