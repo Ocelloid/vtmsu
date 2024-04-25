@@ -37,6 +37,7 @@ model Char {
   status        String?
   childer       String?
   comment       String?              @db.LongText
+  p_comment     String?              @db.LongText
   pending       Boolean?             @default(false)
   verified      Boolean?             @default(false)
   ambition      String?              @db.LongText

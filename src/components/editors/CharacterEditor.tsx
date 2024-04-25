@@ -254,7 +254,8 @@ export default function CharacterEditor() {
       }
 
       if (!playerName) update({ playerName: userData.name ?? "" });
-      if (!playerContact) update({ playerContact: pS[0]?.label ?? "" });
+      if (!playerContact && !!pS.length)
+        update({ playerContact: pS[0]?.label ?? "" });
     }
   }, [
     userData,
@@ -281,8 +282,19 @@ export default function CharacterEditor() {
       setCharacterId(Number(router.query.pid));
       update({ isEditing: true });
     }
-    if (!router.query.pid && isEditing) clear();
+    if (!router.query.pid && isEditing) {
+      clear();
+    }
   }, [router.query.pid, isEditing, update, clear]);
+
+  useEffect(() => {
+    setCostSum(
+      featuresWithComments
+        .filter((fwc) => fwc.checked)
+        .map((fwc) => fwc.cost)
+        .reduce((a, b) => a + b),
+    );
+  }, [featuresWithComments]);
 
   const handleSaveCharacter = () => {
     if (!!characterId)
@@ -460,7 +472,7 @@ export default function CharacterEditor() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`mx-auto flex max-w-5xl flex-1 flex-col gap-2 sm:pb-2`}>
+      <main className={`mx-auto flex max-w-4xl flex-1 flex-col gap-2 sm:pb-2`}>
         <div
           className={`container mt-[5.4rem] flex flex-col gap-2 rounded-none bg-white/75 px-2 dark:bg-red-950/50 sm:mt-24 sm:rounded-b-lg`}
         >
@@ -543,30 +555,30 @@ export default function CharacterEditor() {
             <div className="flex flex-1 flex-grow pb-1 text-center text-xs text-warning">
               {isInvalid && (
                 <p className="mx-auto">
-                  {invalidFields.filter((i) => !!i) && "Введите "}
+                  {!!invalidFields.filter((i) => !!i).length && "Введите "}
                   {invalidFields.filter((i) => !!i).join(", ")}
-                  {invalidFields.filter((i) => !!i) && ". "}
+                  {!!invalidFields.filter((i) => !!i).length && ". "}
                   {!!costSum && "Сумма долнений долна быть равна нулю."}
                 </p>
               )}
             </div>
           </div>
           <div className="-mx-2 -mt-2 flex flex-col px-2 sm:mx-0 sm:px-0">
-            <div className="grid grid-cols-5 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
-              <div className="col-span-2 flex flex-col items-center justify-center sm:col-span-1">
+            <div className="grid grid-cols-11 gap-2">
+              <div className="col-span-5 flex flex-col items-center justify-center sm:col-span-3">
                 {uploading ? (
                   <LoadingSpinner width={80} height={80} />
                 ) : (
                   <Image
-                    className="mt-2 aspect-square h-[160px] w-[160px] rounded-md object-cover"
+                    className="aspect-square h-[220px] w-[220px] rounded-md object-cover"
                     alt="char_photo"
                     src={!!image ? image : default_char}
-                    height="320"
-                    width="320"
+                    height="440"
+                    width="440"
                   />
                 )}
               </div>
-              <div className="col-span-3 flex flex-1 flex-col sm:col-span-2 md:col-span-2">
+              <div className="col-span-6 flex flex-1 flex-col sm:col-span-4">
                 <Input
                   variant="underlined"
                   label="Имя персонажа"
@@ -620,7 +632,7 @@ export default function CharacterEditor() {
                   ))}
                 </Select>
               </div>
-              <div className="col-span-5 flex-1 flex-col sm:col-span-3 sm:flex md:col-span-2">
+              <div className="col-span-11 flex-1 flex-col sm:col-span-4 sm:flex">
                 <Select
                   label="Фракция"
                   variant="underlined"
@@ -950,9 +962,14 @@ export default function CharacterEditor() {
                         .reduce((a, b) => a + b.cost, 0),
                     );
                     storeFeatures(
-                      featuresWithComments.map((fwc) => {
+                      features.map((fwc) => {
+                        const fWC = featuresWithComments.find(
+                          (fWC) => fWC.id === fwc.id,
+                        );
                         return {
-                          ...fwc,
+                          id: fwc.id,
+                          cost: fwc.cost,
+                          comment: !!fWC ? fWC.comment : "",
                           checked: fids.includes(fwc.id.toString()),
                         };
                       }),

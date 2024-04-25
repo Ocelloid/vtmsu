@@ -39,14 +39,14 @@ const CharacterSheet = ({
   const { data: sessionData } = useSession();
   const [comment, setComment] = useState<string>("");
   const [receivedComment, setReceivedComment] = useState<string>("");
+  const [characterId, setCharacterId] = useState<number>();
   const [publicChar, setPublicChar] = useState<Character>();
   const [privateChar, setPrivateChar] = useState<Character>();
   const [privateVer, setPrivateVer] = useState<boolean>();
   const [factionIsOpen, setFactionIsOpen] = useState(false);
   const [clanIsOpen, setClanIsOpen] = useState(false);
-  const characterId = charId ? charId : router.query.pid;
 
-  const { data: isPersonnel } = api.user.userIsPersonnel.useQuery();
+  const { data: isAdmin } = api.user.userIsAdmin.useQuery();
 
   const {
     data: publicData,
@@ -54,7 +54,7 @@ const CharacterSheet = ({
     refetch: publicRefetch,
   } = api.char.getPublicDataById.useQuery(
     {
-      id: Number(characterId),
+      id: characterId!,
     },
     {
       enabled: !!characterId,
@@ -67,10 +67,10 @@ const CharacterSheet = ({
     refetch: privateRefetch,
   } = api.char.getPrivateDataById.useQuery(
     {
-      id: Number(characterId),
+      id: characterId!,
     },
     {
-      enabled: privateVer,
+      enabled: privateVer && !!characterId,
     },
   );
 
@@ -81,23 +81,38 @@ const CharacterSheet = ({
     api.char.deny.useMutation();
 
   useEffect(() => {
-    if (!!publicData) setPublicChar(publicData);
-  }, [publicData, setPublicChar]);
+    if (!!router.query.pid) {
+      setCharacterId(Number(router.query.pid));
+    } else if (!!charId) setCharacterId(Number(charId));
+  }, [router.query.pid, charId]);
+
+  useEffect(() => {
+    if (!!publicData && !!sessionData) {
+      if (
+        !(
+          !!(publicData.visible && publicData.verified) ||
+          !!isAdmin ||
+          publicData.createdById === sessionData.user.id
+        )
+      ) {
+        void router.push("/characters");
+      } else setPublicChar(publicData);
+    }
+  }, [isAdmin, publicData, sessionData, router, setPublicChar]);
 
   useEffect(() => {
     if (!!privateData) {
       setPrivateChar(privateData);
-      setReceivedComment(privateData.comment ?? "");
+      setComment(privateData.comment ?? "");
+      setReceivedComment(privateData.p_comment ?? "");
     }
   }, [privateData, setPrivateChar]);
 
   useEffect(() => {
     if (!!publicData && !!sessionData) {
-      setPrivateVer(
-        publicData.createdById === sessionData.user.id || isPersonnel,
-      );
+      setPrivateVer(publicData.createdById === sessionData.user.id || isAdmin);
     }
-  }, [publicData, sessionData, isPersonnel, setPrivateVer]);
+  }, [publicData, sessionData, isAdmin, setPrivateVer]);
 
   const handleDeny = () => {
     const deny = confirm("Вернуть персонажа на доработку?");
@@ -164,7 +179,7 @@ const CharacterSheet = ({
         <div
           className={`container flex flex-col gap-2 rounded-none bg-white/75 p-2 pb-4 dark:bg-red-950/50 sm:rounded-lg ${!!charId ? "" : "mt-24"}`}
         >
-          {isPersonnel && (
+          {isAdmin && (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
               <Button
                 onClick={handleDeny}
@@ -191,15 +206,18 @@ const CharacterSheet = ({
               </Button>
             </div>
           )}
-          {receivedComment && (
-            <div
-              className="tiptap-display text-justify"
-              dangerouslySetInnerHTML={{
-                __html: receivedComment,
-              }}
-            />
+          {!!isAdmin && receivedComment && (
+            <div>
+              <p className="text-2xl">Последнее изменение:</p>
+              <div
+                className="tiptap-display text-justify"
+                dangerouslySetInnerHTML={{
+                  __html: receivedComment,
+                }}
+              />
+            </div>
           )}
-          {(!!privateChar || isPersonnel) && (
+          {(!!privateChar || isAdmin) && (
             <div className="flex flex-1 flex-col gap-2">
               <div
                 className={`container grid grid-cols-1 justify-evenly gap-4 rounded-lg bg-white/50 py-2 dark:bg-black/50 ${publicChar.verified ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
@@ -256,7 +274,7 @@ const CharacterSheet = ({
             </div>
           )}
           <div className="flex flex-1 flex-col gap-2">
-            {!isPersonnel && !!privateChar?.comment && (
+            {!isAdmin && !!privateChar?.comment && (
               <Textarea
                 size="sm"
                 label="Комментарий МГ"
@@ -265,6 +283,9 @@ const CharacterSheet = ({
                 value={privateChar.comment ?? ""}
               />
             )}
+            <span className="text-2xl text-default-600">
+              Публичная информация
+            </span>
             <div className="grid grid-cols-1 flex-row gap-2 sm:grid-cols-2">
               <Image
                 onClick={onOpen}
@@ -360,8 +381,18 @@ const CharacterSheet = ({
                 />
               </div>
             </div>
+            <div
+              className="tiptap-display text-justify"
+              dangerouslySetInnerHTML={{
+                __html: publicChar.publicInfo!,
+              }}
+            />
             {!!privateChar && (
               <div className="flex flex-1 flex-col gap-2">
+                <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                <span className="-mt-3 text-2xl text-red-950 dark:text-danger">
+                  Приватная информация
+                </span>
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                   <Input
                     size="sm"
@@ -394,16 +425,6 @@ const CharacterSheet = ({
                 />
               </div>
             )}
-            <span className="text-2xl text-default-600">
-              Публичная информация
-            </span>
-            <div
-              className="tiptap-display text-justify"
-              dangerouslySetInnerHTML={{
-                __html: publicChar.publicInfo!,
-              }}
-            />
-            <Divider className="mb-2 mt-3 bg-danger" />
             {!!privateChar && (
               <div className="flex flex-col">
                 <span className="text-2xl text-default-600">Квента</span>

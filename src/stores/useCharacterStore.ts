@@ -56,6 +56,7 @@ const INITIAL_STATE: OptionalFields & RequiredFields = {
   content: "",
   abilityIds: [],
   featuresWithComments: [],
+  isEditing: false,
 };
 
 type StateFields = OptionalFields & RequiredFields;
@@ -63,6 +64,7 @@ type StateFields = OptionalFields & RequiredFields;
 export const useCharacterStore = create<StateFields & Actions>((set) => ({
   ...Object.assign({}, INITIAL_STATE),
   update: (fields: OptionalFields) => {
+    console.log("update");
     set((state: StateFields) => ({
       ...state,
       isEditing: "isEditing" in fields ? fields.isEditing : state.isEditing,
@@ -98,6 +100,7 @@ export const useCharacterStore = create<StateFields & Actions>((set) => ({
     }));
   },
   clear: () => {
+    console.log("clear");
     set((state: StateFields) => ({
       ...Object.assign({}, INITIAL_STATE),
       featuresWithComments: [

@@ -672,18 +672,18 @@ export const charRouter = createTRPCRouter({
           sire: input.sire,
           childer: input.childer,
           visible: input.visible,
-          comment:
+          p_comment:
             "<div>" +
             changedFields
               .map((cF) =>
                 [
                   "<p>",
                   cF.name,
-                  " было ",
+                  ' было "',
                   cF.from?.toString(),
-                  " стало ",
+                  '" стало "',
                   cF.to,
-                  "<p/>",
+                  '"<p/>',
                 ].join(""),
               )
               .join("") +
@@ -785,6 +785,7 @@ export const charRouter = createTRPCRouter({
           ambition: true,
           content: true,
           comment: true,
+          p_comment: true,
           abilities: { include: { abilitiy: true } },
           features: { include: { feature: true } },
         },
