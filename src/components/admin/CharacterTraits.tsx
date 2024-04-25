@@ -106,7 +106,7 @@ const CharacterTraits = () => {
   if (isCharTraitsLoading) return <LoadingPage />;
 
   return (
-    <Accordion isCompact variant="shadow" className="bg-red-950">
+    <Accordion isCompact variant="shadow" className="bg-red-950/50">
       {characterTraits.map((cs, i) => (
         <AccordionItem key={i} aria-label={cs.label} title={cs.label}>
           <div className="flex flex-col gap-4 pb-4">

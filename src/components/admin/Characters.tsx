@@ -129,7 +129,7 @@ export default function Characters() {
           ))}
         </Select>
       </div>
-      <Accordion isCompact variant="shadow" className="bg-red-950">
+      <Accordion isCompact variant="shadow" className="bg-red-950/50">
         {chars
           .filter((c) =>
             !!factionIds.length ? factionIds.includes(c.factionId) : true,
@@ -158,7 +158,7 @@ export default function Characters() {
               <Link
                 href={`/characters/${char.id}`}
                 target="_blank"
-                className="ml-1 flex flex-row items-center gap-2"
+                className="mb-2 ml-1 flex flex-row items-center gap-2"
               >
                 <FaLink size={16} />
                 Перейти к персонажу
