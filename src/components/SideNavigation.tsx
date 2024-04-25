@@ -15,6 +15,7 @@ type SideNavProps = {
   links: SideNavLink[];
   onClick?: (link: string) => void;
   sideNavClass?: string;
+  sideNavExtraClass?: string;
 } & DefaultSideNavProps;
 type DefaultSideNavProps = Partial<typeof defaultSideNavProps>;
 const defaultSideNavProps = {
@@ -24,6 +25,7 @@ const defaultSideNavProps = {
 type WithSideNavProps = SideNavProps & {
   children: string | JSX.Element | JSX.Element[];
   childrenClass?: string;
+  sideNavExtraClass?: string;
 } & DefaultWithSideNavProps;
 type DefaultWithSideNavProps = Partial<typeof defaultWithSideNavProps>;
 const defaultWithSideNavProps = {
@@ -34,7 +36,7 @@ const SideNavigation = (props: SideNavProps) => {
   return (
     <aside
       id="default-sidebar"
-      className={`${props.sideNavClass} h-screen-translate-x-full z-40 flex flex-col transition-transform sm:translate-x-0`}
+      className={`${props.sideNavClass} ${props.sideNavExtraClass} h-screen-translate-x-full z-40 flex flex-col transition-transform sm:translate-x-0`}
     >
       {props.links?.map((link, index) => (
         <Link
@@ -67,6 +69,7 @@ const WithSideNavigation = (props: WithSideNavProps) => {
           links={props.links}
           onClick={props.onClick}
           sideNavClass={props.sideNavClass}
+          sideNavExtraClass={props.sideNavExtraClass}
         />
       </div>
       <div

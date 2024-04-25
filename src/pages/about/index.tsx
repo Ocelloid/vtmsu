@@ -32,7 +32,8 @@ export default function About() {
       <main className="flex min-h-screen flex-row text-justify">
         <WithSideNavigation
           links={links}
-          childrenClass="pt-20 [&>*]:w-full sm:ml-52 px-4 [&>*]:pt-4"
+          sideNavExtraClass="font-semibold"
+          childrenClass="mt-24 [&>*]:w-full sm:ml-52 px-2 [&>*]:pt-4 bg-white/75 dark:bg-red-950/50 mb-2 mx-2 rounded-b-lg"
         >
           <Element className="section" name="description">
             <p className="pb-4 text-3xl">Ролевая игра живого действия</p>

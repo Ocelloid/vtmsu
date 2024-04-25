@@ -175,6 +175,7 @@ export default function Rules() {
                 "gap-6 w-full relative rounded-none p-0 border-b border-divider",
               cursor: "w-full bg-[#dc2626]",
               tab: "first:ml-auto max-w-fit px-0 h-12 last:mr-auto md:last:mr-0",
+              panel: "bg-white/75 dark:bg-red-950/50 px-2 mb-2 rounded-b-lg",
             }}
           >
             {categories.map((cat) => (
