@@ -38,6 +38,7 @@ const CharacterSheet = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: sessionData } = useSession();
   const [comment, setComment] = useState<string>("");
+  const [receivedComment, setReceivedComment] = useState<string>("");
   const [publicChar, setPublicChar] = useState<Character>();
   const [privateChar, setPrivateChar] = useState<Character>();
   const [privateVer, setPrivateVer] = useState<boolean>();
@@ -86,7 +87,7 @@ const CharacterSheet = ({
   useEffect(() => {
     if (!!privateData) {
       setPrivateChar(privateData);
-      setComment(privateData.comment ?? "");
+      setReceivedComment(privateData.comment ?? "");
     }
   }, [privateData, setPrivateChar]);
 
@@ -190,6 +191,14 @@ const CharacterSheet = ({
               </Button>
             </div>
           )}
+          {receivedComment && (
+            <div
+              className="tiptap-display text-justify"
+              dangerouslySetInnerHTML={{
+                __html: receivedComment,
+              }}
+            />
+          )}
           {(!!privateChar || isPersonnel) && (
             <div className="flex flex-1 flex-col gap-2">
               <div
@@ -234,8 +243,7 @@ const CharacterSheet = ({
                   onClick={() => {
                     void router.push(
                       {
-                        pathname: "/characters",
-                        query: { character: characterId },
+                        pathname: `/characters/${characterId?.toString()}/edit`,
                       },
                       undefined,
                       { shallow: true },

@@ -5,7 +5,6 @@ import { LoadingPage } from "~/components/Loading";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { type Character } from "~/server/api/routers/char";
-import CharacterEditor from "~/components/editors/CharacterEditor";
 import { FaPlus } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import CharacterCard from "~/components/CharacterCard";
@@ -17,16 +16,10 @@ export default function Characters() {
   const [selectedTab, setSelectedTab] = useState("all");
   const router = useRouter();
 
-  const {
-    data: characterData,
-    isLoading: isCharactersLoading,
-    refetch: refetchAll,
-  } = api.char.getAll.useQuery(undefined, { enabled: !!sessionData });
-  const {
-    data: myCharacterData,
-    isLoading: isMyCharactersLoading,
-    refetch: refetchMine,
-  } = api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
+  const { data: characterData, isLoading: isCharactersLoading } =
+    api.char.getAll.useQuery(undefined, { enabled: !!sessionData });
+  const { data: myCharacterData, isLoading: isMyCharactersLoading } =
+    api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
 
   useEffect(() => {
     setCharacters(
@@ -41,18 +34,6 @@ export default function Characters() {
       : router.query.character ?? "";
     if (character) setSelectedTab("edit");
   }, [characterData, myCharacterData, sessionData, router.query]);
-
-  const handleEditCharacter = (cid: number) => {
-    setSelectedTab("edit");
-    void router.push(
-      {
-        pathname: "/characters",
-        query: { character: cid },
-      },
-      undefined,
-      { shallow: true },
-    );
-  };
 
   if (isCharactersLoading || isMyCharactersLoading) return <LoadingPage />;
   if (!sessionData)
@@ -106,7 +87,15 @@ export default function Characters() {
                 <Button
                   variant="ghost"
                   className="w-90 mx-auto h-8 border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white"
-                  onClick={() => setSelectedTab("edit")}
+                  onClick={() => {
+                    void router.push(
+                      {
+                        pathname: `/characters/new`,
+                      },
+                      undefined,
+                      { shallow: true },
+                    );
+                  }}
                 >
                   <FaPlus />
                   Добавить персонажа
@@ -130,7 +119,15 @@ export default function Characters() {
                 <Button
                   variant="ghost"
                   className="w-90 mx-auto h-8 border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white"
-                  onClick={() => setSelectedTab("edit")}
+                  onClick={() => {
+                    void router.push(
+                      {
+                        pathname: `/characters/new`,
+                      },
+                      undefined,
+                      { shallow: true },
+                    );
+                  }}
                 >
                   <FaPlus />
                   Добавить персонажа
@@ -140,34 +137,19 @@ export default function Characters() {
                     <CharacterCard
                       key={character.id}
                       character={character}
-                      handleEditCharacter={handleEditCharacter}
+                      handleEditCharacter={(cid: number) => {
+                        void router.push(
+                          {
+                            pathname: `/characters/${cid}/edit`,
+                          },
+                          undefined,
+                          { shallow: true },
+                        );
+                      }}
                     />
                   ))}
                 </div>
               </div>
-            </Tab>
-            <Tab
-              key={"edit"}
-              title={
-                <div className="flex items-center space-x-2">
-                  <span>Редактор</span>
-                </div>
-              }
-            >
-              <CharacterEditor
-                onSuccess={() => {
-                  void refetchAll();
-                  void refetchMine();
-                  void router.push(
-                    {
-                      pathname: "/characters",
-                    },
-                    undefined,
-                    { shallow: true },
-                  );
-                  setSelectedTab("mine");
-                }}
-              />
             </Tab>
           </Tabs>
         </div>

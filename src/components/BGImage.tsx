@@ -64,6 +64,7 @@ const BGImage = () => {
         <Image
           className="mx-auto my-auto mt-32 max-w-80 sm:max-w-96"
           height={640}
+          priority
           alt="bg"
           src={
             bgSelection.find((bgs) => bgs?.value === background)?.image ??

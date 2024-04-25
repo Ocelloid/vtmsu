@@ -1,7 +1,13 @@
 import { create } from "zustand";
-import { type Character } from "~/server/api/routers/char";
 
-type CharacterFields = {
+type FeatureWithComment = {
+  id: number;
+  cost: number;
+  comment: string;
+  checked: boolean;
+};
+
+type OptionalFields = {
   name?: string;
   age?: number;
   image?: string;
@@ -17,110 +23,95 @@ type CharacterFields = {
   childer?: string;
   ambition?: string;
   content?: string;
-  abilityIds?: [];
-  featuresWithComments?: FeatureWithComment[];
+  isEditing?: boolean;
 };
 
-type FeatureWithComment = {
-  id: number;
-  comment: string;
-  checked: boolean;
-};
-
-interface State {
-  character: Character;
+type RequiredFields = {
   abilityIds: number[];
   featuresWithComments: FeatureWithComment[];
-  clear: () => void;
-  update: (fields: CharacterFields) => void;
-  setFeatures: (features: FeatureWithComment[]) => void;
-  setAbilities: (abilities: number[]) => void;
-}
-
-const INITIAL_STATE: State = {
-  character: {
-    id: 0,
-    age: "",
-    playerName: "",
-    playerContact: "",
-    factionId: 0,
-    clanId: 0,
-    name: "",
-    status: "",
-    title: "",
-    visible: false,
-    publicInfo: "",
-    sire: "",
-    childer: "",
-    ambition: "",
-    content: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    createdById: "",
-  },
-  abilityIds: [],
-  featuresWithComments: [],
-  clear: () => {
-    return;
-  },
-  update: () => {
-    return;
-  },
-  setFeatures: () => {
-    return;
-  },
-  setAbilities: () => {
-    return;
-  },
 };
 
-export const useCharacterStore = create<State>((set, get) => ({
-  character: Object.assign({}, INITIAL_STATE.character),
-  featuresWithComments: [...INITIAL_STATE.featuresWithComments],
-  abilityIds: [...INITIAL_STATE.abilityIds],
-  update: (fields: CharacterFields) => {
-    const updatedCharacter = get().character;
-    if (fields.name) updatedCharacter.name = fields.name;
-    if (fields.image) updatedCharacter.image = fields.image;
-    if (fields.age) updatedCharacter.age = fields.age.toString();
-    if (fields.playerName) updatedCharacter.playerName = fields.playerName;
-    if (fields.playerContact)
-      updatedCharacter.playerContact = fields.playerContact;
-    if (fields.factionId) updatedCharacter.factionId = fields.factionId;
-    if (fields.clanId) updatedCharacter.clanId = fields.clanId;
-    if (fields.status) updatedCharacter.status = fields.status;
-    if (fields.title) updatedCharacter.title = fields.title;
-    if (fields.visible) updatedCharacter.visible = fields.visible;
-    if (fields.publicInfo) updatedCharacter.publicInfo = fields.publicInfo;
-    if (fields.sire) updatedCharacter.sire = fields.sire;
-    if (fields.childer) updatedCharacter.childer = fields.childer;
-    if (fields.ambition) updatedCharacter.ambition = fields.ambition;
-    if (fields.content) updatedCharacter.content = fields.content;
-    set((state: State) => ({
+interface Actions {
+  clear: () => void;
+  update: (fields: OptionalFields) => void;
+  initializeFeatures: (features: FeatureWithComment[]) => void;
+  storeFeatures: (features: FeatureWithComment[]) => void;
+  storeAbilities: (abilities: number[]) => void;
+}
+
+const INITIAL_STATE: OptionalFields & RequiredFields = {
+  age: 0,
+  playerName: "",
+  playerContact: "",
+  image: "",
+  factionId: 0,
+  clanId: 0,
+  name: "",
+  status: "",
+  title: "",
+  visible: false,
+  publicInfo: "",
+  sire: "",
+  childer: "",
+  ambition: "",
+  content: "",
+  abilityIds: [],
+  featuresWithComments: [],
+  isEditing: false,
+};
+
+type StateFields = OptionalFields & RequiredFields;
+
+export const useCharacterStore = create<StateFields & Actions>((set) => ({
+  ...Object.assign({}, INITIAL_STATE),
+  update: (fields: OptionalFields) => {
+    set((state: StateFields) => ({
       ...state,
-      character: updatedCharacter,
+      age: "age" in fields ? fields.age : state.age,
+      image: "image" in fields ? fields.image : state.image,
+      playerName: "playerName" in fields ? fields.playerName : state.playerName,
+      playerContact:
+        "playerContact" in fields ? fields.playerContact : state.playerContact,
+      factionId: "factionId" in fields ? fields.factionId : state.factionId,
+      clanId: "clanId" in fields ? fields.clanId : state.clanId,
+      name: "name" in fields ? fields.name : state.name,
+      status: "status" in fields ? fields.status : state.status,
+      title: "title" in fields ? fields.title : state.title,
+      visible: "visible" in fields ? fields.visible : state.visible,
+      publicInfo: "publicInfo" in fields ? fields.publicInfo : state.publicInfo,
+      sire: "sire" in fields ? fields.sire : state.sire,
+      childer: "childer" in fields ? fields.childer : state.childer,
+      ambition: "ambition" in fields ? fields.ambition : state.ambition,
+      content: "content" in fields ? fields.content : state.content,
     }));
     return;
   },
-  setFeatures: (features: FeatureWithComment[]) => {
-    set((state: State) => ({
+  initializeFeatures: (features: FeatureWithComment[]) => {
+    set((state: StateFields) => ({
+      ...state,
+      featuresWithComments: !state.featuresWithComments.length
+        ? features
+        : state.featuresWithComments,
+    }));
+  },
+  storeFeatures: (features: FeatureWithComment[]) => {
+    set((state: StateFields) => ({
       ...state,
       featuresWithComments: features,
     }));
   },
-  setAbilities: (abilityIds: number[]) => {
-    set((state: State) => ({
+  storeAbilities: (abilityIds: number[]) => {
+    set((state: StateFields) => ({
       ...state,
       abilityIds: abilityIds,
     }));
   },
   clear: () => {
-    set((state: State) => ({
-      ...state,
-      character: Object.assign({}, INITIAL_STATE.character),
+    set((state: StateFields) => ({
+      ...Object.assign({}, INITIAL_STATE),
       featuresWithComments: [
         ...state.featuresWithComments.map((fwc) => {
-          return { id: fwc.id, comment: "", checked: false };
+          return { ...fwc, checked: false };
         }),
       ],
       abilityIds: [...INITIAL_STATE.abilityIds],

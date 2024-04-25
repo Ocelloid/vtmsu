@@ -532,22 +532,104 @@ export const charRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const char = await ctx.db.char.findUnique({
         where: { id: input.id },
-        include: { abilities: true, features: true },
+        include: {
+          abilities: { include: { abilitiy: true } },
+          features: { include: { feature: true } },
+        },
+      });
+      const newAbilities = await ctx.db.ability.findMany({
+        where: { id: { in: input.abilities } },
+      });
+      const newFeatures = await ctx.db.ability.findMany({
+        where: { id: { in: input.features.map((f) => f.id) } },
       });
       const abilitiesChanged =
-        char?.abilities
-          .map((a) => a.id)
-          .every((v) => input.abilities.includes(v)) &&
-        input.abilities.every((v) =>
-          char?.abilities.map((a) => a.id).includes(v),
+        !char?.abilities
+          .map((a) => a.abilityId)
+          .every((v) => input.abilities.includes(v)) ||
+        !input.abilities.every((v) =>
+          char?.abilities.map((a) => a.abilityId).includes(v),
         );
       const featuresChanged =
-        char?.features
-          .map((a) => a.id)
-          .every((v) => input.features.map((f) => f.id).includes(v)) &&
-        input.features
+        !char?.features
+          .map((a) => a.featureId)
+          .every((v) => input.features.map((f) => f.id).includes(v)) ||
+        !input.features
           .map((f) => f.id)
-          .every((v) => char?.abilities.map((a) => a.id).includes(v));
+          .every((v) => char?.features.map((a) => a.featureId).includes(v));
+      const changedFields = [];
+      if (char?.name !== input.name)
+        changedFields.push({
+          name: "Имя",
+          from: char?.name,
+          to: input.name,
+        });
+      if (char?.clanId !== input.clanId)
+        changedFields.push({
+          name: "Клан",
+          from: char?.clanId,
+          to: input.clanId,
+        });
+      if (char?.factionId !== input.factionId)
+        changedFields.push({
+          name: "Фракция",
+          from: char?.factionId,
+          to: input.factionId,
+        });
+      if (char?.title !== input.title)
+        changedFields.push({
+          name: "Титул",
+          from: char?.title,
+          to: input.title,
+        });
+      if (char?.status !== input.status)
+        changedFields.push({
+          name: "Статус",
+          from: char?.status,
+          to: input.status,
+        });
+      if (char?.content !== input.content)
+        changedFields.push({
+          name: "Квента",
+          from: char?.content,
+          to: input.content,
+        });
+      if (char?.ambition !== input.ambition)
+        changedFields.push({
+          name: "Амбиции",
+          from: char?.ambition,
+          to: input.ambition,
+        });
+      if (char?.age !== input.age)
+        changedFields.push({
+          name: "Возраст",
+          from: char?.age,
+          to: input.age,
+        });
+      if (char?.sire !== input.sire)
+        changedFields.push({
+          name: "Сир",
+          from: char?.sire,
+          to: input.sire,
+        });
+      if (char?.childer !== input.childer)
+        changedFields.push({
+          name: "Чайлды",
+          from: char?.childer,
+          to: input.childer,
+        });
+      if (abilitiesChanged)
+        changedFields.push({
+          name: "Дисциплины",
+          from: char?.abilities.map((a) => a.abilitiy.name).join(", "),
+          to: newAbilities.map((a) => a.name).join(", "),
+        });
+      if (featuresChanged)
+        changedFields.push({
+          name: "Дополнения",
+          from: char?.features.map((a) => a.feature.name).join(", "),
+          to: newFeatures.map((a) => a.name).join(", "),
+        });
       const shouldVerify =
         char?.clanId !== input.clanId ||
         char.factionId !== input.factionId ||
@@ -559,8 +641,8 @@ export const charRouter = createTRPCRouter({
         char.sire !== input.sire ||
         char.childer !== input.childer ||
         char.name !== input.name ||
-        abilitiesChanged! ||
-        featuresChanged! ||
+        abilitiesChanged ||
+        featuresChanged ||
         char.pending;
       return ctx.db.char.update({
         where: { id: input.id },
@@ -582,6 +664,22 @@ export const charRouter = createTRPCRouter({
           sire: input.sire,
           childer: input.childer,
           visible: input.visible,
+          comment:
+            "<div>" +
+            changedFields
+              .map((cF) =>
+                [
+                  "<p>",
+                  cF.name,
+                  " было ",
+                  cF.from?.toString(),
+                  " стало ",
+                  cF.to,
+                  "<p/>",
+                ].join(""),
+              )
+              .join("") +
+            "</div>",
           abilities: {
             deleteMany: {},
             createMany: {
