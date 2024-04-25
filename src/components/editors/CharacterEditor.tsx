@@ -109,6 +109,8 @@ export default function CharacterEditor() {
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [initialQuenta, setInitialQuenta] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isPersonnel, setIsPersonnel] = useState<boolean>(false);
   const [publicHookCompleted, setPublicHookCompleted] =
     useState<boolean>(false);
 
@@ -176,6 +178,8 @@ export default function CharacterEditor() {
           description: "",
         });
       setContactSelect(pS);
+      setIsAdmin(userData.isAdmin);
+      setIsPersonnel(userData.isPersonnel);
 
       if (!!traitsData) {
         const fwc = traitsData.features.map((f) => {
@@ -657,7 +661,7 @@ export default function CharacterEditor() {
                   }}
                 >
                   {factions
-                    .filter((f) => f.visibleToPlayer)
+                    .filter((f) => f.visibleToPlayer || isAdmin || isPersonnel)
                     .map((faction) => (
                       <SelectItem
                         key={faction.id}
@@ -713,10 +717,12 @@ export default function CharacterEditor() {
                   {clans
                     .filter(
                       (c) =>
-                        c.visibleToPlayer &&
-                        c
-                          .ClanInFaction!.map((fa) => fa.factionId)
-                          .includes(factionId!),
+                        (c.visibleToPlayer &&
+                          c
+                            .ClanInFaction!.map((fa) => fa.factionId)
+                            .includes(factionId!)) ||
+                        isAdmin ||
+                        isPersonnel,
                     )
                     .map((clan) => (
                       <SelectItem
@@ -872,13 +878,15 @@ export default function CharacterEditor() {
                   {abilities
                     .filter(
                       (a) =>
-                        a
+                        (a
                           .AbilityAvailable!.map((aa) => aa.clanId)
                           .includes(clanId!) &&
-                        (a.requirementId
-                          ? abilityIds.includes(a.requirementId)
-                          : true) &&
-                        a.visibleToPlayer,
+                          (a.requirementId
+                            ? abilityIds.includes(a.requirementId)
+                            : true) &&
+                          a.visibleToPlayer) ||
+                        isAdmin ||
+                        isPersonnel,
                     )
                     .map((ability) => (
                       <Checkbox
@@ -979,9 +987,12 @@ export default function CharacterEditor() {
                   {features
                     .filter(
                       (f) =>
-                        f
+                        (f
                           .FeatureAvailable!.map((fa) => fa.clanId)
-                          .includes(clanId!) && f.visibleToPlayer,
+                          .includes(clanId!) &&
+                          f.visibleToPlayer) ||
+                        isAdmin ||
+                        isPersonnel,
                     )
                     .map((feature) => (
                       <>
