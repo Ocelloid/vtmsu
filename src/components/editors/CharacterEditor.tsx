@@ -288,12 +288,12 @@ export default function CharacterEditor() {
   }, [router.query.pid, isEditing, update, clear]);
 
   useEffect(() => {
-    setCostSum(
-      featuresWithComments
-        .filter((fwc) => fwc.checked)
-        .map((fwc) => fwc.cost)
-        .reduce((a, b) => a + b),
-    );
+    if (!!featuresWithComments.length) {
+      const hasChecked = featuresWithComments.filter((fwc) => fwc.checked);
+      if (!!hasChecked.length) {
+        setCostSum(hasChecked.map((fwc) => fwc.cost).reduce((a, b) => a + b));
+      }
+    }
   }, [featuresWithComments]);
 
   const handleSaveCharacter = () => {
