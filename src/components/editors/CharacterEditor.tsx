@@ -64,6 +64,7 @@ export default function CharacterEditor() {
     content,
     abilityIds,
     featuresWithComments,
+    isEditing,
     clear,
     update,
     storeFeatures,
@@ -108,6 +109,8 @@ export default function CharacterEditor() {
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
   const [initialQuenta, setInitialQuenta] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const [publicHookCompleted, setPublicHookCompleted] =
+    useState<boolean>(false);
 
   const { data: userData, isLoading: isUserLoading } =
     api.user.getCurrent.useQuery();
@@ -250,13 +253,15 @@ export default function CharacterEditor() {
         }
       }
 
-      update({ playerName: userData.name ?? "" });
-      update({ playerContact: pS[0]?.label ?? "" });
+      if (!playerName) update({ playerName: userData.name ?? "" });
+      if (!playerContact) update({ playerContact: pS[0]?.label ?? "" });
     }
   }, [
     userData,
     traitsData,
     characterData,
+    playerName,
+    playerContact,
     router,
     update,
     storeAbilities,
@@ -264,10 +269,20 @@ export default function CharacterEditor() {
   ]);
 
   useEffect(() => {
-    if (router.query.pid) {
-      setCharacterId(Number(router.query.pid));
+    if (!publicHookCompleted) {
+      setPublicHookCompleted(true);
+      setInitialPublicInfo(publicInfo ?? "");
+      setInitialQuenta(content ?? "");
     }
-  }, [router.query.pid]);
+  }, [publicInfo, content, publicHookCompleted]);
+
+  useEffect(() => {
+    if (!!router.query.pid) {
+      setCharacterId(Number(router.query.pid));
+      update({ isEditing: true });
+    }
+    if (!router.query.pid && isEditing) clear();
+  }, [router.query.pid, isEditing, update, clear]);
 
   const handleSaveCharacter = () => {
     if (!!characterId)
@@ -437,8 +452,6 @@ export default function CharacterEditor() {
     !!content ||
     !!featuresWithComments.filter((fs) => fs.checked).length ||
     !!abilityIds.length;
-
-  console.log(router);
 
   return (
     <>
@@ -614,7 +627,10 @@ export default function CharacterEditor() {
                   placeholder="Выберите фракцию"
                   selectedKeys={!!factionId ? [factionId.toString()] : []}
                   onChange={(e) => {
-                    if (!!e.target.value) {
+                    if (
+                      !!e.target.value &&
+                      e.target.value !== factionId?.toString()
+                    ) {
                       update({
                         factionId: Number(e.target.value),
                         clanId: undefined,

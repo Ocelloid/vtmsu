@@ -23,6 +23,7 @@ type OptionalFields = {
   childer?: string;
   ambition?: string;
   content?: string;
+  isEditing?: boolean;
 };
 
 type RequiredFields = {
@@ -64,6 +65,7 @@ export const useCharacterStore = create<StateFields & Actions>((set) => ({
   update: (fields: OptionalFields) => {
     set((state: StateFields) => ({
       ...state,
+      isEditing: "isEditing" in fields ? fields.isEditing : state.isEditing,
       age: "age" in fields ? fields.age : state.age,
       image: "image" in fields ? fields.image : state.image,
       playerName: "playerName" in fields ? fields.playerName : state.playerName,
