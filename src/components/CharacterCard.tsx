@@ -119,7 +119,7 @@ const CharacterCard = ({
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-end gap-1">
+          <div className="absolute bottom-0 right-0 z-20 flex flex-col items-center justify-end gap-1">
             {!!handleEditCharacter && (
               <div className="flex flex-col items-center justify-end">
                 {character.visible && character.verified ? (
