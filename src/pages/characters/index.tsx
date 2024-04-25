@@ -103,7 +103,7 @@ export default function Characters() {
                 <div className="grid grid-cols-4 justify-between gap-2 sm:grid-cols-10">
                   <Button
                     variant="ghost"
-                    className="col-span-4 h-8 w-full rounded-lg border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white sm:col-span-3 xl:col-span-2"
+                    className="col-span-4 h-8 w-full rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white sm:col-span-3 xl:col-span-2"
                     onClick={async () => {
                       await router.push(
                         {
@@ -232,7 +232,7 @@ export default function Characters() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className="mx-auto h-8 w-full rounded-lg border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white sm:w-64"
+                  className="mx-auto h-8 w-full rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white sm:w-64"
                   onClick={() => {
                     void router.push(
                       {
