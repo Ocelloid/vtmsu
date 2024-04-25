@@ -88,10 +88,14 @@ export default function Admin() {
               }
             >
               {users.map((user) => (
-                <div key={user.id} className="flex flex-col gap-4 md:flex-row">
+                <div
+                  key={user.id}
+                  className="flex flex-col gap-4 rounded-lg bg-white/75 p-2 dark:bg-red-950/50 md:flex-row"
+                >
                   <UserIcon
                     name={user.name}
                     className="mr-auto"
+                    classNames={{ description: "text-foreground-600" }}
                     description={user.email}
                     avatarProps={{
                       src: user.image ?? "",

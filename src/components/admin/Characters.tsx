@@ -129,7 +129,11 @@ export default function Characters() {
           ))}
         </Select>
       </div>
-      <Accordion isCompact variant="shadow" className="bg-red-950/50">
+      <Accordion
+        isCompact
+        variant="shadow"
+        className="bg-white/75 dark:bg-red-950/50"
+      >
         {chars
           .filter((c) =>
             !!factionIds.length ? factionIds.includes(c.factionId) : true,
