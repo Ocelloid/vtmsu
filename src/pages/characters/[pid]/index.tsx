@@ -246,7 +246,7 @@ const CharacterSheet = ({
                         pathname: `/characters/${characterId?.toString()}/edit`,
                       },
                       undefined,
-                      { shallow: true },
+                      { shallow: false },
                     );
                   }}
                 >
@@ -270,7 +270,7 @@ const CharacterSheet = ({
                 onClick={onOpen}
                 src={!!publicChar.image ? publicChar.image : default_char}
                 alt="char_img"
-                className="flex min-w-0 max-w-full flex-shrink cursor-pointer object-contain sm:max-h-[21rem]"
+                className="flex min-w-0 max-w-full flex-shrink cursor-pointer rounded-lg object-contain sm:max-h-[21rem]"
                 height={1024}
                 width={1024}
               />

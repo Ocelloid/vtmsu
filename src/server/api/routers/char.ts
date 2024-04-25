@@ -540,7 +540,7 @@ export const charRouter = createTRPCRouter({
       const newAbilities = await ctx.db.ability.findMany({
         where: { id: { in: input.abilities } },
       });
-      const newFeatures = await ctx.db.ability.findMany({
+      const newFeatures = await ctx.db.feature.findMany({
         where: { id: { in: input.features.map((f) => f.id) } },
       });
       const abilitiesChanged =
@@ -627,8 +627,16 @@ export const charRouter = createTRPCRouter({
       if (featuresChanged)
         changedFields.push({
           name: "Дополнения",
-          from: char?.features.map((a) => a.feature.name).join(", "),
-          to: newFeatures.map((a) => a.name).join(", "),
+          from: char?.features
+            .map((a) => [a.feature.name, a.description].join(": "))
+            .join(", "),
+          to: newFeatures
+            .map((a) =>
+              [a.name, input.features.find((f) => f.id === a.id)?.comment].join(
+                ": ",
+              ),
+            )
+            .join(", "),
         });
       const shouldVerify =
         char?.clanId !== input.clanId ||

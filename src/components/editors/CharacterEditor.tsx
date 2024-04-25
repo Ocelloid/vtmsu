@@ -64,10 +64,8 @@ export default function CharacterEditor() {
     content,
     abilityIds,
     featuresWithComments,
-    isEditing,
     clear,
     update,
-    initializeFeatures,
     storeFeatures,
     storeAbilities,
   } = useCharacterStore((state) => state);
@@ -199,7 +197,7 @@ export default function CharacterEditor() {
               pathname: `/characters/`,
             },
             undefined,
-            { shallow: true },
+            { shallow: false },
           );
           return;
         }
@@ -208,7 +206,12 @@ export default function CharacterEditor() {
             return {
               id: f.id,
               cost: f.cost,
-              comment: "",
+              comment: !!characterData.features.find(
+                (fs) => fs.featureId === f.id,
+              )
+                ? characterData.features.find((fs) => fs.featureId === f.id)!
+                    .description ?? ""
+                : "",
               checked:
                 !!characterData.features.find((fs) => fs.featureId === f.id) ??
                 false,
@@ -225,7 +228,7 @@ export default function CharacterEditor() {
 
           setInitialQuenta(characterData.content ?? "");
           setInitialPublicInfo(characterData.publicInfo ?? "");
-          storeAbilities(characterData.abilities.map((a) => a.id));
+          storeAbilities(characterData.abilities.map((a) => a.abilityId));
           storeFeatures(fwc);
           update({
             name: characterData.name,
@@ -242,8 +245,7 @@ export default function CharacterEditor() {
             visible: characterData.visible,
             ambition: characterData.ambition ?? "",
             content: characterData.content ?? "",
-            playerContact:
-              characterData.playerContact ?? contactSelect[0]?.label ?? "",
+            playerContact: characterData.playerContact ?? pS[0]?.label ?? "",
           });
         }
       }
@@ -254,7 +256,6 @@ export default function CharacterEditor() {
   }, [
     userData,
     traitsData,
-    contactSelect,
     characterData,
     router,
     update,
@@ -294,7 +295,13 @@ export default function CharacterEditor() {
         {
           onSuccess: () => {
             handleClear();
-            return;
+            void router.push(
+              {
+                pathname: `/characters/${characterId}`,
+              },
+              undefined,
+              { shallow: false },
+            );
           },
         },
       );
@@ -320,16 +327,22 @@ export default function CharacterEditor() {
           features: featuresWithComments.filter((fwc) => fwc.checked),
         },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
             handleClear();
-            return;
+            void router.push(
+              {
+                pathname: `/characters/${data.id}`,
+              },
+              undefined,
+              { shallow: false },
+            );
           },
         },
       );
-    return;
   };
 
   const handleClear = () => {
+    setCharacterId(undefined);
     setInitialPublicInfo("");
     setInitialQuenta("");
     setCostSum(0);
@@ -344,7 +357,13 @@ export default function CharacterEditor() {
         {
           onSuccess: () => {
             handleClear();
-            return;
+            void router.push(
+              {
+                pathname: `/characters`,
+              },
+              undefined,
+              { shallow: false },
+            );
           },
         },
       );
@@ -419,6 +438,8 @@ export default function CharacterEditor() {
     !!featuresWithComments.filter((fs) => fs.checked).length ||
     !!abilityIds.length;
 
+  console.log(router);
+
   return (
     <>
       <Head>
@@ -491,10 +512,10 @@ export default function CharacterEditor() {
                     handleClear();
                     void router.push(
                       {
-                        pathname: `/characters/`,
+                        pathname: `/characters/new`,
                       },
                       undefined,
-                      { shallow: true },
+                      { shallow: false },
                     );
                   }}
                   variant={"ghost"}

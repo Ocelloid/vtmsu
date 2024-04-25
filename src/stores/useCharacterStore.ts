@@ -23,7 +23,6 @@ type OptionalFields = {
   childer?: string;
   ambition?: string;
   content?: string;
-  isEditing?: boolean;
 };
 
 type RequiredFields = {
@@ -34,7 +33,6 @@ type RequiredFields = {
 interface Actions {
   clear: () => void;
   update: (fields: OptionalFields) => void;
-  initializeFeatures: (features: FeatureWithComment[]) => void;
   storeFeatures: (features: FeatureWithComment[]) => void;
   storeAbilities: (abilities: number[]) => void;
 }
@@ -57,7 +55,6 @@ const INITIAL_STATE: OptionalFields & RequiredFields = {
   content: "",
   abilityIds: [],
   featuresWithComments: [],
-  isEditing: false,
 };
 
 type StateFields = OptionalFields & RequiredFields;
@@ -85,14 +82,6 @@ export const useCharacterStore = create<StateFields & Actions>((set) => ({
       content: "content" in fields ? fields.content : state.content,
     }));
     return;
-  },
-  initializeFeatures: (features: FeatureWithComment[]) => {
-    set((state: StateFields) => ({
-      ...state,
-      featuresWithComments: !state.featuresWithComments.length
-        ? features
-        : state.featuresWithComments,
-    }));
   },
   storeFeatures: (features: FeatureWithComment[]) => {
     set((state: StateFields) => ({

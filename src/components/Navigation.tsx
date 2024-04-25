@@ -19,7 +19,7 @@ const Navigation = () => {
   const { data: sessionData } = useSession();
   const { data: isPersonnel } = api.user.userIsPersonnel.useQuery();
   const pathOpen = (pathname: string) => {
-    void router.replace(`/${pathname}`);
+    void router.push(`/${pathname}`, `/${pathname}`, { shallow: false });
   };
 
   return (

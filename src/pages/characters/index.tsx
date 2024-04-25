@@ -58,13 +58,6 @@ export default function Characters() {
             variant="underlined"
             selectedKey={selectedTab}
             onSelectionChange={(e) => {
-              void router.push(
-                {
-                  pathname: "/characters",
-                },
-                undefined,
-                { shallow: true },
-              );
               setSelectedTab(e.toString());
             }}
             classNames={{
@@ -87,13 +80,13 @@ export default function Characters() {
                 <Button
                   variant="ghost"
                   className="w-90 mx-auto h-8 border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white"
-                  onClick={() => {
-                    void router.push(
+                  onClick={async () => {
+                    await router.push(
                       {
                         pathname: `/characters/new`,
                       },
                       undefined,
-                      { shallow: true },
+                      { shallow: false },
                     );
                   }}
                 >
@@ -125,7 +118,7 @@ export default function Characters() {
                         pathname: `/characters/new`,
                       },
                       undefined,
-                      { shallow: true },
+                      { shallow: false },
                     );
                   }}
                 >
@@ -143,7 +136,7 @@ export default function Characters() {
                             pathname: `/characters/${cid}/edit`,
                           },
                           undefined,
-                          { shallow: true },
+                          { shallow: false },
                         );
                       }}
                     />

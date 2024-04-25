@@ -68,7 +68,7 @@ export default function Rules() {
         query: { category: e },
       },
       undefined,
-      { shallow: true },
+      { shallow: false },
     );
   };
 
@@ -97,7 +97,7 @@ export default function Rules() {
         query: { category: "editor", ruleId: rule.id },
       },
       undefined,
-      { shallow: true },
+      { shallow: false },
     );
   };
 
@@ -116,7 +116,7 @@ export default function Rules() {
         query: { category: category, rule: linkTo },
       },
       undefined,
-      { shallow: true },
+      { shallow: false },
     );
   };
 
@@ -134,7 +134,7 @@ export default function Rules() {
               },
             },
             undefined,
-            { shallow: true },
+            { shallow: false },
           );
         } else {
           setCategory("1");
@@ -146,7 +146,7 @@ export default function Rules() {
               },
             },
             undefined,
-            { shallow: true },
+            { shallow: false },
           );
         }
       })
