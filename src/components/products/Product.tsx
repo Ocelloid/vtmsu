@@ -71,7 +71,7 @@ const Product = () => {
           <h1 className="text-3xl font-bold text-default-900 dark:text-red-100">
             {product.title}
           </h1>
-          <span className=" font-semibold text-red-600">
+          <span className="font-semibold text-red-900 dark:text-red-600">
             {product.subtitle}
           </span>
         </div>
