@@ -558,7 +558,7 @@ export default function CharacterEditor() {
                   {!!invalidFields.filter((i) => !!i).length && "Введите "}
                   {invalidFields.filter((i) => !!i).join(", ")}
                   {!!invalidFields.filter((i) => !!i).length && ". "}
-                  {!!costSum && "Сумма долнений долна быть равна нулю."}
+                  {!!costSum && "Сумма дополнений долна быть равна нулю."}
                 </p>
               )}
             </div>

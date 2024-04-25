@@ -1,5 +1,12 @@
 import Head from "next/head";
-import { Tabs, Tab, Button } from "@nextui-org/react";
+import {
+  Tabs,
+  Tab,
+  Button,
+  Input,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { LoadingPage } from "~/components/Loading";
 import { useState, useEffect } from "react";
@@ -8,18 +15,33 @@ import { type Character } from "~/server/api/routers/char";
 import { FaPlus } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import CharacterCard from "~/components/CharacterCard";
+import type { Faction, Clan } from "~/server/api/routers/char";
 
 export default function Characters() {
   const { data: sessionData } = useSession();
+  const [selectedTab, setSelectedTab] = useState("all");
   const [characters, setCharacters] = useState<Character[]>([]);
   const [myCharacters, setMyCharacters] = useState<Character[]>([]);
-  const [selectedTab, setSelectedTab] = useState("all");
+  const [factionIds, setFactionIds] = useState<number[]>([]);
+  const [factions, setFactions] = useState<Faction[]>([]);
+  const [clanIds, setClanIds] = useState<number[]>([]);
+  const [clans, setClans] = useState<Clan[]>([]);
+  const [name, setName] = useState("");
   const router = useRouter();
 
   const { data: characterData, isLoading: isCharactersLoading } =
     api.char.getAll.useQuery(undefined, { enabled: !!sessionData });
   const { data: myCharacterData, isLoading: isMyCharactersLoading } =
     api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
+  const { data: traitsData, isLoading: isTraitsLoading } =
+    api.char.getCharTraits.useQuery();
+
+  useEffect(() => {
+    if (!!traitsData) {
+      setFactions(traitsData.factions);
+      setClans(traitsData.clans);
+    }
+  }, [traitsData]);
 
   useEffect(() => {
     setCharacters(
@@ -35,7 +57,8 @@ export default function Characters() {
     if (character) setSelectedTab("edit");
   }, [characterData, myCharacterData, sessionData, router.query]);
 
-  if (isCharactersLoading || isMyCharactersLoading) return <LoadingPage />;
+  if (isCharactersLoading || isMyCharactersLoading || isTraitsLoading)
+    return <LoadingPage />;
   if (!sessionData)
     return (
       <div className="flex h-[100vh] w-[100vw] items-center justify-center">
@@ -77,27 +100,125 @@ export default function Characters() {
               }
             >
               <div className="flex flex-col gap-2">
-                <Button
-                  variant="ghost"
-                  className="w-90 mx-auto h-8 border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white"
-                  onClick={async () => {
-                    await router.push(
-                      {
-                        pathname: `/characters/new`,
-                      },
-                      undefined,
-                      { shallow: false },
-                    );
-                  }}
-                >
-                  <FaPlus />
-                  Добавить персонажа
-                </Button>
-                <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                  {characters.map((character) => (
-                    <CharacterCard key={character.id} character={character} />
-                  ))}
+                <div className="grid grid-cols-4 justify-between gap-2 sm:grid-cols-10">
+                  <Button
+                    variant="ghost"
+                    className="col-span-4 h-8 w-full rounded-lg border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white sm:col-span-3 xl:col-span-2"
+                    onClick={async () => {
+                      await router.push(
+                        {
+                          pathname: `/characters/new`,
+                        },
+                        undefined,
+                        { shallow: false },
+                      );
+                    }}
+                  >
+                    <FaPlus />
+                    Добавить персонажа
+                  </Button>
+                  <p className="hidden justify-end py-1 sm:flex xl:col-span-2">
+                    Поиск:
+                  </p>
+                  <Input
+                    size="sm"
+                    variant="bordered"
+                    className="col-span-4 sm:col-span-2"
+                    aria-label="Имя"
+                    placeholder="Имя"
+                    value={name}
+                    onValueChange={setName}
+                  />
+                  <Select
+                    size="sm"
+                    variant="bordered"
+                    aria-label="Фракция"
+                    placeholder="Фракция"
+                    className="col-span-2"
+                    selectionMode="multiple"
+                    selectedKeys={factionIds.map((f) => f.toString())}
+                    onChange={(e) => {
+                      setFactionIds(
+                        !!e.target.value
+                          ? e.target.value.split(",").map((s) => Number(s))
+                          : [],
+                      );
+                    }}
+                  >
+                    {factions.map((faction) => (
+                      <SelectItem
+                        key={faction.id}
+                        value={faction.id}
+                        textValue={faction.name}
+                      >
+                        {faction.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Select
+                    size="sm"
+                    variant="bordered"
+                    placeholder="Клан"
+                    aria-label="Клан"
+                    className="col-span-2"
+                    selectionMode="multiple"
+                    selectedKeys={clanIds.map((f) => f.toString())}
+                    onChange={(e) => {
+                      setClanIds(
+                        !!e.target.value
+                          ? e.target.value.split(",").map((s) => Number(s))
+                          : [],
+                      );
+                    }}
+                  >
+                    {clans.map((clan) => (
+                      <SelectItem
+                        key={clan.id}
+                        value={clan.id}
+                        textValue={clan.name}
+                      >
+                        {clan.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                  {characters
+                    .filter((c) =>
+                      !!factionIds.length
+                        ? factionIds.includes(c.factionId)
+                        : true,
+                    )
+                    .filter((c) =>
+                      !!clanIds.length ? clanIds.includes(c.clanId) : true,
+                    )
+                    .filter((c) =>
+                      !!name
+                        ? c.name.toLowerCase().includes(name.toLowerCase())
+                        : true,
+                    )
+                    .map((character) => (
+                      <CharacterCard key={character.id} character={character} />
+                    ))}
+                </div>
+                {!characters
+                  .filter((c) =>
+                    !!factionIds.length
+                      ? factionIds.includes(c.factionId)
+                      : true,
+                  )
+                  .filter((c) =>
+                    !!clanIds.length ? clanIds.includes(c.clanId) : true,
+                  )
+                  .filter((c) =>
+                    !!name
+                      ? c.name.toLowerCase().includes(name.toLowerCase())
+                      : true,
+                  ).length && (
+                  <p className="mx-auto text-2xl">
+                    Не найдено ни одного персонажа
+                  </p>
+                )}
               </div>
             </Tab>
             <Tab
@@ -111,7 +232,7 @@ export default function Characters() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="ghost"
-                  className="w-90 mx-auto h-8 border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white"
+                  className="mx-auto h-8 w-full rounded-lg border-warning hover:!bg-warning/25 dark:text-white dark:hover:text-white sm:w-64"
                   onClick={() => {
                     void router.push(
                       {
@@ -125,6 +246,7 @@ export default function Characters() {
                   <FaPlus />
                   Добавить персонажа
                 </Button>
+
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                   {myCharacters.map((character) => (
                     <CharacterCard
