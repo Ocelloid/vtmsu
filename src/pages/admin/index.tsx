@@ -1,23 +1,16 @@
 import Head from "next/head";
 import { Tabs, Tab, User as UserIcon, Checkbox } from "@nextui-org/react";
-import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import { LoadingPage } from "~/components/Loading";
 import type { User } from "~/server/api/routers/user";
-import type { Character } from "~/server/api/routers/char";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "~/utils/api";
-import CharacterTraits from "~/components/CharacterTraits";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
-import CharacterSheet from "~/pages/characters/[pid]";
+import CharacterTraits from "~/components/admin/CharacterTraits";
+import Characters from "~/components/admin/Characters";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
   const [users, setUsers] = useState<User[]>([]);
-  const [chars, setChars] = useState<Character[]>([]);
-  const [selectedChars, setSelectedChars] = useState<Set<number | string>>(
-    new Set([]),
-  );
 
   const { data: isPersonnel, isLoading: isUserPersonnelLoading } =
     api.user.userIsPersonnel.useQuery(undefined, { enabled: !!sessionData });
@@ -30,11 +23,6 @@ export default function Admin() {
     isLoading: isUserListLoading,
     refetch: refetchUserList,
   } = api.user.getUserList.useQuery(undefined, { enabled: !!sessionData });
-  const {
-    data: charList,
-    isLoading: isCharListLoading,
-    refetch: refetchCharList,
-  } = api.char.getAll.useQuery(undefined, { enabled: isPersonnel });
 
   const handleUserRoleChange = (e: boolean, id: string, role: string) => {
     if (role === "admin" && !e && users.filter((x) => x.isAdmin).length < 2)
@@ -53,14 +41,12 @@ export default function Admin() {
 
   useEffect(() => {
     setUsers(userList ?? []);
-    setChars(charList ?? []);
-  }, [userList, charList]);
+  }, [userList]);
 
   if (
     isUserPersonnelLoading ||
     isUserAdminLoading ||
     isUserListLoading ||
-    isCharListLoading ||
     isRoleChanging
   )
     return <LoadingPage />;
@@ -87,9 +73,9 @@ export default function Admin() {
             disabledKeys={isAdmin ? [] : ["users", "chars", "char_traits"]}
             classNames={{
               tabList:
-                "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                "grid grid-cols-4 md:grid-cols-8 w-full relative rounded-none p-0 border-b border-divider",
               cursor: "w-full bg-[#dc2626]",
-              tab: "first:ml-auto max-w-fit px-0 h-12 last:mr-auto md:last:mr-0",
+              tab: "max-w-агдд px-0 h-12",
             }}
           >
             <Tab
@@ -97,7 +83,7 @@ export default function Admin() {
               className="flex flex-col gap-8 md:gap-2"
               title={
                 <div className="flex items-center space-x-2">
-                  <span>Пользователи</span>
+                  <span>Аккаунты</span>
                 </div>
               }
             >
@@ -143,35 +129,7 @@ export default function Admin() {
                 </div>
               }
             >
-              <Accordion
-                isCompact
-                selectedKeys={selectedChars}
-                onSelectionChange={(keys) => setSelectedChars(new Set(keys))}
-              >
-                {chars.map((char) => (
-                  <AccordionItem
-                    key={char.id}
-                    aria-label={char.name}
-                    title={
-                      <div className="flex flex-row gap-1">
-                        {char.verified ? (
-                          <VscVerified size={24} className="text-success" />
-                        ) : char.pending ? (
-                          <VscUnverified size={24} className="text-secondary" />
-                        ) : (
-                          <VscWarning size={24} className="text-danger" />
-                        )}
-                        {char.name}
-                      </div>
-                    }
-                  >
-                    <CharacterSheet
-                      charId={char.id}
-                      onChange={refetchCharList}
-                    />
-                  </AccordionItem>
-                ))}
-              </Accordion>
+              <Characters />
             </Tab>
             <Tab
               key={"char_traits"}
@@ -182,6 +140,16 @@ export default function Admin() {
               }
             >
               <CharacterTraits />
+            </Tab>
+            <Tab
+              key={"economy"}
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>Экономика</span>
+                </div>
+              }
+            >
+              Экономика
             </Tab>
             <Tab
               key={"items"}
@@ -202,16 +170,6 @@ export default function Admin() {
               }
             >
               Виртуальный АХЧ
-            </Tab>
-            <Tab
-              key={"economy"}
-              title={
-                <div className="flex items-center space-x-2">
-                  <span>Экономика</span>
-                </div>
-              }
-            >
-              Экономика
             </Tab>
             <Tab
               key={"hunt"}

@@ -18,6 +18,7 @@ import CharacterCard from "~/components/CharacterCard";
 import type { Faction, Clan } from "~/server/api/routers/char";
 
 export default function Characters() {
+  const router = useRouter();
   const { data: sessionData } = useSession();
   const [selectedTab, setSelectedTab] = useState("all");
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -27,7 +28,6 @@ export default function Characters() {
   const [clanIds, setClanIds] = useState<number[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
   const [name, setName] = useState("");
-  const router = useRouter();
 
   const { data: characterData, isLoading: isCharactersLoading } =
     api.char.getAll.useQuery(undefined, { enabled: !!sessionData });

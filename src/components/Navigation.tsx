@@ -43,7 +43,7 @@ const Navigation = () => {
         </div>
       </div>
       <ul
-        className={`${!isOpen && "hidden"} items-right mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex md:flex-row md:justify-end md:gap-4`}
+        className={`${!isOpen && "hidden"} items-right mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex md:flex-row md:justify-end md:gap-4 [&>*]:px-1`}
       >
         <Button
           onClick={() => {
@@ -51,7 +51,7 @@ const Navigation = () => {
             pathOpen("about");
           }}
           variant="bordered"
-          className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
+          className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
         >
           Об игре
         </Button>
@@ -64,7 +64,7 @@ const Navigation = () => {
                   pathOpen("game");
                 }}
                 variant="bordered"
-                className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
+                className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
               >
                 Играть
               </Button>
@@ -75,7 +75,7 @@ const Navigation = () => {
                 pathOpen("characters");
               }}
               variant="bordered"
-              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
+              className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
             >
               Персонажи
             </Button>
@@ -87,7 +87,7 @@ const Navigation = () => {
             pathOpen("rules");
           }}
           variant="bordered"
-          className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
+          className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
         >
           Правила
         </Button>
@@ -97,7 +97,7 @@ const Navigation = () => {
             pathOpen("shop");
           }}
           variant="bordered"
-          className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
+          className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
         >
           Магазин
         </Button>
@@ -110,7 +110,7 @@ const Navigation = () => {
                   pathOpen("admin");
                 }}
                 variant="bordered"
-                className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
+                className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
               >
                 Управление
               </Button>
@@ -121,7 +121,7 @@ const Navigation = () => {
                 pathOpen("settings");
               }}
               variant="bordered"
-              className="w-min min-w-10 border-none px-4 py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
+              className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300 md:hidden"
             >
               Настройки
             </Button>
@@ -131,7 +131,7 @@ const Navigation = () => {
                 void signOut();
               }}
               variant="bordered"
-              className="w-min min-w-10 border-none px-4 py-0 text-medium text-red-500 md:hidden"
+              className="w-min min-w-10 border-none py-0 text-medium text-red-500 md:hidden"
             >
               Выйти
             </Button>
@@ -147,7 +147,7 @@ const Navigation = () => {
                         "w-8 h-8 max-h-8 max-w-8 min-w-8 min-h-8 bg-red-500 ring-offset-red-500 dark:ring-offset-background-red-500",
                       src: sessionData.user.image ?? "",
                     }}
-                    className="hidden border-none text-medium hover:text-red-900 dark:hover:text-red-400 md:flex"
+                    className="hidden w-full gap-2 text-medium hover:text-red-900 dark:hover:text-red-400 md:flex"
                     name={sessionData.user.name}
                   />
                 </div>
@@ -168,9 +168,9 @@ const Navigation = () => {
                   ],
                 }}
               >
-                <DropdownItem key="admin" onClick={() => pathOpen("admin")}>
+                {/* <DropdownItem key="admin" onClick={() => pathOpen("admin")}>
                   Управление
-                </DropdownItem>
+                </DropdownItem> */}
                 <DropdownItem
                   key="settings"
                   onClick={() => pathOpen("settings")}

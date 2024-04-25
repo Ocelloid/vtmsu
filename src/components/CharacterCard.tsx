@@ -56,7 +56,7 @@ const CharacterCard = ({
           { shallow: false },
         );
       }}
-      className="grid min-h-44 cursor-pointer grid-cols-3 gap-2 rounded-md bg-red-950/50 p-2 text-default transition-all duration-1000 hover:shadow-md hover:shadow-red-950/50 hover:brightness-110 hover:drop-shadow-xl dark:text-white sm:grid-cols-3"
+      className="grid min-h-44 cursor-pointer grid-cols-3 gap-2 rounded-md bg-red-950/50 p-2 text-default transition-all duration-300 hover:shadow-md hover:shadow-red-950/50 hover:brightness-110 hover:drop-shadow-xl dark:text-white sm:grid-cols-3"
     >
       <div className="flex flex-col">
         <Image
