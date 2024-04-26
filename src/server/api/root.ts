@@ -3,6 +3,7 @@ import { shopRouter } from "~/server/api/routers/shop";
 import { userRouter } from "~/server/api/routers/user";
 import { ruleRouter } from "~/server/api/routers/rule";
 import { charRouter } from "~/server/api/routers/char";
+import { huntRouter } from "~/server/api/routers/hunt";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 export const appRouter = createTRPCRouter({
@@ -11,6 +12,7 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   rule: ruleRouter,
   char: charRouter,
+  hunt: huntRouter,
 });
 export type AppRouter = typeof appRouter;
 export const createCaller = createCallerFactory(appRouter);

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 import CharacterTraits from "~/components/admin/CharacterTraits";
-import Hunting from "~/components/admin/Hunting";
+import Hunting from "~/components/admin/hunting";
 import Characters from "~/components/admin/Characters";
 
 export default function Admin() {
@@ -66,7 +66,7 @@ export default function Admin() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-screen flex-col pt-20">
+      <main className=" flex min-h-screen flex-col pt-24">
         <div className="container flex flex-col px-4">
           <Tabs
             aria-label="tabs"
@@ -74,9 +74,11 @@ export default function Admin() {
             disabledKeys={isAdmin ? [] : ["users", "chars", "char_traits"]}
             classNames={{
               tabList:
-                "grid grid-cols-4 md:grid-cols-8 w-full relative rounded-none p-0 border-b border-divider",
+                "gap-0 grid grid-cols-4 md:grid-cols-8 w-full relative rounded-none p-0 border-b border-divider",
               cursor: "w-full bg-[#dc2626]",
-              tab: "max-w-агдд px-0 h-12",
+              tab: "max-w-full px-0 h-8",
+              base: "bg-danger/5",
+              panel: "px-0 py-0",
             }}
           >
             <Tab
@@ -88,43 +90,45 @@ export default function Admin() {
                 </div>
               }
             >
-              {users.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex flex-col gap-4 rounded-lg bg-white/75 p-2 dark:bg-red-950/50 md:flex-row"
-                >
-                  <UserIcon
-                    name={user.name}
-                    className="mr-auto"
-                    classNames={{ description: "text-foreground-600" }}
-                    description={user.email}
-                    avatarProps={{
-                      src: user.image ?? "",
-                    }}
-                  />
-                  <div className="flex flex-row gap-4">
-                    <Checkbox
-                      color="warning"
-                      isSelected={user.isPersonnel}
-                      onValueChange={(e) =>
-                        handleUserRoleChange(e, user.id, "personnel")
-                      }
-                    >
-                      Персонал
-                    </Checkbox>
-                    <Checkbox
-                      color="success"
-                      isDisabled={!user.isPersonnel}
-                      isSelected={user.isAdmin}
-                      onValueChange={(e) =>
-                        handleUserRoleChange(e, user.id, "admin")
-                      }
-                    >
-                      Администратор
-                    </Checkbox>
+              <div className="flex flex-col gap-2 py-2">
+                {users.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex flex-col gap-4 rounded-lg bg-white/75 p-2 dark:bg-red-950/50 md:flex-row"
+                  >
+                    <UserIcon
+                      name={user.name}
+                      className="mr-auto"
+                      classNames={{ description: "text-foreground-600" }}
+                      description={user.email}
+                      avatarProps={{
+                        src: user.image ?? "",
+                      }}
+                    />
+                    <div className="flex flex-row gap-4">
+                      <Checkbox
+                        color="warning"
+                        isSelected={user.isPersonnel}
+                        onValueChange={(e) =>
+                          handleUserRoleChange(e, user.id, "personnel")
+                        }
+                      >
+                        Персонал
+                      </Checkbox>
+                      <Checkbox
+                        color="success"
+                        isDisabled={!user.isPersonnel}
+                        isSelected={user.isAdmin}
+                        onValueChange={(e) =>
+                          handleUserRoleChange(e, user.id, "admin")
+                        }
+                      >
+                        Администратор
+                      </Checkbox>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </Tab>
             <Tab
               key={"chars"}

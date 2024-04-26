@@ -53,7 +53,7 @@ export default function Characters() {
 
   return (
     <>
-      <div className="mb-2 grid grid-cols-4 justify-between gap-2 sm:grid-cols-10">
+      <div className="grid grid-cols-4 justify-between gap-2 py-2 sm:grid-cols-10">
         <Button
           variant="ghost"
           className="col-span-4 h-8 w-full rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white sm:col-span-3 xl:col-span-2"

@@ -1,6 +1,69 @@
 import { z } from "zod";
+import type { Character } from "~/server/api/routers/char";
+import type { User } from "~/server/api/routers/user";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+
+export type HuntingData = {
+  id?: number;
+  name: string;
+  image?: string | null;
+  hunt_req?: string | null;
+  descs?: HuntingDescription[];
+  instances?: HuntingInstance[];
+};
+
+export type HuntingDescription = {
+  id?: number;
+  targetId?: number;
+  remains?: number;
+  content?: string | null;
+  target?: HuntingData;
+};
+
+export type HuntingInstance = {
+  id?: number;
+  remains?: number;
+  coordY: number;
+  coordX: number;
+  temporary: boolean;
+  expires?: Date | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  targetId?: number;
+  target?: HuntingData;
+  groundId?: number | null;
+  ground?: HuntingGround | null;
+  hunts?: Hunt[];
+};
+
+export type HuntingGround = {
+  id?: number;
+  name: string;
+  radius: number;
+  max_inst: number;
+  min_inst?: number;
+  delay: number;
+  coordY: number;
+  coordX: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  content?: string | null;
+  instances?: HuntingInstance[];
+};
+
+export type Hunt = {
+  id?: number;
+  instanceId?: number | null;
+  characterId: number;
+  createdById: string;
+  status: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  character?: Character;
+  createdBy?: User;
+  instance?: HuntingInstance | null;
+};
 
 export const huntRouter = createTRPCRouter({
   getAllHunts: protectedProcedure.query(async ({ ctx }) => {

@@ -71,7 +71,7 @@ model HuntingDescription {
   targetId Int
   remains  Int         @default(1)
   content  String?     @db.LongText
-  targets  HuntingData @relation(fields: [targetId], references: [id], onDelete: Cascade)
+  target   HuntingData @relation(fields: [targetId], references: [id], onDelete: Cascade)
 }
 
 model Hunt {

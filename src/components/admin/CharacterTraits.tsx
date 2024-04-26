@@ -109,7 +109,7 @@ const CharacterTraits = () => {
     <Accordion
       isCompact
       variant="shadow"
-      className="bg-white/75 dark:bg-red-950/50"
+      className="my-2 bg-white/75 dark:bg-red-950/50"
     >
       {characterTraits.map((cs, i) => (
         <AccordionItem key={i} aria-label={cs.label} title={cs.label}>
