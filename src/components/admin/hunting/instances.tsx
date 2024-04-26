@@ -1,3 +1,4 @@
+"use client";
 import {
   Button,
   Input,
@@ -8,16 +9,79 @@ import {
   ModalHeader,
 } from "@nextui-org/react";
 import Image from "next/image";
+import "leaflet/dist/leaflet.css";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import L, {
+  type LatLng,
+  type LatLngExpression,
+  type Marker as LeafletMarker,
+} from "leaflet";
 import type { HuntingInstance, HuntingData } from "~/server/api/routers/hunt";
 import { LoadingPage } from "~/components/Loading";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { FaPlus, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
+
+const icon = L.icon({ iconUrl: "/crosshair.png" });
+
+const InstanceMapControl = () => {
+  const map = useMapEvents({
+    click() {
+      map.locate();
+    },
+    locationfound(e) {
+      console.log(e, typeof e);
+    },
+  });
+  return null;
+};
+
+const DraggableInstance = ({
+  updatePosition,
+}: {
+  updatePosition: (p: LatLngExpression) => void;
+}) => {
+  const [position, setPosition] = useState<LatLngExpression>([58.0075, 56.23]);
+  const markerRef = useRef<LeafletMarker | null>(null);
+  const eventHandlers = useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (!!marker) {
+          setPosition(marker.getLatLng());
+          updatePosition(marker.getLatLng());
+        }
+      },
+    }),
+    [updatePosition],
+  );
+
+  return (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      position={position}
+      ref={markerRef}
+      icon={icon}
+    >
+      <Popup>Новая цель</Popup>
+    </Marker>
+  );
+};
 
 const Instances = () => {
   const [targets, setTargets] = useState<HuntingData[]>([]);
   const [instances, setInstances] = useState<HuntingInstance[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [position, setPosition] = useState<LatLng>();
+  const [expires, setExpires] = useState<Date>();
   const [targetId, setTargetId] = useState<number>(0);
   const [coordX, setCoordX] = useState<number>(0);
   const [coordY, setCoordY] = useState<number>(0);
@@ -73,7 +137,13 @@ const Instances = () => {
   const handleFormSubmit = () => {
     if (!!id) {
       updateInstance(
-        { id: id, coordX: coordX, coordY: coordY },
+        {
+          id: id,
+          coordX: coordX,
+          coordY: coordY,
+          targetId: targetId,
+          expires: expires,
+        },
         {
           onSuccess: () => {
             setIsModalOpen(false);
@@ -84,7 +154,12 @@ const Instances = () => {
       );
     } else
       newInstance(
-        { coordX: coordX, coordY: coordY, targetId: targetId },
+        {
+          coordX: coordX,
+          coordY: coordY,
+          targetId: targetId,
+          expires: expires,
+        },
         {
           onSuccess: () => {
             setIsModalOpen(false);
@@ -100,6 +175,7 @@ const Instances = () => {
   };
 
   if (isInstancesLoading || isTargetsLoading) return <LoadingPage />;
+  console.log(position);
 
   return (
     <>
@@ -119,7 +195,10 @@ const Instances = () => {
         }}
       >
         <ModalContent>
-          <ModalHeader>{!!id ? "Редактировать" : "Добавить"} цель</ModalHeader>
+          <ModalHeader>
+            {!!id ? "Редактировать" : "Добавить"} цель по координатам{" "}
+            {position?.lat.toFixed(5)}, {position?.lng.toFixed(5)}
+          </ModalHeader>
           <ModalBody className="-my-8 flex flex-col"></ModalBody>
           <ModalFooter>
             <Button
@@ -149,11 +228,32 @@ const Instances = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
+      <MapContainer
+        center={[58.0075, 56.23]}
+        zoom={13.5}
+        style={{ height: "480px" }}
+      >
+        <TileLayer
+          attribution={
+            !!position
+              ? `Координаты: ${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}`
+              : ""
+          }
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <InstanceMapControl />
+        <DraggableInstance updatePosition={(p) => setPosition(p)} />
+        {instances.map((instance) => (
+          <Marker key={instance.id} position={[coordY, coordX]}>
+            <Popup>{instance.target!.name}</Popup>
+          </Marker>
+        ))}
+      </MapContainer>
       <div className="-mb-4 grid w-full grid-cols-1 gap-2 md:-mb-0 md:-mt-2 md:grid-cols-4">
         <Button
           onClick={() => setIsModalOpen(true)}
           variant="bordered"
+          isDisabled={!position}
           className="my-auto flex min-w-44 flex-row border-black bg-transparent text-black dark:border-white dark:text-white"
         >
           <FaPlus size={16} />

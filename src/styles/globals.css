@@ -31,6 +31,39 @@
   padding-left: 4px;
 }
 
+.leaflet-control-attribution {
+  a,
+  span {
+    display: none;
+    visibility: hidden;
+  }
+}
+
+.dark {
+  .leaflet-layer,
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out,
+  .leaflet-control-attribution {
+    filter: brightness(0.7) invert(1) contrast(250%) hue-rotate(220deg)
+      saturate(0.3) brightness(0.6);
+  }
+}
+
+.leaflet-marker-draggable {
+  left: -24px !important;
+  top: -24px !important;
+}
+
+.leaflet-pane {
+  z-index: 40 !important;
+}
+.leaflet-control {
+  z-index: 41 !important;
+}
+.leaflet-top {
+  z-index: 42 !important;
+}
+
 .tiptap,
 .tiptap-display {
   > * + * {
