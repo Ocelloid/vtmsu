@@ -22,6 +22,71 @@ model Post {
   @@index([name])
 }
 
+model HuntingGround {
+  id        Int               @id @default(autoincrement())
+  name      String
+  radius    Int
+  max_inst  Int
+  min_inst  Int               @default(0)
+  delay     Int               @default(3600)
+  coordY    Float
+  coordX    Float
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  content   String?           @db.LongText
+  instances HuntingInstance[]
+
+  @@index([name])
+}
+
+model HuntingData {
+  id        Int                  @id @default(autoincrement())
+  name      String
+  image     String?
+  hunt_req  String?
+  descs     HuntingDescription[]
+  instances HuntingInstance[]
+
+  @@index([name])
+}
+
+model HuntingInstance {
+  id        Int            @id @default(autoincrement())
+  remains   Int            @default(1)
+  coordY    Float
+  coordX    Float
+  temporary Boolean        @default(false)
+  expires   DateTime?       
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  targetId  Int
+  target    HuntingData    @relation(fields: [targetId], references: [id], onDelete: Cascade)
+  groundId  Int?
+  ground    HuntingGround? @relation(fields: [groundId], references: [id], onDelete: SetNull)
+  hunts     Hunt[]
+}
+
+model HuntingDescription {
+  id       Int         @id @default(autoincrement())
+  targetId Int
+  remains  Int         @default(1)
+  content  String?     @db.LongText
+  targets  HuntingData @relation(fields: [targetId], references: [id], onDelete: Cascade)
+}
+
+model Hunt {
+  id          Int              @id @default(autoincrement())
+  instanceId  Int?
+  characterId Int
+  createdById String
+  status      String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  character   Char             @relation(fields: [characterId], references: [id])
+  createdBy   User             @relation(fields: [createdById], references: [id])
+  instance    HuntingInstance? @relation(fields: [instanceId], references: [id], onDelete: SetNull)
+}
+
 model Char {
   id            Int                  @id @default(autoincrement())
   name          String
@@ -36,6 +101,7 @@ model Char {
   title         String?
   status        String?
   childer       String?
+  hunt_req      String?
   comment       String?              @db.LongText
   p_comment     String?              @db.LongText
   pending       Boolean?             @default(false)
@@ -50,6 +116,7 @@ model Char {
   faction       Faction              @relation(fields: [factionId], references: [id])
   abilities     CharacterAbilities[]
   features      CharacterFeatures[]
+  hunts         Hunt[]
   createdById   String
 }
 
@@ -219,6 +286,7 @@ model User {
   posts         Post[]
   rules         Rule[]
   characters    Char[]
+  hunts         Hunt[]
 }
 
 model VerificationToken {

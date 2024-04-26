@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 import CharacterTraits from "~/components/admin/CharacterTraits";
+import Hunting from "~/components/admin/Hunting";
 import Characters from "~/components/admin/Characters";
 
 export default function Admin() {
@@ -183,7 +184,7 @@ export default function Admin() {
                 </div>
               }
             >
-              Охота
+              <Hunting />
             </Tab>
             <Tab
               key={"tasks"}
