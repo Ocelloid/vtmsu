@@ -8,13 +8,14 @@ import {
   ModalHeader,
 } from "@nextui-org/react";
 import Image from "next/image";
-import type { HuntingInstance } from "~/server/api/routers/hunt";
+import type { HuntingInstance, HuntingData } from "~/server/api/routers/hunt";
 import { LoadingPage } from "~/components/Loading";
 import { useState, useEffect } from "react";
 import { FaPlus, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
 
 const Instances = () => {
+  const [targets, setTargets] = useState<HuntingData[]>([]);
   const [instances, setInstances] = useState<HuntingInstance[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [targetId, setTargetId] = useState<number>(0);
@@ -29,19 +30,44 @@ const Instances = () => {
     refetch: refetchInstances,
   } = api.hunt.getAllHuntingInstances.useQuery();
 
+  const { data: targetsData, isLoading: isTargetsLoading } =
+    api.hunt.getAllHuntingTargets.useQuery();
+
   const { mutate: newInstance, isPending: isCreatePending } =
     api.hunt.createHuntingInstance.useMutation();
 
   const { mutate: updateInstance, isPending: isUpdatePending } =
     api.hunt.updateHuntingInstance.useMutation();
 
+  const { mutate: deleteInstance, isPending: isDeletePending } =
+    api.hunt.deleteHuntingInstance.useMutation();
+
   useEffect(() => {
     if (!!instancesData) setInstances(instancesData);
   }, [instancesData]);
 
+  useEffect(() => {
+    if (!!targetsData) setTargets(targetsData);
+  }, [targetsData]);
+
   const handleInstanceEdit = (t: HuntingInstance) => {
     setId(t.id);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = () => {
+    const confirmDelete = confirm("Удалить добычу?");
+    if (confirmDelete && !!id)
+      deleteInstance(
+        { id: id },
+        {
+          onSuccess: () => {
+            setIsModalOpen(false);
+            void refetchInstances();
+            handleClear();
+          },
+        },
+      );
   };
 
   const handleFormSubmit = () => {
@@ -73,8 +99,7 @@ const Instances = () => {
     return;
   };
 
-  if (isInstancesLoading || isCreatePending || isUpdatePending)
-    return <LoadingPage />;
+  if (isInstancesLoading || isTargetsLoading) return <LoadingPage />;
 
   return (
     <>
@@ -94,7 +119,7 @@ const Instances = () => {
         }}
       >
         <ModalContent>
-          <ModalHeader>Добавить добычу</ModalHeader>
+          <ModalHeader>{!!id ? "Редактировать" : "Добавить"} цель</ModalHeader>
           <ModalBody className="-my-8 flex flex-col"></ModalBody>
           <ModalFooter>
             <Button
@@ -106,15 +131,25 @@ const Instances = () => {
             </Button>
             <Button
               variant="solid"
+              color="danger"
+              onClick={handleDelete}
+              isDisabled={isCreatePending || isUpdatePending || isDeletePending}
+              className="mr-auto"
+            >
+              Удалить
+            </Button>
+            <Button
+              variant="solid"
               color="success"
               onClick={handleFormSubmit}
-              isDisabled={isCreatePending || isUpdatePending}
+              isDisabled={isCreatePending || isUpdatePending || isDeletePending}
             >
               Добавить
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
       <div className="-mb-4 grid w-full grid-cols-1 gap-2 md:-mb-0 md:-mt-2 md:grid-cols-4">
         <Button
           onClick={() => setIsModalOpen(true)}

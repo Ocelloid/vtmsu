@@ -46,7 +46,7 @@ export const LoadingPage = () => {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-transparent">
+      <main className="flex min-h-[50vh] flex-col items-center justify-center bg-transparent">
         <div className="absolute right-0 top-0 flex h-screen w-screen items-center justify-center">
           <LoadingSpinner width={80} height={80} />
         </div>

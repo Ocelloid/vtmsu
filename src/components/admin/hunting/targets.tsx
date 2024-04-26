@@ -46,6 +46,9 @@ const Targets = () => {
   const { mutate: updateTarget, isPending: isUpdatePending } =
     api.hunt.updateHuntingTarget.useMutation();
 
+  const { mutate: deleteTarget, isPending: isDeletePending } =
+    api.hunt.deleteHuntingTarget.useMutation();
+
   useEffect(() => {
     if (!!targetsData) setTargets(targetsData);
   }, [targetsData]);
@@ -57,6 +60,21 @@ const Targets = () => {
     setReq(t.hunt_req ?? "");
     setDescs(!!t.descs ? t.descs.map((d) => d.content ?? "") : [""]);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = () => {
+    const confirmDelete = confirm("Удалить добычу?");
+    if (confirmDelete && !!id)
+      deleteTarget(
+        { id: id },
+        {
+          onSuccess: () => {
+            setIsModalOpen(false);
+            void refetchTargets();
+            handleClear();
+          },
+        },
+      );
   };
 
   const handleFormSubmit = () => {
@@ -104,8 +122,7 @@ const Targets = () => {
     setDescs(newDescs);
   };
 
-  if (isTargetsLoading || isCreatePending || isUpdatePending)
-    return <LoadingPage />;
+  if (isTargetsLoading) return <LoadingPage />;
 
   return (
     <>
@@ -125,7 +142,9 @@ const Targets = () => {
         }}
       >
         <ModalContent>
-          <ModalHeader>Добавить добычу</ModalHeader>
+          <ModalHeader>
+            {!!id ? "Редактировать" : "Добавить"} добычу
+          </ModalHeader>
           <ModalBody className="-my-8 flex flex-col">
             <div className="relative mx-auto flex w-full flex-col">
               {uploading ? (
@@ -215,13 +234,26 @@ const Targets = () => {
             </Button>
             <Button
               variant="solid"
+              color="danger"
+              onClick={handleDelete}
+              isDisabled={isCreatePending || isUpdatePending || isDeletePending}
+              className="mr-auto"
+            >
+              Удалить
+            </Button>
+            <Button
+              variant="solid"
               color="success"
               onClick={handleFormSubmit}
               isDisabled={
-                isCreatePending || isUpdatePending || !name || !descs[0]
+                isCreatePending ||
+                isUpdatePending ||
+                isDeletePending ||
+                !name ||
+                !descs[0]
               }
             >
-              Добавить
+              {!!id ? "Обновить" : "Добавить"}
             </Button>
           </ModalFooter>
         </ModalContent>
