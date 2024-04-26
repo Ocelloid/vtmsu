@@ -33,7 +33,7 @@ export default function Home() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-screen flex-col items-center justify-center">
+      <main className=" mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center">
         <div className="container flex flex-col items-center justify-center gap-4 bg-black bg-clip-text px-4 pt-24 text-justify text-transparent dark:bg-white">
           <h1 className="flex flex-col items-center justify-center text-5xl font-extrabold tracking-tight sm:text-[5rem]">
             Маскарад
