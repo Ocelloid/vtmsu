@@ -71,6 +71,7 @@ export const huntRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
       include: {
         createdBy: true,
+        character: true,
         instance: {
           include: {
             target: { include: { descs: true } },

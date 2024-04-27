@@ -8,6 +8,7 @@ import {
   ModalFooter,
   ModalHeader,
   TimeInput,
+  Textarea,
 } from "@nextui-org/react";
 import "leaflet/dist/leaflet.css";
 import {
@@ -85,6 +86,7 @@ const Grounds = () => {
   const [delay, setDelay] = useState<Time>(new Time(1, 0));
   const [position, setPosition] = useState<LatLng>();
   const [radius, setRadius] = useState<number>(100);
+  const [content, setContent] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [min, setMin] = useState<number>(0);
   const [max, setMax] = useState<number>(10);
@@ -116,6 +118,11 @@ const Grounds = () => {
 
   const handleGroundEdit = (t: HuntingGround) => {
     setId(t.id);
+    setMax(t.max_inst);
+    setMin(t.min_inst ?? 0);
+    setName(t.name);
+    setRadius(t.radius);
+    setContent(t.content ?? "");
     setPosition(new LatLng(t.coordY, t.coordX));
     setIsModalOpen(true);
   };
@@ -146,6 +153,7 @@ const Grounds = () => {
           max_inst: max,
           min_inst: min,
           radius: radius,
+          content: content,
           name: name,
         },
         {
@@ -165,6 +173,7 @@ const Grounds = () => {
           max_inst: max,
           min_inst: min,
           radius: radius,
+          content: content,
           name: name,
         },
         {
@@ -183,6 +192,7 @@ const Grounds = () => {
     setRadius(100);
     setMin(0);
     setMax(10);
+    setContent("");
     setDelay(new Time(1, 0));
     setPosition(undefined);
   };
@@ -201,7 +211,9 @@ const Grounds = () => {
         placement="top-center"
         backdrop="blur"
         classNames={{
-          body: "py-6",
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
           base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
           closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
         }}
@@ -218,6 +230,13 @@ const Grounds = () => {
               placeholder="Введите название"
               value={name}
               onValueChange={setName}
+            />
+            <Textarea
+              variant="underlined"
+              label={`Описание`}
+              placeholder={`Введите описание`}
+              value={content}
+              onValueChange={setContent}
             />
             <div className="flex flex-row gap-2">
               <TimeInput
@@ -296,7 +315,7 @@ const Grounds = () => {
                 delay.hour * 3600 + delay.minute * 60 + delay.second <= 60
               }
             >
-              Добавить
+              {!!id ? "Обновить" : "Добавить"}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -323,7 +342,23 @@ const Grounds = () => {
               radius={ground.radius}
               center={new LatLng(ground.coordY, ground.coordX)}
               pathOptions={{ color: "red" }}
-            />
+            >
+              <Popup>
+                <div className="flex max-h-20 max-w-60 flex-col items-center text-justify">
+                  <span
+                    className="cursor-pointer hover:opacity-75"
+                    onClick={() => handleGroundEdit(ground)}
+                  >
+                    {ground.name}
+                  </span>
+                  {!!ground.content && (
+                    <span className="overflow-hidden text-ellipsis pb-1 text-xs">
+                      {ground.content}
+                    </span>
+                  )}
+                </div>
+              </Popup>
+            </Circle>
           ))}
         </Pane>
       </MapContainer>

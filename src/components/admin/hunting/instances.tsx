@@ -213,9 +213,9 @@ const Instances = () => {
         classNames={{
           body: "py-6 z-[1001]",
           wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
           base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100 z-[1001]",
           closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
-          backdrop: "z-[1000]",
         }}
       >
         <ModalContent>
@@ -320,12 +320,27 @@ const Instances = () => {
             icon={marker_icon}
           >
             <Popup>
-              <span
-                className="cursor-pointer"
-                onClick={() => handleInstanceEdit(instance)}
-              >
-                {instance.target!.name}
-              </span>
+              <div className="flex flex-col items-center">
+                <span
+                  className="cursor-pointer hover:opacity-75"
+                  onClick={() => handleInstanceEdit(instance)}
+                >
+                  {instance.target!.name}
+                </span>
+                {!instance.remains && (
+                  <span className="pb-1 text-xs">Истощена</span>
+                )}
+                {!!instance.remains && (
+                  <span className="pb-1 text-xs">
+                    Осталось {instance.remains}&nbsp;
+                    {instance.remains === 1
+                      ? "охота"
+                      : instance.remains < 5
+                        ? "охоты"
+                        : "охот"}
+                  </span>
+                )}
+              </div>
             </Popup>
           </Marker>
         ))}

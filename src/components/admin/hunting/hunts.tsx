@@ -219,7 +219,14 @@ const Hunts = () => {
               selectedKeys={instanceId ? [instanceId] : []}
               onChange={(e) => setInstanceId(Number(e.target.value))}
             >
-              {sortClosest(instances, position).map((instance) => (
+              {sortClosest(
+                instances.filter(
+                  (i) =>
+                    i.remains! > 0 &&
+                    (!!i.expires ? i.expires < new Date() : true),
+                ),
+                position,
+              ).map((instance) => (
                 <SelectItem
                   key={instance.id ?? ""}
                   value={instance.id}
@@ -270,23 +277,28 @@ const Hunts = () => {
         />
         <InstanceMapControl />
         <DraggableInstance updatePosition={(p) => setPosition(p)} />
-        {instances.map((instance) => (
-          <Marker
-            key={instance.id}
-            position={[instance.coordY, instance.coordX]}
-            icon={marker_icon}
-          >
-            <Popup>
-              <div className="flex flex-col items-center gap-0">
-                <span>{instance.target!.name}</span>
-                <span>Осталость попыток: {instance.remains}</span>
-                <span>
-                  {instance.coordY.toFixed(5)}, {instance.coordX.toFixed(5)}
-                </span>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {instances
+          .filter(
+            (i) =>
+              i.remains! > 0 && (!!i.expires ? i.expires < new Date() : true),
+          )
+          .map((instance) => (
+            <Marker
+              key={instance.id}
+              position={[instance.coordY, instance.coordX]}
+              icon={marker_icon}
+            >
+              <Popup>
+                <div className="flex flex-col items-center gap-0">
+                  <span>{instance.target!.name}</span>
+                  <span>Осталость попыток: {instance.remains}</span>
+                  <span>
+                    {instance.coordY.toFixed(5)}, {instance.coordX.toFixed(5)}
+                  </span>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
       </MapContainer>
       <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-4">
         <Button
@@ -321,14 +333,23 @@ const Hunts = () => {
             <div className="flex flex-row items-center pb-2 text-xl">
               {hunt.instance!.target!.name}
             </div>
-            <div className="-mt-2 pb-1 text-xs">
-              {hunt.instance!.coordY.toFixed(5)},{" "}
+            <div className="-mt-1 pb-1 text-xs">
+              Игрок:&nbsp;{hunt.createdBy?.name}
+            </div>
+            <div className="-mt-1 pb-1 text-xs">
+              Персонаж:&nbsp;{hunt.character?.name}
+            </div>
+            <div className="-mt-1 pb-1 text-xs">
+              Координаты:&nbsp;
+              {hunt.instance!.coordY.toFixed(5)},&nbsp;
               {hunt.instance!.coordX.toFixed(5)}
             </div>
-            <div className="-mt-2 pb-1 text-xs">
+            <div className="-mt-1 pb-1 text-xs">
+              Дата:&nbsp;
               {hunt.createdAt?.toLocaleString()}
             </div>
-            <div className="-mt-2 pb-1 text-xs">
+            <div className="-mt-1 pb-1 text-xs">
+              Статус:&nbsp;
               {hunt.status === "success"
                 ? "Успешно"
                 : hunt.status === "req_failure"
@@ -338,11 +359,11 @@ const Hunts = () => {
                     : "Нарушение маскарада"}
             </div>
             {hunt.instance!.groundId && (
-              <div className="-mt-2 pb-1 text-xs">
+              <div className="-mt-1 pb-1 text-xs">
                 {hunt.instance!.ground?.name}
               </div>
             )}
-            <div className="flex max-h-20 flex-row overflow-hidden text-ellipsis text-justify text-xs">
+            <div className="mt-1 flex max-h-20 flex-row overflow-hidden text-ellipsis text-justify text-xs">
               {hunt.instance!.target!.descs![0]!.content}
             </div>
           </div>
