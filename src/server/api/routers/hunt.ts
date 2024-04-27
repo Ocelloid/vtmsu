@@ -184,8 +184,8 @@ export const huntRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.number(),
-        coordX: z.number(),
-        coordY: z.number(),
+        coordX: z.number().optional(),
+        coordY: z.number().optional(),
         targetId: z.number().int().optional(),
         groundId: z.number().int().optional(),
         expires: z.date().optional(),

@@ -1,12 +1,17 @@
 "use client";
 import {
   Button,
+  Select,
+  SelectItem,
   Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
+  DateInput,
+  type DateValue,
+  CalendarDate,
 } from "@nextui-org/react";
 import Image from "next/image";
 import "leaflet/dist/leaflet.css";
@@ -18,17 +23,19 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import L, {
-  type LatLng,
+  LatLng,
   type LatLngExpression,
   type Marker as LeafletMarker,
 } from "leaflet";
 import type { HuntingInstance, HuntingData } from "~/server/api/routers/hunt";
+import default_char from "~/../public/default_char.png";
 import { LoadingPage } from "~/components/Loading";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { FaPlus, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
 
-const icon = L.icon({ iconUrl: "/crosshair.png" });
+const target_icon = L.icon({ iconUrl: "/crosshair.png" });
+const marker_icon = L.icon({ iconUrl: "/map-marker.png" });
 
 const InstanceMapControl = () => {
   const map = useMapEvents({
@@ -45,7 +52,7 @@ const InstanceMapControl = () => {
 const DraggableInstance = ({
   updatePosition,
 }: {
-  updatePosition: (p: LatLngExpression) => void;
+  updatePosition: (p: LatLng) => void;
 }) => {
   const [position, setPosition] = useState<LatLngExpression>([58.0075, 56.23]);
   const markerRef = useRef<LeafletMarker | null>(null);
@@ -69,7 +76,7 @@ const DraggableInstance = ({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       position={position}
       ref={markerRef}
-      icon={icon}
+      icon={target_icon}
     >
       <Popup>Новая цель</Popup>
     </Marker>
@@ -81,10 +88,8 @@ const Instances = () => {
   const [instances, setInstances] = useState<HuntingInstance[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [position, setPosition] = useState<LatLng>();
-  const [expires, setExpires] = useState<Date>();
-  const [targetId, setTargetId] = useState<number>(0);
-  const [coordX, setCoordX] = useState<number>(0);
-  const [coordY, setCoordY] = useState<number>(0);
+  const [expires, setExpires] = useState<DateValue>();
+  const [targetId, setTargetId] = useState<number>();
   const [id, setId] = useState<number>();
   const [search, setSearch] = useState<string>("");
 
@@ -116,6 +121,17 @@ const Instances = () => {
 
   const handleInstanceEdit = (t: HuntingInstance) => {
     setId(t.id);
+    setTargetId(t.targetId);
+    setExpires(
+      !!t.expires
+        ? new CalendarDate(
+            t.expires.getFullYear(),
+            t.expires.getMonth() + 1,
+            t.expires.getDate(),
+          )
+        : undefined,
+    );
+    setPosition(new LatLng(t.coordY, t.coordX));
     setIsModalOpen(true);
   };
 
@@ -139,10 +155,12 @@ const Instances = () => {
       updateInstance(
         {
           id: id,
-          coordX: coordX,
-          coordY: coordY,
+          coordX: !!position ? position.lng : undefined,
+          coordY: !!position ? position.lat : undefined,
           targetId: targetId,
-          expires: expires,
+          expires: !!expires
+            ? new Date(expires.year, expires.month, expires.day)
+            : undefined,
         },
         {
           onSuccess: () => {
@@ -155,10 +173,12 @@ const Instances = () => {
     } else
       newInstance(
         {
-          coordX: coordX,
-          coordY: coordY,
-          targetId: targetId,
-          expires: expires,
+          coordX: position!.lng,
+          coordY: position!.lat,
+          targetId: targetId ?? 0,
+          expires: !!expires
+            ? new Date(expires.year, expires.month, expires.day)
+            : undefined,
         },
         {
           onSuccess: () => {
@@ -171,6 +191,10 @@ const Instances = () => {
   };
 
   const handleClear = () => {
+    setId(undefined);
+    setExpires(undefined);
+    setPosition(undefined);
+    setTargetId(0);
     return;
   };
 
@@ -199,7 +223,44 @@ const Instances = () => {
             {!!id ? "Редактировать" : "Добавить"} цель по координатам{" "}
             {position?.lat.toFixed(5)}, {position?.lng.toFixed(5)}
           </ModalHeader>
-          <ModalBody className="-my-8 flex flex-col"></ModalBody>
+          <ModalBody className="flex flex-col">
+            <Image
+              className="mx-auto mt-1 aspect-square h-[196px] w-full rounded-md object-cover"
+              alt="char_photo"
+              src={
+                !!targets.find((t) => t.id === targetId)?.image
+                  ? targets.find((t) => t.id === targetId)!.image ?? ""
+                  : default_char
+              }
+              height="640"
+              width="640"
+            />
+            <DateInput
+              variant="underlined"
+              label="Доступно до"
+              value={expires}
+              onChange={setExpires}
+            />
+            <Select
+              size="sm"
+              variant="underlined"
+              placeholder="Выберите добычу"
+              aria-label="Добыча"
+              selectedKeys={[targetId ?? 0]}
+              onChange={(e) => setTargetId(Number(e.target.value))}
+            >
+              {targets.map((target) => (
+                <SelectItem
+                  key={target.id ?? ""}
+                  value={target.id}
+                  textValue={target.name}
+                >
+                  <p>{target.name}</p>
+                  <p className="text-xs">{target.descs![0]!.content}</p>
+                </SelectItem>
+              ))}
+            </Select>
+          </ModalBody>
           <ModalFooter>
             <Button
               variant="light"
@@ -221,7 +282,12 @@ const Instances = () => {
               variant="solid"
               color="success"
               onClick={handleFormSubmit}
-              isDisabled={isCreatePending || isUpdatePending || isDeletePending}
+              isDisabled={
+                isCreatePending ||
+                isUpdatePending ||
+                isDeletePending ||
+                !targetId
+              }
             >
               Добавить
             </Button>
@@ -244,12 +310,23 @@ const Instances = () => {
         <InstanceMapControl />
         <DraggableInstance updatePosition={(p) => setPosition(p)} />
         {instances.map((instance) => (
-          <Marker key={instance.id} position={[coordY, coordX]}>
-            <Popup>{instance.target!.name}</Popup>
+          <Marker
+            key={instance.id}
+            position={[instance.coordY, instance.coordX]}
+            icon={marker_icon}
+          >
+            <Popup>
+              <span
+                className="cursor-pointer"
+                onClick={() => handleInstanceEdit(instance)}
+              >
+                {instance.target!.name}
+              </span>
+            </Popup>
           </Marker>
         ))}
       </MapContainer>
-      <div className="-mb-4 grid w-full grid-cols-1 gap-2 md:-mb-0 md:-mt-2 md:grid-cols-4">
+      <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-4">
         <Button
           onClick={() => setIsModalOpen(true)}
           variant="bordered"
@@ -278,7 +355,7 @@ const Instances = () => {
             className="flex flex-col rounded-lg bg-white/75 p-2 dark:bg-red-950/50"
           >
             <div className="flex flex-row items-center pb-2 text-xl">
-              {`${instance.target!.name} - ${instance.target!.descs?.length} охот${!!instance.target!.descs?.length && (instance.target!.descs?.length === 1 ? "а" : instance.target!.descs?.length < 5 ? "ы" : "")}`}
+              {instance.target!.name}
               <Button
                 variant="light"
                 color="warning"
@@ -288,6 +365,21 @@ const Instances = () => {
                 <FaPencilAlt size={16} />
               </Button>
             </div>
+            <div className="-mt-2 pb-1 text-xs">
+              {instance.target!.descs?.length}&nbsp;
+              {!!instance.target!.descs?.length &&
+                (instance.target!.descs?.length === 1
+                  ? "охота"
+                  : instance.target!.descs?.length < 5
+                    ? "охоты"
+                    : "охот")}
+            </div>
+            <div className="-mt-2 pb-1 text-xs">
+              {instance.coordY.toFixed(5)}, {instance.coordX.toFixed(5)}
+            </div>
+            {instance.groundId && (
+              <div className="-mt-2 pb-1 text-xs">{instance.ground?.name}</div>
+            )}
             <div className="flex max-h-20 flex-row overflow-hidden text-ellipsis text-justify text-xs">
               {instance.target!.descs![0]!.content}
             </div>

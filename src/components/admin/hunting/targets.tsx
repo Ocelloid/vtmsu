@@ -145,7 +145,7 @@ const Targets = () => {
           <ModalHeader>
             {!!id ? "Редактировать" : "Добавить"} добычу
           </ModalHeader>
-          <ModalBody className="-my-8 flex flex-col">
+          <ModalBody className="flex flex-col">
             <div className="relative mx-auto flex w-full flex-col">
               {uploading ? (
                 <LoadingSpinner width={80} height={80} />
@@ -286,7 +286,7 @@ const Targets = () => {
             className="flex flex-col rounded-lg bg-white/75 p-2 dark:bg-red-950/50"
           >
             <div className="flex flex-row items-center pb-2 text-xl">
-              {`${target.name} - ${target.descs?.length} охот${!!target.descs?.length && (target.descs?.length === 1 ? "а" : target.descs?.length < 5 ? "ы" : "")}`}
+              {target.name}
               <Button
                 variant="light"
                 color="warning"
@@ -295,6 +295,16 @@ const Targets = () => {
               >
                 <FaPencilAlt size={16} />
               </Button>
+            </div>
+
+            <div className="-mt-2 pb-1 text-xs">
+              {target.descs?.length}&nbsp;
+              {!!target.descs?.length &&
+                (target.descs?.length === 1
+                  ? "охота"
+                  : target.descs?.length < 5
+                    ? "охоты"
+                    : "охот")}
             </div>
             <div className="flex max-h-20 flex-row overflow-hidden text-ellipsis text-justify text-xs">
               {target.descs![0]!.content}
