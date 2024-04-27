@@ -68,6 +68,7 @@ export type Hunt = {
 export const huntRouter = createTRPCRouter({
   getAllHunts: protectedProcedure.query(async ({ ctx }) => {
     const hunts = await ctx.db.hunt.findMany({
+      orderBy: { createdAt: "desc" },
       include: {
         createdBy: true,
         instance: {
@@ -112,13 +113,15 @@ export const huntRouter = createTRPCRouter({
 
       if (!!instance && instance.remains === 1) status = "masq_failure";
 
+      let newInstance = undefined;
+
       if (status !== "exp_failure" && !!instance)
-        void ctx.db.huntingInstance.update({
+        newInstance = await ctx.db.huntingInstance.update({
           where: { id: input.instanceId },
           data: { remains: instance.remains - 1 },
         });
 
-      return ctx.db.hunt.create({
+      const newHunt = await ctx.db.hunt.create({
         data: {
           instanceId: input.instanceId,
           characterId: input.characterId,
@@ -126,6 +129,8 @@ export const huntRouter = createTRPCRouter({
           status: status,
         },
       });
+
+      return { hunt: newHunt, instance: newInstance };
     }),
 
   getAllHuntingInstances: protectedProcedure.query(async ({ ctx }) => {

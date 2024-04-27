@@ -198,7 +198,6 @@ const Instances = () => {
   };
 
   if (isInstancesLoading || isTargetsLoading) return <LoadingPage />;
-  console.log(position);
 
   return (
     <>
@@ -370,12 +369,12 @@ const Instances = () => {
                 <FaPencilAlt size={16} />
               </Button>
             </div>
-            {!!instance.target!.descs?.length && (
+            {!!instance.remains && (
               <div className="-mt-2 pb-1 text-xs">
-                Осталось {instance.target!.descs?.length}&nbsp;
-                {instance.target!.descs?.length === 1
+                Осталось {instance.remains}&nbsp;
+                {instance.remains === 1
                   ? "охота"
-                  : instance.target!.descs?.length < 5
+                  : instance.remains < 5
                     ? "охоты"
                     : "охот"}
               </div>

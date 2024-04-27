@@ -188,7 +188,6 @@ const Grounds = () => {
   };
 
   if (isGroundsLoading || isGroundsLoading) return <LoadingPage />;
-  console.log(position);
 
   return (
     <>
