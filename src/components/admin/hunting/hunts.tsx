@@ -139,6 +139,8 @@ const Hunts = () => {
 
   const handleClear = () => {
     setPosition(undefined);
+    setInstanceId(undefined);
+    setCharacterId(undefined);
   };
 
   const sortClosest = (is: HuntingInstance[], coords?: LatLng) => {

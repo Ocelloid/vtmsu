@@ -369,6 +369,9 @@ const Instances = () => {
                 <FaPencilAlt size={16} />
               </Button>
             </div>
+            {!instance.remains && (
+              <div className="-mt-2 pb-1 text-xs">Истощена</div>
+            )}
             {!!instance.remains && (
               <div className="-mt-2 pb-1 text-xs">
                 Осталось {instance.remains}&nbsp;

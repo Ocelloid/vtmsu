@@ -23,7 +23,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="iphone-backdrop fixed left-0 top-0 z-50 flex w-full flex-col items-center justify-between gap-4 bg-transparent p-7 md:flex-row md:gap-0">
+    <nav className="iphone-backdrop fixed left-0 top-0 z-[1050] flex w-full flex-col items-center justify-between gap-4 bg-transparent p-7 md:flex-row md:gap-0">
       <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight dark:text-neutral-100 md:text-4xl">
         <Link
           href={
@@ -43,7 +43,7 @@ const Navigation = () => {
         </div>
       </div>
       <ul
-        className={`${!isOpen && "hidden"} items-right mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex md:flex-row md:justify-end md:gap-4 [&>*]:px-1`}
+        className={`${!isOpen && "hidden"} items-right mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex md:flex-row md:justify-end md:gap-6 lg:gap-8 [&>*]:px-1`}
       >
         <Button
           onClick={() => {
