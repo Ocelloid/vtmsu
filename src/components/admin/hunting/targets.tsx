@@ -232,15 +232,19 @@ const Targets = () => {
             >
               Отменить
             </Button>
-            <Button
-              variant="solid"
-              color="danger"
-              onClick={handleDelete}
-              isDisabled={isCreatePending || isUpdatePending || isDeletePending}
-              className="mr-auto"
-            >
-              Удалить
-            </Button>
+            {!!id && (
+              <Button
+                variant="solid"
+                color="danger"
+                onClick={handleDelete}
+                isDisabled={
+                  isCreatePending || isUpdatePending || isDeletePending
+                }
+                className="mr-auto"
+              >
+                Удалить
+              </Button>
+            )}
             <Button
               variant="solid"
               color="success"
@@ -265,7 +269,7 @@ const Targets = () => {
           className="my-auto flex min-w-44 flex-row gap-0 border-black bg-transparent text-black dark:border-white dark:text-white"
         >
           <FaPlus size={16} />
-          &nbsp;Добавить добычу
+          &nbsp;Добавить
         </Button>
         <Input
           variant="underlined"
@@ -297,15 +301,16 @@ const Targets = () => {
               </Button>
             </div>
 
-            <div className="-mt-2 pb-1 text-xs">
-              {target.descs?.length}&nbsp;
-              {!!target.descs?.length &&
-                (target.descs?.length === 1
+            {!!target.descs?.length && (
+              <div className="-mt-2 pb-1 text-xs">
+                {target.descs?.length}&nbsp;
+                {target.descs?.length === 1
                   ? "охота"
                   : target.descs?.length < 5
                     ? "охоты"
-                    : "охот")}
-            </div>
+                    : "охот"}
+              </div>
+            )}
             <div className="flex max-h-20 flex-row overflow-hidden text-ellipsis text-justify text-xs">
               {target.descs![0]!.content}
             </div>

@@ -1,19 +1,14 @@
 "use client";
 import {
   Button,
-  Select,
-  SelectItem,
   Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  DateInput,
-  type DateValue,
-  CalendarDate,
+  TimeInput,
 } from "@nextui-org/react";
-import Image from "next/image";
 import "leaflet/dist/leaflet.css";
 import {
   MapContainer,
@@ -21,23 +16,24 @@ import {
   Marker,
   Popup,
   useMapEvents,
+  Pane,
+  Circle,
 } from "react-leaflet";
 import L, {
   LatLng,
   type LatLngExpression,
   type Marker as LeafletMarker,
 } from "leaflet";
-import type { HuntingInstance, HuntingData } from "~/server/api/routers/hunt";
-import default_char from "~/../public/default_char.png";
+import type { HuntingGround } from "~/server/api/routers/hunt";
+import { Time } from "@internationalized/date";
 import { LoadingPage } from "~/components/Loading";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { FaPlus, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
 
 const target_icon = L.icon({ iconUrl: "/crosshair.png" });
-const marker_icon = L.icon({ iconUrl: "/map-marker.png" });
 
-const InstanceMapControl = () => {
+const GroundMapControl = () => {
   const map = useMapEvents({
     click() {
       map.locate();
@@ -49,7 +45,7 @@ const InstanceMapControl = () => {
   return null;
 };
 
-const DraggableInstance = ({
+const DraggableGround = ({
   updatePosition,
 }: {
   updatePosition: (p: LatLng) => void;
@@ -83,67 +79,56 @@ const DraggableInstance = ({
   );
 };
 
-const Instances = () => {
-  const [targets, setTargets] = useState<HuntingData[]>([]);
-  const [instances, setInstances] = useState<HuntingInstance[]>([]);
+const Grounds = () => {
+  const [grounds, setGrounds] = useState<HuntingGround[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [delay, setDelay] = useState<Time>(new Time(1, 0));
   const [position, setPosition] = useState<LatLng>();
-  const [expires, setExpires] = useState<DateValue>();
-  const [targetId, setTargetId] = useState<number>();
+  const [radius, setRadius] = useState<number>(100);
+  const [name, setName] = useState<string>("");
+  const [min, setMin] = useState<number>(0);
+  const [max, setMax] = useState<number>(10);
   const [id, setId] = useState<number>();
   const [search, setSearch] = useState<string>("");
 
   const {
-    data: instancesData,
-    isLoading: isInstancesLoading,
-    refetch: refetchInstances,
-  } = api.hunt.getAllHuntingInstances.useQuery();
+    data: groundsData,
+    isLoading: isGroundsLoading,
+    refetch: refetchGrounds,
+  } = api.hunt.getAllHuntingGrounds.useQuery();
 
-  const { data: targetsData, isLoading: isTargetsLoading } =
-    api.hunt.getAllHuntingTargets.useQuery();
+  const { mutate: newGround, isPending: isCreatePending } =
+    api.hunt.createHuntingGround.useMutation();
 
-  const { mutate: newInstance, isPending: isCreatePending } =
-    api.hunt.createHuntingInstance.useMutation();
+  const { mutate: updateGround, isPending: isUpdatePending } =
+    api.hunt.updateHuntingGround.useMutation();
 
-  const { mutate: updateInstance, isPending: isUpdatePending } =
-    api.hunt.updateHuntingInstance.useMutation();
-
-  const { mutate: deleteInstance, isPending: isDeletePending } =
-    api.hunt.deleteHuntingInstance.useMutation();
+  const { mutate: deleteGround, isPending: isDeletePending } =
+    api.hunt.deleteHuntingGround.useMutation();
 
   useEffect(() => {
-    if (!!instancesData) setInstances(instancesData);
-  }, [instancesData]);
+    if (!!groundsData) setGrounds(groundsData);
+  }, [groundsData]);
 
   useEffect(() => {
-    if (!!targetsData) setTargets(targetsData);
-  }, [targetsData]);
+    if (!!groundsData) setGrounds(groundsData);
+  }, [groundsData]);
 
-  const handleInstanceEdit = (t: HuntingInstance) => {
+  const handleGroundEdit = (t: HuntingGround) => {
     setId(t.id);
-    setTargetId(t.targetId);
-    setExpires(
-      !!t.expires
-        ? new CalendarDate(
-            t.expires.getFullYear(),
-            t.expires.getMonth() + 1,
-            t.expires.getDate(),
-          )
-        : undefined,
-    );
     setPosition(new LatLng(t.coordY, t.coordX));
     setIsModalOpen(true);
   };
 
   const handleDelete = () => {
-    const confirmDelete = confirm("Удалить цель?");
+    const confirmDelete = confirm("Удалить добычу?");
     if (confirmDelete && !!id)
-      deleteInstance(
+      deleteGround(
         { id: id },
         {
           onSuccess: () => {
             setIsModalOpen(false);
-            void refetchInstances();
+            void refetchGrounds();
             handleClear();
           },
         },
@@ -152,38 +137,40 @@ const Instances = () => {
 
   const handleFormSubmit = () => {
     if (!!id) {
-      updateInstance(
+      updateGround(
         {
           id: id,
-          coordX: !!position ? position.lng : undefined,
-          coordY: !!position ? position.lat : undefined,
-          targetId: targetId,
-          expires: !!expires
-            ? new Date(expires.year, expires.month, expires.day)
-            : undefined,
+          coordX: position!.lng,
+          coordY: position!.lat,
+          delay: delay.hour * 3600 + delay.minute * 60 + delay.second,
+          max_inst: max,
+          min_inst: min,
+          radius: radius,
+          name: name,
         },
         {
           onSuccess: () => {
             setIsModalOpen(false);
-            void refetchInstances();
+            void refetchGrounds();
             handleClear();
           },
         },
       );
     } else
-      newInstance(
+      newGround(
         {
           coordX: position!.lng,
           coordY: position!.lat,
-          targetId: targetId ?? 0,
-          expires: !!expires
-            ? new Date(expires.year, expires.month, expires.day)
-            : undefined,
+          delay: delay.hour * 60 + delay.second,
+          max_inst: max,
+          min_inst: min,
+          radius: radius,
+          name: name,
         },
         {
           onSuccess: () => {
             setIsModalOpen(false);
-            void refetchInstances();
+            void refetchGrounds();
             handleClear();
           },
         },
@@ -192,12 +179,15 @@ const Instances = () => {
 
   const handleClear = () => {
     setId(undefined);
-    setExpires(undefined);
+    setName("");
+    setRadius(100);
+    setMin(0);
+    setMax(10);
+    setDelay(new Time(1, 0));
     setPosition(undefined);
-    setTargetId(0);
   };
 
-  if (isInstancesLoading || isTargetsLoading) return <LoadingPage />;
+  if (isGroundsLoading || isGroundsLoading) return <LoadingPage />;
   console.log(position);
 
   return (
@@ -212,55 +202,65 @@ const Instances = () => {
         placement="top-center"
         backdrop="blur"
         classNames={{
-          body: "py-6 z-[1001]",
-          wrapper: "z-[1001]",
-          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100 z-[1001]",
+          body: "py-6",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
           closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
-          backdrop: "z-[1000]",
         }}
       >
         <ModalContent>
           <ModalHeader>
-            {!!id ? "Редактировать" : "Добавить"} цель по координатам{" "}
+            {!!id ? "Редактировать" : "Добавить"} кормушку по координатам{" "}
             {position?.lat.toFixed(5)}, {position?.lng.toFixed(5)}
           </ModalHeader>
           <ModalBody className="flex flex-col">
-            <Image
-              className="mx-auto mt-1 aspect-square h-[196px] w-full rounded-md object-cover"
-              alt="char_photo"
-              src={
-                !!targets.find((t) => t.id === targetId)?.image
-                  ? targets.find((t) => t.id === targetId)!.image ?? ""
-                  : default_char
-              }
-              height="640"
-              width="640"
-            />
-            <DateInput
+            <Input
               variant="underlined"
-              label="Доступно до"
-              value={expires}
-              onChange={setExpires}
+              label="Название"
+              placeholder="Введите название"
+              value={name}
+              onValueChange={setName}
             />
-            <Select
-              size="sm"
-              variant="underlined"
-              placeholder="Выберите добычу"
-              aria-label="Добыча"
-              selectedKeys={[targetId ?? 0]}
-              onChange={(e) => setTargetId(Number(e.target.value))}
-            >
-              {targets.map((target) => (
-                <SelectItem
-                  key={target.id ?? ""}
-                  value={target.id}
-                  textValue={target.name}
-                >
-                  <p>{target.name}</p>
-                  <p className="text-xs">{target.descs![0]!.content}</p>
-                </SelectItem>
-              ))}
-            </Select>
+            <div className="flex flex-row gap-2">
+              <TimeInput
+                hourCycle={24}
+                variant="underlined"
+                granularity="second"
+                label="Задержка"
+                value={delay}
+                onChange={setDelay}
+              />
+              <Input
+                type="number"
+                variant="underlined"
+                label="Радиус"
+                placeholder="Введите радиус в метрах"
+                value={radius.toString()}
+                onValueChange={(n) => setRadius(Number(n))}
+                endContent={
+                  <div className="pointer-events-none flex items-center">
+                    <span className="text-small text-default-400">
+                      в&nbsp;метрах
+                    </span>
+                  </div>
+                }
+              />
+            </div>
+            <div className="flex flex-row gap-2">
+              <Input
+                variant="underlined"
+                label="Минимум целей"
+                placeholder="Введите минимальное число целей"
+                value={min.toString()}
+                onValueChange={(n) => setMin(Number(n))}
+              />
+              <Input
+                variant="underlined"
+                label="Максимум целей"
+                placeholder="Введите максимальное число целей"
+                value={max.toString()}
+                onValueChange={(n) => setMax(Number(n))}
+              />
+            </div>
           </ModalBody>
           <ModalFooter>
             <Button
@@ -291,7 +291,10 @@ const Instances = () => {
                 isCreatePending ||
                 isUpdatePending ||
                 isDeletePending ||
-                !targetId
+                !name ||
+                !radius ||
+                !max ||
+                delay.hour * 3600 + delay.minute * 60 + delay.second <= 60
               }
             >
               Добавить
@@ -312,24 +315,18 @@ const Instances = () => {
           }
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <InstanceMapControl />
-        <DraggableInstance updatePosition={(p) => setPosition(p)} />
-        {instances.map((instance) => (
-          <Marker
-            key={instance.id}
-            position={[instance.coordY, instance.coordX]}
-            icon={marker_icon}
-          >
-            <Popup>
-              <span
-                className="cursor-pointer"
-                onClick={() => handleInstanceEdit(instance)}
-              >
-                {instance.target!.name}
-              </span>
-            </Popup>
-          </Marker>
-        ))}
+        <GroundMapControl />
+        <DraggableGround updatePosition={(p) => setPosition(p)} />
+        <Pane name="purple-rectangle">
+          {grounds.map((ground) => (
+            <Circle
+              key={ground.id}
+              radius={ground.radius}
+              center={new LatLng(ground.coordY, ground.coordX)}
+              pathOptions={{ color: "red" }}
+            />
+          ))}
+        </Pane>
       </MapContainer>
       <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-4">
         <Button
@@ -350,44 +347,38 @@ const Instances = () => {
           onValueChange={setSearch}
         />
       </div>
-      {instances
+      {grounds
         .filter((t) =>
-          !!search ? t.target!.name.toLowerCase().includes(search) : true,
+          !!search ? t.name.toLowerCase().includes(search) : true,
         )
-        .map((instance) => (
+        .map((ground) => (
           <div
-            key={instance.id}
+            key={ground.id}
             className="flex flex-col rounded-lg bg-white/75 p-2 dark:bg-red-950/50"
           >
             <div className="flex flex-row items-center pb-2 text-xl">
-              {instance.target!.name}
+              {ground.name}
               <Button
                 variant="light"
                 color="warning"
                 className="ml-auto h-8 w-8 min-w-0 rounded-full p-0"
-                onClick={() => handleInstanceEdit(instance)}
+                onClick={() => handleGroundEdit(ground)}
               >
                 <FaPencilAlt size={16} />
               </Button>
             </div>
-            {!!instance.target!.descs?.length && (
+            {!!ground.instances?.length && (
               <div className="-mt-2 pb-1 text-xs">
-                Осталось {instance.target!.descs?.length}&nbsp;
-                {instance.target!.descs?.length === 1
-                  ? "охота"
-                  : instance.target!.descs?.length < 5
-                    ? "охоты"
-                    : "охот"}
+                {ground.instances?.length}&nbsp;
+                {ground.instances?.length === 1
+                  ? "цель"
+                  : ground.instances?.length < 5
+                    ? "цели"
+                    : "целей"}
               </div>
             )}
             <div className="-mt-2 pb-1 text-xs">
-              {instance.coordY.toFixed(5)}, {instance.coordX.toFixed(5)}
-            </div>
-            {instance.groundId && (
-              <div className="-mt-2 pb-1 text-xs">{instance.ground?.name}</div>
-            )}
-            <div className="flex max-h-20 flex-row overflow-hidden text-ellipsis text-justify text-xs">
-              {instance.target!.descs![0]!.content}
+              {ground.coordY.toFixed(5)}, {ground.coordX.toFixed(5)}
             </div>
           </div>
         ))}
@@ -395,4 +386,4 @@ const Instances = () => {
   );
 };
 
-export default Instances;
+export default Grounds;

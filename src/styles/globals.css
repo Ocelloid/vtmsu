@@ -52,19 +52,13 @@
 .leaflet-marker-icon {
   left: -24px !important;
   top: -24px !important;
+  z-index: 49 !important;
 }
-
-.leaflet-pane {
-  z-index: 40 !important;
+.leaflet-marker-icon {
+  z-index: 43 !important;
 }
-.leaflet-control {
-  z-index: 41 !important;
-}
-.leaflet-top {
-  z-index: 42 !important;
-}
-.leaflet-bottom {
-  z-index: 42 !important;
+.leaflet-marker-draggable {
+  z-index: 400 !important;
 }
 
 .tiptap,

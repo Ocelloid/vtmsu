@@ -1,11 +1,7 @@
 "use client";
 import { Tabs, Tab } from "@nextui-org/react";
-import { LoadingPage } from "~/components/Loading";
 import dynamic from "next/dynamic";
 import Targets from "~/components/admin/hunting/targets";
-import { useState, useEffect } from "react";
-import type { HuntingGround, Hunt } from "~/server/api/routers/hunt";
-import { api } from "~/utils/api";
 
 const DynamicInstances = dynamic(
   () => import("~/components/admin/hunting/instances"),
@@ -14,24 +10,18 @@ const DynamicInstances = dynamic(
   },
 );
 
+const DynamicGrounds = dynamic(
+  () => import("~/components/admin/hunting/grounds"),
+  {
+    ssr: false,
+  },
+);
+
+const DynamicHunts = dynamic(() => import("~/components/admin/hunting/hunts"), {
+  ssr: false,
+});
+
 const Hunting = () => {
-  const [grounds, setGrounds] = useState<HuntingGround[]>([]);
-  const [hunts, setHunts] = useState<Hunt[]>([]);
-
-  const { data: groundsData, isLoading: isGroundsLoading } =
-    api.hunt.getAllHuntingGrounds.useQuery();
-  const { data: huntsData, isLoading: isHuntsLoading } =
-    api.hunt.getAllHunts.useQuery();
-
-  useEffect(() => {
-    if (!!groundsData) setGrounds(groundsData);
-  }, [groundsData]);
-  useEffect(() => {
-    if (!!huntsData) setHunts(huntsData);
-  }, [huntsData]);
-
-  if (isGroundsLoading || isHuntsLoading) return <LoadingPage />;
-
   return (
     <>
       <Tabs
@@ -76,7 +66,9 @@ const Hunting = () => {
               <span>Кормушки</span>
             </div>
           }
-        ></Tab>
+        >
+          <DynamicGrounds />
+        </Tab>
         <Tab
           key={"hunts"}
           className="flex flex-col gap-8 md:gap-2"
@@ -85,7 +77,9 @@ const Hunting = () => {
               <span>Атаки</span>
             </div>
           }
-        ></Tab>
+        >
+          <DynamicHunts />
+        </Tab>
       </Tabs>
     </>
   );
