@@ -52,11 +52,40 @@
 .leaflet-marker-icon {
   left: -24px !important;
   top: -48px !important;
-  z-index: 49 !important;
+  z-index: 249 !important;
 }
 .leaflet-marker-draggable {
   top: -24px !important;
   z-index: 400 !important;
+}
+
+.red-pulse {
+  animation: red-pulse-animation 5s infinite;
+  -webkit-animation: red-pulse-animation 5s infinite;
+}
+
+@keyframes red-pulse-animation {
+  0% {
+    fill: #ff000000;
+  }
+  50% {
+    fill: #ff0000;
+  }
+  100% {
+    fill: #ff000000;
+  }
+}
+
+@-webkit-keyframes red-pulse-animation {
+  0% {
+    fill: #ff000000;
+  }
+  50% {
+    fill: #ff0000;
+  }
+  100% {
+    fill: #ff000000;
+  }
 }
 
 .tiptap,

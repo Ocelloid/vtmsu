@@ -13,7 +13,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import { MapControl, Draggable } from "~/components/map";
 import { FaCheck, FaExclamationTriangle, FaClock } from "react-icons/fa";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import L, { LatLng } from "leaflet";
 import type { Hunt, HuntingInstance } from "~/server/api/routers/hunt";
 import type { Character } from "~/server/api/routers/char";
@@ -109,6 +109,18 @@ const Hunts = () => {
 
     return sortedInstances;
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      const red = document.getElementsByClassName("red-pulse");
+      for (const item of red) {
+        if (!!item)
+          (item as HTMLElement).style.animationDuration =
+            Math.random() * 5 + 5 + "s";
+        console.log(item);
+      }
+    }, 5000);
+  }, []);
 
   if (isInstancesLoading || isHuntsLoading || isCharactersLoading)
     return <LoadingPage />;
@@ -254,27 +266,52 @@ const Hunts = () => {
         {instances
           .filter((i) => (!!i.expires ? i.expires < new Date() : true))
           .map((instance) => (
-            <Marker
-              key={instance.id}
-              position={[instance.coordY, instance.coordX]}
-              icon={instance.remains! > 1 ? marker_icon : skull_icon}
-            >
-              <Popup>
-                <div className="flex flex-col items-center gap-0">
-                  <span>{instance.target!.name}</span>
-                  {instance.remains! < 1 ? (
-                    <span className="pb-1 text-xs">Истощена</span>
-                  ) : (
-                    <span className="pb-1 text-xs">
-                      Осталось попыток: {instance.remains! - 1}
-                    </span>
-                  )}
-                  <span>
-                    {instance.coordY.toFixed(5)}, {instance.coordX.toFixed(5)}
-                  </span>
-                </div>
-              </Popup>
-            </Marker>
+            <>
+              {instance.remains! > 1 ? (
+                <Circle
+                  key={instance.id}
+                  center={[instance.coordY, instance.coordX]}
+                  pathOptions={{ color: "transparent", className: "red-pulse" }}
+                  radius={(50 + Math.random() * 50) * instance.remains!}
+                >
+                  <Popup>
+                    <div className="flex flex-col items-center gap-0">
+                      <span>{instance.target!.name}</span>
+                      <span className="pb-1 text-xs">
+                        Осталось попыток: {instance.remains}
+                      </span>
+                      <span>
+                        {
+                          instance.target!.descs![
+                            instance.target!.descs!.length - instance.remains!
+                          ]!.content
+                        }
+                      </span>
+                    </div>
+                  </Popup>
+                </Circle>
+              ) : (
+                <Marker
+                  key={instance.id}
+                  position={[instance.coordY, instance.coordX]}
+                  icon={instance.remains! > 1 ? marker_icon : skull_icon}
+                >
+                  <Popup>
+                    <div className="flex flex-col items-center gap-0">
+                      <span>{instance.target!.name}</span>
+                      <span className="pb-1 text-xs">Нарушение маскарада</span>
+                      <span>
+                        {
+                          instance.target!.descs![
+                            instance.target!.descs!.length - 1
+                          ]!.content
+                        }
+                      </span>
+                    </div>
+                  </Popup>
+                </Marker>
+              )}
+            </>
           ))}
       </MapContainer>
       <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-4">

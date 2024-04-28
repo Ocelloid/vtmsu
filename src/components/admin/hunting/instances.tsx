@@ -275,7 +275,7 @@ const Instances = () => {
                 >
                   {instance.target!.name}
                 </span>
-                {instance.remains! < 1 ? (
+                {instance.remains! < 2 ? (
                   <span className="pb-1 text-xs">Истощена</span>
                 ) : (
                   <span className="pb-1 text-xs">
