@@ -11,73 +11,17 @@ import {
   SelectItem,
 } from "@nextui-org/react";
 import "leaflet/dist/leaflet.css";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMapEvents,
-} from "react-leaflet";
-import L, {
-  type LatLng,
-  type LatLngExpression,
-  type Marker as LeafletMarker,
-} from "leaflet";
+import { MapControl, Draggable } from "~/components/map";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L, { LatLng } from "leaflet";
 import type { Hunt, HuntingInstance } from "~/server/api/routers/hunt";
 import type { Character } from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
 import { api } from "~/utils/api";
 
-const target_icon = L.icon({ iconUrl: "/crosshair.png" });
 const marker_icon = L.icon({ iconUrl: "/map-marker.png" });
-
-const InstanceMapControl = () => {
-  const map = useMapEvents({
-    click() {
-      map.locate();
-    },
-    locationfound(e) {
-      console.log(e, typeof e);
-    },
-  });
-  return null;
-};
-
-const DraggableInstance = ({
-  updatePosition,
-}: {
-  updatePosition: (p: LatLng) => void;
-}) => {
-  const [position, setPosition] = useState<LatLngExpression>([58.0075, 56.23]);
-  const markerRef = useRef<LeafletMarker | null>(null);
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current;
-        if (!!marker) {
-          setPosition(marker.getLatLng());
-          updatePosition(marker.getLatLng());
-        }
-      },
-    }),
-    [updatePosition],
-  );
-
-  return (
-    <Marker
-      draggable={true}
-      eventHandlers={eventHandlers}
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      position={position}
-      ref={markerRef}
-      icon={target_icon}
-    >
-      <Popup>Новая цель</Popup>
-    </Marker>
-  );
-};
 
 const Hunts = () => {
   const [hunts, setHunts] = useState<Hunt[]>([]);
@@ -86,8 +30,9 @@ const Hunts = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [characterId, setCharacterId] = useState<number>();
   const [instanceId, setInstanceId] = useState<number>();
-  const [position, setPosition] = useState<LatLng>();
+  const [position, setPosition] = useState<LatLng>(new LatLng(58.0075, 56.23));
   const [search, setSearch] = useState<string>("");
+  const [desc, setDesc] = useState<string>("");
 
   const {
     data: huntsData,
@@ -138,9 +83,10 @@ const Hunts = () => {
   };
 
   const handleClear = () => {
-    setPosition(undefined);
+    setDesc("");
     setInstanceId(undefined);
     setCharacterId(undefined);
+    setPosition(new LatLng(58.0075, 56.23));
   };
 
   const sortClosest = (is: HuntingInstance[], coords?: LatLng) => {
@@ -190,6 +136,12 @@ const Hunts = () => {
             {position?.lat.toFixed(5)}, {position?.lng.toFixed(5)}
           </ModalHeader>
           <ModalBody className="flex flex-col">
+            {!!desc && (
+              <div className="flex flex-col text-xs">
+                <p className="text-default-600">Описание:</p>
+                <p>{desc}</p>
+              </div>
+            )}
             <Select
               size="sm"
               variant="underlined"
@@ -217,7 +169,20 @@ const Hunts = () => {
               placeholder="Выберите цель"
               aria-label="Цель"
               selectedKeys={instanceId ? [instanceId] : []}
-              onChange={(e) => setInstanceId(Number(e.target.value))}
+              onChange={(e) => {
+                console.log(e);
+                setInstanceId(Number(e.target.value));
+                if (!!e.target.value)
+                  setDesc(
+                    instances.find((i) => i.id === Number(e.target.value))
+                      ?.target!.descs![
+                      instances.find((i) => i.id === Number(e.target.value))!
+                        .target!.descs!.length -
+                        instances.find((i) => i.id === Number(e.target.value))!
+                          .remains!
+                    ]?.content ?? "",
+                  );
+              }}
             >
               {sortClosest(
                 instances.filter(
@@ -237,7 +202,11 @@ const Hunts = () => {
                     {instance.coordY.toFixed(5)}, {instance.coordX.toFixed(5)}
                   </p>
                   <p className="text-xs">
-                    {instance.target?.descs![0]!.content}
+                    {
+                      instance.target?.descs![
+                        instance.target?.descs!.length - instance.remains!
+                      ]!.content
+                    }
                   </p>
                 </SelectItem>
               ))}
@@ -246,7 +215,10 @@ const Hunts = () => {
           <ModalFooter>
             <Button
               variant="light"
-              onClick={() => setIsModalOpen(!isModalOpen)}
+              onClick={() => {
+                setIsModalOpen(!isModalOpen);
+                handleClear();
+              }}
               className="mr-auto"
             >
               Отменить
@@ -275,8 +247,8 @@ const Hunts = () => {
           }
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <InstanceMapControl />
-        <DraggableInstance updatePosition={(p) => setPosition(p)} />
+        <MapControl />
+        <Draggable updatePosition={(p) => setPosition(p)} />
         {instances
           .filter(
             (i) =>

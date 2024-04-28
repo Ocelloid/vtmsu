@@ -208,21 +208,26 @@ const Targets = () => {
                     setDescs(newDescs);
                   }}
                 />
-                <Button
-                  variant="bordered"
-                  className="mx-2 my-auto min-w-0"
-                  color={i === descs.length - 1 ? "warning" : "danger"}
-                  onClick={() => {
-                    if (i === descs.length - 1) addDesc();
-                    else removeDesc(i);
-                  }}
-                >
-                  {i === descs.length - 1 ? (
-                    <FaPlusCircle size={24} />
-                  ) : (
+                <div className="flex flex-col">
+                  <Button
+                    variant="bordered"
+                    className="mx-2 my-auto min-w-0"
+                    color="danger"
+                    onClick={() => removeDesc(i)}
+                  >
                     <FaTrashAlt size={24} />
+                  </Button>
+                  {i === descs.length - 1 && (
+                    <Button
+                      variant="bordered"
+                      className="mx-2 my-auto min-w-0"
+                      color="warning"
+                      onClick={addDesc}
+                    >
+                      <FaPlusCircle size={24} />
+                    </Button>
                   )}
-                </Button>
+                </div>
               </div>
             ))}
           </ModalBody>

@@ -15,79 +15,23 @@ import {
 } from "@nextui-org/react";
 import Image from "next/image";
 import "leaflet/dist/leaflet.css";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMapEvents,
-} from "react-leaflet";
-import L, {
-  LatLng,
-  type LatLngExpression,
-  type Marker as LeafletMarker,
-} from "leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L, { LatLng } from "leaflet";
+import { MapControl, Draggable } from "~/components/map";
 import type { HuntingInstance, HuntingData } from "~/server/api/routers/hunt";
 import default_char from "~/../public/default_char.png";
 import { LoadingPage } from "~/components/Loading";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
 
-const target_icon = L.icon({ iconUrl: "/crosshair.png" });
 const marker_icon = L.icon({ iconUrl: "/map-marker.png" });
-
-const InstanceMapControl = () => {
-  const map = useMapEvents({
-    click() {
-      map.locate();
-    },
-    locationfound(e) {
-      console.log(e, typeof e);
-    },
-  });
-  return null;
-};
-
-const DraggableInstance = ({
-  updatePosition,
-}: {
-  updatePosition: (p: LatLng) => void;
-}) => {
-  const [position, setPosition] = useState<LatLngExpression>([58.0075, 56.23]);
-  const markerRef = useRef<LeafletMarker | null>(null);
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current;
-        if (!!marker) {
-          setPosition(marker.getLatLng());
-          updatePosition(marker.getLatLng());
-        }
-      },
-    }),
-    [updatePosition],
-  );
-
-  return (
-    <Marker
-      draggable={true}
-      eventHandlers={eventHandlers}
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      position={position}
-      ref={markerRef}
-      icon={target_icon}
-    >
-      <Popup>Новая цель</Popup>
-    </Marker>
-  );
-};
 
 const Instances = () => {
   const [targets, setTargets] = useState<HuntingData[]>([]);
   const [instances, setInstances] = useState<HuntingInstance[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [position, setPosition] = useState<LatLng>();
+  const [position, setPosition] = useState<LatLng>(new LatLng(58.0075, 56.23));
   const [expires, setExpires] = useState<DateValue>();
   const [targetId, setTargetId] = useState<number>();
   const [id, setId] = useState<number>();
@@ -173,8 +117,8 @@ const Instances = () => {
     } else
       newInstance(
         {
-          coordX: position!.lng,
-          coordY: position!.lat,
+          coordX: position.lng,
+          coordY: position.lat,
           targetId: targetId ?? 0,
           expires: !!expires
             ? new Date(expires.year, expires.month, expires.day)
@@ -193,7 +137,7 @@ const Instances = () => {
   const handleClear = () => {
     setId(undefined);
     setExpires(undefined);
-    setPosition(undefined);
+    setPosition(new LatLng(58.0075, 56.23));
     setTargetId(0);
   };
 
@@ -264,7 +208,10 @@ const Instances = () => {
           <ModalFooter>
             <Button
               variant="light"
-              onClick={() => setIsModalOpen(!isModalOpen)}
+              onClick={() => {
+                setIsModalOpen(!isModalOpen);
+                handleClear();
+              }}
               className="mr-auto"
             >
               Отменить
@@ -311,8 +258,8 @@ const Instances = () => {
           }
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <InstanceMapControl />
-        <DraggableInstance updatePosition={(p) => setPosition(p)} />
+        <MapControl />
+        <Draggable updatePosition={(p) => setPosition(p)} />
         {instances.map((instance) => (
           <Marker
             key={instance.id}

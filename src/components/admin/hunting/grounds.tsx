@@ -11,80 +11,21 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import "leaflet/dist/leaflet.css";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMapEvents,
-  Pane,
-  Circle,
-} from "react-leaflet";
-import L, {
-  LatLng,
-  type LatLngExpression,
-  type Marker as LeafletMarker,
-} from "leaflet";
+import { MapContainer, TileLayer, Popup, Pane, Circle } from "react-leaflet";
+import { LatLng } from "leaflet";
+import { MapControl, Draggable } from "~/components/map";
 import type { HuntingGround } from "~/server/api/routers/hunt";
 import { Time } from "@internationalized/date";
 import { LoadingPage } from "~/components/Loading";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
-
-const target_icon = L.icon({ iconUrl: "/crosshair.png" });
-
-const GroundMapControl = () => {
-  const map = useMapEvents({
-    click() {
-      map.locate();
-    },
-    locationfound(e) {
-      console.log(e, typeof e);
-    },
-  });
-  return null;
-};
-
-const DraggableGround = ({
-  updatePosition,
-}: {
-  updatePosition: (p: LatLng) => void;
-}) => {
-  const [position, setPosition] = useState<LatLngExpression>([58.0075, 56.23]);
-  const markerRef = useRef<LeafletMarker | null>(null);
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current;
-        if (!!marker) {
-          setPosition(marker.getLatLng());
-          updatePosition(marker.getLatLng());
-        }
-      },
-    }),
-    [updatePosition],
-  );
-
-  return (
-    <Marker
-      draggable={true}
-      eventHandlers={eventHandlers}
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      position={position}
-      ref={markerRef}
-      icon={target_icon}
-    >
-      <Popup>Новая цель</Popup>
-    </Marker>
-  );
-};
 
 const Grounds = () => {
   const [grounds, setGrounds] = useState<HuntingGround[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [delay, setDelay] = useState<Time>(new Time(1, 0));
-  const [position, setPosition] = useState<LatLng>();
+  const [position, setPosition] = useState<LatLng>(new LatLng(58.0075, 56.23));
   const [radius, setRadius] = useState<number>(100);
   const [content, setContent] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -147,8 +88,8 @@ const Grounds = () => {
       updateGround(
         {
           id: id,
-          coordX: position!.lng,
-          coordY: position!.lat,
+          coordX: position.lng,
+          coordY: position.lat,
           delay: delay.hour * 3600 + delay.minute * 60 + delay.second,
           max_inst: max,
           min_inst: min,
@@ -167,8 +108,8 @@ const Grounds = () => {
     } else
       newGround(
         {
-          coordX: position!.lng,
-          coordY: position!.lat,
+          coordX: position.lng,
+          coordY: position.lat,
           delay: delay.hour * 60 + delay.second,
           max_inst: max,
           min_inst: min,
@@ -194,7 +135,7 @@ const Grounds = () => {
     setMax(10);
     setContent("");
     setDelay(new Time(1, 0));
-    setPosition(undefined);
+    setPosition(new LatLng(58.0075, 56.23));
   };
 
   if (isGroundsLoading || isGroundsLoading) return <LoadingPage />;
@@ -283,7 +224,10 @@ const Grounds = () => {
           <ModalFooter>
             <Button
               variant="light"
-              onClick={() => setIsModalOpen(!isModalOpen)}
+              onClick={() => {
+                setIsModalOpen(!isModalOpen);
+                handleClear();
+              }}
               className="mr-auto"
             >
               Отменить
@@ -333,8 +277,8 @@ const Grounds = () => {
           }
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <GroundMapControl />
-        <DraggableGround updatePosition={(p) => setPosition(p)} />
+        <MapControl />
+        <Draggable updatePosition={(p) => setPosition(p)} />
         <Pane name="purple-rectangle">
           {grounds.map((ground) => (
             <Circle
