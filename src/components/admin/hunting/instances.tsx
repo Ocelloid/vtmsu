@@ -26,6 +26,7 @@ import { FaPlus, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
 
 const marker_icon = L.icon({ iconUrl: "/map-marker.png" });
+const skull_icon = L.icon({ iconUrl: "/skull.png" });
 
 const Instances = () => {
   const [targets, setTargets] = useState<HuntingData[]>([]);
@@ -264,7 +265,7 @@ const Instances = () => {
           <Marker
             key={instance.id}
             position={[instance.coordY, instance.coordX]}
-            icon={marker_icon}
+            icon={instance.remains! > 1 ? marker_icon : skull_icon}
           >
             <Popup>
               <div className="flex flex-col items-center">
@@ -274,17 +275,11 @@ const Instances = () => {
                 >
                   {instance.target!.name}
                 </span>
-                {!instance.remains && (
+                {instance.remains! < 1 ? (
                   <span className="pb-1 text-xs">Истощена</span>
-                )}
-                {!!instance.remains && (
+                ) : (
                   <span className="pb-1 text-xs">
-                    Осталось {instance.remains}&nbsp;
-                    {instance.remains === 1
-                      ? "охота"
-                      : instance.remains < 5
-                        ? "охоты"
-                        : "охот"}
+                    Осталось попыток: {instance.remains! - 1}
                   </span>
                 )}
               </div>
@@ -336,12 +331,7 @@ const Instances = () => {
             )}
             {!!instance.remains && (
               <div className="-mt-2 pb-1 text-xs">
-                Осталось {instance.remains}&nbsp;
-                {instance.remains === 1
-                  ? "охота"
-                  : instance.remains < 5
-                    ? "охоты"
-                    : "охот"}
+                Осталось попыток: {instance.remains - 1}
               </div>
             )}
             <div className="-mt-2 pb-1 text-xs">

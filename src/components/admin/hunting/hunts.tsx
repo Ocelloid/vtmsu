@@ -188,7 +188,7 @@ const Hunts = () => {
               {sortClosest(
                 instances.filter(
                   (i) =>
-                    i.remains! > 0 &&
+                    i.remains! > 1 &&
                     (!!i.expires ? i.expires < new Date() : true),
                 ),
                 position,
@@ -256,12 +256,18 @@ const Hunts = () => {
             <Marker
               key={instance.id}
               position={[instance.coordY, instance.coordX]}
-              icon={instance.remains! > 0 ? marker_icon : skull_icon}
+              icon={instance.remains! > 1 ? marker_icon : skull_icon}
             >
               <Popup>
                 <div className="flex flex-col items-center gap-0">
                   <span>{instance.target!.name}</span>
-                  <span>Осталость попыток: {instance.remains}</span>
+                  {instance.remains! < 1 ? (
+                    <span className="pb-1 text-xs">Истощена</span>
+                  ) : (
+                    <span className="pb-1 text-xs">
+                      Осталось попыток: {instance.remains! - 1}
+                    </span>
+                  )}
                   <span>
                     {instance.coordY.toFixed(5)}, {instance.coordX.toFixed(5)}
                   </span>

@@ -112,7 +112,7 @@ export const huntRouter = createTRPCRouter({
       if (!!instance && !!instance.expires && instance.expires < new Date())
         status = "exp_failure";
 
-      if (!!instance && instance.remains === 1) status = "masq_failure";
+      if (!!instance && instance.remains === 2) status = "masq_failure";
 
       let newInstance = undefined;
 
