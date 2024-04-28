@@ -12,6 +12,7 @@ import {
 } from "@nextui-org/react";
 import "leaflet/dist/leaflet.css";
 import { MapControl, Draggable } from "~/components/map";
+import { FaCheck, FaExclamationTriangle, FaClock } from "react-icons/fa";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L, { LatLng } from "leaflet";
 import type { Hunt, HuntingInstance } from "~/server/api/routers/hunt";
@@ -295,55 +296,62 @@ const Hunts = () => {
           onValueChange={setSearch}
         />
       </div>
-      {hunts
-        .filter((t) =>
-          !!search
-            ? t.instance!.target!.name.toLowerCase().includes(search)
-            : true,
-        )
-        .map((hunt) => (
-          <div
-            key={hunt.id}
-            className="flex flex-col rounded-lg bg-white/75 p-2 dark:bg-red-950/50"
-          >
-            <div className="flex flex-row items-center pb-2 text-xl">
-              {hunt.instance!.target!.name}
-            </div>
-            <div className="-mt-1 pb-1 text-xs">
-              Игрок:&nbsp;{hunt.createdBy?.name}
-            </div>
-            <div className="-mt-1 pb-1 text-xs">
-              Персонаж:&nbsp;{hunt.character?.name}
-            </div>
-            <div className="-mt-1 pb-1 text-xs">
-              Координаты:&nbsp;
-              {hunt.instance!.coordY.toFixed(5)},&nbsp;
-              {hunt.instance!.coordX.toFixed(5)}
-            </div>
-            <div className="-mt-1 pb-1 text-xs">
-              Дата:&nbsp;
-              {hunt.createdAt?.toLocaleString()}
-            </div>
-            <div className="-mt-1 pb-1 text-xs">
-              Статус:&nbsp;
-              {hunt.status === "success"
-                ? "Успешно"
-                : hunt.status === "req_failure"
-                  ? "Цель не соответствует предпочтениям персонажа"
-                  : hunt.status === "exp_failure"
-                    ? "Срок цели истёк"
-                    : "Нарушение маскарада"}
-            </div>
-            {hunt.instance!.groundId && (
-              <div className="-mt-1 pb-1 text-xs">
-                {hunt.instance!.ground?.name}
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
+        {hunts
+          .filter((t) =>
+            !!search
+              ? t.instance!.target!.name.toLowerCase().includes(search)
+              : true,
+          )
+          .map((hunt) => (
+            <div
+              key={hunt.id}
+              className="flex flex-col rounded-lg bg-white/75 p-2 dark:bg-red-950/50"
+            >
+              <div className="flex flex-row items-center pb-2 text-xl">
+                {hunt.status === "success" ? (
+                  <FaCheck />
+                ) : hunt.status === "exp_failure" ? (
+                  <FaClock />
+                ) : (
+                  <FaExclamationTriangle />
+                )}
+                &nbsp;
+                {hunt.instance!.target!.name}
               </div>
-            )}
-            <div className="mt-1 flex max-h-20 flex-row overflow-hidden text-ellipsis text-justify text-xs">
-              {hunt.instance!.target!.descs![0]!.content}
+              <div className="-mt-1 pb-1 text-xs">
+                Игрок:&nbsp;{hunt.createdBy?.name}
+              </div>
+              <div className="-mt-1 pb-1 text-xs">
+                Персонаж:&nbsp;{hunt.character?.name}
+              </div>
+              <div className="-mt-1 pb-1 text-xs">
+                Координаты:&nbsp;
+                {hunt.instance!.coordY.toFixed(5)},&nbsp;
+                {hunt.instance!.coordX.toFixed(5)}
+              </div>
+              <div className="-mt-1 pb-1 text-xs">
+                Дата:&nbsp;
+                {hunt.createdAt?.toLocaleString()}
+              </div>
+              <div className="-mt-1 pb-1 text-xs">
+                Статус:&nbsp;
+                {hunt.status === "success"
+                  ? "Успешно"
+                  : hunt.status === "req_failure"
+                    ? "Цель не соответствует предпочтениям персонажа"
+                    : hunt.status === "exp_failure"
+                      ? "Срок цели истёк"
+                      : "Нарушение маскарада"}
+              </div>
+              {hunt.instance!.groundId && (
+                <div className="-mt-1 pb-1 text-xs">
+                  {hunt.instance!.ground?.name}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          ))}
+      </div>
     </>
   );
 };
