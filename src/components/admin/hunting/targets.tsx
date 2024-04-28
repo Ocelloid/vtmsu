@@ -31,7 +31,7 @@ const Targets = () => {
   const [search, setSearch] = useState<string>("");
   const [image, setImage] = useState<string>("");
   const [req, setReq] = useState<string>("");
-  const [descs, setDescs] = useState<string[]>([""]);
+  const [descs, setDescs] = useState<string[]>(["", ""]);
   const [uploading, setUploading] = useState<boolean>(false);
 
   const {
@@ -58,7 +58,7 @@ const Targets = () => {
     setImage(t.image ?? "");
     setName(t.name ?? "");
     setReq(t.hunt_req ?? "");
-    setDescs(!!t.descs ? t.descs.map((d) => d.content ?? "") : [""]);
+    setDescs(!!t.descs ? t.descs.map((d) => d.content ?? "") : ["", ""]);
     setIsModalOpen(true);
   };
 
@@ -107,7 +107,7 @@ const Targets = () => {
     setImage("");
     setName("");
     setReq("");
-    setDescs([""]);
+    setDescs(["", ""]);
   };
 
   const addDesc = () => {
@@ -199,8 +199,16 @@ const Targets = () => {
               <div key={"ta_" + i} className="flex flex-row">
                 <Textarea
                   variant="bordered"
-                  label={`Описание - ${i + 1}`}
-                  placeholder={`Введите описание ${i + 1}-й охоты`}
+                  label={
+                    i + 1 === descs.length
+                      ? "Описание нарушения маскарада"
+                      : `Описание ${i + 1}-й охоты`
+                  }
+                  placeholder={
+                    i + 1 === descs.length
+                      ? "Введите описание нарушения маскарада"
+                      : `Введите описание ${i + 1}-й охоты`
+                  }
                   value={desc}
                   onValueChange={(v) => {
                     const newDescs = [...descs];
@@ -209,15 +217,17 @@ const Targets = () => {
                   }}
                 />
                 <div className="flex flex-col">
-                  <Button
-                    variant="bordered"
-                    className="mx-2 my-auto min-w-0"
-                    color="danger"
-                    onClick={() => removeDesc(i)}
-                  >
-                    <FaTrashAlt size={24} />
-                  </Button>
-                  {i === descs.length - 1 && (
+                  {descs.length > 2 && i !== descs.length - 1 && (
+                    <Button
+                      variant="bordered"
+                      className="mx-2 my-auto min-w-0"
+                      color="danger"
+                      onClick={() => removeDesc(i)}
+                    >
+                      <FaTrashAlt size={24} />
+                    </Button>
+                  )}
+                  {i === descs.length - 2 && (
                     <Button
                       variant="bordered"
                       className="mx-2 my-auto min-w-0"
@@ -234,7 +244,10 @@ const Targets = () => {
           <ModalFooter>
             <Button
               variant="light"
-              onClick={() => setIsModalOpen(!isModalOpen)}
+              onClick={() => {
+                setIsModalOpen(!isModalOpen);
+                handleClear();
+              }}
               className="mr-auto"
             >
               Отменить
