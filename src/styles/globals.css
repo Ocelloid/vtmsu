@@ -51,13 +51,11 @@
 
 .leaflet-marker-icon {
   left: -24px !important;
-  top: -24px !important;
+  top: -48px !important;
   z-index: 49 !important;
 }
-.leaflet-marker-icon {
-  z-index: 43 !important;
-}
 .leaflet-marker-draggable {
+  top: -24px !important;
   z-index: 400 !important;
 }
 
