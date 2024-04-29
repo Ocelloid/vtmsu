@@ -91,23 +91,19 @@ const Hunts = () => {
     setPosition(new LatLng(58.0075, 56.23));
   };
 
-  const sortClosest = (is: HuntingInstance[], coords?: LatLng) => {
-    let sortedInstances: HuntingInstance[] = [...is];
-    if (!!coords) {
-      sortedInstances = is.sort(
-        (a, b) =>
-          Math.sqrt(
-            Math.abs(coords.lat - a.coordY) ** 2 +
-              Math.abs(coords.lng - a.coordX) ** 2,
-          ) -
-          Math.sqrt(
-            Math.abs(coords.lat - b.coordY) ** 2 +
-              Math.abs(coords.lng - b.coordX) ** 2,
+  const sortClosest = (is: HuntingInstance[], coords: LatLng) => {
+    return is
+      .map((i) => {
+        return {
+          ...i,
+          distance: Math.sqrt(
+            Math.abs(coords.lat - i.coordY) ** 2 +
+              Math.abs(coords.lng - i.coordX) ** 2,
           ),
-      );
-    }
-
-    return sortedInstances;
+        };
+      })
+      .sort((a, b) => a.distance - b.distance)
+      .filter((a) => a.distance < 300 / 111000);
   };
 
   useEffect(() => {
@@ -119,7 +115,7 @@ const Hunts = () => {
             Math.random() * 5 + 5 + "s";
         console.log(item);
       }
-    }, 5000);
+    }, 2500);
   }, []);
 
   if (isInstancesLoading || isHuntsLoading || isCharactersLoading)
@@ -271,10 +267,14 @@ const Hunts = () => {
                 <Circle
                   key={instance.id}
                   center={[instance.coordY, instance.coordX]}
-                  pathOptions={{ color: "transparent", className: "red-pulse" }}
+                  pathOptions={{
+                    color: "transparent",
+                    fillColor: "red",
+                    className: "red-pulse",
+                  }}
                   radius={(50 + Math.random() * 50) * instance.remains!}
                 >
-                  <Popup>
+                  {/* <Popup>
                     <div className="flex flex-col items-center gap-0">
                       <span>{instance.target!.name}</span>
                       <span className="pb-1 text-xs">
@@ -288,7 +288,7 @@ const Hunts = () => {
                         }
                       </span>
                     </div>
-                  </Popup>
+                  </Popup> */}
                 </Circle>
               ) : (
                 <Marker
