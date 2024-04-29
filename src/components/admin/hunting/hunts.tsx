@@ -273,23 +273,7 @@ const Hunts = () => {
                     className: "red-pulse",
                   }}
                   radius={(50 + Math.random() * 50) * instance.remains!}
-                >
-                  {/* <Popup>
-                    <div className="flex flex-col items-center gap-0">
-                      <span>{instance.target!.name}</span>
-                      <span className="pb-1 text-xs">
-                        Осталось попыток: {instance.remains}
-                      </span>
-                      <span>
-                        {
-                          instance.target!.descs![
-                            instance.target!.descs!.length - instance.remains!
-                          ]!.content
-                        }
-                      </span>
-                    </div>
-                  </Popup> */}
-                </Circle>
+                />
               ) : (
                 <Marker
                   key={instance.id}

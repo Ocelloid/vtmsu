@@ -66,7 +66,17 @@
 
 @keyframes red-pulse-animation {
   0% {
+  }
+  50% {
+    fill-opacity: 0.2;
+  }
+  100% {
     fill-opacity: 0;
+  }
+}
+
+@-moz-keyframes red-pulse-animation {
+  0% {
   }
   50% {
     fill-opacity: 0.2;
@@ -78,7 +88,6 @@
 
 @-webkit-keyframes red-pulse-animation {
   0% {
-    fill-opacity: 0;
   }
   50% {
     fill-opacity: 0.2;
