@@ -8,6 +8,7 @@ import { api } from "~/utils/api";
 import CharacterTraits from "~/components/admin/CharacterTraits";
 import Hunting from "~/components/admin/hunting";
 import Characters from "~/components/admin/Characters";
+import Link from "next/link";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -96,15 +97,27 @@ export default function Admin() {
                     key={user.id}
                     className="flex flex-col gap-4 rounded-lg bg-white/75 p-2 dark:bg-red-950/50 md:flex-row"
                   >
-                    <UserIcon
-                      name={user.name}
-                      className="mr-auto"
-                      classNames={{ description: "text-foreground-600" }}
-                      description={user.email}
-                      avatarProps={{
-                        src: user.image ?? "",
-                      }}
-                    />
+                    <div className="flex flex-col md:mr-auto">
+                      <UserIcon
+                        name={
+                          <Link href={`/admin/${user.id}`}>{user.name}</Link>
+                        }
+                        className="mr-auto"
+                        classNames={{ description: "text-foreground-600" }}
+                        description={
+                          <div className="flex flex-col">
+                            <span>{user.email}</span>
+                            <span>
+                              Персонажей:&nbsp;
+                              {!!user.characters ? user.characters.length : 0}
+                            </span>
+                          </div>
+                        }
+                        avatarProps={{
+                          src: user.image ?? "",
+                        }}
+                      />
+                    </div>
                     <div className="flex flex-row gap-4">
                       <Checkbox
                         color="warning"

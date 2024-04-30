@@ -4,6 +4,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { z } from "zod";
+import type { Character } from "~/server/api/routers/char";
 
 export type User = {
   id: string;
@@ -13,6 +14,7 @@ export type User = {
   isPersonnel: boolean;
   emailVerified: Date | null;
   image: string | null;
+  characters?: Character[] | null;
 };
 
 export const userRouter = createTRPCRouter({
@@ -74,9 +76,22 @@ export const userRouter = createTRPCRouter({
     const user = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
     });
-    const users = await ctx.db.user.findMany();
+    const users = await ctx.db.user.findMany({ include: { characters: true } });
     return user?.isAdmin ? users : [];
   }),
+
+  getUserById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const currentUser = await ctx.db.user.findUnique({
+        where: { id: ctx.session.user.id },
+      });
+      const user = await ctx.db.user.findUnique({
+        where: { id: input.id },
+        include: { characters: { include: { faction: true, clan: true } } },
+      });
+      return currentUser?.isAdmin ? user : null;
+    }),
 
   userIsAdmin: publicProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
