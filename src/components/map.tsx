@@ -9,14 +9,14 @@ import L, {
 const target_icon = L.icon({ iconUrl: "/crosshair.png" });
 
 export const MapControl = () => {
-  const map = useMapEvents({
-    click() {
-      map.locate();
-    },
-    locationfound(e) {
-      console.log(e, typeof e);
-    },
-  });
+  // const map = useMapEvents({
+  //   loading() {
+  //     map.locate();
+  //   },
+  //   locationfound(e) {
+  //     map.flyTo(e.latlng, map.getZoom());
+  //   },
+  // });
   return null;
 };
 

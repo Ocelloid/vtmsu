@@ -92,18 +92,21 @@ const Hunts = () => {
   };
 
   const sortClosest = (is: HuntingInstance[], coords: LatLng) => {
-    return is
+    const si = is
       .map((i) => {
         return {
           ...i,
-          distance: Math.sqrt(
-            Math.abs(coords.lat - i.coordY) ** 2 +
-              Math.abs(coords.lng - i.coordX) ** 2,
-          ),
+          distance:
+            Math.sqrt(
+              Math.abs(coords.lat - i.coordY) ** 2 +
+                Math.abs(coords.lng - i.coordX) ** 2,
+            ) * 111000,
         };
       })
       .sort((a, b) => a.distance - b.distance)
-      .filter((a) => a.distance < 300 / 111000);
+      .filter((a) => a.distance <= (a.remains! + 1.5) * 100);
+    console.log(si);
+    return si;
   };
 
   useEffect(() => {
@@ -113,7 +116,6 @@ const Hunts = () => {
         if (!!item)
           (item as HTMLElement).style.animationDuration =
             Math.random() * 5 + 5 + "s";
-        console.log(item);
       }
     }, 2500);
   }, []);
@@ -180,7 +182,6 @@ const Hunts = () => {
               aria-label="Цель"
               selectedKeys={instanceId ? [instanceId] : []}
               onChange={(e) => {
-                console.log(e);
                 setInstanceId(Number(e.target.value));
                 if (!!e.target.value)
                   setDesc(
@@ -272,7 +273,7 @@ const Hunts = () => {
                     fillColor: "red",
                     className: "red-pulse",
                   }}
-                  radius={(50 + Math.random() * 50) * instance.remains!}
+                  radius={100 * instance.remains!}
                 />
               ) : (
                 <Marker

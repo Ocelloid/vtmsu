@@ -322,10 +322,10 @@ const Targets = () => {
             </div>
             {!!target.descs?.length && (
               <div className="-mt-2 pb-1 text-xs">
-                {target.descs?.length}&nbsp;
-                {target.descs?.length === 1
+                {target.descs?.length - 1}&nbsp;
+                {target.descs?.length === 2
                   ? "охота"
-                  : target.descs?.length < 5
+                  : target.descs?.length < 6
                     ? "охоты"
                     : "охот"}
               </div>
