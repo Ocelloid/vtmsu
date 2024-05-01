@@ -10,8 +10,37 @@ import {
   type SideNavLink,
 } from "~/components/SideNavigation";
 import Link from "next/link";
+// import { clans, factions } from "~/assets";
+// import { useTheme } from "next-themes";
 
 export default function About() {
+  // const { theme } = useTheme();
+
+  // const clanKeys = Object.keys(clans);
+  // const factionKeys = Object.keys(factions);
+  // const clanSelection = Object.values(clans).map((clan, i) => {
+  //   if (theme === "light" && !clanKeys[i]?.includes("_white"))
+  //     return { value: clanKeys[i] ?? "", image: clan };
+  //   if (theme === "dark" && clanKeys[i]?.includes("_white"))
+  //     return { value: clanKeys[i]?.replace("_white", "") ?? "", image: clan };
+  //   else return undefined;
+  // });
+
+  // const factionSelection = Object.values(factions).map((faction, i) => {
+  //   if (theme === "light" && !factionKeys[i]?.includes("_white"))
+  //     return { value: factionKeys[i] ?? "", image: faction };
+  //   if (theme === "dark" && factionKeys[i]?.includes("_white"))
+  //     return {
+  //       value: factionKeys[i]?.replace("_white", "") ?? "",
+  //       image: faction,
+  //     };
+  //   else return undefined;
+  // });
+
+  // const bgSelection = [...factionSelection, ...clanSelection].filter(
+  //   (x) => x !== undefined,
+  // );
+
   const links: SideNavLink[] = [
     { title: "Описание игры", section: "description" },
     { title: "Создание персонажа", section: "character_creation" },
@@ -93,10 +122,26 @@ export default function About() {
             накануне событий игры.
           </Element>
           <Element className="section" name="camarilla">
-            <p className="pb-4 text-3xl">Камарилья</p>
+            <p className="flex flex-row pb-4 text-3xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-8 w-8 rounded-md object-contain"
+                alt="camarilla"
+                height="16"
+                width="16"
+                src={
+                  bgSelection.find((bg) => bg!.value === "camarilla")?.image ??
+                  ""
+                }
+              /> */}
+              Камарилья
+            </p>
             Это основополагающая фракция домена Молотов, поддерживающая традиции
-            и протоколы. Князь домена Молотов, Дон Артур Нордан (Олег Уличев)
-            является гарантом соблюдения традиций и определяет политику домена.
+            и протоколы. Князь домена Молотов, Дон Артур Нордан (
+            <a target="_blank" href="https://vk.com/ovul79">
+              Олег Уличев
+            </a>
+            ) является гарантом соблюдения традиций и определяет политику
+            домена.
             <br />
             <br />
             <Image alt="camarilla" src={camarilla} />
@@ -127,49 +172,110 @@ export default function About() {
             роль требует большого количества личного времени, опыта и моральных
             сил. Если вы полны энтузиазма, сил, жедания помочь другим и опыта
             управления людьми - эта роль для вас.
-            <p className="p-4 text-2xl">Бруха</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="brujah"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "brujah")?.image ?? ""
+                }
+              /> */}
+              Бруха
+            </p>
             <p className="pl-4">
               Клан воинов-поэтов, которые рады возможности высказать свои мысли,
               а затем подкрепить их делом. Проклятая ярость заставляет сородичей
               закипать, и лучше не оказываться у них на пути в этот момент.
-              Глава клана: Матвей Фурман.
+              Глава клана:{" "}
+              <a href="https://vk.com/id51605519" target="_blank">
+                Матвей Фурман
+              </a>
+              .
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_brujah"
             >
               Подробнее в книге клана
             </Link>
-            <p className="p-4 text-2xl">Малкавиан</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="malkavian"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "malkavian")?.image ??
+                  ""
+                }
+              /> */}
+              Малкавиан
+            </p>
             <p className="pl-4">
               Это клан безумных Сородичей, к которым страшно поворачиваться
               спиной - а придётся - ведь для невидимки спина у тебя везде.
               Другие сородичи испытывают к ним отвращение и страх. Они с трудом
               справляются со своими тёмными зависимостями. Старейшина клана -
-              нарколог, доктор Тоторович (Роман Новиков).
+              нарколог, доктор Тоторович (
+              <a href="https://vk.com/id21464523" target="_blank">
+                Роман Новиков
+              </a>
+              ).
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_malkavian"
             >
               Подробнее в книге клана
             </Link>
-            <p className="p-4 text-2xl">Носферату</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="nosferatu"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "nosferatu")?.image ??
+                  ""
+                }
+              /> */}
+              Носферату
+            </p>
             <p className="pl-4">
               <Image alt="nosferatu" src={nosferatu} />
               <br />
               Это клан, внешний вид членов которого полностью отражает суть
               уродства окружающего вас мира Тьмы, поэтому, они с радостью готовы
               вам помочь в любых ваших не благих начинаниях. Старейшина Карл
-              Модерах (Александр Кравчун).
+              Модерах (
+              <a href="https://vk.com/vector_alex" target="_blank">
+                Александр Кравчун
+              </a>
+              ).
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_nosferatu"
             >
               Подробнее в книге клана
             </Link>
-            <p className="p-4 text-2xl">Вентру</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="ventrue"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "ventrue")?.image ?? ""
+                }
+              /> */}
+              Вентру
+            </p>
             <p className="pl-4">
               Вечность - это не просто сила. Сила составляет только одну часть
               мира Вентру, хотя это чрезвычайно важная часть. Вампиры из клана
@@ -178,15 +284,32 @@ export default function About() {
               свои огромные ресурсы, чтобы расширить свое влияние, все время
               наблюдая и выжидая подходящего момента для удара. Ибо в этом мире
               есть вещи и похуже вампиров, и вентру знают, что они -
-              единственная надежда. Старейшина клана Алиса Гладких.
+              единственная надежда. Старейшина клана{" "}
+              <a href="https://vk.com/pandaalice" target="_blank">
+                Алиса Гладких
+              </a>
+              .
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_ventrue"
             >
               Подробнее в книге клана
             </Link>
-            <p className="p-4 text-2xl">Ассамит</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="assamite"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "assamite")?.image ??
+                  ""
+                }
+              /> */}
+              Ассамит
+            </p>
             <p className="pl-4">
               Это клан восточных сородичей, с которых совсем недавно было снято
               проклятье и которые стремятся возродить былое величие. Места
@@ -194,11 +317,23 @@ export default function About() {
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_assamite"
             >
               Подробнее в книге клана
             </Link>
-            <p className="p-4 text-2xl">Гангрел</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="gangrel"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "gangrel")?.image ?? ""
+                }
+              /> */}
+              Гангрел
+            </p>
             <p className="pl-4">
               Это клан звероподобных Сородичей, которым открыты секреты природы.
               Клан официально вышел из Камарильи, однако, в домене Молотов
@@ -207,11 +342,24 @@ export default function About() {
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_gangrel"
             >
               Подробнее в книге клана
             </Link>
-            <p className="p-4 text-2xl">Тореадор</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="toreador"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "toreador")?.image ??
+                  ""
+                }
+              /> */}
+              Тореадор
+            </p>
             <p className="pl-4">
               Этот клан стремится сохранить чувство прекрасного в своём мёртвом
               сердце и находится под большой угрозой - известно, что на них было
@@ -220,24 +368,52 @@ export default function About() {
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_toreador"
             >
               Подробнее в книге клана
             </Link>
-            <p className="p-4 text-2xl">Тремер</p>
+            <p className="flex flex-row p-4 text-2xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-6 w-6 rounded-md object-contain"
+                alt="tremere"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "tremere")?.image ?? ""
+                }
+              /> */}
+              Тремер
+            </p>
             <p className="pl-4">
               Это сородичи, посвятившие свою вечность исследованию сокрытой
-              изнанки этого мира. Старейшина клана Роман Любин.
+              изнанки этого мира. Старейшина клана{" "}
+              <a href="https://vk.com/v1nce" target="_blank">
+                Роман Любин
+              </a>
+              .
             </p>
             <Link
               className="pl-4 text-xs underline"
+              target="_blank"
               href="https://wod.su/vampire/book/clanbook_tremere"
             >
               Подробнее в книге клана
             </Link>
           </Element>
           <Element className="section" name="anarchs">
-            <p className="pb-4 text-3xl">Анархи</p>
+            <p className="flex flex-row pb-4 text-3xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-8 w-8 rounded-md object-contain"
+                alt="anarch"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "anarch")?.image ?? ""
+                }
+              /> */}
+              Анархи
+            </p>
             <Image alt="anarchs" src={anarchs} />
             <br />
             В отличие от игроков Камарильи, которые действуют в основном в целях
@@ -253,9 +429,11 @@ export default function About() {
             информацию, и с этим Анархом считаются главы других фракций.
             <br />
             <br />
-            Анархи могут быть из любых перечисленных кланов, осталось 11
-            свободных мест.
-            <p className="p-4 text-2xl">Независимые</p>
+            Анархи могут быть из любых перечисленных кланов, эмиссар -{" "}
+            <a href="https://vk.com/kiroill" target="_blank">
+              Кир Уличев
+            </a>
+            .<p className="p-4 text-2xl">Независимые</p>
             <p className="pl-4">
               Вышедшие из борьбы между фракциями, эти сородичи заняты своим
               делом и редко вмешиваются в происходящее в домене. Места
@@ -263,18 +441,64 @@ export default function About() {
             </p>
           </Element>
           <Element className="section" name="sabbat">
-            <p className="pb-4 text-3xl">Шабаш</p>
+            <p className="flex flex-row pb-4 text-3xl">
+              {/* <Image
+                className="mr-1 mt-1 aspect-square h-8 w-8 rounded-md object-contain"
+                alt="sabbat"
+                height="32"
+                width="32"
+                src={
+                  bgSelection.find((bg) => bg!.value === "sabbat")?.image ?? ""
+                }
+              /> */}
+              Шабаш
+            </p>
             Эта деструктивная и опасная группа сородичей стремится захватить
             домен Молотов и подчинить его своим правилам и взглядам. Архиепископ
-            Артём Баторий выполняет роль духовного наставника и политического
-            лидера. Во фракции 7 свободных мест. Отдельно общую вводную по
-            шабашу вы можете прочитать в группе игры.
+            <a href="https://vk.com/id42416962" target="_blank">
+              Артём Баторий
+            </a>{" "}
+            выполняет роль духовного наставника и политического лидера. Отдельно
+            общую вводную по шабашу вы можете прочитать в группе игры.
           </Element>
           <Element className="section pb-4" name="links">
             <p className="pb-4 text-3xl">Ссылки</p>
             Следующие ссылки, группы и серверы используются для официальной
             связи между игроками, с мастерской группой и регистрации на игре:
-            Группа ВК Сервер в дискорде Сайт и личный кабинет игрока Сетка ролей
+            <ul>
+              <li>
+                <a
+                  className="underline"
+                  target="_blank"
+                  href="https://vk.com/vtm2024"
+                >
+                  Группа ВКонтакте
+                </a>
+              </li>
+              <li>
+                <a
+                  className="underline"
+                  target="_blank"
+                  href="https://vtm.su/discord"
+                >
+                  Сервер в дискорде
+                </a>
+              </li>
+              <li>
+                <a className="underline" target="_blank" href="https://vtm.su/">
+                  Сайт и личный кабинет игрока
+                </a>
+              </li>
+              <li>
+                <a
+                  className="underline"
+                  target="_blank"
+                  href="https://docs.google.com/spreadsheets/d/12rkLIJlO60HAPeCVm1CwI_69ymq1bWnvvRt7zOqrV28/"
+                >
+                  Сетка ролей
+                </a>
+              </li>
+            </ul>
           </Element>
         </WithSideNavigation>
       </main>
