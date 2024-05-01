@@ -23,6 +23,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <SessionProvider session={session}>
           <main className={`font-sans ${inter.variable}`}>
+            <meta name="HandheldFriendly" content="true" />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1.0, 
+minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+            />
             <BGImage />
             <Component {...pageProps} />
             <Navigation />
