@@ -56,7 +56,7 @@ model HuntingInstance {
   coordY    Float
   coordX    Float
   temporary Boolean        @default(false)
-  expires   DateTime?       
+  expires   DateTime?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   targetId  Int
@@ -93,6 +93,7 @@ model Char {
   factionId     Int
   clanId        Int
   visible       Boolean              @default(false)
+  playerId      String?
   playerName    String?
   playerContact String?
   image         String?

@@ -8,6 +8,7 @@ import {
   AccordionItem,
   CheckboxGroup,
   Checkbox,
+  User as UserIcon,
   // Link,
   cn,
 } from "@nextui-org/react";
@@ -22,7 +23,6 @@ import Image from "next/image";
 import { UploadButton } from "~/utils/uploadthing";
 import DefaultEditor from "~/components/editors/DefaultEditor";
 import { FaRegSave, FaTrashAlt, FaImage, FaFile } from "react-icons/fa";
-// import { VscWarning } from "react-icons/vsc";
 import default_char from "~/../public/default_char.png";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect } from "react";
@@ -107,6 +107,7 @@ export default function CharacterEditor() {
   const [costSum, setCostSum] = useState<number>(0);
   const [contactSelect, setContactSelect] = useState<SelectContact[]>([]);
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
+  const [playerId, setPlayerId] = useState<string>("");
   const [initialQuenta, setInitialQuenta] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -131,6 +132,9 @@ export default function CharacterEditor() {
 
   const { mutate: deleteMutation, isPending: isCharacterDeletePending } =
     api.char.delete.useMutation();
+
+  const { data: userList, isLoading: isUserListLoading } =
+    api.user.getUserList.useQuery(undefined, { enabled: isAdmin });
 
   useEffect(() => {
     if (!!userData) {
@@ -233,6 +237,7 @@ export default function CharacterEditor() {
                 .reduce((a, b) => a + b),
             );
 
+          setPlayerId(characterData.playerId ?? "");
           setInitialQuenta(characterData.content ?? "");
           setInitialPublicInfo(characterData.publicInfo ?? "");
           storeAbilities(characterData.abilities.map((a) => a.abilityId));
@@ -311,6 +316,7 @@ export default function CharacterEditor() {
           visible: !!visible,
           image: image ?? "",
           age: age ? age.toString() : "",
+          playerId: playerId,
           playerName: playerName,
           playerContact: playerContact,
           sire: sire ?? "",
@@ -345,6 +351,7 @@ export default function CharacterEditor() {
           visible: !!visible,
           image: image ?? "",
           age: age ? age.toString() : "",
+          playerId: playerId,
           playerName: playerName,
           playerContact: playerContact,
           sire: sire ?? "",
@@ -376,6 +383,7 @@ export default function CharacterEditor() {
     setCharacterId(undefined);
     setInitialPublicInfo("");
     setInitialQuenta("");
+    setPlayerId("");
     setCostSum(0);
     clear();
   };
@@ -406,7 +414,8 @@ export default function CharacterEditor() {
     isCharacterCreatePending ||
     isCharacterUpdatePending ||
     isCharacterDeletePending ||
-    isCharacterLoading
+    isCharacterLoading ||
+    isUserListLoading
   )
     return <LoadingPage />;
 
@@ -567,6 +576,43 @@ export default function CharacterEditor() {
               )}
             </div>
           </div>
+          {isAdmin && userList && (
+            <Select
+              label="Игрок"
+              placeholder="Выберите игрока"
+              variant="underlined"
+              selectedKeys={[playerId ?? ""]}
+              onChange={(e) =>
+                setPlayerId(!!e.target.value ? e.target.value : playerId)
+              }
+            >
+              {userList.map((user) => (
+                <SelectItem
+                  key={user.id}
+                  value={user.id}
+                  textValue={user.name!}
+                >
+                  <UserIcon
+                    name={user.name}
+                    className="mr-auto"
+                    classNames={{ description: "text-foreground-600" }}
+                    description={
+                      <div className="flex flex-col">
+                        <span>{user.email}</span>
+                        <span>
+                          Персонажей:&nbsp;
+                          {!!user.characters ? user.characters.length : 0}
+                        </span>
+                      </div>
+                    }
+                    avatarProps={{
+                      src: user.image ?? "",
+                    }}
+                  />
+                </SelectItem>
+              ))}
+            </Select>
+          )}
           <div className="-mx-2 -mt-2 flex flex-col px-2 sm:mx-0 sm:px-0">
             <div className="grid grid-cols-11 gap-2">
               <div className="col-span-5 flex flex-col items-center justify-center sm:col-span-3">

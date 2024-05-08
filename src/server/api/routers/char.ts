@@ -17,6 +17,7 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
+  playerId?: string | null;
   comment?: string | null;
   pending?: boolean | null;
   verified?: boolean | null;
@@ -439,6 +440,7 @@ export const charRouter = createTRPCRouter({
         publicInfo: z.string().nullish(),
         playerName: z.string().nullish(),
         playerContact: z.string().nullish(),
+        playerId: z.string().nullish(),
         clanId: z.number(),
         factionId: z.number(),
         image: z.string(),
@@ -469,6 +471,7 @@ export const charRouter = createTRPCRouter({
           publicInfo: input.publicInfo,
           playerName: input.playerName,
           playerContact: input.playerContact,
+          playerId: input.playerId ? input.playerId : ctx.session.user.id,
           pending: true,
           image: input.image,
           age: input.age,
@@ -512,6 +515,7 @@ export const charRouter = createTRPCRouter({
         content: z.string().nullish(),
         ambition: z.string().nullish(),
         publicInfo: z.string().nullish(),
+        playerId: z.string().nullish(),
         clanId: z.number(),
         factionId: z.number(),
         image: z.string(),
@@ -659,6 +663,7 @@ export const charRouter = createTRPCRouter({
           factionId: input.factionId,
           playerName: input.playerName,
           playerContact: input.playerContact,
+          playerId: input.playerId ? input.playerId : ctx.session.user.id,
           name: input.name,
           title: input.title,
           status: input.status,
