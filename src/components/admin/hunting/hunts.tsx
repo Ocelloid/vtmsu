@@ -105,7 +105,6 @@ const Hunts = () => {
       })
       .sort((a, b) => a.distance - b.distance)
       .filter((a) => a.distance <= (a.remains! + 1.5) * 100);
-    console.log(si);
     return si;
   };
 
