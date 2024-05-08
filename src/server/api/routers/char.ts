@@ -841,7 +841,7 @@ export const charRouter = createTRPCRouter({
         features: { include: { feature: true } },
       },
       orderBy: { createdAt: "desc" },
-      where: { createdBy: { id: ctx.session.user.id } },
+      where: { playerId: ctx.session.user.id },
     });
   }),
 });
