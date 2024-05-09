@@ -17,6 +17,7 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
+  additionalAbilities: number;
   playerId?: string | null;
   comment?: string | null;
   pending?: boolean | null;
@@ -440,6 +441,7 @@ export const charRouter = createTRPCRouter({
         publicInfo: z.string().nullish(),
         playerName: z.string().nullish(),
         playerContact: z.string().nullish(),
+        additionalAbilities: z.number(),
         playerId: z.string().nullish(),
         clanId: z.number(),
         factionId: z.number(),
@@ -471,6 +473,7 @@ export const charRouter = createTRPCRouter({
           publicInfo: input.publicInfo,
           playerName: input.playerName,
           playerContact: input.playerContact,
+          additionalAbilities: input.additionalAbilities,
           playerId: input.playerId ? input.playerId : ctx.session.user.id,
           pending: true,
           image: input.image,
@@ -517,6 +520,7 @@ export const charRouter = createTRPCRouter({
         publicInfo: z.string().nullish(),
         playerId: z.string().nullish(),
         clanId: z.number(),
+        additionalAbilities: z.number(),
         factionId: z.number(),
         image: z.string(),
         age: z.string(),
@@ -622,6 +626,12 @@ export const charRouter = createTRPCRouter({
           from: char?.childer,
           to: input.childer,
         });
+      if (char?.additionalAbilities !== input.additionalAbilities)
+        changedFields.push({
+          name: "Дополнительные очки дисциплин",
+          from: char?.additionalAbilities,
+          to: input.additionalAbilities,
+        });
       if (abilitiesChanged)
         changedFields.push({
           name: "Дисциплины",
@@ -664,6 +674,7 @@ export const charRouter = createTRPCRouter({
           playerName: input.playerName,
           playerContact: input.playerContact,
           playerId: input.playerId ? input.playerId : ctx.session.user.id,
+          additionalAbilities: input.additionalAbilities,
           name: input.name,
           title: input.title,
           status: input.status,

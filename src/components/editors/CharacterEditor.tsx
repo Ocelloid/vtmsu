@@ -63,6 +63,7 @@ export default function CharacterEditor() {
     ambition,
     content,
     abilityIds,
+    additionalAbilities,
     featuresWithComments,
     isEditing,
     clear,
@@ -104,6 +105,10 @@ export default function CharacterEditor() {
     theme === "light" ? faction_icons._ankh : faction_icons._ankh_white;
 
   const [characterId, setCharacterId] = useState<number>();
+  const [infiniteAbilities, setInfiniteAbilities] = useState<boolean>(false);
+  const [infiniteFeatures, setInfiniteFeatures] = useState<boolean>(false);
+  const [seeAllAbilities, setSeeAllAbilities] = useState<boolean>(false);
+  const [seeAllFeatures, setSeeAllFeatures] = useState<boolean>(false);
   const [costSum, setCostSum] = useState<number>(0);
   const [contactSelect, setContactSelect] = useState<SelectContact[]>([]);
   const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
@@ -256,6 +261,7 @@ export default function CharacterEditor() {
             publicInfo: characterData.publicInfo ?? "",
             visible: characterData.visible,
             ambition: characterData.ambition ?? "",
+            additionalAbilities: characterData.additionalAbilities ?? 0,
             content: characterData.content ?? "",
             playerContact: characterData.playerContact ?? pS[0]?.label ?? "",
           });
@@ -324,6 +330,7 @@ export default function CharacterEditor() {
           title: title,
           status: status,
           ambition: ambition,
+          additionalAbilities: additionalAbilities ?? 0,
           publicInfo: publicInfo,
           content: content ?? "",
           abilities: abilityIds,
@@ -359,6 +366,7 @@ export default function CharacterEditor() {
           title: title,
           status: status,
           ambition: ambition,
+          additionalAbilities: additionalAbilities ?? 0,
           publicInfo: publicInfo,
           content: content ?? "",
           abilities: abilityIds,
@@ -424,6 +432,14 @@ export default function CharacterEditor() {
   const abilities: Ability[] = !!traitsData ? traitsData.abilities : [];
   const features: Feature[] = !!traitsData ? traitsData.features : [];
 
+  const abilitiesRemain =
+    (featuresWithComments
+      .filter((fwc) => fwc.checked)
+      .map((fwc) => fwc.id)
+      .includes(features.find((f) => f.name === "Способный ученик")!.id)
+      ? (additionalAbilities ?? 0) + 4
+      : (additionalAbilities ?? 0) + 3) - abilityIds.length;
+
   const isInvalid =
     !name ||
     !factionId ||
@@ -436,10 +452,11 @@ export default function CharacterEditor() {
     publicInfo === "<p></p>" ||
     !content ||
     content === "<p></p>" ||
-    !!costSum ||
+    (!!costSum && !infiniteFeatures) ||
     !featuresWithComments
       .filter((fwc) => fwc.checked)
-      .reduce((a, b) => a && !!b.comment, true);
+      .reduce((a, b) => a && !!b.comment, true) ||
+    abilitiesRemain < 0;
 
   const invalidFields = [
     !name ? "имя персонажа" : undefined,
@@ -474,6 +491,7 @@ export default function CharacterEditor() {
     !!sire ||
     !!childer ||
     !!ambition ||
+    !!additionalAbilities ||
     !!content ||
     !!featuresWithComments.filter((fs) => fs.checked).length ||
     !!abilityIds.length;
@@ -571,7 +589,12 @@ export default function CharacterEditor() {
                   {!!invalidFields.filter((i) => !!i).length && "Введите "}
                   {invalidFields.filter((i) => !!i).join(", ")}
                   {!!invalidFields.filter((i) => !!i).length && ". "}
-                  {!!costSum && "Сумма дополнений долна быть равна нулю."}
+                  {!!costSum &&
+                    !infiniteFeatures &&
+                    "Сумма дополнений долна быть равна нулю."}
+                  {abilitiesRemain < 0 &&
+                    !infiniteAbilities &&
+                    `Вы можете выбрать не более ${abilitiesRemain + abilityIds.length} дисциплин.`}
                 </p>
               )}
             </div>
@@ -885,38 +908,61 @@ export default function CharacterEditor() {
                 aria-label={"Дисциплины"}
                 title={
                   "Дисциплины" +
-                  (!!abilityIds.length ? ` (всего ${abilityIds.length})` : "")
+                  (!!abilityIds.length
+                    ? abilitiesRemain >= 0
+                      ? ` (осталось ${abilitiesRemain})`
+                      : ` (уберите ${abilitiesRemain * -1})`
+                    : "")
                 }
               >
+                <div className="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    variant="underlined"
+                    type="number"
+                    isDisabled={
+                      abilityIds.length > 3 + (additionalAbilities ?? 0)
+                    }
+                    label="Для старейшин: дополнительные дисциплины"
+                    placeholder="1 по-умолчанию или 2 по договорённости с МГ"
+                    value={
+                      additionalAbilities ? additionalAbilities.toString() : ""
+                    }
+                    onValueChange={(a) => {
+                      if (Number(a) > -1 && Number(a) < 3)
+                        update({ additionalAbilities: Math.floor(Number(a)) });
+                    }}
+                  />
+                  <div className="flex flex-col-reverse">
+                    {(isAdmin || isPersonnel) && (
+                      <Checkbox
+                        isSelected={infiniteAbilities}
+                        onValueChange={setInfiniteAbilities}
+                      >
+                        Бесконечные дисциплины
+                      </Checkbox>
+                    )}
+                    {(isAdmin || isPersonnel) && (
+                      <Checkbox
+                        isSelected={seeAllAbilities}
+                        onValueChange={setSeeAllAbilities}
+                      >
+                        Показать все дисциплины
+                      </Checkbox>
+                    )}
+                  </div>
+                </div>
                 <CheckboxGroup
                   label={
                     !!clanId
-                      ? `Выберите дисциплины - не больше ${
-                          featuresWithComments
-                            .filter((fwc) => fwc.checked)
-                            .map((fwc) => fwc.id)
-                            .includes(
-                              features.find(
-                                (f) => f.name === "Способный ученик",
-                              )!.id,
-                            )
-                            ? "четырёх"
-                            : "трёх"
-                        }`
+                      ? `Выберите дисциплины - не больше ${abilitiesRemain + abilityIds.length}`
                       : "Сначала выберите клан"
                   }
                   color="warning"
                   value={abilityIds ? abilityIds.map((a) => a.toString()) : []}
                   onValueChange={(aids) => {
-                    const maxDisc = featuresWithComments
-                      .filter((fwc) => fwc.checked)
-                      .map((fwc) => fwc.id)
-                      .includes(
-                        features.find((f) => f.name === "Способный ученик")!.id,
-                      )
-                      ? 4
-                      : 3;
-                    if (aids.length <= maxDisc) {
+                    const maxDisc = abilitiesRemain + abilityIds.length;
+                    console.log(maxDisc);
+                    if (aids.length <= maxDisc || infiniteAbilities) {
                       storeAbilities(aids.map((aid) => Number(aid)));
                     }
                   }}
@@ -931,31 +977,22 @@ export default function CharacterEditor() {
                             ? abilityIds.includes(a.requirementId)
                             : true) &&
                           a.visibleToPlayer) ||
-                        isAdmin ||
-                        isPersonnel,
+                        seeAllAbilities,
                     )
                     .map((ability) => (
                       <Checkbox
                         isDisabled={
-                          abilities
+                          (abilities
                             .filter((a) => abilityIds.includes(a.id))
                             .map((a) => a.requirementId)
                             .includes(Number(ability.id)) ||
-                          (abilities
-                            .filter((a) => !abilityIds.includes(a.id))
-                            .map((a) => a.id)
-                            .includes(Number(ability.id)) &&
-                            abilityIds.length >
-                              (featuresWithComments
-                                .filter((fwc) => fwc.checked)
-                                .map((fwc) => fwc.id)
-                                .includes(
-                                  features.find(
-                                    (f) => f.name === "Способный ученик",
-                                  )!.id,
-                                )
-                                ? 3
-                                : 2))
+                            (abilities
+                              .filter((a) => !abilityIds.includes(a.id))
+                              .map((a) => a.id)
+                              .includes(Number(ability.id)) &&
+                              abilityIds.length >
+                                abilitiesRemain + abilityIds.length - 1)) &&
+                          !infiniteAbilities
                         }
                         key={ability.id}
                         value={ability.id.toString()}
@@ -1001,6 +1038,24 @@ export default function CharacterEditor() {
                   "Дополнения" + (!!costSum ? ` (в сумме ${costSum})` : "")
                 }
               >
+                <div className="mb-1 flex flex-col-reverse">
+                  {(isAdmin || isPersonnel) && (
+                    <Checkbox
+                      isSelected={seeAllFeatures}
+                      onValueChange={setSeeAllFeatures}
+                    >
+                      Показать все дополнения
+                    </Checkbox>
+                  )}
+                  {(isAdmin || isPersonnel) && (
+                    <Checkbox
+                      isSelected={infiniteFeatures}
+                      onValueChange={setInfiniteFeatures}
+                    >
+                      Бесконечные дополнения
+                    </Checkbox>
+                  )}
+                </div>
                 <CheckboxGroup
                   label={
                     !!clanId ? "Выберите дополнения" : "Сначала выберите клан"
@@ -1037,8 +1092,7 @@ export default function CharacterEditor() {
                           .FeatureAvailable!.map((fa) => fa.clanId)
                           .includes(clanId!) &&
                           f.visibleToPlayer) ||
-                        isAdmin ||
-                        isPersonnel,
+                        seeAllFeatures,
                     )
                     .map((feature) => (
                       <>
@@ -1047,7 +1101,7 @@ export default function CharacterEditor() {
                           value={feature.id.toString()}
                           isDisabled={
                             feature.name === "Способный ученик" &&
-                            abilityIds.length > 3
+                            abilityIds.length > 3 + (additionalAbilities ?? 0)
                           }
                           classNames={{
                             base: cn(

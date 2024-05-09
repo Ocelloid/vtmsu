@@ -24,6 +24,7 @@ type OptionalFields = {
   ambition?: string;
   content?: string;
   isEditing?: boolean;
+  additionalAbilities?: number;
 };
 
 type RequiredFields = {
@@ -55,6 +56,7 @@ const INITIAL_STATE: OptionalFields & RequiredFields = {
   ambition: "",
   content: "",
   abilityIds: [],
+  additionalAbilities: 0,
   featuresWithComments: [],
   isEditing: false,
 };
@@ -83,6 +85,10 @@ export const useCharacterStore = create<StateFields & Actions>((set) => ({
       childer: "childer" in fields ? fields.childer : state.childer,
       ambition: "ambition" in fields ? fields.ambition : state.ambition,
       content: "content" in fields ? fields.content : state.content,
+      additionalAbilities:
+        "additionalAbilities" in fields
+          ? fields.additionalAbilities
+          : state.additionalAbilities,
     }));
     return;
   },

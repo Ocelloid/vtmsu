@@ -88,37 +88,38 @@ model Hunt {
 }
 
 model Char {
-  id            Int                  @id @default(autoincrement())
-  name          String
-  factionId     Int
-  clanId        Int
-  visible       Boolean              @default(false)
-  playerId      String?
-  playerName    String?
-  playerContact String?
-  image         String?
-  age           String?
-  sire          String?
-  title         String?
-  status        String?
-  childer       String?
-  hunt_req      String?
-  comment       String?              @db.LongText
-  p_comment     String?              @db.LongText
-  pending       Boolean?             @default(false)
-  verified      Boolean?             @default(false)
-  ambition      String?              @db.LongText
-  publicInfo    String?              @db.LongText
-  content       String?              @db.LongText
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  createdBy     User                 @relation(fields: [createdById], references: [id])
-  clan          Clan                 @relation(fields: [clanId], references: [id])
-  faction       Faction              @relation(fields: [factionId], references: [id])
-  abilities     CharacterAbilities[]
-  features      CharacterFeatures[]
-  hunts         Hunt[]
-  createdById   String
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  factionId           Int
+  clanId              Int
+  visible             Boolean              @default(false)
+  additionalAbilities Int                  @default(0)
+  playerId            String?
+  playerName          String?
+  playerContact       String?
+  image               String?
+  age                 String?
+  sire                String?
+  title               String?
+  status              String?
+  childer             String?
+  hunt_req            String?
+  comment             String?              @db.LongText
+  p_comment           String?              @db.LongText
+  pending             Boolean?             @default(false)
+  verified            Boolean?             @default(false)
+  ambition            String?              @db.LongText
+  publicInfo          String?              @db.LongText
+  content             String?              @db.LongText
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  createdBy           User                 @relation(fields: [createdById], references: [id])
+  clan                Clan                 @relation(fields: [clanId], references: [id])
+  faction             Faction              @relation(fields: [factionId], references: [id])
+  abilities           CharacterAbilities[]
+  features            CharacterFeatures[]
+  hunts               Hunt[]
+  createdById         String
 }
 
 model ClanInFaction {
