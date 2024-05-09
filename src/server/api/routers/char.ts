@@ -17,7 +17,7 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
-  additionalAbilities: number;
+  additionalAbilities?: number | null;
   playerId?: string | null;
   comment?: string | null;
   pending?: boolean | null;
