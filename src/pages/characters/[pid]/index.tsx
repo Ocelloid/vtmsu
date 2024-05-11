@@ -110,7 +110,7 @@ const CharacterSheet = ({
 
   useEffect(() => {
     if (!!publicData && !!sessionData) {
-      setPrivateVer(publicData.createdById === sessionData.user.id || isAdmin);
+      setPrivateVer(publicData.playerId === sessionData.user.id || isAdmin);
     }
   }, [publicData, sessionData, isAdmin, setPrivateVer]);
 

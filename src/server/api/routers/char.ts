@@ -822,6 +822,7 @@ export const charRouter = createTRPCRouter({
           visible: true,
           createdById: true,
           name: true,
+          playerId: true,
           playerName: true,
           playerContact: true,
           image: true,
