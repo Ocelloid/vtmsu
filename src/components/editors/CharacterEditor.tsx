@@ -36,11 +36,11 @@ import {
 import { useTheme } from "next-themes";
 import { useCharacterStore } from "~/stores/useCharacterStore";
 
-type SelectContact = {
-  label: string;
-  value: string;
-  description: string;
-};
+// type SelectContact = {
+//   label: string;
+//   value: string;
+//   description: string;
+// };
 
 export default function CharacterEditor() {
   const router = useRouter();
