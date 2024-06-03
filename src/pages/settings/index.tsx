@@ -80,7 +80,7 @@ export default function Settings() {
     value.match(/^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{10}$/i);
 
   const isPhoneInvalid = useMemo(() => {
-    if (userPhone === "") return false;
+    if (userPhone === "") return true;
     return validatePhone(userPhone) ? false : true;
   }, [userPhone]);
 
@@ -288,6 +288,11 @@ export default function Settings() {
                   value={userPhone}
                   onValueChange={setUserPhone}
                 />
+                {(isPhoneInvalid || isEmailInvalid || !userName) && (
+                  <span className="ml-1 text-xs text-danger">
+                    Обязательные поля отмечены красным
+                  </span>
+                )}
               </div>
               <div className="col-span-2 flex flex-1 flex-grow flex-col">
                 <Input
