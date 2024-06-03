@@ -18,6 +18,7 @@ import { api } from "~/utils/api";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useTheme } from "next-themes";
 import { clans, factions, other } from "~/assets";
+import { signOut } from "next-auth/react";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
@@ -31,6 +32,7 @@ export default function Settings() {
   const [userTG, setUserTG] = useState<string>("");
   const [userDiscord, setUserDiscord] = useState<string>("");
   const [bgLoading, setBgLoading] = useState<boolean>(false);
+  const { mutate: deleteUser } = api.user.delete.useMutation();
   const { mutate: changePP } = api.user.changePP.useMutation();
   const { mutate: updateBG } = api.user.updateBG.useMutation();
   const { mutate: update } = api.user.update.useMutation();
@@ -87,14 +89,14 @@ export default function Settings() {
 
   useEffect(() => {
     if (!!sessionData && !!userData) {
-      const bg = userData.background!;
+      const bg = userData.background;
       setUserName(sessionData.user.name ?? "");
       setUserEmail(sessionData.user.email ?? "");
       setUserPhone(userData.phone ?? "");
       setUserVK(userData.vk ?? "");
       setUserTG(userData.tg ?? "");
       setUserDiscord(userData.discord ?? "");
-      setBgSelected(bg);
+      setBgSelected(bg ?? "");
     }
   }, [sessionData, userData, theme]);
 
@@ -161,6 +163,19 @@ export default function Settings() {
     );
   };
 
+  const handleDeleteUser = () => {
+    const confirm = window.confirm(
+      "Вы уверены, что хотите удалить аккаунт?\nЭто действие необратимо - вы потеряете все свои данные!",
+    );
+    if (!confirm) return;
+    else
+      void deleteUser(undefined, {
+        onSuccess: () => {
+          void signOut({ callbackUrl: "/", redirect: true });
+        },
+      });
+  };
+
   if (isUserLoading) return <LoadingPage />;
   if (!sessionData)
     return (
@@ -190,7 +205,9 @@ export default function Settings() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-1 flex-col sm:pb-4">
+      <main
+        className={`${isChanged ? "mb-36 min-h-[calc(100vh-9rem)]" : "min-h-[calc(100vh-1.5rem)]"} flex  flex-1 flex-col sm:pb-4`}
+      >
         <div
           className={`${isChanged ? "bottom-0 z-20" : "-bottom-36 opacity-0"} fixed inset-x-0 h-36 w-full bg-black/75`}
         />
@@ -338,7 +355,7 @@ export default function Settings() {
           >
             {theme === "light" ? "Светлая тема" : "Тёмная тема"}
           </Switch>
-          <Accordion isCompact className="mb-36">
+          <Accordion isCompact>
             <AccordionItem
               aria-label={"Фон"}
               title={"Фон"}
@@ -371,7 +388,7 @@ export default function Settings() {
                     "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 overflow-hidden",
                 }}
                 color="danger"
-                value={bgSelected}
+                value={bgSelected ?? bgSelection[0]?.value ?? ""}
                 onValueChange={handleUpdateBG}
               >
                 {bgSelection.map((bg) => (
@@ -393,6 +410,14 @@ export default function Settings() {
               </RadioGroup>
             </AccordionItem>
           </Accordion>
+          <Button
+            className="mb-2 mt-auto"
+            variant="ghost"
+            color="danger"
+            onClick={() => handleDeleteUser()}
+          >
+            Удалить аккаунт
+          </Button>
         </div>
       </main>
     </>
