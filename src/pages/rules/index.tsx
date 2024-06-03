@@ -163,7 +163,7 @@ export default function Rules() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-screen flex-1 flex-col">
+      <main className=" flex min-h-[calc(100vh-1.5rem)] flex-1 flex-col">
         <div className="container mt-20 flex flex-1 flex-col">
           <Tabs
             selectedKey={category}

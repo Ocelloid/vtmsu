@@ -38,7 +38,7 @@ const UserPage = () => {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-screen flex-col pt-24">
+      <main className=" flex min-h-[calc(100vh-1.5rem)] flex-col pt-24">
         <div className="container flex flex-col gap-2 px-4">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <div>

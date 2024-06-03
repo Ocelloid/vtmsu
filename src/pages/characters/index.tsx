@@ -74,7 +74,7 @@ export default function Characters() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-screen flex-col pt-20">
+      <main className=" flex min-h-[calc(100vh-1.5rem)] flex-col pt-20">
         <div className="container flex flex-col px-4">
           <Tabs
             aria-label="tabs"

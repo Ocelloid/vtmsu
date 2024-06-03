@@ -58,7 +58,7 @@ export default function About() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-row text-justify">
+      <main className="flex min-h-[calc(100vh-1.5rem)] flex-row text-justify">
         <WithSideNavigation
           links={links}
           sideNavExtraClass="font-semibold"
