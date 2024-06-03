@@ -6,7 +6,7 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import DiscordProvider from "next-auth/providers/discord";
+import DiscordProvider from "./ds";
 import YandexProvider from "next-auth/providers/yandex";
 import Vk from "./vk";
 import { env } from "~/env";

@@ -32,7 +32,11 @@ export default function Shop() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
-      <main className="flex min-h-screen flex-1 flex-col pt-20">
+      <main className="flex min-h-screen flex-1 flex-col pt-24">
+        <p className="mx-auto px-4">
+          Раздел находится в разработке - товары ненастоящие, это только пример
+          того, как они могут выглядеть.
+        </p>
         <div className="container grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
           {!!isAdmin && <AddProduct onClose={refetch} />}
           {!!products.length &&

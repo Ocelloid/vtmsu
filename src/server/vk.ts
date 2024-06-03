@@ -50,6 +50,7 @@ export default function VK<P extends Record<string, any> = VkProfile>(
         name: [profile.first_name, profile.last_name].filter(Boolean).join(" "),
         email: null,
         image: profile.photo_200,
+        vk: profile.domain,
       };
     },
     options,

@@ -26,12 +26,26 @@ const MyApp: AppType<{ session: Session | null }> = ({
             <meta name="HandheldFriendly" content="true" />
             <meta
               name="viewport"
-              content="width=device-width, initial-scale=1.0, 
-minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+              content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
             />
             <BGImage />
             <Component {...pageProps} />
             <Navigation />
+            {/* <div
+              className="relative h-[160px] md:h-[80px]"
+              style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
+            > */}
+            <div className="mb-6" />
+            <div className="fixed bottom-0 flex h-6 w-full flex-col justify-between bg-slate-950 px-12 py-1">
+              <a
+                href="https://ocelloid.com"
+                target="_blank"
+                className="ml-auto text-xs"
+              >
+                © Ocelloid 2024
+              </a>
+            </div>
+            {/* </div> */}
           </main>
         </SessionProvider>
       </NextThemesProvider>

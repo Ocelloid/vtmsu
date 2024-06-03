@@ -30,6 +30,7 @@ export default function Settings() {
   const [userVK, setUserVK] = useState<string>("");
   const [userTG, setUserTG] = useState<string>("");
   const [userDiscord, setUserDiscord] = useState<string>("");
+  const [bgLoading, setBgLoading] = useState<boolean>(false);
   const { mutate: changePP } = api.user.changePP.useMutation();
   const { mutate: updateBG } = api.user.updateBG.useMutation();
   const { mutate: update } = api.user.update.useMutation();
@@ -111,6 +112,7 @@ export default function Settings() {
   };
 
   const handleUpdateBG = (bgs: string) => {
+    setBgLoading(true);
     updateBG(
       {
         bg: bgs.includes("_white") ? bgs.replace("_white", "") : bgs,
@@ -121,6 +123,7 @@ export default function Settings() {
           setTimeout(() => {
             void updateSession();
             void refetchUser();
+            setBgLoading(false);
           }, 500);
         },
       },
@@ -335,22 +338,29 @@ export default function Settings() {
           >
             {theme === "light" ? "Светлая тема" : "Тёмная тема"}
           </Switch>
-          <Accordion isCompact>
+          <Accordion isCompact className="mb-36">
             <AccordionItem
               aria-label={"Фон"}
               title={"Фон"}
               subtitle="Сменить фоновое изображение"
               startContent={
-                <Image
-                  alt="current_background"
-                  className="-ml-2 max-h-8 max-w-8 object-contain"
-                  src={
-                    bgSelected
-                      ? bgSelection?.find((bgs) => bgs?.value === bgSelected)
-                          ?.image ?? ""
-                      : defaultImage
-                  }
-                />
+                <>
+                  {bgLoading && (
+                    <div className="absolute -ml-1 items-center justify-center py-1">
+                      <LoadingSpinner width={24} height={24} />
+                    </div>
+                  )}
+                  <Image
+                    alt="current_background"
+                    className="-ml-2 max-h-8 max-w-8 object-contain"
+                    src={
+                      bgSelected
+                        ? bgSelection?.find((bgs) => bgs?.value === bgSelected)
+                            ?.image ?? ""
+                        : defaultImage
+                    }
+                  />
+                </>
               }
             >
               <RadioGroup

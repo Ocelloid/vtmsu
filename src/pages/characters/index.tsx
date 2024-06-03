@@ -20,7 +20,7 @@ import type { Faction, Clan } from "~/server/api/routers/char";
 export default function Characters() {
   const router = useRouter();
   const { data: sessionData } = useSession();
-  const [selectedTab, setSelectedTab] = useState("all");
+  const [selectedTab, setSelectedTab] = useState("mine");
   const [characters, setCharacters] = useState<Character[]>([]);
   const [myCharacters, setMyCharacters] = useState<Character[]>([]);
   const [factionIds, setFactionIds] = useState<number[]>([]);

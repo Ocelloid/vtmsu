@@ -20,6 +20,10 @@ export default function ProductPage() {
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
       <main className="flex min-h-screen flex-1 flex-col py-24">
         <div className="container flex flex-col gap-12">
+          <p className="mx-auto px-4">
+            Раздел находится в разработке - товары ненастоящие, это только
+            пример того, как они могут выглядеть.
+          </p>
           <Product />
         </div>
       </main>

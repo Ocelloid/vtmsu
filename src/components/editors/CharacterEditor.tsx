@@ -680,8 +680,17 @@ export default function CharacterEditor() {
                     update({ playerName: s });
                   }}
                 />
+                <Input
+                  variant="underlined"
+                  label="Способ связи"
+                  placeholder="Введите способ связи"
+                  value={playerContact}
+                  onValueChange={(s) => {
+                    update({ playerContact: s });
+                  }}
+                />
 
-                <Select
+                {/* <Select
                   label="Способ связи"
                   placeholder="Введите способ связи"
                   variant="underlined"
@@ -703,7 +712,7 @@ export default function CharacterEditor() {
                       {item.label}
                     </SelectItem>
                   ))}
-                </Select>
+                </Select> */}
               </div>
               <div className="col-span-11 flex-1 flex-col sm:col-span-4 sm:flex">
                 <Select
