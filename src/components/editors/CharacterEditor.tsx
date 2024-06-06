@@ -638,7 +638,7 @@ export default function CharacterEditor() {
               ))}
             </Select>
           )}
-          <div className="-mx-2 -mt-2 flex flex-col px-2 sm:mx-0 sm:px-0">
+          <div className="-mx-2 -mt-2 flex flex-col gap-2 px-2 sm:mx-0 sm:px-0 md:gap-4">
             <div className="grid grid-cols-11 gap-2">
               <div className="col-span-5 flex flex-col items-center justify-center sm:col-span-3">
                 {uploading ? (
@@ -865,6 +865,7 @@ export default function CharacterEditor() {
             </Checkbox>
             <div className="flex flex-col gap-2">
               <DefaultEditor
+                label="Публичная информация"
                 className="min-h-44 sm:min-h-20"
                 onUpdate={(a) => {
                   update({ publicInfo: a });
@@ -872,26 +873,26 @@ export default function CharacterEditor() {
                 initialContent={initialPublicInfo}
                 placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
               />
-              <div className={"-mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2"}>
-                <Input
-                  variant="underlined"
-                  label="Сир"
-                  placeholder="Введите имя сира"
-                  value={sire}
-                  onValueChange={(a) => {
-                    update({ sire: a });
-                  }}
-                />
-                <Input
-                  variant="underlined"
-                  label="Чайлды"
-                  placeholder="Введите имена чайлдов через запятую"
-                  value={childer}
-                  onValueChange={(a) => {
-                    update({ childer: a });
-                  }}
-                />
-              </div>
+            </div>
+            <div className={"grid grid-cols-1 gap-4 sm:grid-cols-2"}>
+              <Input
+                variant="underlined"
+                label="Сир"
+                placeholder="Введите имя сира"
+                value={sire}
+                onValueChange={(a) => {
+                  update({ sire: a });
+                }}
+              />
+              <Input
+                variant="underlined"
+                label="Чайлды"
+                placeholder="Введите имена чайлдов через запятую"
+                value={childer}
+                onValueChange={(a) => {
+                  update({ childer: a });
+                }}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Textarea
