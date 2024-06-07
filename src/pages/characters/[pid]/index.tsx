@@ -92,7 +92,7 @@ const CharacterSheet = ({
         !(
           !!(publicData.visible && publicData.verified) ||
           !!isAdmin ||
-          publicData.createdById === sessionData.user.id
+          publicData.playerId === sessionData.user.id
         )
       ) {
         void router.push("/characters");

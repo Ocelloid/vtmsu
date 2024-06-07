@@ -783,7 +783,7 @@ export const charRouter = createTRPCRouter({
       });
       const whereData = user?.isAdmin
         ? { id: input.id }
-        : { id: input.id, createdById: ctx.session.user.id };
+        : { id: input.id, playerId: ctx.session.user.id };
       return ctx.db.char.findFirst({
         where: whereData,
         select: {
