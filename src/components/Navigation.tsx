@@ -37,7 +37,7 @@ const Navigation = () => {
           className="flex flex-row items-center text-xl hover:text-gray-700 dark:hover:text-gray-300"
         >
           {router.query.pid ? <FaArrowLeft size={30} /> : <FaAnkh size={30} />}
-          &nbsp;-&nbsp;βeta
+          &nbsp;βeta
         </Link>
         <div className="flex md:hidden" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <FaXmark size={30} /> : <FaBars size={30} />}
