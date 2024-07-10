@@ -35,7 +35,7 @@ export default function QRCodes() {
             <div className="gap-full flex w-full flex-row">
               <Link href={`/qr/${item.id}`}>{item.name}</Link>
               <span className="ml-auto px-2">
-                {item.createdAt.toLocaleString()}
+                {item.createdAt.toLocaleDateString()}
               </span>
             </div>
             <Button
