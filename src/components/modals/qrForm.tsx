@@ -55,7 +55,7 @@ const QRForm = () => {
         }}
       >
         <ModalContent>
-          <ModalHeader>Оформить заказ</ModalHeader>
+          <ModalHeader>Добавить код</ModalHeader>
           <ModalBody>
             <Input
               variant="underlined"
