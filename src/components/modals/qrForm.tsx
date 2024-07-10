@@ -48,8 +48,9 @@ const QRForm = () => {
         placement="top-center"
         backdrop="blur"
         classNames={{
+          wrapper: "z-[1000]",
           body: "py-6",
-          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100 mt-24",
           closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
         }}
       >
