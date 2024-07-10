@@ -7,23 +7,42 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@nextui-org/react";
-import { useState } from "react";
 import { api } from "~/utils/api";
 import { FaQrcode } from "react-icons/fa";
 import { LoadingSpinner } from "~/components/Loading";
+import { type ReactNode, useState, useEffect } from "react";
 import DefaultEditor from "~/components/editors/DefaultEditor";
 
-const QRForm = () => {
+const QRForm = ({
+  editId,
+  children,
+}: {
+  editId?: number;
+  children?: ReactNode;
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
 
   const { mutate: createMutation, isPending } = api.item.create.useMutation();
+  const { data: item, isLoading: isItemLoading } = api.item.getById.useQuery(
+    {
+      id: editId!,
+    },
+    { enabled: !!editId },
+  );
 
   const resetForm = () => {
     setTitle("");
     setDescription("");
   };
+
+  useEffect(() => {
+    if (!!item) {
+      setTitle(item?.name ?? "");
+      setDescription(item?.content ?? "");
+    }
+  }, [item]);
 
   const handleFormSubmit = () => {
     createMutation(
@@ -37,6 +56,8 @@ const QRForm = () => {
     );
   };
 
+  if (isItemLoading) return <LoadingSpinner />;
+
   return (
     <>
       <Modal
@@ -49,13 +70,14 @@ const QRForm = () => {
         backdrop="blur"
         classNames={{
           wrapper: "z-[1000]",
-          body: "py-6",
           base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100 mt-24",
           closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
         }}
       >
         <ModalContent>
-          <ModalHeader>Добавить код</ModalHeader>
+          <ModalHeader>
+            {!!editId ? "Редактирование кода" : "Добавить код"}
+          </ModalHeader>
           <ModalBody>
             <Input
               variant="underlined"
@@ -93,10 +115,18 @@ const QRForm = () => {
       </Modal>
       <Button
         onClick={() => setIsModalOpen(true)}
-        className="flex w-full flex-row gap-0 rounded-none bg-transparent text-black dark:text-red-100"
+        variant="light"
+        size="sm"
+        className="flex min-w-10 flex-row gap-0 bg-transparent text-black dark:text-red-100"
       >
-        <FaQrcode size={24} />
-        &nbsp;Добавить код
+        {children ? (
+          children
+        ) : (
+          <>
+            <FaQrcode size={24} />
+            &nbsp;Добавить код
+          </>
+        )}
       </Button>
     </>
   );

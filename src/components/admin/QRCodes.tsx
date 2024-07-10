@@ -1,7 +1,7 @@
 import { LoadingPage } from "~/components/Loading";
 import QRForm from "~/components/modals/qrForm";
 import { Button } from "@nextui-org/react";
-import { FaDownload } from "react-icons/fa";
+import { FaDownload, FaPencilAlt } from "react-icons/fa";
 import { api } from "~/utils/api";
 import Link from "next/link";
 import QRCode from "qrcode";
@@ -25,8 +25,8 @@ export default function QRCodes() {
 
   return (
     <>
-      <QRForm />
       <div className="flex flex-col gap-2">
+        <QRForm />
         {itemList?.map((item) => (
           <div
             key={item.id}
@@ -40,11 +40,15 @@ export default function QRCodes() {
             </div>
             <Button
               size="sm"
+              variant="light"
               className="w-10 min-w-10"
               onClick={() => generateQRCode(`https://vtm.su/qr/${item.id}`)}
             >
               <FaDownload />
             </Button>
+            <QRForm editId={item.id}>
+              <FaPencilAlt />
+            </QRForm>
           </div>
         ))}
       </div>
