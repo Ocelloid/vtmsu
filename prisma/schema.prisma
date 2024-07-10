@@ -202,7 +202,7 @@ model CharacterFeatures {
   id              Int     @id @default(autoincrement())
   characterId     Int
   featureId       Int
-  description     String?
+  description     String? @db.LongText
   visibleToPlayer Boolean @default(false)
   feature         Feature @relation(fields: [featureId], references: [id])
   Char            Char    @relation(fields: [characterId], references: [id], onDelete: Cascade)
