@@ -9,6 +9,7 @@ import CharacterTraits from "~/components/admin/CharacterTraits";
 import Hunting from "~/components/admin/hunting";
 import Characters from "~/components/admin/Characters";
 import Link from "next/link";
+import QRCodes from "~/components/admin/QRCodes";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -191,7 +192,7 @@ export default function Admin() {
                 </div>
               }
             >
-              Виртуальный АХЧ
+              <QRCodes />
             </Tab>
             <Tab
               key={"hunt"}

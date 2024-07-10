@@ -4,6 +4,7 @@ import { userRouter } from "~/server/api/routers/user";
 import { ruleRouter } from "~/server/api/routers/rule";
 import { charRouter } from "~/server/api/routers/char";
 import { huntRouter } from "~/server/api/routers/hunt";
+import { itemRouter } from "~/server/api/routers/item";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 export const appRouter = createTRPCRouter({
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
   rule: ruleRouter,
   char: charRouter,
   hunt: huntRouter,
+  item: itemRouter,
 });
 export type AppRouter = typeof appRouter;
 export const createCaller = createCallerFactory(appRouter);

@@ -22,6 +22,16 @@ model Post {
   @@index([name])
 }
 
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  content     String?  @db.LongText
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+}
+
 model HuntingGround {
   id        Int               @id @default(autoincrement())
   name      String
@@ -289,6 +299,7 @@ model User {
   rules         Rule[]
   characters    Char[]
   hunts         Hunt[]
+  Item          Item[]
 }
 
 model VerificationToken {
