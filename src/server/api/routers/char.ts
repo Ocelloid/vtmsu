@@ -35,9 +35,34 @@ export type Character = {
   content?: string | null;
   abilities?: CharacterAbility[];
   features?: CharacterFeature[];
+  rituals?: CharacterRituals[];
+  knowledges?: CharacterKnowledges[];
   clan?: Clan;
   faction?: Faction;
   createdBy?: User;
+};
+
+export type CharacterKnowledges = {
+  id: number;
+  characterId: number;
+  knowledgeId: number;
+  knowledge?: Knowledge;
+  Char?: Character;
+};
+
+export type Knowledge = {
+  id: number;
+  name: string;
+  content: string;
+  visibleToPlayer: boolean;
+};
+
+export type CharacterRituals = {
+  id: number;
+  characterId: number;
+  ritualId: number;
+  ritual?: Ritual;
+  Char?: Character;
 };
 
 export type CharacterAbility = {
@@ -104,6 +129,26 @@ export type Feature = {
   FeatureAvailable?: FeatureAvailable[];
 };
 
+export type Ritual = {
+  id: number;
+  name: string;
+  image: string;
+  recipe: string;
+  content: string;
+  visibleToPlayer: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  ritualKnowledges?: RitualKnowledges[];
+};
+
+export type RitualKnowledges = {
+  id: number;
+  ritualId: number;
+  knowledgeId: number;
+  ritual?: Ritual;
+  knowledge?: Knowledge;
+};
+
 export type AbilityAvailable = {
   id: number;
   clanId: number;
@@ -141,7 +186,18 @@ export const charRouter = createTRPCRouter({
         FeatureAvailable: { include: { feature: true } },
       },
     });
+    const rituals = await ctx.db.ritual.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        ritualKnowledges: { include: { knowledge: true } },
+      },
+    });
+    const knowledges = await ctx.db.knowledge.findMany({
+      orderBy: { name: "asc" },
+    });
     return {
+      knowledges: knowledges,
+      rituals: rituals,
       features: features,
       abilities: abilities,
       factions: factions,
@@ -175,6 +231,21 @@ export const charRouter = createTRPCRouter({
         ClanInFaction: { include: { faction: true } },
         AbilityAvailable: { include: { ability: true } },
         FeatureAvailable: { include: { feature: true } },
+      },
+    });
+  }),
+
+  getKnowledges: publicProcedure.query(({ ctx }) => {
+    return ctx.db.knowledge.findMany({
+      orderBy: { name: "asc" },
+    });
+  }),
+
+  getRituals: publicProcedure.query(({ ctx }) => {
+    return ctx.db.ritual.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        ritualKnowledges: { include: { knowledge: true } },
       },
     });
   }),
@@ -242,6 +313,119 @@ export const charRouter = createTRPCRouter({
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.feature.delete({ where: { id: input.id } });
+    }),
+
+  createRitual: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        image: z.string(),
+        recipe: z.string(),
+        content: z.string(),
+        visibleToPlayer: z.boolean(),
+        ritualKnowledges: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.ritual.create({
+        data: {
+          name: input.name,
+          image: input.image,
+          recipe: input.recipe,
+          content: input.content,
+          visibleToPlayer: input.visibleToPlayer,
+          ritualKnowledges: {
+            createMany: {
+              data: input.ritualKnowledges.map((a) => {
+                return { knowledgeId: a };
+              }),
+            },
+          },
+        },
+      });
+    }),
+
+  updateRitual: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        image: z.string(),
+        recipe: z.string(),
+        content: z.string(),
+        visibleToPlayer: z.boolean(),
+        ritualKnowledges: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.ritual.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          image: input.image,
+          recipe: input.recipe,
+          content: input.content,
+          visibleToPlayer: input.visibleToPlayer,
+          ritualKnowledges: {
+            deleteMany: {},
+            createMany: {
+              data: input.ritualKnowledges.map((a) => {
+                return { knowledgeId: a };
+              }),
+            },
+          },
+        },
+      });
+    }),
+
+  deleteRitual: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.ritual.delete({ where: { id: input.id } });
+    }),
+
+  createKnowledge: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        content: z.string(),
+        visibleToPlayer: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.knowledge.create({
+        data: {
+          name: input.name,
+          content: input.content,
+          visibleToPlayer: input.visibleToPlayer,
+        },
+      });
+    }),
+
+  updateKnowledge: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        content: z.string(),
+        visibleToPlayer: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.knowledge.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          content: input.content,
+          visibleToPlayer: input.visibleToPlayer,
+        },
+      });
+    }),
+
+  deleteKnowledge: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.knowledge.delete({ where: { id: input.id } });
     }),
 
   createAbility: protectedProcedure

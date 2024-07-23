@@ -128,6 +128,8 @@ model Char {
   faction             Faction              @relation(fields: [factionId], references: [id])
   abilities           CharacterAbilities[]
   features            CharacterFeatures[]
+  rituals             CharacterRituals[]
+  knowledges          CharacterKnowledges[]
   hunts               Hunt[]
   createdById         String
 }
@@ -176,6 +178,52 @@ model Faction {
   visibleToPlayer Boolean         @default(false)
   Char            Char[]
   ClanInFaction   ClanInFaction[]
+}
+
+model CharacterKnowledges {
+  id          Int     @id @default(autoincrement())
+  characterId Int
+  knowledgeId Int
+  knowledge   Knowledge @relation(fields: [knowledgeId], references: [id])
+  Char        Char      @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+model Knowledge {
+  id          Int     @id @default(autoincrement())
+  name        String
+  content     String  @db.LongText
+  visibleToPlayer Boolean @default(false)
+  CharacterKnowledges CharacterKnowledges[]
+  RitualKnowledges RitualKnowledges[]
+}
+
+model CharacterRituals {
+  id          Int     @id @default(autoincrement())
+  characterId Int
+  ritualId    Int
+  ritual      Ritual  @relation(fields: [ritualId], references: [id])
+  Char        Char    @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+model Ritual {
+  id          Int     @id @default(autoincrement())
+  name        String
+  image       String
+  recipe      String  @db.LongText
+  content String  @db.LongText
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  visibleToPlayer Boolean @default(false)
+  CharacterRituals CharacterRituals[]
+  ritualKnowledges RitualKnowledges[]
+}
+
+model RitualKnowledges {
+  id          Int     @id @default(autoincrement())
+  ritualId    Int
+  knowledgeId   Int
+  ritual      Ritual  @relation(fields: [ritualId], references: [id], onDelete: Cascade)
+  knowledge   Knowledge @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
 }
 
 model CharacterAbilities {

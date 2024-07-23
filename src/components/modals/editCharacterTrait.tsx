@@ -21,6 +21,8 @@ import type {
   Clan,
   Ability,
   Feature,
+  Ritual,
+  Knowledge,
 } from "~/server/api/routers/char";
 import Image from "next/image";
 import { LoadingPage } from "~/components/Loading";
@@ -40,7 +42,7 @@ const EditCharacterTrait = ({
   children,
 }: {
   onClose: () => void;
-  trait?: Faction | Clan | Ability | Feature;
+  trait?: Faction | Clan | Ability | Feature | Ritual | Knowledge;
   traitType?: string;
   className?: string;
   children?: string | JSX.Element | JSX.Element[] | (string | JSX.Element)[];
@@ -48,12 +50,15 @@ const EditCharacterTrait = ({
   const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExpert, setIsExpert] = useState(false);
+  const [recipe, setRecipe] = useState("");
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [cost, setCost] = useState<number>(0);
   const [requirement, setRequirement] = useState<number>();
+  const [knowledgeIds, setKnowledgeIds] = useState<number[]>([]);
   const [factionIds, setfactionIds] = useState<number[]>([]);
   const [clanIds, setclanIds] = useState<number[]>([]);
+  const [knowledges, setKnowledges] = useState<Knowledge[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [abilities, setAbilities] = useState<Ability[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
@@ -134,6 +139,18 @@ const EditCharacterTrait = ({
     );
   }, [abilityData]);
 
+  const { data: knowledgeData } = api.char.getKnowledges.useQuery();
+
+  useEffect(() => {
+    setKnowledges(
+      !!knowledgeData
+        ? knowledgeData.sort((a, b) =>
+            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+          )
+        : [],
+    );
+  }, [knowledgeData]);
+
   useEffect(() => {
     if (!!trait) {
       setTitle(trait.name ?? "");
@@ -160,6 +177,12 @@ const EditCharacterTrait = ({
           (trait as Clan).ClanInFaction!.map((v) => v.factionId) ?? [],
         );
       }
+      if (traitType === "Ritual") {
+        setKnowledgeIds(
+          (trait as Ritual).ritualKnowledges!.map((v) => v.knowledgeId) ?? [],
+        );
+        setRecipe((trait as Ritual).recipe ?? "");
+      }
     }
   }, [trait, traitType]);
 
@@ -171,7 +194,9 @@ const EditCharacterTrait = ({
 
   const handleSuccess = () => {
     onClose();
+    setRecipe("");
     setIsExpert(false);
+    setKnowledgeIds([]);
     setfactionIds([]);
     setclanIds([]);
     setContent("");
@@ -214,6 +239,20 @@ const EditCharacterTrait = ({
       },
     });
 
+  const { mutate: createRitual, isPending: isRitualPending } =
+    api.char.createRitual.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
+  const { mutate: createKnowledge, isPending: isKnowledgePending } =
+    api.char.createKnowledge.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
   const { mutate: updateFaction, isPending: isFactionUpdatePending } =
     api.char.updateFaction.useMutation({
       onSuccess() {
@@ -237,6 +276,20 @@ const EditCharacterTrait = ({
 
   const { mutate: updateFeature, isPending: isFeatureUpdatePending } =
     api.char.updateFeature.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
+  const { mutate: updateRitual, isPending: isRitualUpdatePending } =
+    api.char.updateRitual.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
+  const { mutate: updateKnowledge, isPending: isKnowledgeUpdatePending } =
+    api.char.updateKnowledge.useMutation({
       onSuccess() {
         handleSuccess();
       },
@@ -270,6 +323,20 @@ const EditCharacterTrait = ({
       },
     });
 
+  const { mutate: deleteRitual, isPending: isRitualDeletePending } =
+    api.char.deleteRitual.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
+  const { mutate: deleteKnowledge, isPending: isKnowledgeDeletePending } =
+    api.char.deleteKnowledge.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
   const handleDelete = () => {
     const confirmDeletion = confirm(
       "Удалить " +
@@ -279,7 +346,11 @@ const EditCharacterTrait = ({
             ? "клан"
             : traitType === "Ability"
               ? "способность"
-              : "дополнение") +
+              : traitType === "Ritual"
+                ? "ритуал"
+                : traitType === "Knowledge"
+                  ? "знание"
+                  : "дополнение") +
         "?",
     );
     if (confirmDeletion)
@@ -295,6 +366,12 @@ const EditCharacterTrait = ({
           return;
         case "Feature":
           deleteFeature({ id: trait!.id });
+          return;
+        case "Ritual":
+          deleteRitual({ id: trait!.id });
+          return;
+        case "Knowledge":
+          deleteKnowledge({ id: trait!.id });
           return;
       }
   };
@@ -383,6 +460,44 @@ const EditCharacterTrait = ({
           });
         }
         return;
+      case "Ritual":
+        if (!editing) {
+          createRitual({
+            name: title,
+            image: "",
+            recipe: recipe,
+            content: content,
+            visibleToPlayer: isVisibleToPlayer,
+            ritualKnowledges: knowledgeIds,
+          });
+        } else {
+          updateRitual({
+            id: trait.id ?? "",
+            name: title,
+            image: "",
+            recipe: recipe,
+            content: content,
+            visibleToPlayer: isVisibleToPlayer,
+            ritualKnowledges: knowledgeIds,
+          });
+        }
+        return;
+      case "Knowledge":
+        if (!editing) {
+          createKnowledge({
+            name: title,
+            content: content,
+            visibleToPlayer: isVisibleToPlayer,
+          });
+        } else {
+          updateKnowledge({
+            id: trait.id ?? "",
+            name: title,
+            content: content,
+            visibleToPlayer: isVisibleToPlayer,
+          });
+        }
+        return;
     }
   };
 
@@ -419,7 +534,11 @@ const EditCharacterTrait = ({
                 ? "клан"
                 : traitType === "Ability"
                   ? "способность"
-                  : "дополнение"}
+                  : traitType === "Ritual"
+                    ? "ритуал"
+                    : traitType === "Knowledge"
+                      ? "знание"
+                      : "дополнение"}
           </ModalHeader>
           <ModalBody>
             <div className={"flex flex-row"}>
@@ -433,7 +552,11 @@ const EditCharacterTrait = ({
                       ? "клана"
                       : traitType === "Ability"
                         ? "способности"
-                        : "дополнения"
+                        : traitType === "Ritual"
+                          ? "ритуала"
+                          : traitType === "Knowledge"
+                            ? "знания"
+                            : "дополнения"
                 }`}
                 value={title}
                 onValueChange={setTitle}
@@ -475,7 +598,11 @@ const EditCharacterTrait = ({
                     ? "клана"
                     : traitType === "Ability"
                       ? "способности"
-                      : "дополнения"
+                      : traitType === "Ritual"
+                        ? "ритуала"
+                        : traitType === "Knowledge"
+                          ? "знания"
+                          : "дополнения"
               }`}
               value={content}
               onValueChange={setContent}
@@ -651,6 +778,36 @@ const EditCharacterTrait = ({
                 Экспертная
               </Checkbox>
             )}
+            {traitType === "Ritual" && (
+              <Textarea
+                variant="underlined"
+                label="Рецепт"
+                placeholder={`Введите рецепт ритуала`}
+                value={recipe}
+                onValueChange={setRecipe}
+              />
+            )}
+            {traitType === "Ritual" && (
+              <Select
+                label="Требует наличие"
+                variant="underlined"
+                placeholder="Выберите оккультное знание"
+                selectedKeys={knowledgeIds.map((f) => f.toString())}
+                onChange={(e) => {
+                  if (!!e.target.value) {
+                    setKnowledgeIds(
+                      e.target.value.split(",").map((s) => Number(s)),
+                    );
+                  }
+                }}
+              >
+                {knowledges.map((knowledge) => (
+                  <SelectItem key={knowledge.id} value={knowledge.id}>
+                    {knowledge.name}
+                  </SelectItem>
+                ))}
+              </Select>
+            )}
             <Checkbox
               isSelected={isVisibleToPlayer}
               onValueChange={setIsVisibleToPlayer}
@@ -683,7 +840,13 @@ const EditCharacterTrait = ({
                 isFactionDeletePending ||
                 isClanDeletePending ||
                 isAbilityDeletePending ||
-                isFeatureDeletePending
+                isFeatureDeletePending ||
+                isRitualPending ||
+                isRitualUpdatePending ||
+                isRitualDeletePending ||
+                isKnowledgePending ||
+                isKnowledgeUpdatePending ||
+                isKnowledgeDeletePending
               }
               onClick={handleFormSubmit}
             >
@@ -698,7 +861,13 @@ const EditCharacterTrait = ({
               isFactionDeletePending ||
               isClanDeletePending ||
               isAbilityDeletePending ||
-              isFeatureDeletePending ? (
+              isRitualPending ||
+              isRitualUpdatePending ||
+              isRitualDeletePending ||
+              isFeatureDeletePending ||
+              isKnowledgePending ||
+              isKnowledgeUpdatePending ||
+              isKnowledgeDeletePending ? (
                 <LoadingSpinner />
               ) : (
                 `${editing ? "Обновить" : "Добавить"}`

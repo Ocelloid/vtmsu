@@ -36,12 +36,6 @@ import {
 import { useTheme } from "next-themes";
 import { useCharacterStore } from "~/stores/useCharacterStore";
 
-// type SelectContact = {
-//   label: string;
-//   value: string;
-//   description: string;
-// };
-
 export default function CharacterEditor() {
   const router = useRouter();
   const { theme } = useTheme();
@@ -143,50 +137,6 @@ export default function CharacterEditor() {
 
   useEffect(() => {
     if (!!userData) {
-      // const pS = [];
-      // pS.push({
-      //   label: "Не пользуется техникой",
-      //   value: "anachronism",
-      //   description:
-      //     "С этим персонажем нет возможности связаться с помощью современной техники.",
-      // });
-      // pS.push({
-      //   label: "Не идёт на контакт",
-      //   value: "antisocial",
-      //   description:
-      //     "Этот персонаж принципиально не желает, чтобы с ним выходили на связь.",
-      // });
-      // if (userData.phone)
-      //   pS.push({
-      //     label: "телефон: " + userData.phone,
-      //     value: "phone",
-      //     description: "",
-      //   });
-      // if (userData.email)
-      //   pS.push({
-      //     label: "email: " + userData.email,
-      //     value: "email",
-      //     description: "",
-      //   });
-      // if (userData.vk)
-      //   pS.push({
-      //     label: "ВК: " + userData.vk,
-      //     value: "vk",
-      //     description: "",
-      //   });
-      // if (userData.tg)
-      //   pS.push({
-      //     label: "TG: " + userData.tg,
-      //     value: "tg",
-      //     description: "",
-      //   });
-      // if (userData.discord)
-      //   pS.push({
-      //     label: "Discord: " + userData.discord,
-      //     value: "discord",
-      //     description: "",
-      //   });
-      // setContactSelect(pS);
       setIsAdmin(userData.isAdmin);
       setIsPersonnel(userData.isPersonnel);
 
@@ -263,15 +213,12 @@ export default function CharacterEditor() {
             ambition: characterData.ambition ?? "",
             additionalAbilities: characterData.additionalAbilities ?? 0,
             content: characterData.content ?? "",
-            // playerContact: characterData.playerContact ?? pS[0]?.label ?? "",
             playerContact: characterData.playerContact ?? "",
           });
         }
       }
 
       if (!playerName) update({ playerName: userData.name ?? "" });
-      // if (!playerContact && !!pS.length)
-      //   update({ playerContact: pS[0]?.label ?? "" });
     }
   }, [
     userData,

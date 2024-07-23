@@ -6,10 +6,12 @@ import RuleEditor from "~/components/editors/RuleEditor";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { type Rule } from "~/server/api/routers/rule";
-import { type Ability } from "~/server/api/routers/char";
+import type { Ability, Knowledge, Ritual } from "~/server/api/routers/char";
 import { Element, scroller } from "react-scroll";
 import { FaPencilAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { translit } from "~/utils/text";
+
+type RiteByKnowledge = Knowledge & { rituals: Ritual[] };
 
 export default function Rules() {
   const categories = [
@@ -21,6 +23,9 @@ export default function Rules() {
   const [category, setCategory] = useState<string>("");
   const [rules, setRules] = useState<Rule[]>([]);
   const [abilities, setAbilities] = useState<Ability[]>([]);
+  const [ritesByKnowledge, setRitesByKnowledge] = useState<RiteByKnowledge[]>(
+    [],
+  );
 
   const { data: isPersonnel, isLoading: isUserLoading } =
     api.user.userIsPersonnel.useQuery();
@@ -35,10 +40,27 @@ export default function Rules() {
   } = api.rule.getAll.useQuery();
   const { data: abilityData, isLoading: isAbilityLoading } =
     api.char.getAbilities.useQuery();
+  const { data: knowledgeData, isLoading: isKnowledgeLoading } =
+    api.char.getKnowledges.useQuery();
+  const { data: ritualData, isLoading: isRitualLoading } =
+    api.char.getRituals.useQuery();
 
   useEffect(() => {
+    if (!rulesData || !abilityData || !knowledgeData || !ritualData) return;
     setRules(rulesData ?? []);
     setAbilities(abilityData ?? []);
+    setRitesByKnowledge(
+      knowledgeData.map((k) => {
+        return {
+          ...k,
+          rituals: ritualData
+            .filter((r) => r.visibleToPlayer)
+            .filter((r) =>
+              r.ritualKnowledges.some((rk) => rk.knowledgeId === k.id),
+            ),
+        };
+      }),
+    );
 
     const ruleTo = Array.isArray(router.query.rule)
       ? router.query.rule[0] ?? ""
@@ -58,7 +80,7 @@ export default function Rules() {
           offset: -96,
         });
       }, 200);
-  }, [rulesData, abilityData, router.query]);
+  }, [rulesData, abilityData, knowledgeData, ritualData, router.query]);
 
   const handleCategoryChange = (e: string) => {
     setCategory(e);
@@ -153,7 +175,13 @@ export default function Rules() {
       .catch((e) => console.log(e));
   };
 
-  if (isUserLoading || isRulesLoading || isAbilityLoading)
+  if (
+    isUserLoading ||
+    isRulesLoading ||
+    isAbilityLoading ||
+    isKnowledgeLoading ||
+    isRitualLoading
+  )
     return <LoadingPage />;
 
   return (
@@ -283,6 +311,38 @@ export default function Rules() {
                         <div className="tiptap-display whitespace-break-spaces pb-4 text-justify">
                           {ability.content}
                         </div>
+                      </Element>
+                    );
+                  })}
+                {cat.value === 3 &&
+                  ritesByKnowledge.map((rite: RiteByKnowledge) => {
+                    return (
+                      <Element
+                        key={rite.id}
+                        className="section"
+                        name={translit(rite.name)}
+                      >
+                        <div className="flex flex-row">
+                          <h2 className={"text-4xl"}>{rite.name}</h2>
+                        </div>
+                        <div className="tiptap-display pb-4 text-justify">
+                          {rite.content}
+                        </div>
+                        {rite.rituals.map((ritual: Ritual) => {
+                          return (
+                            <div
+                              key={"ritual_" + ritual.id}
+                              className="flex flex-col"
+                            >
+                              <h2 className={"text-2xl"}>
+                                &bull;&nbsp;{ritual.name}
+                              </h2>
+                              <div className="tiptap-display pb-4 text-justify">
+                                {ritual.content}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </Element>
                     );
                   })}

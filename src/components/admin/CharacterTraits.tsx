@@ -10,6 +10,8 @@ import type {
   Clan,
   Ability,
   Feature,
+  Ritual,
+  Knowledge,
 } from "~/server/api/routers/char";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
@@ -18,7 +20,7 @@ import { LoadingPage } from "~/components/Loading";
 type characterTraitsType = {
   label: string;
   type: string;
-  list: Faction[] | Clan[] | Ability[] | Feature[];
+  list: Faction[] | Clan[] | Ability[] | Feature[] | Ritual[] | Knowledge[];
 }[];
 
 const CharacterTraits = () => {
@@ -29,6 +31,8 @@ const CharacterTraits = () => {
     { label: "Кланы", type: "Clan", list: [] },
     { label: "Способности", type: "Ability", list: [] },
     { label: "Дополнения", type: "Feature", list: [] },
+    { label: "Знания", type: "Knowledge", list: [] },
+    { label: "Ритуалы", type: "Ritual", list: [] },
   ]);
 
   const discKeys = Object.keys(disciplines);
@@ -99,6 +103,22 @@ const CharacterTraits = () => {
         label: "Дополнения",
         type: "Feature",
         list: charTraitsData?.features.sort((a, b) => a.cost - b.cost) ?? [],
+      },
+      {
+        label: "Знания",
+        type: "Knowledge",
+        list:
+          charTraitsData?.knowledges.sort((a, b) =>
+            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+          ) ?? [],
+      },
+      {
+        label: "Ритуалы",
+        type: "Ritual",
+        list:
+          charTraitsData?.rituals.sort((a, b) =>
+            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+          ) ?? [],
       },
     ]);
   }, [charTraitsData]);
