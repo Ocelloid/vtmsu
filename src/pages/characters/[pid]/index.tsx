@@ -369,8 +369,14 @@ const CharacterSheet = ({
                   dangerouslySetInnerHTML={privateChar.content!}
                 />
                 <div className="flex flex-col gap-2 pt-4">
-                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
-                  <span className="text-2xl text-default-600">Дисциплины</span>
+                  {!!privateChar.abilities?.length && (
+                    <>
+                      <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                      <span className="text-2xl text-default-600">
+                        Дисциплины
+                      </span>
+                    </>
+                  )}
                   {privateChar.abilities?.map((a) => (
                     <div
                       key={a.abilityId + "_ability"}
@@ -397,8 +403,14 @@ const CharacterSheet = ({
                       </p>
                     </div>
                   ))}
-                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
-                  <span className="text-2xl text-default-600">Дополнения</span>
+                  {!!privateChar.features?.length && (
+                    <>
+                      <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                      <span className="text-2xl text-default-600">
+                        Дополнения
+                      </span>
+                    </>
+                  )}
                   {privateChar.features?.map((f) => (
                     <div
                       className="flex flex-col"
@@ -416,8 +428,12 @@ const CharacterSheet = ({
                       </p>
                     </div>
                   ))}
-                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
-                  <span className="text-2xl text-default-600">Знания</span>
+                  {!!privateChar.knowledges?.length && (
+                    <>
+                      <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                      <span className="text-2xl text-default-600">Знания</span>
+                    </>
+                  )}
                   {privateChar.knowledges?.map((k) => (
                     <div
                       className="flex flex-col"
@@ -431,8 +447,12 @@ const CharacterSheet = ({
                       </p>
                     </div>
                   ))}
-                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
-                  <span className="text-2xl text-default-600">Ритуалы</span>
+                  {!!privateChar.rituals?.length && (
+                    <>
+                      <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                      <span className="text-2xl text-default-600">Ритуалы</span>
+                    </>
+                  )}
                   {privateChar.rituals?.map((r) => (
                     <div className="flex flex-col" key={r.ritualId + "_ritual"}>
                       <div className="flex flex-row items-center gap-2 text-xl">
