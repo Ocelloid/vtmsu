@@ -132,6 +132,7 @@ model Char {
   knowledges          CharacterKnowledges[]
   hunts               Hunt[]
   createdById         String
+  active              Boolean              @default(false)
 }
 
 model ClanInFaction {

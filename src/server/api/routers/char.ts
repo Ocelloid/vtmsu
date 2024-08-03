@@ -40,6 +40,7 @@ export type Character = {
   clan?: Clan;
   faction?: Faction;
   createdBy?: User;
+  active?: boolean | null;
 };
 
 export type CharacterKnowledges = {
@@ -1043,6 +1044,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.char.findFirst({
         where: whereData,
         select: {
+          active: true,
           createdAt: true,
           updatedAt: true,
           id: true,
