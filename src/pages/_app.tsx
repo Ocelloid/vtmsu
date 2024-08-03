@@ -36,7 +36,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
               style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
             > */}
             <div className="mb-6" />
-            <div className="fixed bottom-0 flex h-6 w-full flex-col justify-between bg-slate-950 px-12 py-1">
+            <div className="fixed bottom-0 flex h-6 w-full flex-col justify-between bg-slate-950 px-12 py-1 text-slate-400">
               <a
                 href="https://ocelloid.com"
                 target="_blank"

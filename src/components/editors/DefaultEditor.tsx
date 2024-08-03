@@ -12,10 +12,10 @@ import Link from "@tiptap/extension-link";
 import EditorMenu from "~/components/EditorMenu";
 import { type Editor, EditorContent, useEditor } from "@tiptap/react";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEffect } from "react";
 
 const DefaultEditor = ({
   initialContent,
+  isRequired,
   placeholder,
   className,
   onUpdate,
@@ -24,6 +24,7 @@ const DefaultEditor = ({
   label,
 }: {
   initialContent?: string;
+  isRequired?: boolean;
   placeholder?: string;
   className?: string;
   onUpdate?: (arg0: string) => void;
@@ -86,14 +87,14 @@ const DefaultEditor = ({
     },
   });
 
-  useEffect(() => {
-    editor?.commands.setContent(initialContent!);
-    defaultEditor?.commands.setContent(initialContent!);
-  }, [editor, defaultEditor, initialContent]);
-
   return (
     <>
-      {label ?? <p className="text-xs">{label}</p>}
+      {!!label && (
+        <p className="ml-1 mt-1 py-1 text-xs text-default-600">
+          {label}
+          {isRequired && <span className="ml-0.5 text-red-500">*</span>}
+        </p>
+      )}
       <EditorMenu editor={!!editor ? editor : defaultEditor!} />
       <EditorContent
         tabIndex={!!tabIndex ? tabIndex : 4}

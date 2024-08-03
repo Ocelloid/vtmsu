@@ -48,7 +48,7 @@ const Navigation = () => {
         </div>
       </div>
       <ul
-        className={`${!isOpen && "hidden"} items-right mr-auto flex flex-col gap-4 dark:text-neutral-100 md:flex md:flex-row md:justify-end md:gap-6 lg:gap-8 [&>*]:px-1`}
+        className={`${!isOpen && "hidden"} items-right mr-auto flex flex-col gap-4 dark:text-neutral-100 sm:gap-1 md:flex md:flex-row md:justify-end md:gap-2 lg:gap-4 xl:gap-6 2xl:gap-8 [&>*]:px-2`}
       >
         <Button
           onClick={() => {

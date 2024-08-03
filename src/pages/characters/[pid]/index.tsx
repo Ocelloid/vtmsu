@@ -1,27 +1,49 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import { LoadingPage } from "~/components/Loading";
 import type { Character } from "~/server/api/routers/char";
 import default_char from "~/../public/default_char.png";
 import {
-  Input,
-  Tooltip,
   Textarea,
   Modal,
   ModalContent,
-  ModalHeader,
   ModalBody,
   Button,
   useDisclosure,
   Divider,
 } from "@nextui-org/react";
-import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaPencilAlt, FaEye, FaEyeSlash, FaTrashAlt } from "react-icons/fa";
 import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import { disciplines } from "~/assets";
 import { api } from "~/utils/api";
 import Image from "next/image";
 import Head from "next/head";
+
+const Display = ({
+  label,
+  children,
+  dangerouslySetInnerHTML,
+}: {
+  label?: string;
+  children?: ReactNode;
+  dangerouslySetInnerHTML?: string;
+}) => {
+  return (
+    <div className="flex flex-col gap-0">
+      {!!label && <p className="text-sm text-default-500">{label}</p>}
+      {dangerouslySetInnerHTML ? (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: dangerouslySetInnerHTML,
+          }}
+        />
+      ) : (
+        children
+      )}
+    </div>
+  );
+};
 
 const CharacterSheet = ({
   charId,
@@ -43,8 +65,6 @@ const CharacterSheet = ({
   const [publicChar, setPublicChar] = useState<Character>();
   const [privateChar, setPrivateChar] = useState<Character>();
   const [privateVer, setPrivateVer] = useState<boolean>();
-  const [factionIsOpen, setFactionIsOpen] = useState(false);
-  const [clanIsOpen, setClanIsOpen] = useState(false);
 
   const { data: isAdmin } = api.user.userIsAdmin.useQuery();
 
@@ -79,6 +99,9 @@ const CharacterSheet = ({
 
   const { mutate: denyMutation, isPending: isDenyPending } =
     api.char.deny.useMutation();
+
+  const { mutate: deleteMutation, isPending: isDeletePending } =
+    api.char.delete.useMutation();
 
   useEffect(() => {
     if (!!router.query.pid) {
@@ -144,12 +167,34 @@ const CharacterSheet = ({
       );
   };
 
+  const handleDeleteCharacter = () => {
+    const confirmDelete = confirm(
+      "Вы уверены, что хотите удалить персонажа? Это действие необратимо!",
+    );
+    if (!confirmDelete) return;
+    void deleteMutation(
+      { id: Number(characterId) },
+      {
+        onSuccess: () => {
+          void router.push(
+            {
+              pathname: `/characters/`,
+            },
+            undefined,
+            { shallow: false },
+          );
+        },
+      },
+    );
+  };
+
   if (
     !publicChar ||
     isDenyPending ||
     isAllowPending ||
     isPublicLoading ||
     isPrivateLoading ||
+    isDeletePending ||
     (privateVer && !privateChar)
   )
     return <LoadingPage />;
@@ -163,14 +208,14 @@ const CharacterSheet = ({
       </Head>
       <Modal size={"full"} isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader>Фото персонажа</ModalHeader>
-          <ModalBody>
+          <ModalBody className="mt-24">
             <Image
               src={!!publicChar.image ? publicChar.image : default_char}
               className="max-h-[90vh] object-contain"
               alt="char_img"
               height={2048}
               width={2048}
+              onClick={onClose}
             />
           </ModalBody>
         </ModalContent>
@@ -207,15 +252,10 @@ const CharacterSheet = ({
             </div>
           )}
           {!!isAdmin && receivedComment && (
-            <div>
-              <p className="text-2xl">Последнее изменение:</p>
-              <div
-                className="tiptap-display text-justify"
-                dangerouslySetInnerHTML={{
-                  __html: receivedComment,
-                }}
-              />
-            </div>
+            <Display
+              label="Последнее изменение"
+              dangerouslySetInnerHTML={receivedComment}
+            />
           )}
           {(!!privateChar || isAdmin) && (
             <div className="flex flex-1 flex-col gap-2">
@@ -275,13 +315,9 @@ const CharacterSheet = ({
           )}
           <div className="flex flex-1 flex-col gap-2">
             {!isAdmin && !!privateChar?.comment && (
-              <Textarea
-                size="sm"
-                label="Комментарий МГ"
-                variant="underlined"
-                isReadOnly
-                value={privateChar.comment ?? ""}
-              />
+              <Display label="Комментарий МГ">
+                {privateChar.comment ?? ""}
+              </Display>
             )}
             <span className="text-2xl text-default-600">
               Публичная информация
@@ -295,98 +331,23 @@ const CharacterSheet = ({
                 height={1024}
                 width={1024}
               />
-              <div className="flex w-full flex-1 flex-grow flex-col [&>*]:flex [&>*]:w-full">
-                <Input
-                  size="sm"
-                  label="Имя персонажа"
-                  variant="underlined"
-                  isReadOnly
-                  value={publicChar.name}
-                />
-                <Input
-                  size="sm"
-                  label="Статус"
-                  variant="underlined"
-                  isReadOnly
-                  value={publicChar.status ?? ""}
-                />
-                <Input
-                  size="sm"
-                  label="Титул"
-                  variant="underlined"
-                  isReadOnly
-                  value={publicChar.title ?? ""}
-                />
-                <Tooltip
-                  className="w-80 rounded-md text-justify text-tiny text-black dark:text-white"
-                  content={publicChar.faction?.content}
-                  placement="top"
-                  closeDelay={2000}
-                  isOpen={factionIsOpen}
-                  onOpenChange={(open) => setFactionIsOpen(open)}
-                >
-                  <Input
-                    size="sm"
-                    label="Фракция"
-                    variant="underlined"
-                    onMouseOver={() => {
-                      setClanIsOpen(false);
-                      setFactionIsOpen(true);
-                    }}
-                    onClick={() => {
-                      setClanIsOpen(false);
-                      setFactionIsOpen(true);
-                    }}
-                    isReadOnly
-                    value={publicChar.faction?.name}
-                  />
-                </Tooltip>
-                <Tooltip
-                  className="w-80 rounded-md text-justify text-tiny text-black dark:text-white"
-                  content={publicChar.clan?.content}
-                  placement="bottom"
-                  closeDelay={2000}
-                  isOpen={clanIsOpen}
-                  onOpenChange={(open) => setClanIsOpen(open)}
-                >
-                  <Input
-                    size="sm"
-                    label="Клан"
-                    variant="underlined"
-                    onMouseOver={() => {
-                      setClanIsOpen(true);
-                      setFactionIsOpen(false);
-                    }}
-                    onClick={() => {
-                      setClanIsOpen(true);
-                      setFactionIsOpen(false);
-                    }}
-                    isReadOnly
-                    value={publicChar.clan?.name}
-                  />
-                </Tooltip>
-                <Input
-                  size="sm"
-                  label="Имя игрока"
-                  variant="underlined"
-                  isReadOnly
-                  value={publicChar.playerName ?? ""}
-                />
-                <Input
-                  size="sm"
-                  label="Предпочитаемый способ связи"
-                  variant="underlined"
-                  isReadOnly
-                  value={publicChar.playerContact ?? ""}
-                />
+              <div className="flex w-full flex-1 flex-grow flex-col gap-2 [&>*]:flex [&>*]:w-full">
+                <Display label="Имя персонажа">{publicChar.name}</Display>
+                {publicChar.status && (
+                  <Display label="Статус">{publicChar.status}</Display>
+                )}
+                {publicChar.title && (
+                  <Display label="Титул">{publicChar.title}</Display>
+                )}
+                <Display label="Фракция">{publicChar.faction?.name}</Display>
+                <Display label="Клан">{publicChar.clan?.name}</Display>
+                <Display label="Имя игрока">{publicChar.playerName}</Display>
+                <Display label="Предпочитаемый способ связи">
+                  {publicChar.playerContact}
+                </Display>
               </div>
             </div>
-            <div
-              className="tiptap-display text-justify"
-              dangerouslySetInnerHTML={{
-                __html: publicChar.publicInfo!,
-              }}
-            />
+            <Display dangerouslySetInnerHTML={publicChar.publicInfo!} />
             {!!privateChar && (
               <div className="flex flex-1 flex-col gap-2">
                 <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
@@ -394,50 +355,27 @@ const CharacterSheet = ({
                   Приватная информация
                 </span>
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-                  <Input
-                    size="sm"
-                    label="Возраст"
-                    variant="underlined"
-                    isReadOnly
-                    value={privateChar.age ?? ""}
-                  />
-                  <Input
-                    size="sm"
-                    label="Сир"
-                    variant="underlined"
-                    isReadOnly
-                    value={privateChar.sire ?? ""}
-                  />
-                  <Input
-                    size="sm"
-                    label="Чайлды"
-                    variant="underlined"
-                    isReadOnly
-                    value={privateChar.childer ?? ""}
-                  />
+                  <Display label="Возраст">{privateChar.age ?? ""}</Display>
+                  <Display label="Сир">{privateChar.sire ?? ""}</Display>
+                  <Display label="Чайлды">{privateChar.childer ?? ""}</Display>
                 </div>
-                <Textarea
-                  size="sm"
-                  label="Амбиции и желения"
-                  variant="underlined"
-                  isReadOnly
-                  value={privateChar.ambition ?? ""}
-                />
-              </div>
-            )}
-            {!!privateChar && (
-              <div className="flex flex-col">
-                <span className="text-2xl text-default-600">Квента</span>
-                <div
-                  className="tiptap-display text-justify"
-                  dangerouslySetInnerHTML={{
-                    __html: privateChar.content!,
-                  }}
+                {privateChar.ambition && (
+                  <Display label="Амбиции и желения">
+                    {privateChar.ambition ?? ""}
+                  </Display>
+                )}
+                <Display
+                  label="Квента"
+                  dangerouslySetInnerHTML={privateChar.content!}
                 />
                 <div className="flex flex-col gap-2 pt-4">
+                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
                   <span className="text-2xl text-default-600">Дисциплины</span>
                   {privateChar.abilities?.map((a) => (
-                    <div key={a.abilityId} className="flex flex-col">
+                    <div
+                      key={a.abilityId + "_ability"}
+                      className="flex flex-col"
+                    >
                       <div className="flex flex-row items-center gap-2 text-xl">
                         <Image
                           alt="disc"
@@ -459,9 +397,13 @@ const CharacterSheet = ({
                       </p>
                     </div>
                   ))}
+                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
                   <span className="text-2xl text-default-600">Дополнения</span>
                   {privateChar.features?.map((f) => (
-                    <div className="flex flex-col" key={f.featureId}>
+                    <div
+                      className="flex flex-col"
+                      key={f.featureId + "_feature"}
+                    >
                       {(f.feature?.cost ?? 0) > 0
                         ? `+${f.feature?.cost}`
                         : f.feature?.cost}
@@ -474,11 +416,46 @@ const CharacterSheet = ({
                       </p>
                     </div>
                   ))}
+                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                  <span className="text-2xl text-default-600">Знания</span>
+                  {privateChar.knowledges?.map((k) => (
+                    <div
+                      className="flex flex-col"
+                      key={k.knowledgeId + "_knowledge"}
+                    >
+                      <div className="flex flex-row items-center gap-2 text-xl">
+                        {k.knowledge?.name}
+                      </div>
+                      <p className="whitespace-break-spaces pt-2 text-justify text-xs">
+                        {k.knowledge?.content}
+                      </p>
+                    </div>
+                  ))}
+                  <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                  <span className="text-2xl text-default-600">Ритуалы</span>
+                  {privateChar.rituals?.map((r) => (
+                    <div className="flex flex-col" key={r.ritualId + "_ritual"}>
+                      <div className="flex flex-row items-center gap-2 text-xl">
+                        {r.ritual?.name}
+                      </div>
+                      <p className="whitespace-break-spaces pt-2 text-justify text-xs">
+                        {r.ritual?.content}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
         </div>
+        <Button
+          variant="light"
+          color="danger"
+          className="text-md text-danger"
+          onClick={handleDeleteCharacter}
+        >
+          <FaTrashAlt size={24} /> Удалить персонажа
+        </Button>
       </main>
     </>
   );

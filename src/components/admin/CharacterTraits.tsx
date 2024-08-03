@@ -172,6 +172,8 @@ const CharacterTraits = () => {
                         `${(trait as Ability).AbilityAvailable?.map((a) => a.clan?.name).join(", ")}`}
                       {cs.type === "Ability" &&
                         `${(trait as Ability).expertise ? " - Экспертная" : ""}`}
+                      {cs.type === "Ritual" &&
+                        `${(trait as Ritual).ritualKnowledges?.map((k) => k.knowledge?.name).join(", ")}`}
                     </p>
                   </div>
                   {trait.visibleToPlayer ? (

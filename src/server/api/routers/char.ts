@@ -634,6 +634,8 @@ export const charRouter = createTRPCRouter({
         sire: z.string(),
         childer: z.string(),
         abilities: z.array(z.number()),
+        knowledges: z.array(z.number()),
+        rituals: z.array(z.number()),
         features: z.array(
           z.object({
             id: z.number(),
@@ -670,6 +672,20 @@ export const charRouter = createTRPCRouter({
             createMany: {
               data: input.abilities.map((a) => {
                 return { abilityId: a };
+              }),
+            },
+          },
+          knowledges: {
+            createMany: {
+              data: input.knowledges.map((a) => {
+                return { knowledgeId: a };
+              }),
+            },
+          },
+          rituals: {
+            createMany: {
+              data: input.rituals.map((a) => {
+                return { ritualId: a };
               }),
             },
           },
@@ -711,6 +727,8 @@ export const charRouter = createTRPCRouter({
         sire: z.string(),
         childer: z.string(),
         abilities: z.array(z.number()),
+        knowledges: z.array(z.number()),
+        rituals: z.array(z.number()),
         features: z.array(
           z.object({
             id: z.number(),
@@ -727,6 +745,8 @@ export const charRouter = createTRPCRouter({
         include: {
           abilities: { include: { abilitiy: true } },
           features: { include: { feature: true } },
+          knowledges: { include: { knowledge: true } },
+          rituals: { include: { ritual: true } },
         },
       });
       const newAbilities = await ctx.db.ability.findMany({
@@ -734,6 +754,12 @@ export const charRouter = createTRPCRouter({
       });
       const newFeatures = await ctx.db.feature.findMany({
         where: { id: { in: input.features.map((f) => f.id) } },
+      });
+      const newKnowledges = await ctx.db.knowledge.findMany({
+        where: { id: { in: input.knowledges } },
+      });
+      const newRituals = await ctx.db.ritual.findMany({
+        where: { id: { in: input.rituals } },
       });
       const abilitiesChanged =
         !char?.abilities
@@ -749,6 +775,20 @@ export const charRouter = createTRPCRouter({
         !input.features
           .map((f) => f.id)
           .every((v) => char?.features.map((a) => a.featureId).includes(v));
+      const knowledgesChanged =
+        !char?.knowledges
+          .map((a) => a.knowledgeId)
+          .every((v) => input.knowledges.includes(v)) ||
+        !input.knowledges.every((v) =>
+          char?.knowledges.map((a) => a.knowledgeId).includes(v),
+        );
+      const ritualsChanged =
+        !char?.rituals
+          .map((a) => a.ritualId)
+          .every((v) => input.rituals.includes(v)) ||
+        !input.rituals.every((v) =>
+          char?.rituals.map((a) => a.ritualId).includes(v),
+        );
       const changedFields = [];
       if (char?.name !== input.name)
         changedFields.push({
@@ -836,6 +876,18 @@ export const charRouter = createTRPCRouter({
             )
             .join(", "),
         });
+      if (knowledgesChanged)
+        changedFields.push({
+          name: "Знания",
+          from: char?.knowledges.map((a) => a.knowledge.name).join(", "),
+          to: newKnowledges.map((a) => a.name).join(", "),
+        });
+      if (ritualsChanged)
+        changedFields.push({
+          name: "Ритуалы",
+          from: char?.rituals.map((a) => a.ritual.name).join(", "),
+          to: newRituals.map((a) => a.name).join(", "),
+        });
       const shouldVerify =
         char?.clanId !== input.clanId ||
         char.factionId !== input.factionId ||
@@ -849,6 +901,8 @@ export const charRouter = createTRPCRouter({
         char.name !== input.name ||
         abilitiesChanged ||
         featuresChanged ||
+        knowledgesChanged ||
+        ritualsChanged ||
         char.pending;
       return ctx.db.char.update({
         where: { id: input.id },
@@ -904,6 +958,22 @@ export const charRouter = createTRPCRouter({
               }),
             },
           },
+          knowledges: {
+            deleteMany: {},
+            createMany: {
+              data: input.knowledges.map((a) => {
+                return { knowledgeId: a };
+              }),
+            },
+          },
+          rituals: {
+            deleteMany: {},
+            createMany: {
+              data: input.rituals.map((a) => {
+                return { ritualId: a };
+              }),
+            },
+          },
         },
         include: {
           abilities: true,
@@ -954,6 +1024,8 @@ export const charRouter = createTRPCRouter({
           clan: true,
           abilities: { include: { abilitiy: true } },
           features: { include: { feature: true } },
+          knowledges: { include: { knowledge: true } },
+          rituals: { include: { ritual: true } },
         },
       });
       return char ?? "404";
@@ -988,6 +1060,8 @@ export const charRouter = createTRPCRouter({
           p_comment: true,
           abilities: { include: { abilitiy: true } },
           features: { include: { feature: true } },
+          knowledges: { include: { knowledge: true } },
+          rituals: { include: { ritual: true } },
         },
       });
     }),

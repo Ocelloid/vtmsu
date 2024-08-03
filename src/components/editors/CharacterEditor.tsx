@@ -1,70 +1,91 @@
-import {
-  Input,
-  Select,
-  SelectItem,
-  Button,
-  Textarea,
-  Accordion,
-  AccordionItem,
-  CheckboxGroup,
-  Checkbox,
-  User as UserIcon,
-  // Link,
-  cn,
-} from "@nextui-org/react";
-import type {
-  Faction,
-  Clan,
-  Ability,
-  Feature,
-} from "~/server/api/routers/char";
 import Head from "next/head";
 import Image from "next/image";
-import { UploadButton } from "~/utils/uploadthing";
-import DefaultEditor from "~/components/editors/DefaultEditor";
-import { FaRegSave, FaTrashAlt, FaImage, FaFile } from "react-icons/fa";
-import default_char from "~/../public/default_char.png";
-import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect } from "react";
+import { LoadingSpinner, LoadingPage } from "~/components/Loading";
+import default_char from "~/../public/default_char.png";
+import {
+  Button,
+  Input,
+  Checkbox,
+  CheckboxGroup,
+  Textarea,
+  Select,
+  SelectItem,
+  cn,
+} from "@nextui-org/react";
+import { useForm } from "react-hook-form";
+import { UploadButton } from "~/utils/uploadthing";
+import { FaRegSave, FaImage, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { z } from "zod";
+import DefaultEditor from "~/components/editors/DefaultEditor";
 import { api } from "~/utils/api";
-import { useRouter } from "next/router";
+import type {
+  Faction,
+  Feature,
+  Clan,
+  Ability,
+  Knowledge,
+  Ritual,
+} from "~/server/api/routers/char";
 import {
   disciplines,
   clans as clan_icons,
   factions as faction_icons,
 } from "~/assets";
 import { useTheme } from "next-themes";
-import { useCharacterStore } from "~/stores/useCharacterStore";
+import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+
+const schema = z.object({
+  name: z.string().min(1),
+  age: z.number().min(18).max(1000).optional(),
+  image: z.string(),
+  playerName: z.string().min(1),
+  playerContact: z.string().min(1),
+  visible: z.boolean(),
+  title: z.string(),
+  status: z.string(),
+  sire: z.string(),
+  childer: z.string(),
+  ambition: z.string(),
+  publicInfo: z.string(),
+  content: z.string(),
+  clanId: z.number(),
+  factionId: z.number(),
+  abilityIds: z.array(z.number()),
+  additionalAbilities: z.number().min(0).max(2),
+  featuresWithComments: z.array(
+    z.object({
+      id: z.number(),
+      cost: z.number(),
+      comment: z.string(),
+      checked: z.boolean(),
+    }),
+  ),
+  knowledges: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      checked: z.boolean(),
+    }),
+  ),
+  rituals: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      checked: z.boolean(),
+      knowledgeRequired: z.number().optional(),
+    }),
+  ),
+});
+
+type CharacterFormFields = z.infer<typeof schema>;
 
 export default function CharacterEditor() {
-  const router = useRouter();
+  const { data: sessionData } = useSession();
   const { theme } = useTheme();
-
-  const {
-    name,
-    age,
-    image,
-    playerName,
-    playerContact,
-    factionId,
-    clanId,
-    status,
-    title,
-    visible,
-    publicInfo,
-    sire,
-    childer,
-    ambition,
-    content,
-    abilityIds,
-    additionalAbilities,
-    featuresWithComments,
-    isEditing,
-    clear,
-    update,
-    storeFeatures,
-    storeAbilities,
-  } = useCharacterStore((state) => state);
+  const router = useRouter();
 
   const discKeys = Object.keys(disciplines);
   const discIcons = Object.values(disciplines).map((disc, i) => {
@@ -98,231 +119,217 @@ export default function CharacterEditor() {
   const defaultIcon =
     theme === "light" ? faction_icons._ankh : faction_icons._ankh_white;
 
-  const [characterId, setCharacterId] = useState<number>();
-  const [infiniteAbilities, setInfiniteAbilities] = useState<boolean>(false);
-  const [infiniteFeatures, setInfiniteFeatures] = useState<boolean>(false);
-  const [seeAllAbilities, setSeeAllAbilities] = useState<boolean>(false);
-  const [seeAllFeatures, setSeeAllFeatures] = useState<boolean>(false);
-  const [costSum, setCostSum] = useState<number>(0);
-  // const [contactSelect, setContactSelect] = useState<SelectContact[]>([]);
-  const [initialPublicInfo, setInitialPublicInfo] = useState<string>("");
-  const [playerId, setPlayerId] = useState<string>("");
-  const [initialQuenta, setInitialQuenta] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isPersonnel, setIsPersonnel] = useState<boolean>(false);
-  const [publicHookCompleted, setPublicHookCompleted] =
-    useState<boolean>(false);
+  const [infiniteAbilities, setInfiniteAbilities] = useState<boolean>(false);
+  const [seeAllAbilities, setSeeAllAbilities] = useState<boolean>(false);
+  const [infiniteFeatures, setInfiniteFeatures] = useState<boolean>(false);
+  const [seeAllFeatures, setSeeAllFeatures] = useState<boolean>(false);
+  const [costSum, setCostSum] = useState<number>(0);
+  const [step, setStep] = useState<number>(1);
+  const [characterId, setCharacterId] = useState<number>();
+
+  const {
+    register,
+    formState: { errors },
+    getValues,
+    setValue,
+    setError,
+    watch,
+  } = useForm<CharacterFormFields>({
+    defaultValues: {
+      visible: true,
+      abilityIds: [],
+      featuresWithComments: [],
+    },
+  });
+
+  const watchedImage = watch("image");
+  const watchedPlayerName = watch("playerName");
+  const watchedPlayerContact = watch("playerContact");
+  const watchedName = watch("name");
+  const watchedAge = watch("age");
+  const watchedFactionId = watch("factionId");
+  const watchedClanId = watch("clanId");
+  const watchedPublicInfo = watch("publicInfo");
+  const watchedContent = watch("content");
+  const watchedAbilityIds = watch("abilityIds");
+  const watchedFWC = watch("featuresWithComments");
+  const watchedAdditionalAbilities = watch("additionalAbilities");
+  const watchedKnowledges = watch("knowledges");
+  const watchedRituals = watch("rituals");
 
   const { data: userData, isLoading: isUserLoading } =
-    api.user.getCurrent.useQuery();
-
+    api.user.getCurrent.useQuery(undefined, { refetchOnWindowFocus: false });
   const { data: characterData, isLoading: isCharacterLoading } =
-    api.char.getById.useQuery({ id: characterId! }, { enabled: !!characterId });
-
+    api.char.getById.useQuery(
+      { id: characterId! },
+      { enabled: !!characterId, refetchOnWindowFocus: false },
+    );
   const { data: traitsData, isLoading: isTraitsLoading } =
-    api.char.getCharTraits.useQuery();
-
+    api.char.getCharTraits.useQuery(undefined, { refetchOnWindowFocus: false });
   const { mutate: createMutation, isPending: isCharacterCreatePending } =
     api.char.create.useMutation();
-
   const { mutate: updateMutation, isPending: isCharacterUpdatePending } =
     api.char.update.useMutation();
 
-  const { mutate: deleteMutation, isPending: isCharacterDeletePending } =
-    api.char.delete.useMutation();
-
-  const { data: userList, isLoading: isUserListLoading } =
-    api.user.getUserList.useQuery(undefined, { enabled: isAdmin });
+  useEffect(() => {
+    if (!!router.query.pid) {
+      setCharacterId(Number(router.query.pid));
+    }
+  }, [router.query.pid]);
 
   useEffect(() => {
     if (!!userData) {
       setIsAdmin(userData.isAdmin);
       setIsPersonnel(userData.isPersonnel);
+    }
+  }, [userData]);
 
-      if (!!traitsData) {
-        const fwc = traitsData.features.map((f) => {
+  useEffect(() => {
+    const playerName = userData?.name ?? "";
+    const playerContact =
+      (!!userData?.vk ? `ВКонтакте: @${userData?.vk}` : null) ??
+      (!!userData?.tg ? `telegram: @${userData?.tg}` : null) ??
+      (!!userData?.discord ? `discord: ${userData?.discord}` : null) ??
+      (!!userData?.phone ? `телефон: ${userData?.phone}` : null) ??
+      (!!userData?.email ? `электронная почта: ${userData?.email}` : null) ??
+      "";
+    if (!!characterData && characterData !== "404" && !!traitsData) {
+      setValue("image", characterData.image ?? "");
+      setValue("playerName", characterData.playerName ?? playerName);
+      setValue("playerContact", characterData.playerContact ?? playerContact);
+      setValue("name", characterData.name);
+      setValue("age", Number(characterData.age));
+      setValue("factionId", characterData.factionId);
+      setValue("clanId", characterData.clanId);
+      setValue("status", characterData.status ?? "");
+      setValue("title", characterData.title ?? "");
+      setValue("publicInfo", characterData.publicInfo ?? "");
+      setValue("sire", characterData.sire ?? "");
+      setValue("childer", characterData.childer ?? "");
+      setValue("ambition", characterData.ambition ?? "");
+      setValue("content", characterData.content ?? "");
+      setValue("additionalAbilities", characterData.additionalAbilities);
+      setValue(
+        "abilityIds",
+        characterData.abilities.map((a) => a.abilityId),
+      );
+      setValue(
+        "featuresWithComments",
+        traitsData.features.map((f) => {
+          const characterFeature = characterData.features.find(
+            (cf) => cf.featureId === f.id,
+          );
+          return {
+            id: f.id,
+            cost: f.cost,
+            comment: !!characterFeature
+              ? characterFeature.description ?? ""
+              : "",
+            checked: !!characterFeature,
+          };
+        }),
+      );
+      setValue(
+        "knowledges",
+        traitsData.knowledges.map((k) => {
+          return {
+            id: k.id,
+            name: k.name,
+            checked: characterData.knowledges
+              .map((ck) => ck.knowledgeId)
+              .includes(k.id),
+          };
+        }),
+      );
+      setValue(
+        "rituals",
+        traitsData.rituals.map((r) => {
+          return {
+            id: r.id,
+            name: r.name,
+            checked: characterData.rituals
+              .map((cr) => cr.ritualId)
+              .includes(r.id),
+            knowledgeRequired: r.ritualKnowledges[0]?.knowledgeId,
+          };
+        }),
+      );
+    } else if (!!traitsData) {
+      setValue("playerName", playerName);
+      setValue("playerContact", playerContact);
+      setValue(
+        "featuresWithComments",
+        traitsData.features.map((f) => {
           return {
             id: f.id,
             cost: f.cost,
             comment: "",
             checked: false,
           };
-        });
-        if (fwc.filter((fs) => fs.checked).length > 0)
-          setCostSum(
-            fwc
-              .filter((fs) => fs.checked)
-              .map((ff) => ff.cost)
-              .reduce((a, b) => a + b),
-          );
-
-        if (characterData === "404") {
-          void router.push(
-            {
-              pathname: `/characters/`,
-            },
-            undefined,
-            { shallow: false },
-          );
-          return;
-        }
-        if (!!characterData) {
-          const fwc = traitsData.features.map((f) => {
-            return {
-              id: f.id,
-              cost: f.cost,
-              comment: !!characterData.features.find(
-                (fs) => fs.featureId === f.id,
-              )
-                ? characterData.features.find((fs) => fs.featureId === f.id)!
-                    .description ?? ""
-                : "",
-              checked:
-                !!characterData.features.find((fs) => fs.featureId === f.id) ??
-                false,
-            };
-          });
-
-          if (fwc.filter((fs) => fs.checked).length > 0)
-            setCostSum(
-              fwc
-                .filter((fs) => fs.checked)
-                .map((ff) => ff.cost)
-                .reduce((a, b) => a + b),
-            );
-
-          setPlayerId(characterData.playerId ?? "");
-          setInitialQuenta(characterData.content ?? "");
-          setInitialPublicInfo(characterData.publicInfo ?? "");
-          storeAbilities(characterData.abilities.map((a) => a.abilityId));
-          storeFeatures(fwc);
-          update({
-            name: characterData.name,
-            factionId: characterData.factionId,
-            clanId: characterData.clanId,
-            playerName: characterData.playerName ?? "",
-            age: !!characterData.age ? Number(characterData.age) : 0,
-            image: characterData.image ?? "",
-            sire: characterData.sire ?? "",
-            childer: characterData.childer ?? "",
-            title: characterData.title ?? "",
-            status: characterData.status ?? "",
-            publicInfo: characterData.publicInfo ?? "",
-            visible: characterData.visible,
-            ambition: characterData.ambition ?? "",
-            additionalAbilities: characterData.additionalAbilities ?? 0,
-            content: characterData.content ?? "",
-            playerContact: characterData.playerContact ?? "",
-          });
-        }
-      }
-
-      if (!playerName) update({ playerName: userData.name ?? "" });
+        }),
+      );
+      setValue(
+        "knowledges",
+        traitsData.knowledges.map((k) => {
+          return {
+            id: k.id,
+            name: k.name,
+            checked: false,
+          };
+        }),
+      );
+      setValue(
+        "rituals",
+        traitsData.rituals.map((r) => {
+          return {
+            id: r.id,
+            name: r.name,
+            checked: false,
+            knowledgeRequired: r.ritualKnowledges[0]?.knowledgeId,
+          };
+        }),
+      );
     }
-  }, [
-    userData,
-    traitsData,
-    characterData,
-    playerName,
-    playerContact,
-    router,
-    update,
-    storeAbilities,
-    storeFeatures,
-  ]);
-
-  useEffect(() => {
-    if (!publicHookCompleted) {
-      setPublicHookCompleted(true);
-      setInitialPublicInfo(publicInfo ?? "");
-      setInitialQuenta(content ?? "");
-    }
-  }, [publicInfo, content, publicHookCompleted]);
-
-  useEffect(() => {
-    if (!!router.query.pid) {
-      setCharacterId(Number(router.query.pid));
-      update({ isEditing: true });
-    }
-    if (!router.query.pid && isEditing) {
-      clear();
-    }
-  }, [router.query.pid, isEditing, update, clear]);
-
-  useEffect(() => {
-    if (!!featuresWithComments.length) {
-      const hasChecked = featuresWithComments.filter((fwc) => fwc.checked);
-      if (!!hasChecked.length) {
-        setCostSum(hasChecked.map((fwc) => fwc.cost).reduce((a, b) => a + b));
-      }
-    }
-  }, [featuresWithComments]);
+  }, [setValue, traitsData, characterData, userData]);
 
   const handleSaveCharacter = () => {
-    if (!!characterId)
+    if (!!characterId) {
       updateMutation(
         {
           id: characterId,
-          name: name ?? "",
-          clanId: clanId!,
-          factionId: factionId!,
-          visible: !!visible,
-          image: image ?? "",
-          age: age ? age.toString() : "",
-          playerId: playerId,
-          playerName: playerName,
-          playerContact: playerContact,
-          sire: sire ?? "",
-          childer: childer ?? "",
-          title: title,
-          status: status,
-          ambition: ambition,
-          additionalAbilities: additionalAbilities ?? 0,
-          publicInfo: publicInfo,
-          content: content ?? "",
-          abilities: abilityIds,
-          features: featuresWithComments.filter((fwc) => fwc.checked),
-        },
-        {
-          onSuccess: () => {
-            handleClear();
-            void router.push(
-              {
-                pathname: `/characters/${characterId}`,
-              },
-              undefined,
-              { shallow: false },
-            );
-          },
-        },
-      );
-    else
-      createMutation(
-        {
-          name: name ?? "",
-          clanId: clanId!,
-          factionId: factionId!,
-          visible: !!visible,
-          image: image ?? "",
-          age: age ? age.toString() : "",
-          playerId: playerId,
-          playerName: playerName,
-          playerContact: playerContact,
-          sire: sire ?? "",
-          childer: childer ?? "",
-          title: title,
-          status: status,
-          ambition: ambition,
-          additionalAbilities: additionalAbilities ?? 0,
-          publicInfo: publicInfo,
-          content: content ?? "",
-          abilities: abilityIds,
-          features: featuresWithComments.filter((fwc) => fwc.checked),
+          name: getValues("name") ?? "",
+          clanId: getValues("clanId"),
+          factionId: getValues("factionId"),
+          visible: !!getValues("visible"),
+          image: getValues("image") ?? "",
+          age: !!getValues("age") ? getValues("age")!.toString() : "",
+          playerId: sessionData?.user.id,
+          playerName: getValues("playerName"),
+          playerContact: getValues("playerContact"),
+          sire: getValues("sire") ?? "",
+          childer: getValues("childer") ?? "",
+          title: getValues("title"),
+          status: getValues("status"),
+          ambition: getValues("ambition"),
+          additionalAbilities: Number(getValues("additionalAbilities")),
+          publicInfo: getValues("publicInfo"),
+          content: getValues("content") ?? "",
+          abilities: getValues("abilityIds"),
+          features: getValues("featuresWithComments").filter(
+            (fwc) => fwc.checked,
+          ),
+          knowledges: getValues("knowledges")
+            .filter((k) => k.checked)
+            .map((k) => k.id),
+          rituals: getValues("rituals")
+            .filter((r) => r.checked)
+            .map((r) => r.id),
         },
         {
           onSuccess: (data) => {
-            handleClear();
             void router.push(
               {
                 pathname: `/characters/${data.id}`,
@@ -331,737 +338,822 @@ export default function CharacterEditor() {
               { shallow: false },
             );
           },
+          onError: () => {
+            setError("root", {
+              message: "Ошибка сохранения: подробности в консоли",
+            });
+          },
         },
       );
-  };
-
-  const handleClear = () => {
-    setCharacterId(undefined);
-    setInitialPublicInfo("");
-    setInitialQuenta("");
-    setPlayerId("");
-    setCostSum(0);
-    clear();
-  };
-
-  const handleDeleteCharacter = () => {
-    const deleteConfirm = confirm("Вы уверены, что хотите удалить персонажа?");
-    if (!!characterId && deleteConfirm)
-      deleteMutation(
-        { id: characterId },
+    } else
+      createMutation(
         {
-          onSuccess: () => {
-            handleClear();
+          name: getValues("name") ?? "",
+          clanId: getValues("clanId"),
+          factionId: getValues("factionId"),
+          visible: !!getValues("visible"),
+          image: getValues("image") ?? "",
+          age: !!getValues("age") ? getValues("age")!.toString() : "",
+          playerId: sessionData?.user.id,
+          playerName: getValues("playerName"),
+          playerContact: getValues("playerContact"),
+          sire: getValues("sire") ?? "",
+          childer: getValues("childer") ?? "",
+          title: getValues("title"),
+          status: getValues("status"),
+          ambition: getValues("ambition"),
+          additionalAbilities: Number(getValues("additionalAbilities")),
+          publicInfo: getValues("publicInfo"),
+          content: getValues("content") ?? "",
+          abilities: getValues("abilityIds"),
+          features: getValues("featuresWithComments").filter(
+            (fwc) => fwc.checked,
+          ),
+          knowledges: getValues("knowledges")
+            .filter((k) => k.checked)
+            .map((k) => k.id),
+          rituals: getValues("rituals")
+            .filter((r) => r.checked)
+            .map((r) => r.id),
+        },
+        {
+          onSuccess: (data) => {
             void router.push(
               {
-                pathname: `/characters`,
+                pathname: `/characters/${data.id}`,
               },
               undefined,
               { shallow: false },
             );
           },
+          onError: () => {
+            setError("root", {
+              message: "Ошибка сохранения: подробности в консоли",
+            });
+          },
         },
       );
   };
 
-  if (
-    isUserLoading ||
-    isTraitsLoading ||
-    isCharacterCreatePending ||
-    isCharacterUpdatePending ||
-    isCharacterDeletePending ||
-    isCharacterLoading ||
-    isUserListLoading
-  )
+  if (isUserLoading || isTraitsLoading || isCharacterLoading)
     return <LoadingPage />;
 
   const factions: Faction[] = !!traitsData ? traitsData.factions : [];
   const clans: Clan[] = !!traitsData ? traitsData.clans : [];
   const abilities: Ability[] = !!traitsData ? traitsData.abilities : [];
   const features: Feature[] = !!traitsData ? traitsData.features : [];
+  const knowledges: Knowledge[] = !!traitsData ? traitsData.knowledges : [];
+  const rituals: Ritual[] = !!traitsData ? traitsData.rituals : [];
 
-  const abilitiesRemain =
-    (featuresWithComments
-      .filter((fwc) => fwc.checked)
-      .map((fwc) => fwc.id)
-      .includes(features.find((f) => f.name === "Способный ученик")!.id)
-      ? (additionalAbilities ?? 0) + 4
-      : (additionalAbilities ?? 0) + 3) - abilityIds.length;
+  const abilitiesRemain: number = watchedFWC
+    .filter((fwc) => fwc.checked)
+    .map((fwc) => fwc.id)
+    .includes(features.find((f) => f.name === "Способный ученик")!.id)
+    ? Number(watchedAdditionalAbilities ?? 0) + 4
+    : Number(watchedAdditionalAbilities ?? 0) + 3;
 
-  const isInvalid =
-    !name ||
-    !factionId ||
-    !clanId ||
-    !age ||
-    !playerName ||
-    !playerContact ||
-    !ambition ||
-    !publicInfo ||
-    publicInfo === "<p></p>" ||
-    !content ||
-    content === "<p></p>" ||
-    (!!costSum && !infiniteFeatures) ||
-    !featuresWithComments
-      .filter((fwc) => fwc.checked)
-      .reduce((a, b) => a && !!b.comment, true) ||
-    abilitiesRemain < 0;
-
-  const invalidFields = [
-    !name ? "имя персонажа" : undefined,
-    !factionId ? "фракцию" : undefined,
-    !clanId ? "клан" : undefined,
-    !age ? "возраст" : undefined,
-    !playerName ? "имя игрока" : undefined,
-    !playerContact ? "способ связи" : undefined,
-    !ambition ? "амбиции" : undefined,
-    !publicInfo || publicInfo === "<p></p>"
-      ? "публичную информацию"
-      : undefined,
-    !content || content === "<p></p>" ? "квенту" : undefined,
-    !featuresWithComments
-      .filter((fwc) => fwc.checked)
-      .reduce((a, b) => a && !!b.comment, true)
-      ? "комментарии к дополнениям"
-      : undefined,
-  ];
-
-  const storeChanged =
-    !!name ||
-    !!age ||
-    (!!playerName && playerName !== userData?.name) ||
-    // (!!playerContact && playerContact !== contactSelect[0]?.label) ||
-    !!playerContact ||
-    !!factionId ||
-    !!clanId ||
-    !!status ||
-    !!title ||
-    !!visible ||
-    !!publicInfo ||
-    !!sire ||
-    !!childer ||
-    !!ambition ||
-    !!additionalAbilities ||
-    !!content ||
-    !!featuresWithComments.filter((fs) => fs.checked).length ||
-    !!abilityIds.length;
+  const isContinueDisabled: boolean =
+    (step === 1 && (!watchedPlayerName || !watchedPlayerContact)) ||
+    (step === 2 &&
+      (!watchedName ||
+        !watchedAge ||
+        !watchedFactionId ||
+        !watchedClanId ||
+        !watchedPublicInfo ||
+        watchedPublicInfo === "<p></p>")) ||
+    (step === 3 && (!watchedContent || watchedContent === "<p></p>")) ||
+    (step === 4 &&
+      watchedAbilityIds.length > abilitiesRemain &&
+      !infiniteAbilities) ||
+    (step === 5 &&
+      (!!costSum ||
+        watchedFWC.reduce((a, b) => a || (!b.comment && b.checked), false)) &&
+      !infiniteFeatures);
 
   return (
     <>
       <Head>
-        <title>{!!name ? name : "Новый персонаж"}</title>
+        <title>Новый персонаж</title>
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`mx-auto flex max-w-4xl flex-1 flex-col gap-2 sm:pb-2`}>
         <div
-          className={`container mt-[5.4rem] flex flex-col gap-2 rounded-none bg-white/75 px-2 dark:bg-red-950/50 sm:mt-24 sm:rounded-b-lg`}
+          className={`container mt-[5.4rem] flex flex-col gap-2 rounded-none bg-white/75 px-2 pb-2 dark:bg-red-950/50 sm:mt-24 sm:rounded-b-lg`}
         >
-          <div className="sticky top-[5.4rem] z-30 -mx-2 flex flex-col bg-black/50 px-2 sm:top-24 sm:rounded-b-lg">
-            <div className="flex w-full flex-row gap-2 pb-1 pt-2">
+          <h1 className="text-3xl font-semibold">Новый персонаж</h1>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex flex-col gap-2">
+              <Checkbox {...register("visible")}>Виден другим игрокам</Checkbox>
+              {uploading ? (
+                <LoadingSpinner width={220} height={220} />
+              ) : (
+                <Image
+                  className="mx-auto aspect-square h-[220px] w-[220px] rounded-md object-cover"
+                  alt="char_photo"
+                  src={!!watchedImage ? watchedImage : default_char}
+                  height="440"
+                  width="440"
+                />
+              )}
               <UploadButton
+                disabled={uploading}
                 content={{
                   button: (
-                    <>
+                    <div className="flex flex-row items-center gap-2">
                       <FaImage size={16} className="ml-2" />
-                      <p className="hidden text-sm sm:flex">{`Фото (до 4 Мб)`}</p>
-                    </>
+                      <p className="text-sm">Загрузить</p>
+                    </div>
                   ),
-                  allowedContent: "Изображение (1 Мб)",
+                  allowedContent: "до 4 Мб",
                 }}
-                className="h-8 w-full max-w-[160px] cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
+                appearance={{ button: { height: 30, width: 120 } }}
+                className="h-14"
                 endpoint="imageUploader"
-                onUploadBegin={() => {
+                onBeforeUploadBegin={(files) => {
                   setUploading(true);
+                  return files;
                 }}
                 onClientUploadComplete={(res) => {
-                  update({ image: res[0]?.url ?? "" });
+                  setValue("image", res[0]?.url ?? "");
                   setUploading(false);
                 }}
               />
-              <Button
-                isDisabled={isInvalid}
-                onClick={handleSaveCharacter}
-                variant={"ghost"}
-                className="h-8 w-full border-warning text-sm hover:!bg-warning/25"
-              >
-                <FaRegSave size={16} />
-                <p className="hidden sm:flex">Сохранить</p>
-              </Button>
-              {!!characterId && (
-                <Button
-                  onClick={handleDeleteCharacter}
-                  variant={"ghost"}
-                  color="danger"
-                  className="h-8 w-full text-white hover:!bg-danger/25"
-                >
-                  <FaTrashAlt size={16} />
-                  <p className="hidden sm:flex">Удалить</p>
-                </Button>
-              )}
-              {!characterId && storeChanged && (
-                <Button
-                  onClick={() => {
-                    handleClear();
-                  }}
-                  variant={"ghost"}
-                  color="primary"
-                  className="h-8 w-full text-white hover:!bg-primary/25"
-                >
-                  <FaFile size={16} />
-                  <p className="hidden sm:flex">Очистить</p>
-                </Button>
-              )}
-              {!!characterId && (
-                <Button
-                  onClick={() => {
-                    handleClear();
-                    void router.push(
-                      {
-                        pathname: `/characters/new`,
-                      },
-                      undefined,
-                      { shallow: false },
-                    );
-                  }}
-                  variant={"ghost"}
-                  color="primary"
-                  className="h-8 w-full text-white hover:!bg-primary/25"
-                >
-                  <FaFile size={16} />
-                  <p className="hidden sm:flex">Новый</p>
-                </Button>
-              )}
             </div>
-            <div className="flex flex-1 flex-grow pb-1 text-center text-xs text-warning">
-              {isInvalid && (
-                <p className="mx-auto">
-                  {!!invalidFields.filter((i) => !!i).length && "Введите "}
-                  {invalidFields.filter((i) => !!i).join(", ")}
-                  {!!invalidFields.filter((i) => !!i).length && ". "}
-                  {!!costSum &&
-                    !infiniteFeatures &&
-                    "Сумма дополнений долна быть равна нулю."}
-                  {abilitiesRemain < 0 &&
-                    !infiniteAbilities &&
-                    `Вы можете выбрать не более ${abilitiesRemain + abilityIds.length} дисциплин.`}
-                </p>
-              )}
-            </div>
-          </div>
-          {isAdmin && userList && (
-            <Select
-              label="Игрок"
-              placeholder="Выберите игрока"
-              variant="underlined"
-              selectedKeys={[playerId ?? ""]}
-              onChange={(e) =>
-                setPlayerId(!!e.target.value ? e.target.value : playerId)
-              }
-            >
-              {userList.map((user) => (
-                <SelectItem
-                  key={user.id}
-                  value={user.id}
-                  textValue={user.name!}
+            <div className="-mt-16 flex flex-1 flex-col sm:mt-0">
+              <div className="mb-4 flex flex-row items-center justify-between sm:mb-1">
+                <Button
+                  size="sm"
+                  variant="bordered"
+                  className="w-24 gap-1 px-0"
+                  isDisabled={step === 1}
+                  onClick={() => setStep(step - 1)}
                 >
-                  <UserIcon
-                    name={user.name}
-                    className="mr-auto"
-                    classNames={{ description: "text-foreground-600" }}
-                    description={
-                      <div className="flex flex-col">
-                        <span>{user.email}</span>
-                        <span>
-                          Персонажей:&nbsp;
-                          {!!user.characters ? user.characters.length : 0}
-                        </span>
-                      </div>
+                  <FaArrowLeft size={16} /> Назад
+                </Button>
+                {step === 6 && (
+                  <Button
+                    size="sm"
+                    variant="bordered"
+                    className="w-24 gap-1 px-0"
+                    onClick={handleSaveCharacter}
+                    isDisabled={
+                      isContinueDisabled ||
+                      isCharacterCreatePending ||
+                      isCharacterUpdatePending
                     }
-                    avatarProps={{
-                      src: user.image ?? "",
-                    }}
-                  />
-                </SelectItem>
-              ))}
-            </Select>
-          )}
-          <div className="-mx-2 -mt-2 flex flex-col gap-2 px-2 sm:mx-0 sm:px-0 md:gap-4">
-            <div className="grid grid-cols-11 gap-2">
-              <div className="col-span-5 flex flex-col items-center justify-center sm:col-span-3">
-                {uploading ? (
-                  <LoadingSpinner width={80} height={80} />
-                ) : (
-                  <Image
-                    className="aspect-square h-[220px] w-[220px] rounded-md object-cover"
-                    alt="char_photo"
-                    src={!!image ? image : default_char}
-                    height="440"
-                    width="440"
-                  />
+                  >
+                    {isCharacterCreatePending || isCharacterUpdatePending ? (
+                      <LoadingSpinner width={16} height={16} />
+                    ) : (
+                      <FaRegSave size={16} />
+                    )}
+                    Сохранить
+                  </Button>
+                )}
+                {step < 6 && (
+                  <Button
+                    size="sm"
+                    variant="bordered"
+                    className="w-24 gap-1 px-0"
+                    isDisabled={isContinueDisabled}
+                    onClick={() => setStep(step + 1)}
+                  >
+                    Вперёд <FaArrowRight size={16} />
+                  </Button>
                 )}
               </div>
-              <div className="col-span-6 flex flex-1 flex-col sm:col-span-4">
-                <Input
-                  variant="underlined"
-                  label="Имя персонажа"
-                  placeholder="Введите имя персонажа"
-                  value={name}
-                  onValueChange={(s) => {
-                    update({ name: s });
-                  }}
-                />
-                <Input
-                  type="number"
-                  variant="underlined"
-                  label="Возраст персонажа"
-                  placeholder="Введите возраст"
-                  value={age ? age.toString() : ""}
-                  onValueChange={(a) => {
-                    update({ age: Number(a) });
-                  }}
-                />
-                <Input
-                  variant="underlined"
-                  label="Имя игрока"
-                  placeholder="Введите имя игрока"
-                  value={playerName}
-                  onValueChange={(s) => {
-                    update({ playerName: s });
-                  }}
-                />
-                <Input
-                  variant="underlined"
-                  label="Способ связи"
-                  placeholder="Введите способ связи"
-                  value={playerContact}
-                  onValueChange={(s) => {
-                    update({ playerContact: s });
-                  }}
-                />
-
-                {/* <Select
-                  label="Способ связи"
-                  placeholder="Введите способ связи"
-                  variant="underlined"
-                  selectedKeys={[playerContact ?? ""]}
-                  onChange={(e) => {
-                    update({
-                      playerContact: !!e.target.value
-                        ? e.target.value
-                        : playerContact,
-                    });
-                  }}
+              {step === 1 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ ease: "easeInOut", duration: 0.5 }}
+                  className="flex flex-1 flex-col"
                 >
-                  {contactSelect.map((item) => (
-                    <SelectItem
-                      key={item.label}
-                      value={item.label}
-                      textValue={item.label}
-                    >
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </Select> */}
-              </div>
-              <div className="col-span-11 flex-1 flex-col sm:col-span-4 sm:flex">
-                <Select
-                  label="Фракция"
-                  variant="underlined"
-                  placeholder="Выберите фракцию"
-                  selectedKeys={!!factionId ? [factionId.toString()] : []}
-                  onChange={(e) => {
-                    if (
-                      !!e.target.value &&
-                      e.target.value !== factionId?.toString()
-                    ) {
-                      update({
-                        factionId: Number(e.target.value),
-                        clanId: undefined,
-                      });
-                      storeAbilities([]);
-                      storeFeatures(
-                        featuresWithComments.map((fwc) => {
-                          return { ...fwc, comment: "", checked: false };
-                        }),
-                      );
-                    }
-                  }}
-                >
-                  {factions
-                    .filter((f) => f.visibleToPlayer || isAdmin || isPersonnel)
-                    .map((faction) => (
-                      <SelectItem
-                        key={faction.id}
-                        value={faction.id}
-                        textValue={faction.name}
-                      >
-                        <div className="flex flex-col gap-1">
-                          <div className="text-small dark:text-red-100">
-                            {faction.name}
-                          </div>
-                          <div className="flex flex-row gap-1">
-                            <Image
-                              alt="icon"
-                              className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
-                              src={
-                                !!faction.icon
-                                  ? icons.find((di) => di!.key === faction.icon)
-                                      ?.value ?? ""
-                                  : defaultIcon
-                              }
-                              height={128}
-                              width={128}
-                            />
-                            <span className="whitespace-normal text-tiny dark:text-red-100">
-                              {faction.content}
-                            </span>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                </Select>
-                <Select
-                  label="Клан"
-                  variant="underlined"
-                  disabled={!factionId}
-                  placeholder={
-                    !!factionId ? "Выберите клан" : "Сначала выберите фракцию"
-                  }
-                  selectedKeys={!!clanId ? [clanId.toString()] : []}
-                  onChange={(e) => {
-                    if (!!e.target.value) {
-                      update({ clanId: Number(e.target.value) });
-                      storeAbilities([]);
-                      storeFeatures(
-                        featuresWithComments.map((fwc) => {
-                          return { ...fwc, comment: "", checked: false };
-                        }),
-                      );
-                      setCostSum(0);
-                    }
-                  }}
-                >
-                  {clans
-                    .filter(
-                      (c) =>
-                        (c.visibleToPlayer &&
-                          c
-                            .ClanInFaction!.map((fa) => fa.factionId)
-                            .includes(factionId!)) ||
-                        isAdmin ||
-                        isPersonnel,
-                    )
-                    .map((clan) => (
-                      <SelectItem
-                        key={clan.id}
-                        value={clan.id}
-                        textValue={clan.name}
-                      >
-                        <div className="flex flex-col gap-1">
-                          <span className="text-small dark:text-red-100">
-                            {clan.name}
-                          </span>
-                          <div className="flex flex-row gap-1">
-                            <Image
-                              alt="icon"
-                              className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
-                              src={
-                                !!clan.icon
-                                  ? icons.find((di) => di!.key === clan.icon)
-                                      ?.value ?? ""
-                                  : defaultIcon
-                              }
-                              height={128}
-                              width={128}
-                            />
-                            <span className="whitespace-normal text-tiny dark:text-red-100">
-                              {clan.content}
-                            </span>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                </Select>
-                <Input
-                  variant="underlined"
-                  label="Статусы"
-                  placeholder="Введите статусы через запятую"
-                  value={status}
-                  onValueChange={(a) => {
-                    update({ status: a });
-                  }}
-                />
-                <Input
-                  variant="underlined"
-                  label="Титулы"
-                  placeholder="Введите титулы через запятую"
-                  value={title}
-                  onValueChange={(a) => {
-                    update({ title: a });
-                  }}
-                />
-              </div>
-            </div>
-            <Checkbox
-              color="warning"
-              size="sm"
-              isSelected={visible}
-              onValueChange={(e) => update({ visible: e })}
-            >
-              Виден другим игрокам
-            </Checkbox>
-            <div className="flex flex-col gap-2">
-              <DefaultEditor
-                label="Публичная информация"
-                className="min-h-44 sm:min-h-20"
-                onUpdate={(a) => {
-                  update({ publicInfo: a });
-                }}
-                initialContent={initialPublicInfo}
-                placeholder="Введите информацию о вашем персонаже, известную другим персонажам в городе"
-              />
-            </div>
-            <div className={"grid grid-cols-1 gap-4 sm:grid-cols-2"}>
-              <Input
-                variant="underlined"
-                label="Сир"
-                placeholder="Введите имя сира"
-                value={sire}
-                onValueChange={(a) => {
-                  update({ sire: a });
-                }}
-              />
-              <Input
-                variant="underlined"
-                label="Чайлды"
-                placeholder="Введите имена чайлдов через запятую"
-                value={childer}
-                onValueChange={(a) => {
-                  update({ childer: a });
-                }}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Textarea
-                variant="underlined"
-                label="Амбиции и желания"
-                placeholder="Введите амбиции и желания вашего персонажа"
-                value={ambition}
-                onValueChange={(a) => {
-                  update({ ambition: a });
-                }}
-              />
-              <DefaultEditor
-                label="Квента"
-                className="min-h-44 sm:min-h-20"
-                initialContent={initialQuenta}
-                onUpdate={(a) => {
-                  update({ content: a });
-                }}
-                placeholder="Введите предысторию персонажа и прочую информацию для мастерской группы"
-              />
-            </div>
-            <Accordion isCompact>
-              <AccordionItem
-                className="-mx-2"
-                aria-label={"Дисциплины"}
-                title={
-                  "Дисциплины" +
-                  (!!abilityIds.length
-                    ? abilitiesRemain >= 0
-                      ? ` (осталось ${abilitiesRemain})`
-                      : ` (уберите ${abilitiesRemain * -1})`
-                    : "")
-                }
-              >
-                <div className="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <p className="text-lg font-semibold">Информация об игроке</p>
                   <Input
+                    isRequired
+                    isInvalid={!!errors.playerName}
+                    errorMessage={errors.playerName?.message}
+                    autoComplete="off"
                     variant="underlined"
+                    label="Имя игрока"
+                    placeholder="Введите имя игрока"
+                    description="Ваше реальное имя или предпочитаемое обращение как к игроку."
+                    {...register("playerName", {
+                      required:
+                        "Введите ваше реальное имя или предпочитаемое обращение как к игроку.",
+                    })}
+                  />
+                  <Input
+                    isRequired
+                    isInvalid={!!errors.playerContact}
+                    errorMessage={errors.playerContact?.message}
+                    autoComplete="off"
+                    variant="underlined"
+                    label="Способ связи"
+                    placeholder="Введите предпочитаемый способ связи"
+                    description="Например, ссылка на ваш профиль в соцсетях, номер телефона или хэндл в телеграмме или дискорде."
+                    {...register("playerContact", {
+                      required:
+                        "Введите ссылку на ваш профиль в соцсетях, номер телефона или хэндл в телеграмме или дискорде.",
+                    })}
+                  />
+                </motion.div>
+              )}
+              {step === 2 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ ease: "easeInOut", duration: 0.5 }}
+                  className="flex flex-1 flex-col"
+                >
+                  <p className="text-lg font-semibold">
+                    Публичная информация о персонаже
+                  </p>
+                  <Input
+                    isRequired
+                    isInvalid={!!errors.name}
+                    errorMessage={errors.name?.message}
+                    autoComplete="off"
+                    variant="underlined"
+                    label="Имя персонажа"
+                    placeholder="Введите имя персонажа"
+                    description="Имя, известное другим персонажам в городе."
+                    {...register("name", {
+                      required:
+                        "Введите имя вашего персонажа, известное другим персонажам в городе.",
+                    })}
+                  />
+                  <Input
+                    isRequired
+                    autoComplete="off"
+                    isInvalid={!!errors.age}
+                    errorMessage={errors.age?.message}
                     type="number"
-                    isDisabled={
-                      abilityIds.length > 3 + (additionalAbilities ?? 0)
-                    }
-                    label="Для старейшин: дополнительные дисциплины"
-                    placeholder="1 по-умолчанию или 2 по договорённости с МГ"
-                    value={
-                      additionalAbilities ? additionalAbilities.toString() : ""
-                    }
-                    onValueChange={(a) => {
-                      if (Number(a) > -1 && Number(a) < 3)
-                        update({ additionalAbilities: Math.floor(Number(a)) });
+                    variant="underlined"
+                    label="Возраст персонажа"
+                    placeholder="Введите возраст"
+                    description="Возраст, известный другим персонажам в городе."
+                    {...register("age", {
+                      validate: (value) => {
+                        if (Number(value) < 18)
+                          return "Ваш персонаж не может быть младше 18 лет";
+                      },
+                    })}
+                    onChange={(e) => {
+                      setValue(
+                        "age",
+                        Number(e.target.value) > 0
+                          ? Number(e.target.value)
+                          : undefined,
+                      );
                     }}
                   />
-                  <div className="flex flex-col-reverse">
+                  <Select
+                    isRequired
+                    label="Фракция"
+                    variant="underlined"
+                    placeholder="Выберите фракцию"
+                    {...register("factionId")}
+                    onChange={(e) => {
+                      if (
+                        !!e.target.value &&
+                        e.target.value !== watchedFactionId?.toString()
+                      ) {
+                        setValue("factionId", Number(e.target.value));
+                        setValue(
+                          "featuresWithComments",
+                          watchedFWC.map((fwc) => {
+                            return { ...fwc, comment: "", checked: false };
+                          }),
+                        );
+                      }
+                    }}
+                  >
+                    {factions
+                      .filter(
+                        (f) => f.visibleToPlayer || isAdmin || isPersonnel,
+                      )
+                      .map((faction) => (
+                        <SelectItem
+                          key={faction.id}
+                          value={faction.id}
+                          textValue={faction.name}
+                        >
+                          <div className="flex flex-col gap-1">
+                            <div className="text-small dark:text-red-100">
+                              {faction.name}
+                            </div>
+                            <div className="flex flex-row gap-1">
+                              <Image
+                                alt="icon"
+                                className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
+                                src={
+                                  !!faction.icon
+                                    ? icons.find(
+                                        (di) => di!.key === faction.icon,
+                                      )?.value ?? ""
+                                    : defaultIcon
+                                }
+                                height={128}
+                                width={128}
+                              />
+                              <span className="whitespace-normal text-tiny dark:text-red-100">
+                                {faction.content}
+                              </span>
+                            </div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </Select>
+                  <Select
+                    isRequired
+                    label="Клан"
+                    variant="underlined"
+                    disabled={!watchedFactionId}
+                    placeholder={
+                      !!watchedFactionId
+                        ? "Выберите клан"
+                        : "Сначала выберите фракцию"
+                    }
+                    {...register("clanId")}
+                    onChange={(e) => {
+                      if (
+                        !!e.target.value &&
+                        Number(e.target.value) !== watchedClanId
+                      ) {
+                        setValue("clanId", Number(e.target.value));
+                        setValue("abilityIds", []);
+                        setValue(
+                          "featuresWithComments",
+                          watchedFWC.map((fwc) => {
+                            return { ...fwc, comment: "", checked: false };
+                          }),
+                        );
+                        setCostSum(0);
+                      }
+                    }}
+                  >
+                    {clans
+                      .filter(
+                        (c) =>
+                          (c.visibleToPlayer &&
+                            c
+                              .ClanInFaction!.map((fa) => fa.factionId)
+                              .includes(watchedFactionId)) ||
+                          isAdmin ||
+                          isPersonnel,
+                      )
+                      .map((clan) => (
+                        <SelectItem
+                          key={clan.id}
+                          value={clan.id}
+                          textValue={clan.name}
+                        >
+                          <div className="flex flex-col gap-1">
+                            <span className="text-small dark:text-red-100">
+                              {clan.name}
+                            </span>
+                            <div className="flex flex-row gap-1">
+                              <Image
+                                alt="icon"
+                                className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
+                                src={
+                                  !!clan.icon
+                                    ? icons.find((di) => di!.key === clan.icon)
+                                        ?.value ?? ""
+                                    : defaultIcon
+                                }
+                                height={128}
+                                width={128}
+                              />
+                              <span className="whitespace-normal text-tiny dark:text-red-100">
+                                {clan.content}
+                              </span>
+                            </div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </Select>
+                  <Input
+                    autoComplete="off"
+                    variant="underlined"
+                    label="Статусы"
+                    placeholder="Введите статусы через запятую"
+                    description="Статусы - это социальная валюта сородичей, определяющая вес вашего персонажа в обществе."
+                    {...register("status")}
+                  />
+                  <Input
+                    autoComplete="off"
+                    variant="underlined"
+                    label="Титулы"
+                    placeholder="Введите титулы через запятую"
+                    description="Титулы - это должностные обращения персонажа."
+                    {...register("title")}
+                  />
+                  <DefaultEditor
+                    isRequired
+                    label="Публичная информация"
+                    initialContent={getValues("publicInfo")}
+                    className="min-h-44"
+                    onUpdate={(a) => setValue("publicInfo", a)}
+                    placeholder="Введите информацию, известную другим персонажам в городе"
+                  />
+                </motion.div>
+              )}
+              {step === 3 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ ease: "easeInOut", duration: 0.5 }}
+                  className="flex flex-1 flex-col"
+                >
+                  <p className="text-lg font-semibold">
+                    Приватная информация о персонаже
+                  </p>
+                  <Input
+                    autoComplete="off"
+                    variant="underlined"
+                    label="Сир"
+                    placeholder="Введите имя сира"
+                    {...register("sire")}
+                  />
+                  <Input
+                    autoComplete="off"
+                    variant="underlined"
+                    label="Чайлды"
+                    placeholder="Введите имена чайлдов через запятую"
+                    {...register("childer")}
+                  />
+                  <Textarea
+                    variant="underlined"
+                    label="Амбиции и желания"
+                    placeholder="Введите амбиции и желания вашего персонажа"
+                    {...register("ambition")}
+                  />
+                  <DefaultEditor
+                    isRequired
+                    label="Квента"
+                    className="min-h-44"
+                    initialContent={watchedContent}
+                    onUpdate={(a) => setValue("content", a)}
+                    placeholder="Введите предысторию и прочую информацию для мастерской группы"
+                  />
+                </motion.div>
+              )}
+              {step === 4 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ ease: "easeInOut", duration: 0.5 }}
+                  className="flex flex-1 flex-col"
+                >
+                  <div className="mb-2 flex flex-col gap-2">
+                    <p className="text-lg font-semibold">Дисциплины</p>
+                    <Input
+                      variant="underlined"
+                      type="number"
+                      label="Для старейшин: дополнительные дисциплины"
+                      placeholder="1 по-умолчанию или 2 по сюжетным причинам"
+                      {...register("additionalAbilities")}
+                      onChange={(e) => {
+                        setValue(
+                          "additionalAbilities",
+                          Number(e.target.value) > 0 &&
+                            Number(e.target.value) < 3
+                            ? Number(e.target.value)
+                            : 0,
+                        );
+                      }}
+                    />
+                    <div className="flex flex-col-reverse">
+                      {(isAdmin || isPersonnel) && (
+                        <Checkbox
+                          isSelected={infiniteAbilities}
+                          onValueChange={setInfiniteAbilities}
+                        >
+                          Бесконечные дисциплины
+                        </Checkbox>
+                      )}
+                      {(isAdmin || isPersonnel) && (
+                        <Checkbox
+                          isSelected={seeAllAbilities}
+                          onValueChange={setSeeAllAbilities}
+                        >
+                          Показать все дисциплины
+                        </Checkbox>
+                      )}
+                    </div>
+                  </div>
+                  <CheckboxGroup
+                    label={
+                      !!watchedClanId
+                        ? `Выберите дисциплины - не больше ${abilitiesRemain}`
+                        : "Сначала выберите клан"
+                    }
+                    color="warning"
+                    value={
+                      watchedAbilityIds
+                        ? watchedAbilityIds.map((a) => a.toString())
+                        : []
+                    }
+                    onValueChange={(aids) =>
+                      setValue(
+                        "abilityIds",
+                        aids.map((aid) => Number(aid)),
+                      )
+                    }
+                  >
+                    {abilities
+                      .filter(
+                        (a) =>
+                          (a
+                            .AbilityAvailable!.map((aa) => aa.clanId)
+                            .includes(watchedClanId) &&
+                            (a.requirementId
+                              ? watchedAbilityIds.includes(a.requirementId)
+                              : true) &&
+                            a.visibleToPlayer) ||
+                          seeAllAbilities,
+                      )
+                      .map((ability) => (
+                        <Checkbox
+                          isDisabled={
+                            (abilities
+                              .filter((a) => watchedAbilityIds.includes(a.id))
+                              .map((a) => a.requirementId)
+                              .includes(Number(ability.id)) ||
+                              (abilities
+                                .filter(
+                                  (a) => !watchedAbilityIds.includes(a.id),
+                                )
+                                .map((a) => a.id)
+                                .includes(Number(ability.id)) &&
+                                watchedAbilityIds.length >
+                                  abilitiesRemain - 1)) &&
+                            !infiniteAbilities
+                          }
+                          key={ability.id + "_ability"}
+                          value={ability.id.toString()}
+                          classNames={{
+                            base: cn(
+                              "flex-row flex flex-1 max-w-full w-full m-0",
+                              "hover:bg-success/25 dark:hover:bg-danger/25 items-center justify-start",
+                              "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
+                              "data-[selected=true]:border-success dark:data-[selected=true]:border-warning",
+                            ),
+                            label: "w-full",
+                          }}
+                        >
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ ease: "easeInOut", duration: 0.5 }}
+                            className="flex flex-col"
+                          >
+                            <div className="flex flex-row items-center gap-2 text-xl">
+                              <Image
+                                alt="disc"
+                                className="max-h-12 max-w-12"
+                                src={
+                                  !!ability.icon
+                                    ? discIcons.find(
+                                        (di) => di.key === ability.icon,
+                                      )?.value ?? ""
+                                    : ""
+                                }
+                                height={128}
+                                width={128}
+                              />{" "}
+                              {ability.name}
+                            </div>
+                            <p className="whitespace-break-spaces pt-2 text-justify text-xs">
+                              {ability.content}
+                            </p>
+                          </motion.div>
+                        </Checkbox>
+                      ))}
+                  </CheckboxGroup>
+                </motion.div>
+              )}
+              {step === 5 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ ease: "easeInOut", duration: 0.5 }}
+                  className="flex flex-1 flex-col"
+                >
+                  <p className="text-lg font-semibold">
+                    {"Дополнения" + (!!costSum ? ` (в сумме ${costSum})` : "")}
+                  </p>
+                  <div className="mb-1 flex flex-col-reverse">
                     {(isAdmin || isPersonnel) && (
                       <Checkbox
-                        isSelected={infiniteAbilities}
-                        onValueChange={setInfiniteAbilities}
+                        isSelected={seeAllFeatures}
+                        onValueChange={setSeeAllFeatures}
                       >
-                        Бесконечные дисциплины
+                        Показать все дополнения
                       </Checkbox>
                     )}
                     {(isAdmin || isPersonnel) && (
                       <Checkbox
-                        isSelected={seeAllAbilities}
-                        onValueChange={setSeeAllAbilities}
+                        isSelected={infiniteFeatures}
+                        onValueChange={setInfiniteFeatures}
                       >
-                        Показать все дисциплины
+                        Бесконечные дополнения
                       </Checkbox>
                     )}
                   </div>
-                </div>
-                <CheckboxGroup
-                  label={
-                    !!clanId
-                      ? `Выберите дисциплины - не больше ${abilitiesRemain + abilityIds.length}`
-                      : "Сначала выберите клан"
-                  }
-                  color="warning"
-                  value={abilityIds ? abilityIds.map((a) => a.toString()) : []}
-                  onValueChange={(aids) => {
-                    const maxDisc = abilitiesRemain + abilityIds.length;
-                    console.log(maxDisc);
-                    if (aids.length <= maxDisc || infiniteAbilities) {
-                      storeAbilities(aids.map((aid) => Number(aid)));
+                  <CheckboxGroup
+                    label={
+                      !!watchedClanId
+                        ? "Выберите дополнения"
+                        : "Сначала выберите клан"
                     }
-                  }}
-                >
-                  {abilities
-                    .filter(
-                      (a) =>
-                        (a
-                          .AbilityAvailable!.map((aa) => aa.clanId)
-                          .includes(clanId!) &&
-                          (a.requirementId
-                            ? abilityIds.includes(a.requirementId)
-                            : true) &&
-                          a.visibleToPlayer) ||
-                        seeAllAbilities,
-                    )
-                    .map((ability) => (
-                      <Checkbox
-                        isDisabled={
-                          (abilities
-                            .filter((a) => abilityIds.includes(a.id))
-                            .map((a) => a.requirementId)
-                            .includes(Number(ability.id)) ||
-                            (abilities
-                              .filter((a) => !abilityIds.includes(a.id))
-                              .map((a) => a.id)
-                              .includes(Number(ability.id)) &&
-                              abilityIds.length >
-                                abilitiesRemain + abilityIds.length - 1)) &&
-                          !infiniteAbilities
-                        }
-                        key={ability.id}
-                        value={ability.id.toString()}
-                        classNames={{
-                          base: cn(
-                            "flex-row flex flex-1 max-w-full w-full m-0",
-                            "hover:bg-success/25 dark:hover:bg-danger/25 items-center justify-start",
-                            "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
-                            "data-[selected=true]:border-success dark:data-[selected=true]:border-warning",
-                          ),
-                          label: "w-full",
-                        }}
-                      >
-                        <div className="flex flex-col">
-                          <div className="flex flex-row items-center gap-2 text-xl">
-                            <Image
-                              alt="disc"
-                              className="max-h-12 max-w-12"
-                              src={
-                                !!ability.icon
-                                  ? discIcons.find(
-                                      (di) => di.key === ability.icon,
-                                    )?.value ?? ""
-                                  : ""
-                              }
-                              height={128}
-                              width={128}
-                            />{" "}
-                            {ability.name}
-                          </div>
-                          <p className="whitespace-break-spaces pt-2 text-justify text-xs">
-                            {ability.content}
-                          </p>
-                        </div>
-                      </Checkbox>
-                    ))}
-                </CheckboxGroup>
-              </AccordionItem>
-              <AccordionItem
-                className="-mx-2"
-                aria-label={"Дополнения"}
-                title={
-                  "Дополнения" + (!!costSum ? ` (в сумме ${costSum})` : "")
-                }
-              >
-                <div className="mb-1 flex flex-col-reverse">
-                  {(isAdmin || isPersonnel) && (
-                    <Checkbox
-                      isSelected={seeAllFeatures}
-                      onValueChange={setSeeAllFeatures}
-                    >
-                      Показать все дополнения
-                    </Checkbox>
-                  )}
-                  {(isAdmin || isPersonnel) && (
-                    <Checkbox
-                      isSelected={infiniteFeatures}
-                      onValueChange={setInfiniteFeatures}
-                    >
-                      Бесконечные дополнения
-                    </Checkbox>
-                  )}
-                </div>
-                <CheckboxGroup
-                  label={
-                    !!clanId ? "Выберите дополнения" : "Сначала выберите клан"
-                  }
-                  color="warning"
-                  value={featuresWithComments
-                    .filter((fwc) => fwc.checked)
-                    .map((fwc) => fwc.id.toString())}
-                  onValueChange={(fids) => {
-                    setCostSum(
-                      features
-                        .filter((f) => fids.includes(f.id.toString()))
-                        .reduce((a, b) => a + b.cost, 0),
-                    );
-                    storeFeatures(
-                      features.map((fwc) => {
-                        const fWC = featuresWithComments.find(
-                          (fWC) => fWC.id === fwc.id,
-                        );
+                    color="warning"
+                    value={watchedFWC
+                      .filter((fwc) => fwc.checked)
+                      .map((fwc) => fwc.id.toString())}
+                    onValueChange={(fids) => {
+                      setCostSum(
+                        features
+                          .filter((f) => fids.includes(f.id.toString()))
+                          .reduce((a, b) => a + b.cost, 0),
+                      );
+                      const newFWC = watchedFWC.map((fwc) => {
+                        const fWC = watchedFWC.find((fWC) => fWC.id === fwc.id);
                         return {
                           id: fwc.id,
                           cost: fwc.cost,
                           comment: !!fWC ? fWC.comment : "",
                           checked: fids.includes(fwc.id.toString()),
                         };
-                      }),
-                    );
-                  }}
+                      });
+                      setValue("featuresWithComments", newFWC);
+                    }}
+                  >
+                    {features
+                      .filter(
+                        (f) =>
+                          (f
+                            .FeatureAvailable!.map((fa) => fa.clanId)
+                            .includes(watchedClanId) &&
+                            f.visibleToPlayer) ||
+                          seeAllFeatures,
+                      )
+                      .map((feature) => (
+                        <div key={feature.id + "_feature"}>
+                          <Checkbox
+                            value={feature.id.toString()}
+                            isDisabled={
+                              feature.name === "Способный ученик" &&
+                              watchedAbilityIds.length >
+                                3 + Number(watchedAdditionalAbilities ?? 0)
+                            }
+                            classNames={{
+                              base: cn(
+                                "flex-row flex flex-1 max-w-full w-full m-0",
+                                "hover:bg-warning/25 items-center justify-start",
+                                "cursor-pointer rounded-lg gap-1 p-2 border-2 border-transparent",
+                                "data-[selected=true]:border-warning",
+                              ),
+                              label: "w-full",
+                            }}
+                          >
+                            <div className="flex flex-col">
+                              {feature.cost > 0
+                                ? `+${feature.cost}`
+                                : feature.cost}
+                              &nbsp;{feature.name}
+                              <p className="whitespace-break-spaces pt-1 text-justify text-xs">
+                                {feature.content}
+                              </p>
+                            </div>
+                          </Checkbox>
+                          {watchedFWC.find((fwc) => fwc.id === feature.id)
+                            ?.checked && (
+                            <Textarea
+                              variant="underlined"
+                              color="warning"
+                              label="Комментарий"
+                              placeholder={`Введите комментарий к дополнению "${feature.name}"`}
+                              onValueChange={(v) => {
+                                setValue(
+                                  "featuresWithComments",
+                                  watchedFWC.map((fwc) => {
+                                    return {
+                                      ...fwc,
+                                      comment:
+                                        fwc.id === feature.id ? v : fwc.comment,
+                                    };
+                                  }),
+                                );
+                              }}
+                              value={
+                                watchedFWC.find((fwc) => fwc.id === feature.id)
+                                  ?.comment
+                              }
+                            />
+                          )}
+                        </div>
+                      ))}
+                  </CheckboxGroup>
+                </motion.div>
+              )}
+              {step === 6 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ ease: "easeInOut", duration: 0.5 }}
+                  className="flex flex-1 flex-col"
                 >
-                  {features
-                    .filter(
-                      (f) =>
-                        (f
-                          .FeatureAvailable!.map((fa) => fa.clanId)
-                          .includes(clanId!) &&
-                          f.visibleToPlayer) ||
-                        seeAllFeatures,
-                    )
-                    .map((feature) => (
-                      <>
+                  <p className="text-lg font-semibold">Знания</p>
+                  <CheckboxGroup
+                    label="Выберите знания"
+                    color="warning"
+                    value={watchedKnowledges
+                      .filter((k) => k.checked)
+                      .map((k) => k.id.toString())}
+                    onValueChange={(kids) => {
+                      const newKnowledges = watchedKnowledges.map((k) => {
+                        return {
+                          id: k.id,
+                          name: k.name,
+                          checked: !!kids.includes(k.id.toString()),
+                        };
+                      });
+                      setValue("knowledges", newKnowledges);
+                    }}
+                  >
+                    {knowledges.map((knowledge) => (
+                      <Checkbox
+                        key={knowledge.id + "_knowledge"}
+                        value={knowledge.id.toString()}
+                        classNames={{
+                          base: cn(
+                            "flex-row flex flex-1 max-w-full w-full m-0",
+                            "hover:bg-warning/25 items-center justify-start",
+                            "cursor-pointer rounded-lg gap-1 p-2 border-2 border-transparent",
+                            "data-[selected=true]:border-warning",
+                          ),
+                          label: "w-full",
+                        }}
+                      >
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ ease: "easeInOut", duration: 0.5 }}
+                          className="flex flex-col"
+                        >
+                          <div className="flex flex-row items-center gap-2 text-xl">
+                            {knowledge.name}
+                          </div>
+                          <p className="whitespace-break-spaces pt-2 text-justify text-xs">
+                            {knowledge.content}
+                          </p>
+                        </motion.div>
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
+                  <p className="text-lg font-semibold">Ритуалы</p>
+                  <p className="text-justify text-sm italic">
+                    Игроки с продвинутыми версиями Тауматургии или Чародейства
+                    могут взять до 4 ритуалов, все остальные - не больше 2.
+                  </p>
+                  <CheckboxGroup
+                    label="Выберите ритуалы"
+                    color="warning"
+                    value={watchedRituals
+                      .filter((r) => r.checked)
+                      .map((r) => r.id.toString())}
+                    onValueChange={(rids) => {
+                      const newRituals = watchedRituals.map((r) => {
+                        return {
+                          id: r.id,
+                          name: r.name,
+                          checked: !!rids.includes(r.id.toString()),
+                          knowledgeRequired: r.knowledgeRequired,
+                        };
+                      });
+                      setValue("rituals", newRituals);
+                    }}
+                  >
+                    {rituals
+                      .filter(
+                        (r) =>
+                          r.visibleToPlayer &&
+                          watchedKnowledges
+                            .filter((wK) => wK.checked)
+                            .some(
+                              (k) =>
+                                k.id === r.ritualKnowledges![0]?.knowledgeId,
+                            ),
+                      )
+                      .map((ritual) => (
                         <Checkbox
-                          key={feature.id}
-                          value={feature.id.toString()}
-                          isDisabled={
-                            feature.name === "Способный ученик" &&
-                            abilityIds.length > 3 + (additionalAbilities ?? 0)
-                          }
+                          key={ritual.id + "_ritual"}
+                          value={ritual.id.toString()}
                           classNames={{
                             base: cn(
                               "flex-row flex flex-1 max-w-full w-full m-0",
@@ -1072,47 +1164,25 @@ export default function CharacterEditor() {
                             label: "w-full",
                           }}
                         >
-                          <div className="flex flex-col">
-                            {feature.cost > 0
-                              ? `+${feature.cost}`
-                              : feature.cost}
-                            &nbsp;{feature.name}
-                            <p className="whitespace-break-spaces pt-1 text-justify text-xs">
-                              {feature.content}
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ ease: "easeInOut", duration: 0.5 }}
+                            className="flex flex-col"
+                          >
+                            <div className="flex flex-row items-center gap-2 text-xl">
+                              {ritual.name}
+                            </div>
+                            <p className="whitespace-break-spaces pt-2 text-justify text-xs">
+                              {ritual.content}
                             </p>
-                          </div>
+                          </motion.div>
                         </Checkbox>
-                        {featuresWithComments.find(
-                          (fwc) => fwc.id === feature.id,
-                        )?.checked && (
-                          <Input
-                            variant="underlined"
-                            color="warning"
-                            label="Комментарий"
-                            placeholder={`Введите комментарий к дополнению "${feature.name}"`}
-                            onValueChange={(v) => {
-                              storeFeatures(
-                                featuresWithComments.map((fwc) => {
-                                  return {
-                                    ...fwc,
-                                    comment:
-                                      fwc.id === feature.id ? v : fwc.comment,
-                                  };
-                                }),
-                              );
-                            }}
-                            value={
-                              featuresWithComments.find(
-                                (fwc) => fwc.id === feature.id,
-                              )?.comment
-                            }
-                          />
-                        )}
-                      </>
-                    ))}
-                </CheckboxGroup>
-              </AccordionItem>
-            </Accordion>
+                      ))}
+                  </CheckboxGroup>
+                </motion.div>
+              )}
+            </div>
           </div>
         </div>
       </main>
