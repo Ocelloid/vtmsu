@@ -23,7 +23,9 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="iphone-backdrop fixed left-0 top-0 z-[950] flex w-full flex-col items-center justify-between gap-4 bg-transparent p-7 md:flex-row md:gap-0">
+    <nav
+      className={`${!router.asPath.includes("game") ? "flex" : "hidden"} iphone-backdrop fixed left-0 top-0 z-[950] w-full flex-col items-center justify-between gap-4 bg-transparent p-7 sm:flex md:flex-row md:gap-0`}
+    >
       <div className="font-poppins flex w-full items-center justify-between font-bold lowercase tracking-tight dark:text-neutral-100 md:text-4xl">
         <Link
           href={
