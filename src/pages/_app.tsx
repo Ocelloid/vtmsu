@@ -22,7 +22,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <NextUIProvider>
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <SessionProvider session={session}>
-          <main className={`font-sans ${inter.variable} flex flex-1 flex-grow`}>
+          <main
+            className={`font-sans ${inter.variable} flex flex-1 flex-grow flex-col`}
+          >
             <meta name="HandheldFriendly" content="true" />
             <meta
               name="viewport"
@@ -31,10 +33,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
             <BGImage />
             <Component {...pageProps} />
             <Navigation />
-            {/* <div
-              className="relative h-[160px] md:h-[80px]"
-              style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
-            > */}
             <div className="mb-6" />
             <div className="fixed bottom-0 flex h-6 w-full flex-col justify-between bg-slate-950 px-12 py-1 text-slate-400">
               <a
@@ -45,7 +43,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 © Ocelloid 2024
               </a>
             </div>
-            {/* </div> */}
           </main>
         </SessionProvider>
       </NextThemesProvider>

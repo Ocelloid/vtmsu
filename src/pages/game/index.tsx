@@ -47,8 +47,8 @@ export default function Game() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex h-full flex-grow basis-full flex-col">
-        <div className="container mt-24 flex flex-1 flex-col gap-2 rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:rounded-b-lg">
+      <main className="flex h-screen flex-grow basis-full flex-col pb-2">
+        <div className="container mt-24 flex h-full flex-col gap-2 rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:rounded-b-lg">
           <Select
             size="sm"
             variant="bordered"
@@ -90,10 +90,10 @@ export default function Game() {
               aria-label="Игровое меню"
               placement="bottom"
               classNames={{
-                panel:
-                  "min-h-[calc(100vh-13.5rem)] sm:min-h-[calc(100vh-14rem)] py-0",
+                panel: "py-0 h-full",
                 tab: "p-1 w-min",
                 tabList: "w-full",
+                wrapper: "flex-grow",
               }}
             >
               <Tab
