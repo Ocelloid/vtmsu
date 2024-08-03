@@ -34,12 +34,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className=" mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-4xl flex-col items-center justify-center">
-        <div className="container flex flex-col items-center justify-center gap-4 bg-black bg-clip-text px-4 pt-24 text-justify text-transparent dark:bg-white">
+        <div className="container flex flex-col items-center justify-center gap-4 px-4 pt-24 text-justify">
           <h1 className="flex flex-col items-center justify-center text-5xl font-extrabold tracking-tight sm:text-[5rem]">
             Маскарад
             <span className="text-red-600">Вампиров</span>
           </h1>
-          <div className="flex flex-col gap-2 bg-black bg-clip-text font-semibold dark:bg-white">
+          <div className="flex flex-col gap-2 font-semibold">
             <p>
               Вот уже много веков люди живут в этом мире, не подозревая о том,
               что происходит в их городах после захода солнца. Однако каждый
