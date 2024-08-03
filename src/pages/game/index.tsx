@@ -40,6 +40,8 @@ export default function Game() {
 
   if (isMyCharactersLoading) return <LoadingPage />;
 
+  console.log(navigator.userAgent);
+
   return (
     <>
       <Head>
@@ -48,7 +50,9 @@ export default function Game() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex h-screen flex-grow basis-full flex-col sm:mt-24 sm:pb-2">
-        <div className="container flex h-full flex-col gap-2 rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:rounded-b-lg">
+        <div
+          className={`${navigator.userAgent.includes("iPhone") ? "max-h-[calc(100vh-8rem)]" : ""} container flex h-full flex-col gap-2 rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:rounded-b-lg`}
+        >
           <Select
             size="sm"
             variant="bordered"
@@ -90,10 +94,10 @@ export default function Game() {
               aria-label="Игровое меню"
               placement="bottom"
               classNames={{
-                panel: "py-0 h-full max-h-[calc(100vh-8rem)]",
+                panel: "py-0 h-full",
                 tab: "p-1 w-min",
                 tabList: "w-full",
-                wrapper: "flex-grow max-h-[calc(100vh-8rem)]",
+                wrapper: "flex-grow",
               }}
             >
               <Tab
