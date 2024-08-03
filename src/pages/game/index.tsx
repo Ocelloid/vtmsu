@@ -90,10 +90,10 @@ export default function Game() {
               aria-label="Игровое меню"
               placement="bottom"
               classNames={{
-                panel: "py-0 h-full",
+                panel: "py-0 h-full max-h-[calc(100vh-8rem)]",
                 tab: "p-1 w-min",
                 tabList: "w-full",
-                wrapper: "flex-grow",
+                wrapper: "flex-grow max-h-[calc(100vh-8rem)]",
               }}
             >
               <Tab
