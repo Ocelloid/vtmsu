@@ -15,7 +15,7 @@ import {
 } from "@nextui-org/react";
 import { useForm } from "react-hook-form";
 import { UploadButton } from "~/utils/uploadthing";
-import { FaRegSave, FaImage, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { FaRegSave, FaImage, FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { z } from "zod";
 import DefaultEditor from "~/components/editors/DefaultEditor";
 import { api } from "~/utils/api";
@@ -190,7 +190,7 @@ export default function CharacterEditor() {
   useEffect(() => {
     const playerName = userData?.name ?? "";
     const playerContact =
-      (!!userData?.vk ? `ВКонтакте: @${userData?.vk}` : null) ??
+      (!!userData?.vk ? `ВКонтакте: ${userData?.vk}` : null) ??
       (!!userData?.tg ? `telegram: @${userData?.tg}` : null) ??
       (!!userData?.discord ? `discord: ${userData?.discord}` : null) ??
       (!!userData?.phone ? `телефон: ${userData?.phone}` : null) ??
@@ -489,7 +489,7 @@ export default function CharacterEditor() {
                   isDisabled={step === 1}
                   onClick={() => setStep(step - 1)}
                 >
-                  <FaArrowLeft size={16} /> Назад
+                  <FaAngleLeft size={16} /> Назад
                 </Button>
                 {step === 6 && (
                   <Button
@@ -519,7 +519,7 @@ export default function CharacterEditor() {
                     isDisabled={isContinueDisabled}
                     onClick={() => setStep(step + 1)}
                   >
-                    Вперёд <FaArrowRight size={16} />
+                    Вперёд <FaAngleRight size={16} />
                   </Button>
                 )}
               </div>
@@ -794,6 +794,7 @@ export default function CharacterEditor() {
                   />
                   <DefaultEditor
                     isRequired
+                    tabIndex={10}
                     label="Квента"
                     className="min-h-44"
                     initialContent={watchedContent}

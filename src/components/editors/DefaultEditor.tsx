@@ -97,7 +97,7 @@ const DefaultEditor = ({
       )}
       <EditorMenu editor={!!editor ? editor : defaultEditor!} />
       <EditorContent
-        tabIndex={!!tabIndex ? tabIndex : 4}
+        tabIndex={!!tabIndex ? tabIndex : 99}
         editor={!!editor ? editor : defaultEditor!}
       />
     </>
