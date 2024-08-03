@@ -98,42 +98,77 @@ export default function Game() {
             >
               <Tab
                 key="main"
-                title={<GiRestingVampire size={32} className="text-red-800" />}
+                title={<GiRestingVampire size={28} className="text-red-800" />}
                 className="flex flex-col gap-2"
               >
                 Главная страница
               </Tab>
               <Tab
                 key="hunt"
-                title={<FaMap size={32} className="text-red-800" />}
+                title={
+                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                    <FaMap size={28} />
+                    <span className="hidden text-lg font-bold md:flex">
+                      Карта
+                    </span>
+                  </div>
+                }
                 className="flex flex-col gap-2"
               >
-                Охота
+                Карта
               </Tab>
               <Tab
                 key="items"
-                title={<GiLightBackpack size={32} className="text-red-800" />}
+                title={
+                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                    <GiLightBackpack size={28} />
+                    <span className="hidden text-lg font-bold md:flex">
+                      Инвентарь
+                    </span>
+                  </div>
+                }
                 className="flex flex-col gap-2"
               >
                 Инвентарь
               </Tab>
               <Tab
                 key="money"
-                title={<GiMoneyStack size={32} className="text-red-800" />}
+                title={
+                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                    <GiMoneyStack size={28} />
+                    <span className="hidden text-lg font-bold md:flex">
+                      Экономика
+                    </span>
+                  </div>
+                }
                 className="flex flex-col gap-2"
               >
                 Экономика
               </Tab>
               <Tab
                 key="chat"
-                title={<IoMdChatboxes size={32} className="text-red-800" />}
+                title={
+                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                    <IoMdChatboxes size={28} />
+                    <span className="hidden text-lg font-bold md:flex">
+                      Заявки
+                    </span>
+                  </div>
+                }
                 className="flex flex-col gap-2"
               >
                 Заявки
               </Tab>
               <Tab
                 key="qrcode"
-                title={<FaQrcode size={32} className="text-red-800" />}
+                title={
+                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                    <FaQrcode size={28} />
+                    <span className="hidden text-lg font-bold md:flex">
+                      QR-коды
+                    </span>
+                  </div>
+                }
                 className="flex flex-col gap-2"
               >
                 QR-коды
