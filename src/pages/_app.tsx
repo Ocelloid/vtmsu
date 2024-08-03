@@ -22,7 +22,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <NextUIProvider>
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <SessionProvider session={session}>
-          <main className={`font-sans ${inter.variable}`}>
+          <main className={`font-sans ${inter.variable} flex flex-1 flex-grow`}>
             <meta name="HandheldFriendly" content="true" />
             <meta
               name="viewport"
