@@ -98,7 +98,12 @@ export default function Game() {
             >
               <Tab
                 key="main"
-                title={<GiRestingVampire size={28} className="text-red-800" />}
+                title={
+                  <GiRestingVampire
+                    size={28}
+                    className="text-red-900 dark:text-red-700"
+                  />
+                }
                 className="flex flex-col gap-2"
               >
                 Главная страница
