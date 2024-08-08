@@ -175,6 +175,20 @@ export default function CharacterEditor() {
   const { mutate: updateMutation, isPending: isCharacterUpdatePending } =
     api.char.update.useMutation();
 
+  const handleStepChange = (step: number) => {
+    void router.replace(
+      { pathname: router.pathname, query: { ...router.query, step } },
+      undefined,
+      { shallow: false },
+    );
+  };
+
+  useEffect(() => {
+    if (!!router.query.step && step !== Number(router.query.step)) {
+      setStep(Number(router.query.step));
+    }
+  }, [router, step]);
+
   useEffect(() => {
     if (!!router.query.pid) {
       setCharacterId(Number(router.query.pid));
@@ -514,7 +528,7 @@ export default function CharacterEditor() {
                   variant="bordered"
                   className="w-24 gap-1 px-0"
                   isDisabled={step === 1}
-                  onClick={() => setStep(step - 1)}
+                  onClick={() => handleStepChange(step - 1)}
                 >
                   <FaAngleLeft size={16} /> Назад
                 </Button>
@@ -530,9 +544,11 @@ export default function CharacterEditor() {
                   onClick={() =>
                     step > 1 || !!characterId
                       ? handleSaveCharacter(
-                          step === 6 ? undefined : () => setStep(step + 1),
+                          step === 6
+                            ? undefined
+                            : () => handleStepChange(step + 1),
                         )
-                      : setStep(step + 1)
+                      : handleStepChange(step + 1)
                   }
                 >
                   {step === 6 ? "Сохранить" : "Вперёд"}
