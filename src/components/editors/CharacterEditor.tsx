@@ -145,6 +145,7 @@ export default function CharacterEditor() {
     },
   });
 
+  const watchedVisible = watch("visible");
   const watchedImage = watch("image");
   const watchedPlayerName = watch("playerName");
   const watchedPlayerContact = watch("playerContact");
@@ -197,6 +198,7 @@ export default function CharacterEditor() {
       (!!userData?.email ? `электронная почта: ${userData?.email}` : null) ??
       "";
     if (!!characterData && characterData !== "404" && !!traitsData) {
+      setValue("visible", characterData.visible);
       setValue("image", characterData.image ?? "");
       setValue("playerName", characterData.playerName ?? playerName);
       setValue("playerContact", characterData.playerContact ?? playerContact);
@@ -295,7 +297,7 @@ export default function CharacterEditor() {
     }
   }, [setValue, traitsData, characterData, userData]);
 
-  const handleSaveCharacter = () => {
+  const handleSaveCharacter = (callback?: () => void) => {
     if (!!characterId) {
       updateMutation(
         {
@@ -314,7 +316,7 @@ export default function CharacterEditor() {
           title: getValues("title"),
           status: getValues("status"),
           ambition: getValues("ambition"),
-          additionalAbilities: Number(getValues("additionalAbilities")),
+          additionalAbilities: Number(getValues("additionalAbilities") ?? 0),
           publicInfo: getValues("publicInfo"),
           content: getValues("content") ?? "",
           abilities: getValues("abilityIds"),
@@ -330,13 +332,15 @@ export default function CharacterEditor() {
         },
         {
           onSuccess: (data) => {
-            void router.push(
-              {
-                pathname: `/characters/${data.id}`,
-              },
-              undefined,
-              { shallow: false },
-            );
+            if (!!callback) callback();
+            else
+              void router.push(
+                {
+                  pathname: `/characters/${data.id}`,
+                },
+                undefined,
+                { shallow: false },
+              );
           },
           onError: () => {
             setError("root", {
@@ -362,7 +366,7 @@ export default function CharacterEditor() {
           title: getValues("title"),
           status: getValues("status"),
           ambition: getValues("ambition"),
-          additionalAbilities: Number(getValues("additionalAbilities")),
+          additionalAbilities: Number(getValues("additionalAbilities") ?? 0),
           publicInfo: getValues("publicInfo"),
           content: getValues("content") ?? "",
           abilities: getValues("abilityIds"),
@@ -378,13 +382,17 @@ export default function CharacterEditor() {
         },
         {
           onSuccess: (data) => {
-            void router.push(
-              {
-                pathname: `/characters/${data.id}`,
-              },
-              undefined,
-              { shallow: false },
-            );
+            if (!!callback) {
+              callback();
+              setCharacterId(data.id);
+            } else
+              void router.push(
+                {
+                  pathname: `/characters/${data.id}`,
+                },
+                undefined,
+                { shallow: false },
+              );
           },
           onError: () => {
             setError("root", {
@@ -393,6 +401,14 @@ export default function CharacterEditor() {
           },
         },
       );
+  };
+
+  const handleVisibilityChagne = () => {
+    setValue("visible", !watchedVisible);
+    if (!!characterId || step > 2)
+      handleSaveCharacter(() => {
+        return null;
+      });
   };
 
   if (isUserLoading || isTraitsLoading || isCharacterLoading)
@@ -441,10 +457,21 @@ export default function CharacterEditor() {
         <div
           className={`container mt-[5.4rem] flex flex-col gap-2 rounded-none bg-white/75 px-2 pb-2 dark:bg-red-950/50 sm:mt-24 sm:rounded-b-lg`}
         >
-          <h1 className="text-3xl font-semibold">Новый персонаж</h1>
+          <h1 className="text-3xl font-semibold">
+            {characterId ? (
+              <a href={`/characters/${characterId}`}>{watchedName ?? " "}</a>
+            ) : (
+              "Новый персонаж"
+            )}
+          </h1>
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex flex-col gap-2">
-              <Checkbox {...register("visible")}>Виден другим игрокам</Checkbox>
+              <Checkbox
+                isSelected={watchedVisible}
+                onChange={() => handleVisibilityChagne()}
+              >
+                Виден другим игрокам
+              </Checkbox>
               {uploading ? (
                 <LoadingSpinner width={220} height={220} />
               ) : (
@@ -491,37 +518,32 @@ export default function CharacterEditor() {
                 >
                   <FaAngleLeft size={16} /> Назад
                 </Button>
-                {step === 6 && (
-                  <Button
-                    size="sm"
-                    variant="bordered"
-                    className="w-24 gap-1 px-0"
-                    onClick={handleSaveCharacter}
-                    isDisabled={
-                      isContinueDisabled ||
-                      isCharacterCreatePending ||
-                      isCharacterUpdatePending
-                    }
-                  >
-                    {isCharacterCreatePending || isCharacterUpdatePending ? (
-                      <LoadingSpinner width={16} height={16} />
-                    ) : (
-                      <FaRegSave size={16} />
-                    )}
-                    Сохранить
-                  </Button>
-                )}
-                {step < 6 && (
-                  <Button
-                    size="sm"
-                    variant="bordered"
-                    className="w-24 gap-1 px-0"
-                    isDisabled={isContinueDisabled}
-                    onClick={() => setStep(step + 1)}
-                  >
-                    Вперёд <FaAngleRight size={16} />
-                  </Button>
-                )}
+                <Button
+                  size="sm"
+                  variant="bordered"
+                  className="w-24 gap-1 px-0"
+                  isDisabled={
+                    isContinueDisabled ||
+                    isCharacterCreatePending ||
+                    isCharacterUpdatePending
+                  }
+                  onClick={() =>
+                    step > 1 || !!characterId
+                      ? handleSaveCharacter(
+                          step === 6 ? undefined : () => setStep(step + 1),
+                        )
+                      : setStep(step + 1)
+                  }
+                >
+                  {step === 6 ? "Сохранить" : "Вперёд"}
+                  {isCharacterCreatePending || isCharacterUpdatePending ? (
+                    <LoadingSpinner width={16} height={16} />
+                  ) : step === 6 ? (
+                    <FaRegSave size={16} />
+                  ) : (
+                    <FaAngleRight size={16} />
+                  )}
+                </Button>
               </div>
               {step === 1 && (
                 <motion.div

@@ -9,6 +9,9 @@ html,
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+
+body {
   height: 100vh;
 }
 

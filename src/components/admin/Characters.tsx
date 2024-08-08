@@ -1,21 +1,12 @@
-import {
-  Accordion,
-  AccordionItem,
-  Input,
-  Button,
-  Select,
-  SelectItem,
-} from "@nextui-org/react";
-import Link from "next/link";
-import { FaPlus, FaLink } from "react-icons/fa";
+import { Input, Button, Select, SelectItem } from "@nextui-org/react";
+import { FaPlus } from "react-icons/fa";
 import { useRouter } from "next/router";
-import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import type { Character, Faction, Clan } from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
-import CharacterSheet from "~/pages/characters/[pid]";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
+import CharacterCard from "../CharacterCard";
 
 export default function Characters() {
   const router = useRouter();
@@ -31,11 +22,8 @@ export default function Characters() {
     api.char.getCharTraits.useQuery();
   const { data: isPersonnel, isLoading: isUserPersonnelLoading } =
     api.user.userIsPersonnel.useQuery(undefined, { enabled: !!sessionData });
-  const {
-    data: charList,
-    isLoading: isCharListLoading,
-    refetch: refetchCharList,
-  } = api.char.getAll.useQuery(undefined, { enabled: isPersonnel });
+  const { data: charList, isLoading: isCharListLoading } =
+    api.char.getAll.useQuery(undefined, { enabled: isPersonnel });
 
   useEffect(() => {
     if (!!traitsData) {
@@ -129,11 +117,7 @@ export default function Characters() {
           ))}
         </Select>
       </div>
-      <Accordion
-        isCompact
-        variant="shadow"
-        className="bg-white/75 dark:bg-red-950/50"
-      >
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {chars
           .filter((c) =>
             !!factionIds.length ? factionIds.includes(c.factionId) : true,
@@ -143,34 +127,21 @@ export default function Characters() {
             !!name ? c.name.toLowerCase().includes(name.toLowerCase()) : true,
           )
           .map((char) => (
-            <AccordionItem
+            <CharacterCard
               key={char.id}
-              aria-label={char.name}
-              title={
-                <div className="flex flex-row gap-1">
-                  {char.verified ? (
-                    <VscVerified size={24} className="text-success" />
-                  ) : char.pending ? (
-                    <VscUnverified size={24} className="text-secondary" />
-                  ) : (
-                    <VscWarning size={24} className="text-danger" />
-                  )}
-                  {char.name}
-                </div>
-              }
-            >
-              <Link
-                href={`/characters/${char.id}`}
-                target="_blank"
-                className="mb-2 ml-1 flex flex-row items-center gap-2"
-              >
-                <FaLink size={16} />
-                Перейти к персонажу
-              </Link>
-              <CharacterSheet charId={char.id} onChange={refetchCharList} />
-            </AccordionItem>
+              character={char}
+              handleEditCharacter={(cid: number) => {
+                void router.push(
+                  {
+                    pathname: `/characters/${cid}/edit`,
+                  },
+                  undefined,
+                  { shallow: false },
+                );
+              }}
+            />
           ))}
-      </Accordion>
+      </div>
     </>
   );
 }

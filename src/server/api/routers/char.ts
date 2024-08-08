@@ -618,7 +618,7 @@ export const charRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        name: z.string().min(1),
+        name: z.string(),
         title: z.string().nullish(),
         status: z.string().nullish(),
         content: z.string().nullish(),
@@ -628,8 +628,8 @@ export const charRouter = createTRPCRouter({
         playerContact: z.string().nullish(),
         additionalAbilities: z.number(),
         playerId: z.string().nullish(),
-        clanId: z.number(),
-        factionId: z.number(),
+        clanId: z.number().optional(),
+        factionId: z.number().optional(),
         image: z.string(),
         age: z.string(),
         sire: z.string(),
@@ -650,8 +650,8 @@ export const charRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.db.char.create({
         data: {
-          clanId: input.clanId,
-          factionId: input.factionId,
+          clanId: input.clanId ?? 0,
+          factionId: input.factionId ?? 0,
           name: input.name,
           title: input.title,
           status: input.status,
@@ -711,7 +711,7 @@ export const charRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.number(),
-        name: z.string().min(1),
+        name: z.string(),
         title: z.string().nullish(),
         playerName: z.string().nullish(),
         playerContact: z.string().nullish(),
@@ -720,9 +720,9 @@ export const charRouter = createTRPCRouter({
         ambition: z.string().nullish(),
         publicInfo: z.string().nullish(),
         playerId: z.string().nullish(),
-        clanId: z.number(),
+        clanId: z.number().optional(),
         additionalAbilities: z.number(),
-        factionId: z.number(),
+        factionId: z.number().optional(),
         image: z.string(),
         age: z.string(),
         sire: z.string(),
@@ -891,20 +891,20 @@ export const charRouter = createTRPCRouter({
         });
       const shouldVerify =
         char?.clanId !== input.clanId ||
-        char.factionId !== input.factionId ||
-        char.title !== input.title ||
-        char.status !== input.status ||
-        char.content !== input.content ||
-        char.ambition !== input.ambition ||
-        char.age !== input.age ||
-        char.sire !== input.sire ||
-        char.childer !== input.childer ||
-        char.name !== input.name ||
+        char?.factionId !== input.factionId ||
+        char?.title !== input.title ||
+        char?.status !== input.status ||
+        char?.content !== input.content ||
+        char?.ambition !== input.ambition ||
+        char?.age !== input.age ||
+        char?.sire !== input.sire ||
+        char?.childer !== input.childer ||
+        char?.name !== input.name ||
         abilitiesChanged ||
         featuresChanged ||
         knowledgesChanged ||
         ritualsChanged ||
-        char.pending;
+        char?.pending;
       return ctx.db.char.update({
         where: { id: input.id },
         data: {
@@ -1017,7 +1017,7 @@ export const charRouter = createTRPCRouter({
       });
       const whereData = user?.isAdmin
         ? { id: input.id }
-        : { id: input.id, createdById: ctx.session.user.id };
+        : { id: input.id, playerId: ctx.session.user.id };
       const char = await ctx.db.char.findFirst({
         where: { ...whereData },
         include: {
