@@ -34,6 +34,7 @@ const Display = ({
       {!!label && <p className="text-sm text-default-500">{label}</p>}
       {dangerouslySetInnerHTML ? (
         <div
+          className="tiptap-display"
           dangerouslySetInnerHTML={{
             __html: dangerouslySetInnerHTML,
           }}
