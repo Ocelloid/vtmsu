@@ -10,6 +10,7 @@ import Hunting from "~/components/admin/hunting";
 import Characters from "~/components/admin/Characters";
 import Link from "next/link";
 import QRCodes from "~/components/admin/QRCodes";
+import OghamTransliteration from "~/components/admin/OghamTransliteration";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -192,7 +193,42 @@ export default function Admin() {
                 </div>
               }
             >
-              <QRCodes />
+              <Tabs
+                aria-label="tabs"
+                variant="underlined"
+                disabledKeys={isAdmin ? [] : ["users", "chars", "char_traits"]}
+                classNames={{
+                  tabList:
+                    "gap-0 grid grid-cols-4 md:grid-cols-8 w-full relative rounded-none p-0 border-b border-divider",
+                  cursor: "w-full bg-[#dc2626]",
+                  tab: "max-w-full px-0 h-8",
+                  base: "bg-danger/5 w-full",
+                  panel: "px-0 py-0",
+                }}
+              >
+                <Tab
+                  key={"qr_codes"}
+                  className="flex flex-col gap-8 md:gap-2"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>QR-коды</span>
+                    </div>
+                  }
+                >
+                  <QRCodes />
+                </Tab>
+                <Tab
+                  key={"ogham"}
+                  className="flex flex-col gap-8 md:gap-2"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Охам</span>
+                    </div>
+                  }
+                >
+                  <OghamTransliteration />
+                </Tab>
+              </Tabs>
             </Tab>
             <Tab
               key={"hunt"}
