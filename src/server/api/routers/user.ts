@@ -15,6 +15,11 @@ export type User = {
   emailVerified: Date | null;
   image: string | null;
   characters?: Character[] | null;
+  background?: string | null;
+  phone?: string | null;
+  vk?: string | null;
+  tg?: string | null;
+  discord?: string | null;
 };
 
 export const userRouter = createTRPCRouter({

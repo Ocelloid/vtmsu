@@ -707,6 +707,17 @@ export const charRouter = createTRPCRouter({
       });
     }),
 
+  switchPlayer: protectedProcedure
+    .input(z.object({ id: z.number(), playerId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          playerId: input.playerId,
+        },
+      });
+    }),
+
   update: protectedProcedure
     .input(
       z.object({
@@ -912,7 +923,11 @@ export const charRouter = createTRPCRouter({
           factionId: input.factionId,
           playerName: input.playerName,
           playerContact: input.playerContact,
-          playerId: input.playerId ? input.playerId : ctx.session.user.id,
+          playerId: input.playerId
+            ? input.playerId
+            : char?.playerId
+              ? char.playerId
+              : ctx.session.user.id,
           additionalAbilities: input.additionalAbilities,
           name: input.name,
           title: input.title,

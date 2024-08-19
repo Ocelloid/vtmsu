@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
-import { Select, SelectItem, Tabs, Tab } from "@nextui-org/react";
+import { Select, SelectItem, Tabs, Tab, Link } from "@nextui-org/react";
 import default_char from "~/../public/default_char.png";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -34,13 +34,12 @@ export default function Game() {
   if (!myCharacterData?.length)
     return (
       <div className="flex h-[100vh] w-[100vw] items-center justify-center">
-        Сначала создайте персонажа
+        Сначала&nbsp;<Link href="/characters/new">создайте&nbsp;персонажа</Link>
+        &nbsp;и дождитесь верификации
       </div>
     );
 
   if (isMyCharactersLoading) return <LoadingPage />;
-
-  console.log(navigator.userAgent);
 
   return (
     <>
@@ -66,28 +65,34 @@ export default function Game() {
               setSelectedCharacter(Number(e.target.value));
             }}
           >
-            {myCharacterData.map((c) => (
-              <SelectItem key={c.id} value={c.id.toString()} textValue={c.name}>
-                <div className="flex flex-col gap-1">
-                  <div className="text-small dark:text-red-100">{c.name}</div>
-                  <div className="flex flex-row gap-1">
-                    <Image
-                      alt="icon"
-                      className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
-                      src={!!c.image ? c.image : default_char}
-                      height={128}
-                      width={128}
-                    />
-                    <div
-                      className="tiptap-display whitespace-normal text-tiny dark:text-red-100"
-                      dangerouslySetInnerHTML={{
-                        __html: c.publicInfo ?? "",
-                      }}
-                    />
+            {myCharacterData
+              .filter((c) => c.verified)
+              .map((c) => (
+                <SelectItem
+                  key={c.id}
+                  value={c.id.toString()}
+                  textValue={c.name}
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="text-small dark:text-red-100">{c.name}</div>
+                    <div className="flex flex-row gap-1">
+                      <Image
+                        alt="icon"
+                        className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
+                        src={!!c.image ? c.image : default_char}
+                        height={128}
+                        width={128}
+                      />
+                      <div
+                        className="tiptap-display whitespace-normal text-tiny dark:text-red-100"
+                        dangerouslySetInnerHTML={{
+                          __html: c.publicInfo ?? "",
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-              </SelectItem>
-            ))}
+                </SelectItem>
+              ))}
           </Select>
           {!!selectedCharacter && (
             <Tabs

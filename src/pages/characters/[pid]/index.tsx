@@ -12,6 +12,8 @@ import {
   Button,
   useDisclosure,
   Divider,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { FaPencilAlt, FaEye, FaEyeSlash, FaTrashAlt } from "react-icons/fa";
 import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
@@ -66,8 +68,12 @@ const CharacterSheet = ({
   const [publicChar, setPublicChar] = useState<Character>();
   const [privateChar, setPrivateChar] = useState<Character>();
   const [privateVer, setPrivateVer] = useState<boolean>();
+  const [selectedPlayer, setSelectedPlayer] = useState<string>();
 
   const { data: isAdmin } = api.user.userIsAdmin.useQuery();
+
+  const { data: playersData, isLoading: isPlayersLoading } =
+    api.user.getUserList.useQuery(undefined, { enabled: isAdmin });
 
   const {
     data: publicData,
@@ -104,6 +110,9 @@ const CharacterSheet = ({
   const { mutate: deleteMutation, isPending: isDeletePending } =
     api.char.delete.useMutation();
 
+  const { mutate: playerMutation, isPending: isPlayerPending } =
+    api.char.switchPlayer.useMutation();
+
   useEffect(() => {
     if (!!router.query.pid) {
       setCharacterId(Number(router.query.pid));
@@ -120,7 +129,10 @@ const CharacterSheet = ({
         )
       ) {
         void router.push("/characters");
-      } else setPublicChar(publicData);
+      } else {
+        setPublicChar(publicData);
+        setSelectedPlayer(publicData.playerId);
+      }
     }
   }, [isAdmin, publicData, sessionData, router, setPublicChar]);
 
@@ -189,6 +201,11 @@ const CharacterSheet = ({
     );
   };
 
+  const handlePlayerChange = (id: string) => {
+    setSelectedPlayer(id);
+    playerMutation({ id: characterId!, playerId: id });
+  };
+
   if (
     !publicChar ||
     isDenyPending ||
@@ -196,6 +213,8 @@ const CharacterSheet = ({
     isPublicLoading ||
     isPrivateLoading ||
     isDeletePending ||
+    isPlayerPending ||
+    isPlayersLoading ||
     (privateVer && !privateChar)
   )
     return <LoadingPage />;
@@ -250,6 +269,42 @@ const CharacterSheet = ({
               >
                 Принять
               </Button>
+            </div>
+          )}
+          {!!isAdmin && !!playersData && (
+            <div className="flex flex-1 flex-col gap-2">
+              <Select
+                label="Игрок"
+                variant="underlined"
+                placeholder="Выберите игрока"
+                className="w-full"
+                selectedKeys={selectedPlayer ? [selectedPlayer.toString()] : []}
+                onChange={(e) => {
+                  handlePlayerChange(e.target.value);
+                }}
+              >
+                {playersData.map((p) => (
+                  <SelectItem key={p.id} value={p.id} textValue={p.name ?? ""}>
+                    <div className="flex flex-col gap-1">
+                      <div className="text-small dark:text-red-100">
+                        {p.name}
+                      </div>
+                      <div className="flex flex-row gap-1">
+                        <Image
+                          alt="icon"
+                          className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
+                          src={!!p.image ? p.image : default_char}
+                          height={128}
+                          width={128}
+                        />
+                        <div className="whitespace-normal text-tiny dark:text-red-100">
+                          {p.email}
+                        </div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </Select>
             </div>
           )}
           {!!isAdmin && receivedComment && (

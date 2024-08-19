@@ -104,7 +104,7 @@ model Char {
   clanId              Int
   visible             Boolean              @default(false)
   additionalAbilities Int                  @default(0)
-  playerId            String?
+  playerId            String
   playerName          String?
   playerContact       String?
   image               String?
@@ -123,7 +123,7 @@ model Char {
   content             String?              @db.LongText
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
-  createdBy           User                 @relation(fields: [createdById], references: [id])
+  createdBy           User                 @relation(fields: [playerId], references: [id])
   clan                Clan                 @relation(fields: [clanId], references: [id])
   faction             Faction              @relation(fields: [factionId], references: [id])
   abilities           CharacterAbilities[]
