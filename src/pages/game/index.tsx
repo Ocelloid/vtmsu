@@ -51,7 +51,7 @@ export default function Game() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className={`${navigator.userAgent.includes("iPhone") ? "max-h-[calc(100vh-8rem)]" : "h-screen"} flex flex-grow basis-full flex-col sm:mt-24 sm:pb-2`}
+        className={`${navigator.userAgent.includes("iPhone") ? "max-h-[calc(100vh-8rem)]" : "h-screen"} fixed flex h-full w-full flex-grow basis-full flex-col sm:static sm:mt-24 sm:pb-2`}
       >
         <div className="container flex h-full flex-col gap-2 rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:rounded-b-lg">
           <Select
