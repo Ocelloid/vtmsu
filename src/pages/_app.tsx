@@ -8,6 +8,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import Navigation from "~/components/Navigation";
 import BGImage from "~/components/BGImage";
+import Footer from "~/components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,16 +34,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
             <BGImage />
             <Component {...pageProps} />
             <Navigation />
-            <div className="mb-6" />
-            <div className="fixed bottom-0 flex h-6 w-full flex-col justify-between bg-slate-950 px-12 py-1 text-slate-400">
-              <a
-                href="https://ocelloid.com"
-                target="_blank"
-                className="ml-auto text-xs"
-              >
-                © Ocelloid 2024
-              </a>
-            </div>
+            <Footer />
           </main>
         </SessionProvider>
       </NextThemesProvider>

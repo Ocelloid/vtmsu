@@ -13,6 +13,7 @@ import {
 } from "react-icons/gi";
 import { FaQrcode, FaMap } from "react-icons/fa";
 import { IoMdChatboxes } from "react-icons/io";
+import Money from "~/components/game/Money";
 
 export default function Game() {
   const { data: sessionData } = useSession();
@@ -23,6 +24,7 @@ export default function Game() {
 
   useEffect(() => {
     if (!!myCharacterData) setSelectedCharacter(myCharacterData[0]?.id);
+    console.log(myCharacterData);
   }, [myCharacterData]);
 
   if (!sessionData)
@@ -31,7 +33,7 @@ export default function Game() {
         Войдите, чтобы увидеть эту страницу
       </div>
     );
-  if (!myCharacterData?.length)
+  if (!myCharacterData?.filter((c) => c.verified).length)
     return (
       <div className="flex h-[100vh] w-[100vw] items-center justify-center">
         Сначала&nbsp;<Link href="/characters/new">создайте&nbsp;персонажа</Link>
@@ -62,14 +64,16 @@ export default function Game() {
               selectedCharacter ? [selectedCharacter.toString()] : []
             }
             onChange={(e) => {
-              setSelectedCharacter(Number(e.target.value));
+              setSelectedCharacter(
+                !!e.target.value ? Number(e.target.value) : selectedCharacter,
+              );
             }}
           >
             {myCharacterData
               .filter((c) => c.verified)
               .map((c) => (
                 <SelectItem
-                  key={c.id}
+                  key={c.id.toString()}
                   value={c.id.toString()}
                   textValue={c.name}
                 >
@@ -78,7 +82,7 @@ export default function Game() {
                     <div className="flex flex-row gap-1">
                       <Image
                         alt="icon"
-                        className="mr-2 max-h-12 min-w-12 max-w-12 object-contain"
+                        className="mr-2 max-h-36 min-w-36 max-w-36 object-contain"
                         src={!!c.image ? c.image : default_char}
                         height={128}
                         width={128}
@@ -157,7 +161,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                Экономика
+                <Money />
               </Tab>
               <Tab
                 key="chat"
