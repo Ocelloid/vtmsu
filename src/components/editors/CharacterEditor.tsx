@@ -54,7 +54,7 @@ const schema = z.object({
   clanId: z.number(),
   factionId: z.number(),
   abilityIds: z.array(z.number()),
-  additionalAbilities: z.number().min(0).max(2),
+  additionalAbilities: z.number().min(0).max(2).optional(),
   featuresWithComments: z.array(
     z.object({
       id: z.number(),
@@ -862,7 +862,7 @@ export default function CharacterEditor() {
                           Number(e.target.value) > 0 &&
                             Number(e.target.value) < 3
                             ? Number(e.target.value)
-                            : 0,
+                            : undefined,
                         );
                       }}
                     />
