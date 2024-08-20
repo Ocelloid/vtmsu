@@ -923,11 +923,7 @@ export const charRouter = createTRPCRouter({
           factionId: input.factionId,
           playerName: input.playerName,
           playerContact: input.playerContact,
-          playerId: input.playerId
-            ? input.playerId
-            : char?.playerId
-              ? char.playerId
-              : ctx.session.user.id,
+          playerId: input.playerId ? input.playerId : char?.playerId,
           additionalAbilities: input.additionalAbilities,
           name: input.name,
           title: input.title,
