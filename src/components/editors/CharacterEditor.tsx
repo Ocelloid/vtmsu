@@ -322,7 +322,6 @@ export default function CharacterEditor() {
           visible: !!getValues("visible"),
           image: getValues("image") ?? "",
           age: !!getValues("age") ? getValues("age")!.toString() : "",
-          playerId: sessionData?.user.id,
           playerName: getValues("playerName"),
           playerContact: getValues("playerContact"),
           sire: getValues("sire") ?? "",
