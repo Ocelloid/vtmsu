@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem } from "@nextui-org/react";
+import { Tabs, Tab } from "@nextui-org/react";
 import EditCharacterTrait from "~/components/modals/editCharacterTrait";
 import { FaPencilAlt, FaPlusCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import Image from "next/image";
@@ -126,14 +126,29 @@ const CharacterTraits = () => {
   if (isCharTraitsLoading) return <LoadingPage />;
 
   return (
-    <Accordion
-      isCompact
-      variant="shadow"
-      className="my-2 bg-white/75 dark:bg-red-950/50"
+    <Tabs
+      aria-label="tabs"
+      variant="underlined"
+      classNames={{
+        tabList:
+          "gap-0 grid grid-cols-4 md:grid-cols-8 w-full relative rounded-none p-0 border-b border-divider",
+        cursor: "w-full bg-[#dc2626]",
+        tab: "max-w-full px-0 h-8",
+        base: "bg-danger/5 w-full",
+        panel: "px-0 py-0",
+      }}
     >
-      {characterTraits.map((cs, i) => (
-        <AccordionItem key={i} aria-label={cs.label} title={cs.label}>
-          <div className="flex flex-col gap-4 pb-4">
+      {characterTraits.map((cs) => (
+        <Tab
+          key={cs.type}
+          className="flex flex-col gap-8 md:gap-2"
+          title={
+            <div className="flex items-center space-x-2">
+              <span>{cs.label}</span>
+            </div>
+          }
+        >
+          <div className="flex flex-col gap-4 pb-4 pt-2">
             <EditCharacterTrait
               traitType={cs.type}
               onClose={refetchTraits}
@@ -145,21 +160,23 @@ const CharacterTraits = () => {
             {cs.list.map((trait) => (
               <div key={trait.id} className="flex flex-col">
                 <div className="flex flex-row">
-                  {cs.type !== "Feature" && (
-                    <Image
-                      alt="icon"
-                      className="mr-2 max-h-12 max-w-12 object-contain"
-                      src={
-                        !!(trait as Ability).icon
-                          ? icons.find(
-                              (di) => di!.key === (trait as Ability).icon,
-                            )?.value ?? ""
-                          : defaultIcon
-                      }
-                      height={128}
-                      width={128}
-                    />
-                  )}
+                  {cs.type !== "Feature" &&
+                    cs.type !== "Ritual" &&
+                    cs.type !== "Knowledge" && (
+                      <Image
+                        alt="icon"
+                        className="mr-2 max-h-12 max-w-12 object-contain"
+                        src={
+                          !!(trait as Ability).icon
+                            ? icons.find(
+                                (di) => di!.key === (trait as Ability).icon,
+                              )?.value ?? ""
+                            : defaultIcon
+                        }
+                        height={128}
+                        width={128}
+                      />
+                    )}
                   <div className="mr-auto flex flex-col">
                     <p className="text-2xl">{trait.name}</p>
                     <p className="text-sm italic">
@@ -196,9 +213,9 @@ const CharacterTraits = () => {
               </div>
             ))}
           </div>
-        </AccordionItem>
+        </Tab>
       ))}
-    </Accordion>
+    </Tabs>
   );
 };
 

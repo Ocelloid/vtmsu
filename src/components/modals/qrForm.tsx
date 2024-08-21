@@ -16,15 +16,19 @@ import DefaultEditor from "~/components/editors/DefaultEditor";
 const QRForm = ({
   editId,
   children,
+  onRefetch,
 }: {
   editId?: number;
   children?: ReactNode;
+  onRefetch?: () => void;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
 
   const { mutate: createMutation, isPending } = api.item.create.useMutation();
+  const { mutate: updateMutation, isPending: isPendingUpdate } =
+    api.item.update.useMutation();
   const { data: item, isLoading: isItemLoading } = api.item.getById.useQuery(
     {
       id: editId!,
@@ -45,15 +49,28 @@ const QRForm = ({
   }, [item]);
 
   const handleFormSubmit = () => {
-    createMutation(
-      { name: title, content: description },
-      {
-        onSuccess() {
-          resetForm();
-          setIsModalOpen(false);
+    if (!editId)
+      createMutation(
+        { name: title, content: description },
+        {
+          onSuccess() {
+            resetForm();
+            if (onRefetch) onRefetch();
+            setIsModalOpen(false);
+          },
         },
-      },
-    );
+      );
+    else
+      updateMutation(
+        { id: editId, name: title, content: description },
+        {
+          onSuccess() {
+            resetForm();
+            if (onRefetch) onRefetch();
+            setIsModalOpen(false);
+          },
+        },
+      );
   };
 
   if (isItemLoading) return <LoadingSpinner />;
@@ -105,7 +122,9 @@ const QRForm = ({
             <Button
               variant="solid"
               color="success"
-              isDisabled={isPending || !title || !description}
+              isDisabled={
+                isPending || !title || !description || isPendingUpdate
+              }
               onClick={handleFormSubmit}
             >
               {isPending ? <LoadingSpinner /> : "Сохранить"}

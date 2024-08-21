@@ -47,7 +47,6 @@ export default function Users() {
   return (
     <>
       <div className="flex flex-col justify-start gap-2 pt-2 sm:flex-row">
-        <p className="hidden justify-end py-1 sm:flex">Поиск:</p>
         <Input
           size="sm"
           variant="bordered"

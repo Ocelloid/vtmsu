@@ -9,6 +9,8 @@ import Characters from "~/components/admin/Characters";
 import QRCodes from "~/components/admin/QRCodes";
 import OghamTransliteration from "~/components/admin/OghamTransliteration";
 import Users from "~/components/admin/Users";
+import Items from "~/components/admin/Items";
+import ItemTypes from "~/components/admin/ItemTypes";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -142,6 +144,28 @@ export default function Admin() {
                   }
                 >
                   <OghamTransliteration />
+                </Tab>
+                <Tab
+                  key={"item_types"}
+                  className="flex flex-col gap-8 md:gap-2"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Типы предметов</span>
+                    </div>
+                  }
+                >
+                  <ItemTypes />
+                </Tab>
+                <Tab
+                  key={"all_items"}
+                  className="flex flex-col gap-8 md:gap-2"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Все предметы</span>
+                    </div>
+                  }
+                >
+                  <Items />
                 </Tab>
               </Tabs>
             </Tab>
