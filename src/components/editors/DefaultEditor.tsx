@@ -96,6 +96,9 @@ const DefaultEditor = ({
         </p>
       )}
       <EditorMenu editor={!!editor ? editor : defaultEditor!} />
+      <p className="ml-1 text-tiny text-foreground-400">
+        Ctrl+Shift+V чтобы вставить текст без форматирования
+      </p>
       <EditorContent
         tabIndex={!!tabIndex ? tabIndex : 99}
         editor={!!editor ? editor : defaultEditor!}
