@@ -12,6 +12,7 @@ export type Item = {
   id?: number;
   name: string;
   typeId: number;
+  usage: number;
   image?: string | null;
   content?: string | null;
   createdById: string;
@@ -74,6 +75,7 @@ export const itemRouter = createTRPCRouter({
         content: z.string().nullish(),
         typeId: z.number().optional(),
         image: z.string().optional(),
+        usage: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -83,6 +85,7 @@ export const itemRouter = createTRPCRouter({
             name: input.name,
             content: input.content,
             image: input.image,
+            usage: input.usage,
             createdBy: { connect: { id: ctx.session.user.id } },
           },
         })
@@ -115,6 +118,7 @@ export const itemRouter = createTRPCRouter({
         typeId: z.number().optional(),
         image: z.string().optional(),
         content: z.string().nullish(),
+        usage: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -125,6 +129,7 @@ export const itemRouter = createTRPCRouter({
           typeId: input.typeId,
           image: input.image,
           content: input.content,
+          usage: input.usage,
         },
       });
     }),
@@ -138,7 +143,7 @@ export const itemRouter = createTRPCRouter({
     }),
 
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.db.item.findMany();
+    return ctx.db.item.findMany({ include: { type: true } });
   }),
 
   getLatest: protectedProcedure.query(({ ctx }) => {

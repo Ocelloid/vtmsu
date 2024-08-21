@@ -29,10 +29,13 @@ model Item {
   updatedAt   DateTime @updatedAt
   content     String?  @db.LongText
   image       String?
+  usage       Int      @default(-1)
   typeId      Int      @default(1)
   type        ItemType @relation(fields: [typeId], references: [id])
   createdBy   User     @relation(fields: [createdById], references: [id])
   createdById String
+  ownedById   Int?
+  ownedBy     Char?    @relation(fields: [ownedById], references: [id])
 }
 
 model ItemType {
@@ -230,6 +233,7 @@ model Char {
   active              Boolean               @default(false)
   bankAccount         BankAccount[]
   Company             Company[]
+  Item                Item[]
 }
 
 model ClanInFaction {
