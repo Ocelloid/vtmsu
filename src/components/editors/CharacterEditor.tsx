@@ -576,10 +576,10 @@ export default function CharacterEditor() {
                     variant="underlined"
                     label="Имя игрока"
                     placeholder="Введите имя игрока"
-                    description="Ваше реальное имя или предпочитаемое обращение как к игроку."
+                    description="Ваше реальное имя или предпочитаемое обращение как к игроку"
                     {...register("playerName", {
                       required:
-                        "Введите ваше реальное имя или предпочитаемое обращение как к игроку.",
+                        "Введите ваше реальное имя или предпочитаемое обращение как к игроку",
                     })}
                   />
                   <Input
@@ -590,10 +590,10 @@ export default function CharacterEditor() {
                     variant="underlined"
                     label="Способ связи"
                     placeholder="Введите предпочитаемый способ связи"
-                    description="Например, ссылка на ваш профиль в соцсетях, номер телефона или хэндл в телеграмме или дискорде."
+                    description="Например, ссылка на ваш профиль в соцсетях, номер телефона или хэндл в телеграмме или дискорде"
                     {...register("playerContact", {
                       required:
-                        "Введите ссылку на ваш профиль в соцсетях, номер телефона или хэндл в телеграмме или дискорде.",
+                        "Введите ссылку на ваш профиль в соцсетях, номер телефона или хэндл в телеграмме или дискорде",
                     })}
                   />
                 </motion.div>
@@ -616,10 +616,10 @@ export default function CharacterEditor() {
                     variant="underlined"
                     label="Имя персонажа"
                     placeholder="Введите имя персонажа"
-                    description="Имя, известное другим персонажам в городе."
+                    description="Имя, известное другим персонажам в городе"
                     {...register("name", {
                       required:
-                        "Введите имя вашего персонажа, известное другим персонажам в городе.",
+                        "Введите имя вашего персонажа, известное другим персонажам в городе",
                     })}
                   />
                   <Input
@@ -631,7 +631,7 @@ export default function CharacterEditor() {
                     variant="underlined"
                     label="Возраст персонажа"
                     placeholder="Введите возраст"
-                    description="Возраст, известный другим персонажам в городе."
+                    description="Возраст, известный другим персонажам в городе"
                     {...register("age", {
                       validate: (value) => {
                         if (Number(value) < 18)
@@ -778,7 +778,7 @@ export default function CharacterEditor() {
                     variant="underlined"
                     label="Статусы"
                     placeholder="Введите статусы через запятую"
-                    description="Статусы - это социальная валюта сородичей, определяющая вес вашего персонажа в обществе."
+                    description="Статусы - это социальная валюта сородичей, определяющая вес вашего персонажа в обществе"
                     {...register("status")}
                   />
                   <Input
@@ -786,7 +786,7 @@ export default function CharacterEditor() {
                     variant="underlined"
                     label="Титулы"
                     placeholder="Введите титулы через запятую"
-                    description="Титулы - это должностные обращения персонажа."
+                    description="Титулы - это должностные обращения персонажа"
                     {...register("title")}
                   />
                   <DefaultEditor
