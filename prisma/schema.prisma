@@ -28,8 +28,79 @@ model Item {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   content     String?  @db.LongText
+  image       String?
+  typeId      Int      @default(1)
+  type        ItemType @relation(fields: [typeId], references: [id])
   createdBy   User     @relation(fields: [createdById], references: [id])
   createdById String
+}
+
+model ItemType {
+  id              Int               @id @default(autoincrement())
+  name            String
+  image           String?
+  cost            Int
+  usage           Int               @default(-1)
+  content         String            @db.LongText
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Item            Item[]
+  bloodAmount     Int               @default(0)
+  bloodPool       Int               @default(0)
+  violation       String?
+  status          String?
+  boon            String?
+  companyLevels   Int               @default(0)
+  AddingAbility   AddingAbility[]
+  RemovingAbility RemovingAbility[]
+  UsingAbility    UsingAbility[]
+}
+
+model AddingAbility {
+  id         Int      @id @default(autoincrement())
+  itemTypeId Int
+  abilityId  Int
+  ability    Ability  @relation(fields: [abilityId], references: [id])
+  ItemType   ItemType @relation(fields: [itemTypeId], references: [id], onDelete: Cascade)
+}
+
+model RemovingAbility {
+  id         Int      @id @default(autoincrement())
+  itemTypeId Int
+  abilityId  Int
+  ability    Ability  @relation(fields: [abilityId], references: [id])
+  ItemType   ItemType @relation(fields: [itemTypeId], references: [id], onDelete: Cascade)
+}
+
+model UsingAbility {
+  id         Int      @id @default(autoincrement())
+  itemTypeId Int
+  abilityId  Int
+  ability    Ability  @relation(fields: [abilityId], references: [id])
+  ItemType   ItemType @relation(fields: [itemTypeId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  image       String
+  level       Int      @default(1)
+  isActive    Boolean  @default(true)
+  content     String   @db.LongText
+  characterId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  character   Char     @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+model BankAccount {
+  id          Int      @id @default(autoincrement())
+  address     String
+  balance     Int
+  characterId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  character   Char     @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
 model HuntingGround {
@@ -47,6 +118,30 @@ model HuntingGround {
   instances HuntingInstance[]
 
   @@index([name])
+}
+
+model HuntingDomain {
+  id         Int       @id @default(autoincrement())
+  name       String
+  radius     Int
+  validUntil DateTime?
+  coordY     Float
+  coordX     Float
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  content    String?   @db.LongText
+}
+
+model HuntingSecurity {
+  id         Int       @id @default(autoincrement())
+  name       String
+  radius     Int
+  validUntil DateTime?
+  coordY     Float
+  coordX     Float
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  content    String?   @db.LongText
 }
 
 model HuntingData {
@@ -98,12 +193,12 @@ model Hunt {
 }
 
 model Char {
-  id                  Int                  @id @default(autoincrement())
+  id                  Int                   @id @default(autoincrement())
   name                String
   factionId           Int
   clanId              Int
-  visible             Boolean              @default(false)
-  additionalAbilities Int                  @default(0)
+  visible             Boolean               @default(false)
+  additionalAbilities Int                   @default(0)
   playerId            String
   playerName          String?
   playerContact       String?
@@ -114,25 +209,27 @@ model Char {
   status              String?
   childer             String?
   hunt_req            String?
-  comment             String?              @db.LongText
-  p_comment           String?              @db.LongText
-  pending             Boolean?             @default(false)
-  verified            Boolean?             @default(false)
-  ambition            String?              @db.LongText
-  publicInfo          String?              @db.LongText
-  content             String?              @db.LongText
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  createdBy           User                 @relation(fields: [playerId], references: [id])
-  clan                Clan                 @relation(fields: [clanId], references: [id])
-  faction             Faction              @relation(fields: [factionId], references: [id])
+  comment             String?               @db.LongText
+  p_comment           String?               @db.LongText
+  pending             Boolean?              @default(false)
+  verified            Boolean?              @default(false)
+  ambition            String?               @db.LongText
+  publicInfo          String?               @db.LongText
+  content             String?               @db.LongText
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  createdBy           User                  @relation(fields: [playerId], references: [id])
+  clan                Clan                  @relation(fields: [clanId], references: [id])
+  faction             Faction               @relation(fields: [factionId], references: [id])
   abilities           CharacterAbilities[]
   features            CharacterFeatures[]
   rituals             CharacterRituals[]
   knowledges          CharacterKnowledges[]
   hunts               Hunt[]
   createdById         String
-  active              Boolean              @default(false)
+  active              Boolean               @default(false)
+  bankAccount         BankAccount[]
+  Company             Company[]
 }
 
 model ClanInFaction {
@@ -182,7 +279,7 @@ model Faction {
 }
 
 model CharacterKnowledges {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   characterId Int
   knowledgeId Int
   knowledge   Knowledge @relation(fields: [knowledgeId], references: [id])
@@ -190,40 +287,40 @@ model CharacterKnowledges {
 }
 
 model Knowledge {
-  id          Int     @id @default(autoincrement())
-  name        String
-  content     String  @db.LongText
-  visibleToPlayer Boolean @default(false)
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  content             String                @db.LongText
+  visibleToPlayer     Boolean               @default(false)
   CharacterKnowledges CharacterKnowledges[]
-  RitualKnowledges RitualKnowledges[]
+  RitualKnowledges    RitualKnowledges[]
 }
 
 model CharacterRituals {
-  id          Int     @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   characterId Int
   ritualId    Int
-  ritual      Ritual  @relation(fields: [ritualId], references: [id])
-  Char        Char    @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  ritual      Ritual @relation(fields: [ritualId], references: [id])
+  Char        Char   @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
 model Ritual {
-  id          Int     @id @default(autoincrement())
-  name        String
-  image       String
-  recipe      String  @db.LongText
-  content String  @db.LongText
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  visibleToPlayer Boolean @default(false)
+  id               Int                @id @default(autoincrement())
+  name             String
+  image            String
+  recipe           String             @db.LongText
+  content          String             @db.LongText
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  visibleToPlayer  Boolean            @default(false)
   CharacterRituals CharacterRituals[]
   ritualKnowledges RitualKnowledges[]
 }
 
 model RitualKnowledges {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   ritualId    Int
-  knowledgeId   Int
-  ritual      Ritual  @relation(fields: [ritualId], references: [id], onDelete: Cascade)
+  knowledgeId Int
+  ritual      Ritual    @relation(fields: [ritualId], references: [id], onDelete: Cascade)
   knowledge   Knowledge @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
 }
 
@@ -245,6 +342,9 @@ model Ability {
   visibleToPlayer    Boolean              @default(false)
   CharacterAbilities CharacterAbilities[]
   AbilityAvailable   AbilityAvailable[]
+  AddingAbility      AddingAbility[]
+  RemovingAbility    RemovingAbility[]
+  UsingAbility       UsingAbility[]
 }
 
 model CharacterFeatures {
