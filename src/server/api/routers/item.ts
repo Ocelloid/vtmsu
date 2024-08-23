@@ -134,7 +134,7 @@ export const itemRouter = createTRPCRouter({
       });
     }),
 
-  getById: protectedProcedure
+  getById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       return ctx.db.item.findFirst({
