@@ -29,7 +29,7 @@ export default function QRCodes() {
   return (
     <>
       <div className="flex flex-col gap-2 pt-2">
-        <QRForm />
+        <QRForm onRefetch={refetchItemList} />
         {itemList
           ?.filter((item) => item.typeId === 1)
           .map((item) => (

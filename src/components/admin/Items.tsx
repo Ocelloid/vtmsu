@@ -24,7 +24,7 @@ export default function Items() {
   if (isItemsLoading) return <LoadingPage />;
   return (
     <div className="flex flex-col gap-2 pt-2">
-      <ItemForm />
+      <ItemForm onRefetch={refetchItems} />
       {items?.map((item) => (
         <div
           key={item.id}

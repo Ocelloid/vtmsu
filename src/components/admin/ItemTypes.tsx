@@ -12,7 +12,7 @@ export default function ItemTypes() {
   if (isItemTypesLoading) return <LoadingPage />;
   return (
     <div className="flex flex-col gap-2 pt-2">
-      <ItemTypeForm />
+      <ItemTypeForm onRefetch={refetchItemTypes} />
       {itemTypes?.map((itemType) => (
         <div
           key={itemType.id}
