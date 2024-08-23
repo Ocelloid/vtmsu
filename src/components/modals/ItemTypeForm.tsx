@@ -348,7 +348,7 @@ const ItemTypeForm = ({
               }
               onClick={handleFormSubmit}
             >
-              {isPending ? <LoadingSpinner /> : "Сохранить"}
+              {isPending ? "Сохранение..." : "Сохранить"}
             </Button>
           </ModalFooter>
         </ModalContent>
