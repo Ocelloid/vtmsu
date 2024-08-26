@@ -524,14 +524,16 @@ const CharacterSheet = ({
             )}
           </div>
         </div>
-        <Button
-          variant="light"
-          color="danger"
-          className="text-md text-danger"
-          onClick={handleDeleteCharacter}
-        >
-          <FaTrashAlt size={24} /> Удалить персонажа
-        </Button>
+        {(!!privateChar || isAdmin) && (
+          <Button
+            variant="light"
+            color="danger"
+            className="text-md text-danger"
+            onClick={handleDeleteCharacter}
+          >
+            <FaTrashAlt size={24} /> Удалить персонажа
+          </Button>
+        )}
       </main>
     </>
   );
