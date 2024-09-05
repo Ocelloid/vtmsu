@@ -3,7 +3,8 @@ import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import { FaPencilAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import type { Character } from "~/server/api/routers/char";
 import default_char from "~/../public/default_char.png";
-import { Button, Link, Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
+import Link from "next/link";
 import { clans, factions } from "~/assets";
 // import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
@@ -45,7 +46,7 @@ const CharacterCard = ({
   );
 
   return (
-    <div
+    <Link
       key={character.id}
       // onClick={() => {
       //   void router.push(
@@ -56,7 +57,8 @@ const CharacterCard = ({
       //     { shallow: false },
       //   );
       // }}
-      className="grid min-h-44 cursor-pointer grid-cols-3 gap-2 rounded-md bg-red-950/50 p-2 text-default transition-all duration-300 hover:shadow-md hover:shadow-red-950/50 hover:brightness-110 hover:drop-shadow-xl dark:text-white sm:grid-cols-3"
+      href={`/characters/${character.id}`}
+      className="grid min-h-44 grid-cols-3 gap-2 rounded-md bg-red-950/50 p-2 text-default transition-all duration-300 hover:shadow-md hover:shadow-red-950/50 hover:brightness-110 hover:drop-shadow-xl dark:text-white sm:grid-cols-3"
     >
       <div className="flex flex-col">
         <Image
@@ -70,12 +72,9 @@ const CharacterCard = ({
       <div className="relative col-span-2 flex flex-1 flex-col">
         <div className="flex h-full flex-row">
           <div className="flex w-[85%] flex-1 flex-col gap-1">
-            <Link
-              href={`/characters/${character.id}`}
-              className="mr-auto max-w-[90%] break-words text-xl text-default-300 dark:text-default-700"
-            >
+            <p className="mr-auto max-w-[90%] break-words text-xl text-default-300 dark:text-default-700">
               {character.name}
-            </Link>
+            </p>
             <div className="flex flex-row">
               <Tooltip
                 className="text-tiny text-black dark:text-white"
@@ -150,7 +149,7 @@ const CharacterCard = ({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
