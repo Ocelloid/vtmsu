@@ -1111,7 +1111,11 @@ export const charRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.char.findMany({
       orderBy: { pending: "desc" },
-      include: { faction: true, clan: true },
+      include: {
+        faction: true,
+        clan: true,
+        features: { include: { feature: true } },
+      },
     });
   }),
 

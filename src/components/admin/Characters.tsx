@@ -1,4 +1,4 @@
-import { Input, Button, Select, SelectItem } from "@nextui-org/react";
+import { Input, Button, Select, SelectItem, Checkbox } from "@nextui-org/react";
 import { FaPlus } from "react-icons/fa";
 import { useRouter } from "next/router";
 import type { Character, Faction, Clan } from "~/server/api/routers/char";
@@ -17,6 +17,7 @@ export default function Characters() {
   const [clanIds, setClanIds] = useState<number[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
   const [name, setName] = useState("");
+  const [hasNightmares, setHasNightmares] = useState(false);
 
   const { data: traitsData, isLoading: isTraitsLoading } =
     api.char.getCharTraits.useQuery();
@@ -41,10 +42,10 @@ export default function Characters() {
 
   return (
     <>
-      <div className="grid grid-cols-4 justify-between gap-2 py-2 sm:grid-cols-10">
+      <div className="flex flex-col justify-between gap-2 py-2 sm:flex-row">
         <Button
           variant="ghost"
-          className="col-span-4 h-8 w-full rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white sm:col-span-3 xl:col-span-2"
+          className="h-8 w-full max-w-96 rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white"
           onClick={async () => {
             await router.push(
               {
@@ -56,66 +57,73 @@ export default function Characters() {
           }}
         >
           <FaPlus />
-          Добавить персонажа
+          Добавить
         </Button>
-        <p className="hidden justify-end py-1 sm:flex xl:col-span-2">Поиск:</p>
+        {/* <p className="hidden justify-end py-1 sm:flex xl:col-span-1">Поиск:</p> */}
+        <Checkbox
+          isSelected={hasNightmares}
+          onValueChange={setHasNightmares}
+          color="warning"
+        >
+          Кошмары
+        </Checkbox>
         <Input
           size="sm"
           variant="bordered"
-          className="col-span-4 sm:col-span-2"
+          className="min-w-28 max-w-96"
           aria-label="Имя"
           placeholder="Имя"
           value={name}
           onValueChange={setName}
         />
-        <Select
-          size="sm"
-          variant="bordered"
-          aria-label="Фракция"
-          placeholder="Фракция"
-          className="col-span-2"
-          selectionMode="multiple"
-          selectedKeys={factionIds.map((f) => f.toString())}
-          onChange={(e) => {
-            setFactionIds(
-              !!e.target.value
-                ? e.target.value.split(",").map((s) => Number(s))
-                : [],
-            );
-          }}
-        >
-          {factions.map((faction) => (
-            <SelectItem
-              key={faction.id}
-              value={faction.id}
-              textValue={faction.name}
-            >
-              {faction.name}
-            </SelectItem>
-          ))}
-        </Select>
-        <Select
-          size="sm"
-          variant="bordered"
-          placeholder="Клан"
-          aria-label="Клан"
-          className="col-span-2"
-          selectionMode="multiple"
-          selectedKeys={clanIds.map((f) => f.toString())}
-          onChange={(e) => {
-            setClanIds(
-              !!e.target.value
-                ? e.target.value.split(",").map((s) => Number(s))
-                : [],
-            );
-          }}
-        >
-          {clans.map((clan) => (
-            <SelectItem key={clan.id} value={clan.id} textValue={clan.name}>
-              {clan.name}
-            </SelectItem>
-          ))}
-        </Select>
+        <div className="flex w-full min-w-56 flex-row gap-2">
+          <Select
+            size="sm"
+            variant="bordered"
+            aria-label="Фракция"
+            placeholder="Фракция"
+            selectionMode="multiple"
+            selectedKeys={factionIds.map((f) => f.toString())}
+            onChange={(e) => {
+              setFactionIds(
+                !!e.target.value
+                  ? e.target.value.split(",").map((s) => Number(s))
+                  : [],
+              );
+            }}
+          >
+            {factions.map((faction) => (
+              <SelectItem
+                key={faction.id}
+                value={faction.id}
+                textValue={faction.name}
+              >
+                {faction.name}
+              </SelectItem>
+            ))}
+          </Select>
+          <Select
+            size="sm"
+            variant="bordered"
+            placeholder="Клан"
+            aria-label="Клан"
+            selectionMode="multiple"
+            selectedKeys={clanIds.map((f) => f.toString())}
+            onChange={(e) => {
+              setClanIds(
+                !!e.target.value
+                  ? e.target.value.split(",").map((s) => Number(s))
+                  : [],
+              );
+            }}
+          >
+            {clans.map((clan) => (
+              <SelectItem key={clan.id} value={clan.id} textValue={clan.name}>
+                {clan.name}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
       </div>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {chars
@@ -125,6 +133,11 @@ export default function Characters() {
           .filter((c) => (!!clanIds.length ? clanIds.includes(c.clanId) : true))
           .filter((c) =>
             !!name ? c.name.toLowerCase().includes(name.toLowerCase()) : true,
+          )
+          .filter((c) =>
+            !!hasNightmares
+              ? c.features?.find((f) => f.feature?.name === "Кошмары")
+              : true,
           )
           .map((char) => (
             <CharacterCard
