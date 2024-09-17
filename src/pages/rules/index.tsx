@@ -105,7 +105,7 @@ export default function Rules() {
                 handleRuleFind(data!);
               }, 200);
             })
-            .catch((e) => console.log(e));
+            .catch((e) => console.error(e));
         },
       },
     );
@@ -172,7 +172,7 @@ export default function Rules() {
           );
         }
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.error(e));
   };
 
   if (

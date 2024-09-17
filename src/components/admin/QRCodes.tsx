@@ -15,7 +15,6 @@ export default function QRCodes() {
   const generateQRCode = (url: string) => {
     QRCode.toDataURL(url, { width: 1024, margin: 2 }, (err, url) => {
       if (err) throw err;
-      console.log(url);
       const aEl = document.createElement("a");
       aEl.href = url;
       aEl.download = "QR_Code.png";

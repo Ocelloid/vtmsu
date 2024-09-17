@@ -31,6 +31,8 @@ model Item {
   image       String?
   usage       Int      @default(-1)
   typeId      Int      @default(1)
+  coordX      Float?
+  coordY      Float?
   type        ItemType @relation(fields: [typeId], references: [id])
   createdBy   User     @relation(fields: [createdById], references: [id])
   createdById String

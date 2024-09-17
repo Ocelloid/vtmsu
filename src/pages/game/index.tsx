@@ -14,6 +14,9 @@ import {
 import { FaQrcode, FaMap } from "react-icons/fa";
 import { IoMdChatboxes } from "react-icons/io";
 import Money from "~/components/game/Money";
+import Character from "~/components/game/Character";
+import Inventory from "~/components/game/Inventory";
+import Inquiries from "~/components/game/Inquiries";
 
 export default function Game() {
   const { data: sessionData } = useSession();
@@ -24,7 +27,6 @@ export default function Game() {
 
   useEffect(() => {
     if (!!myCharacterData) setSelectedCharacter(myCharacterData[0]?.id);
-    console.log(myCharacterData);
   }, [myCharacterData]);
 
   if (!sessionData)
@@ -117,7 +119,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                Главная страница
+                <Character />
               </Tab>
               <Tab
                 key="hunt"
@@ -145,7 +147,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                Инвентарь
+                <Inventory />
               </Tab>
               <Tab
                 key="money"
@@ -173,7 +175,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                Заявки
+                <Inquiries />
               </Tab>
               <Tab
                 key="qrcode"

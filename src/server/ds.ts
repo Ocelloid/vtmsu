@@ -38,7 +38,6 @@ export default function Discord<P extends DiscordProfile>(
         const format = profile.avatar.startsWith("a_") ? "gif" : "png";
         profile.image_url = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.${format}`;
       }
-      console.log(profile);
       return {
         id: profile.id,
         name: profile.username,
