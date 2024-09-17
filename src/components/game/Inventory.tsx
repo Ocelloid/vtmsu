@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import { CSS } from "@dnd-kit/utilities";
-import { useState, useMemo, type ReactNode } from "react";
+import { useEffect, useState, useMemo, type ReactNode } from "react";
 import {
   Modal,
   ModalContent,
@@ -35,6 +35,8 @@ import { api } from "~/utils/api";
 import { type Character } from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
 import { useGeolocation } from "~/utils/hooks";
+import Image from "next/image";
+import { type Item } from "~/server/api/routers/item";
 
 function degreesToCoordinate(degrees: number): string {
   const wholeDegrees = Math.floor(degrees);
@@ -45,7 +47,7 @@ function degreesToCoordinate(degrees: number): string {
   return `${wholeDegrees}° ${minutes}' ${seconds}"`;
 }
 
-export default function Inventory() {
+export default function Inventory({ currentChar }: { currentChar: number }) {
   const { location, error, isLoading } = useGeolocation();
   const {
     isOpen: isDropOpen,
@@ -58,27 +60,34 @@ export default function Inventory() {
     onClose: onTradeClose,
   } = useDisclosure();
   const { data: chars, isLoading: charsLoading } = api.char.getAll.useQuery();
+  const {
+    data: itemsData,
+    isLoading: itemsLoading,
+    refetch: refetchItems,
+  } = api.item.getByOwnerId.useQuery({ ownerId: currentChar });
+
+  const { mutate: giveItems, isPending: isGiveItemPending } =
+    api.item.giveItems.useMutation();
+  const { mutate: dropItems, isPending: isDropItemPending } =
+    api.item.dropItems.useMutation();
+
   const [char, setChar] = useState<Character>();
   const [items, setItems] = useState<
-    Array<{ id: number; name: string; box: number }>
-  >([
-    { id: 7, name: "Sword", box: 0 },
-    { id: 2, name: "Shield", box: 0 },
-    { id: 3, name: "Armor", box: 0 },
-    { id: 4, name: "Potion", box: 0 },
-    { id: 5, name: "Scroll", box: 0 },
-    { id: 6, name: "Key", box: 0 },
-    { id: 7, name: "Sword", box: 0 },
-    { id: 8, name: "Shield", box: 0 },
-    { id: 9, name: "Armor", box: 0 },
-    { id: 10, name: "Ring", box: 0 },
-    { id: 11, name: "Amulet", box: 0 },
-  ]);
+    Array<{
+      id: number;
+      name: string;
+      description: string;
+      box: number;
+      data: Item;
+    }>
+  >([]);
   const itemsIds = useMemo(() => items.map((item) => item.id), [items]);
   const [activeItem, setActiveItem] = useState<{
     id: number;
     name: string;
+    description: string;
     box: number;
+    data: Item;
   } | null>(null);
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -96,6 +105,19 @@ export default function Inventory() {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  useEffect(() => {
+    if (!!itemsData)
+      setItems(
+        itemsData.map((item) => ({
+          id: item.id,
+          name: item.name,
+          description: item.content ?? "",
+          box: 0,
+          data: item,
+        })),
+      );
+  }, [itemsData]);
 
   const handleDragStart = (e: DragStartEvent) => {
     if (e.active.data.current?.type === "item") {
@@ -148,7 +170,51 @@ export default function Inventory() {
     }
   };
 
-  if (charsLoading || isLoading) return <LoadingPage />;
+  const handleTrade = () => {
+    if (!char) return;
+    const itemsToGive = items.filter((item) => item.box === -1);
+    if (!itemsToGive.length) return;
+    giveItems(
+      {
+        ids: itemsToGive.map((item) => item.id),
+        ownerId: char.id,
+      },
+      {
+        onSuccess() {
+          void refetchItems();
+          onTradeClose();
+        },
+      },
+    );
+  };
+
+  const handleDrop = () => {
+    if (!location) return;
+    const itemsToDrop = items.filter((item) => item.box === 0);
+    if (!itemsToDrop.length) return;
+    dropItems(
+      {
+        ids: itemsToDrop.map((item) => item.id),
+        coordX: location.latitude,
+        coordY: location.longitude,
+      },
+      {
+        onSuccess() {
+          void refetchItems();
+          onDropClose();
+        },
+      },
+    );
+  };
+
+  if (
+    charsLoading ||
+    isLoading ||
+    itemsLoading ||
+    isGiveItemPending ||
+    isDropItemPending
+  )
+    return <LoadingPage />;
 
   return (
     <div className="flex h-full flex-col gap-4 pb-4">
@@ -184,7 +250,7 @@ export default function Inventory() {
             <Button color="danger" onClick={onTradeClose}>
               Отменить
             </Button>
-            <Button color="success" onClick={onTradeClose}>
+            <Button color="success" onClick={handleTrade} isDisabled={!char}>
               Отправить
             </Button>
           </ModalFooter>
@@ -213,12 +279,8 @@ export default function Inventory() {
             <Button color="danger" onClick={onDropClose}>
               Отменить
             </Button>
-            <Button
-              color="success"
-              onClick={onDropClose}
-              isDisabled={!location}
-            >
-              Отправить
+            <Button color="success" onClick={handleDrop} isDisabled={!location}>
+              Сбросить
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -290,7 +352,13 @@ const ItemBox = ({ id, children }: { id: number; children: ReactNode }) => {
 const Item = ({
   item,
 }: {
-  item: { id: number; name: string; box: number };
+  item: {
+    id: number;
+    name: string;
+    description: string;
+    box: number;
+    data: Item;
+  };
 }) => {
   const {
     setNodeRef,
@@ -318,7 +386,7 @@ const Item = ({
         {...listeners}
         className="relative flex w-full cursor-move flex-col justify-between rounded border border-primary p-2 opacity-50"
       >
-        <p>{item.name}</p>
+        <Content item={item.data} />
       </div>
     );
   }
@@ -331,7 +399,28 @@ const Item = ({
       {...listeners}
       className={`relative flex w-full cursor-move flex-col justify-between rounded border p-2 transition hover:shadow-md hover:brightness-110`}
     >
-      <p>{item.name}</p>
+      <Content item={item.data} />
+    </div>
+  );
+};
+
+const Content = ({ item }: { item: Item }) => {
+  return (
+    <div className="flex flex-row gap-2">
+      <Image
+        src={item.image ?? ""}
+        alt=""
+        width="128"
+        height="128"
+        objectFit="contain"
+      />
+      <div className="flex flex-col gap-1">
+        <p className="text-sm">{item.name}</p>
+        <p
+          className="text-xs"
+          dangerouslySetInnerHTML={{ __html: item.content ?? "" }}
+        />
+      </div>
     </div>
   );
 };

@@ -76,6 +76,7 @@ export const itemRouter = createTRPCRouter({
         typeId: z.number().optional(),
         image: z.string().optional(),
         usage: z.number().optional(),
+        ownedById: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -86,7 +87,8 @@ export const itemRouter = createTRPCRouter({
             content: input.content,
             image: input.image,
             usage: input.usage,
-            createdBy: { connect: { id: ctx.session.user.id } },
+            ownedById: input.ownedById,
+            createdById: ctx.session.user.id,
           },
         })
         .then((item) => {
@@ -119,6 +121,7 @@ export const itemRouter = createTRPCRouter({
         image: z.string().optional(),
         content: z.string().nullish(),
         usage: z.number().optional(),
+        ownedById: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -130,6 +133,7 @@ export const itemRouter = createTRPCRouter({
           image: input.image,
           content: input.content,
           usage: input.usage,
+          ownedById: input.ownedById,
         },
       });
     }),
@@ -161,35 +165,34 @@ export const itemRouter = createTRPCRouter({
       });
     }),
 
-  giveItem: protectedProcedure
+  giveItems: protectedProcedure
     .input(
       z.object({
-        id: z.number(),
+        ids: z.array(z.number()),
         ownerId: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.item.update({
-        where: { id: input.id },
+      return ctx.db.item.updateMany({
+        where: { id: { in: input.ids } },
         data: {
           ownedById: input.ownerId,
         },
       });
     }),
 
-  dropItem: protectedProcedure
+  dropItems: protectedProcedure
     .input(
       z.object({
-        id: z.number(),
+        ids: z.array(z.number()),
         coordX: z.number(),
         coordY: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.item.update({
-        where: { id: input.id },
+      return ctx.db.item.updateMany({
+        where: { id: { in: input.ids } },
         data: {
-          ownedById: null,
           coordX: input.coordX,
           coordY: input.coordY,
         },

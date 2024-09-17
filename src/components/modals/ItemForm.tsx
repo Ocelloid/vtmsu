@@ -6,6 +6,8 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FaDropbox } from "react-icons/fa";
@@ -24,12 +26,18 @@ const ItemForm = ({
   children?: ReactNode;
   onRefetch?: () => void;
 }) => {
+  const { data: characterData, isLoading: isCharactersLoading } =
+    api.char.getAll.useQuery();
+  const { data: itemTypes, isLoading: isTypesLoading } =
+    api.item.getAllTypes.useQuery();
+  const [selectedCharacter, setSelectedCharacter] = useState<number>();
+  const [selectedType, setSelectedType] = useState<number>(1);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [usage, setUsage] = useState(-1);
-  const [typeId, setTypeId] = useState(1);
 
   const { mutate: createMutation, isPending } = api.item.create.useMutation();
   const { mutate: updateMutation, isPending: isPendingUpdate } =
@@ -47,7 +55,7 @@ const ItemForm = ({
     setDescription("");
     setImage("");
     setUsage(-1);
-    setTypeId(1);
+    setSelectedType(1);
   };
 
   useEffect(() => {
@@ -56,7 +64,8 @@ const ItemForm = ({
       setDescription(itemData?.content ?? "");
       setImage(itemData?.image ?? "");
       setUsage(itemData?.usage ?? -1);
-      setTypeId(itemData?.typeId ?? 1);
+      setSelectedType(itemData?.typeId ?? 1);
+      setSelectedCharacter(itemData?.ownedById ?? 1);
     }
   }, [itemData]);
 
@@ -68,7 +77,8 @@ const ItemForm = ({
           content: description,
           image,
           usage,
-          typeId,
+          typeId: selectedType,
+          ownedById: selectedCharacter ?? 1,
         },
         {
           onSuccess() {
@@ -86,7 +96,8 @@ const ItemForm = ({
           content: description,
           image,
           usage,
-          typeId,
+          typeId: selectedType,
+          ownedById: selectedCharacter,
         },
         {
           onSuccess() {
@@ -98,7 +109,8 @@ const ItemForm = ({
       );
   };
 
-  if (isItemLoading) return <LoadingSpinner width={24} height={24} />;
+  if (isItemLoading || isCharactersLoading || isTypesLoading)
+    return <LoadingSpinner width={24} height={24} />;
 
   return (
     <>
@@ -118,9 +130,7 @@ const ItemForm = ({
       >
         <ModalContent>
           <ModalHeader>
-            {!!editId
-              ? "Редактирование типа предмета"
-              : "Добавить тип предмета"}
+            {!!editId ? "Редактирование предмета" : "Добавить предмет"}
           </ModalHeader>
           <ModalBody>
             <Input
@@ -167,6 +177,50 @@ const ItemForm = ({
               value={usage.toString()}
               onValueChange={(v) => setUsage(Number(v))}
             />
+            <Select
+              label="Персонаж"
+              selectedKeys={
+                selectedCharacter ? [selectedCharacter.toString()] : []
+              }
+              onChange={(e) => {
+                setSelectedCharacter(
+                  !!e.target.value ? Number(e.target.value) : selectedCharacter,
+                );
+              }}
+            >
+              {!!characterData?.length
+                ? characterData.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {c.name}
+                    </SelectItem>
+                  ))
+                : []}
+            </Select>
+            <Select
+              label="Тип предмета"
+              selectedKeys={selectedType ? [selectedType.toString()] : []}
+              onChange={(e) => {
+                console.log(e.target.value, itemTypes);
+                const newType = !!e.target.value
+                  ? Number(e.target.value)
+                  : selectedType;
+                setSelectedType(newType);
+                setTitle(itemTypes?.find((t) => t.id === newType)?.name ?? "");
+                setDescription(
+                  itemTypes?.find((t) => t.id === newType)?.content ?? "",
+                );
+                setImage(itemTypes?.find((t) => t.id === newType)?.image ?? "");
+                setUsage(itemTypes?.find((t) => t.id === newType)?.usage ?? -1);
+              }}
+            >
+              {!!itemTypes?.length
+                ? itemTypes.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>
+                      {c.name}
+                    </SelectItem>
+                  ))
+                : []}
+            </Select>
           </ModalBody>
           <ModalFooter>
             <Button

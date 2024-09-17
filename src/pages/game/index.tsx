@@ -147,7 +147,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                <Inventory />
+                <Inventory currentChar={selectedCharacter} />
               </Tab>
               <Tab
                 key="money"
