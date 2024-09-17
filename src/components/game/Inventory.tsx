@@ -36,6 +36,15 @@ import { type Character } from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
 import { useGeolocation } from "~/utils/hooks";
 
+function degreesToCoordinate(degrees: number): string {
+  const wholeDegrees = Math.floor(degrees);
+  const decimalPart = degrees - wholeDegrees;
+  const minutes = Math.floor(decimalPart * 60);
+  const seconds = Math.round((decimalPart * 60 - minutes) * 60);
+
+  return `${wholeDegrees}° ${minutes}' ${seconds}"`;
+}
+
 export default function Inventory() {
   const { location, error, isLoading } = useGeolocation();
   const {
@@ -196,7 +205,7 @@ export default function Inventory() {
             <p>
               по координатам:{" "}
               {location
-                ? `(${location.latitude}, ${location.longitude})`
+                ? `(${degreesToCoordinate(location.latitude)}, ${degreesToCoordinate(location.longitude)})`
                 : error}
             </p>
           </ModalBody>
@@ -204,7 +213,11 @@ export default function Inventory() {
             <Button color="danger" onClick={onDropClose}>
               Отменить
             </Button>
-            <Button color="success" onClick={onDropClose}>
+            <Button
+              color="success"
+              onClick={onDropClose}
+              isDisabled={!location}
+            >
               Отправить
             </Button>
           </ModalFooter>

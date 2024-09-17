@@ -153,6 +153,49 @@ export const itemRouter = createTRPCRouter({
     });
   }),
 
+  getByOwnerId: protectedProcedure
+    .input(z.object({ ownerId: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.item.findMany({
+        where: { ownedById: input.ownerId },
+      });
+    }),
+
+  giveItem: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        ownerId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.item.update({
+        where: { id: input.id },
+        data: {
+          ownedById: input.ownerId,
+        },
+      });
+    }),
+
+  dropItem: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        coordX: z.number(),
+        coordY: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.item.update({
+        where: { id: input.id },
+        data: {
+          ownedById: null,
+          coordX: input.coordX,
+          coordY: input.coordY,
+        },
+      });
+    }),
+
   getByTypeId: protectedProcedure
     .input(z.object({ typeId: z.number() }))
     .query(async ({ ctx, input }) => {
