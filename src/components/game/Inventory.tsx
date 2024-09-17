@@ -59,6 +59,9 @@ export default function Inventory() {
     { id: 4, name: "Potion", box: 0 },
     { id: 5, name: "Scroll", box: 0 },
     { id: 6, name: "Key", box: 0 },
+    { id: 7, name: "Sword", box: 0 },
+    { id: 8, name: "Shield", box: 0 },
+    { id: 9, name: "Armor", box: 0 },
     { id: 10, name: "Ring", box: 0 },
     { id: 11, name: "Amulet", box: 0 },
   ]);
