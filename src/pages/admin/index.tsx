@@ -11,6 +11,7 @@ import OghamTransliteration from "~/components/admin/OghamTransliteration";
 import Users from "~/components/admin/Users";
 import Items from "~/components/admin/Items";
 import ItemTypes from "~/components/admin/ItemTypes";
+import Economy from "~/components/admin/Economy";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -90,7 +91,7 @@ export default function Admin() {
                 </div>
               }
             >
-              Экономика
+              <Economy />
             </Tab>
             <Tab
               key={"items"}

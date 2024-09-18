@@ -162,7 +162,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                <Money />
+                <Money characterId={selectedCharacter} />
               </Tab>
               <Tab
                 key="chat"
@@ -190,7 +190,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                <CharQRCode id={selectedCharacter} />
+                <CharQRCode characterId={selectedCharacter} />
               </Tab>
             </Tabs>
           )}

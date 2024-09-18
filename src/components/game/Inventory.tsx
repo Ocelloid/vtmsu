@@ -36,15 +36,7 @@ import { useGeolocation } from "~/utils/hooks";
 import Image from "next/image";
 import { type Item } from "~/server/api/routers/item";
 import QRScanner from "~/components/QRScanner";
-
-function degreesToCoordinate(degrees: number): string {
-  const wholeDegrees = Math.floor(degrees);
-  const decimalPart = degrees - wholeDegrees;
-  const minutes = Math.floor(decimalPart * 60);
-  const seconds = Math.round((decimalPart * 60 - minutes) * 60);
-
-  return `${wholeDegrees}° ${minutes}' ${seconds}"`;
-}
+import { degreesToCoordinate } from "~/utils/text";
 
 export default function Inventory({ currentChar }: { currentChar: number }) {
   const { location, error, isLoading } = useGeolocation();
@@ -333,10 +325,20 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
         )}
       </DndContext>
       <div className="flex flex-row justify-between gap-2">
-        <Button variant="ghost" color="danger" onClick={onDropOpen}>
+        <Button
+          variant="ghost"
+          color="danger"
+          onClick={onDropOpen}
+          isDisabled={!items.filter((i) => i.box === -1).length}
+        >
           Сбросить
         </Button>
-        <Button variant="ghost" color="warning" onClick={onTradeOpen}>
+        <Button
+          variant="ghost"
+          color="warning"
+          onClick={onTradeOpen}
+          isDisabled={!items.filter((i) => i.box === -1).length}
+        >
           Передать
         </Button>
       </div>

@@ -5,9 +5,11 @@ import { ruleRouter } from "~/server/api/routers/rule";
 import { charRouter } from "~/server/api/routers/char";
 import { huntRouter } from "~/server/api/routers/hunt";
 import { itemRouter } from "~/server/api/routers/item";
+import { econRouter } from "~/server/api/routers/econ";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 export const appRouter = createTRPCRouter({
+  econ: econRouter,
   post: postRouter,
   shop: shopRouter,
   user: userRouter,

@@ -1,11 +1,11 @@
 import QRCode from "qrcode";
 import { useEffect } from "react";
 
-export default function CharQRCode({ id }: { id: number }) {
+export default function CharQRCode({ characterId }: { characterId: number }) {
   useEffect(() => {
     QRCode.toCanvas(
       document.getElementById("canvas"),
-      id + "-" + Date.now(),
+      characterId + "-" + Date.now(),
       {
         width: 256,
         margin: 1,
@@ -15,6 +15,6 @@ export default function CharQRCode({ id }: { id: number }) {
         console.log("success!");
       },
     );
-  }, [id]);
+  }, [characterId]);
   return <canvas id="canvas" className="m-auto"></canvas>;
 }

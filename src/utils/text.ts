@@ -53,3 +53,12 @@ export function translit(word: string) {
 
   return answer;
 }
+
+export function degreesToCoordinate(degrees: number): string {
+  const wholeDegrees = Math.floor(degrees);
+  const decimalPart = degrees - wholeDegrees;
+  const minutes = Math.floor(decimalPart * 60);
+  const seconds = Math.round((decimalPart * 60 - minutes) * 60);
+
+  return `${wholeDegrees}° ${minutes}' ${seconds}"`;
+}

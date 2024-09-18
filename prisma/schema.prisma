@@ -86,16 +86,21 @@ model UsingAbility {
 }
 
 model Company {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
   image       String
-  level       Int      @default(1)
-  isActive    Boolean  @default(true)
-  content     String   @db.LongText
+  level       Int           @default(1)
+  isActive    Boolean       @default(true)
+  isVisible   Boolean       @default(true)
+  isWarrens   Boolean       @default(false)
+  coordX      Float         @default(0)
+  coordY      Float         @default(0)
+  content     String        @db.LongText
   characterId Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  character   Char     @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  character   Char          @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  BankAccount BankAccount[]
 }
 
 model BankAccount {
@@ -106,6 +111,8 @@ model BankAccount {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   character   Char     @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model HuntingGround {
