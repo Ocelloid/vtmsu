@@ -104,7 +104,7 @@ export default function Game() {
               aria-label="Игровое меню"
               placement="bottom"
               classNames={{
-                panel: "py-0 h-full",
+                panel: "py-0 h-[calc(100vh-6rem)] sm:h-full",
                 tab: "p-1 w-min",
                 tabList: "w-full",
                 wrapper: "flex-grow",
@@ -146,7 +146,7 @@ export default function Game() {
                     </span>
                   </div>
                 }
-                className="flex flex-col gap-2"
+                className="flex flex-col gap-2 overflow-y-auto "
               >
                 <Inventory currentChar={selectedCharacter} />
               </Tab>

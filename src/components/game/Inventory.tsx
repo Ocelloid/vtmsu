@@ -248,7 +248,7 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
     return <LoadingPage />;
 
   return (
-    <div className="flex h-full flex-col gap-4 pb-4">
+    <div className="flex flex-col gap-4 pb-4">
       <Modal isOpen={isTradeOpen} onClose={onTradeClose}>
         <ModalContent>
           <ModalHeader>Передача предметов</ModalHeader>
