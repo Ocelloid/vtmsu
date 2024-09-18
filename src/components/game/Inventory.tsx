@@ -26,8 +26,6 @@ import {
   ModalBody,
   Button,
   useDisclosure,
-  Select,
-  SelectItem,
   ModalHeader,
   ModalFooter,
 } from "@nextui-org/react";
@@ -37,6 +35,7 @@ import { LoadingPage } from "~/components/Loading";
 import { useGeolocation } from "~/utils/hooks";
 import Image from "next/image";
 import { type Item } from "~/server/api/routers/item";
+import QRScanner from "~/components/QRScanner";
 
 function degreesToCoordinate(degrees: number): string {
   const wholeDegrees = Math.floor(degrees);
@@ -207,6 +206,38 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
     );
   };
 
+  const handleScanSuccess = (decodedText: string) => {
+    if (!chars) {
+      alert("Отсутствует список персонажей");
+      return;
+    }
+    if (!decodedText) {
+      alert("QR-код пуст");
+      return;
+    }
+    const charId = decodedText.split("-")[0];
+    const timecode = decodedText.split("-")[1];
+    if (!charId) {
+      alert("Отсутствует ID персонажа");
+      return;
+    }
+    if (!timecode) {
+      alert("Отсутствует таймкод");
+      return;
+    }
+    const diffMs = Date.now() - Number(timecode);
+    if (diffMs > 1000 * 60 * 60) {
+      alert("QR-код устарел");
+      return;
+    }
+    const char = chars.find((c) => c.id === Number(charId));
+    if (!char) {
+      alert("Персонаж не найден");
+      return;
+    }
+    setChar(char);
+  };
+
   if (
     charsLoading ||
     isLoading ||
@@ -222,21 +253,10 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
         <ModalContent>
           <ModalHeader>Передача предметов</ModalHeader>
           <ModalBody>
-            <Select
-              label="Выберите персонажа"
-              value={char?.id.toString()}
-              onChange={(e) =>
-                setChar(chars?.find((c) => c.id === Number(e.target.value)))
-              }
-            >
-              {!!chars?.length
-                ? chars.map((c) => (
-                    <SelectItem key={c.id} value={c.id.toString()}>
-                      {c.name}
-                    </SelectItem>
-                  ))
-                : []}
-            </Select>
+            <QRScanner
+              onScanSuccess={handleScanSuccess}
+              onScanError={(e) => console.error(e)}
+            />
             <p>Вы отправите персонажу {char?.name} следующие предметы:</p>
             <ul className="list-inside list-disc">
               {items
