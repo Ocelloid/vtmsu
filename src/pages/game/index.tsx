@@ -54,7 +54,7 @@ export default function Game() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="fixed flex h-full w-full flex-grow basis-full flex-col sm:static sm:mt-24 sm:pb-2">
-        <div className="container flex h-screen flex-col gap-2 overflow-auto rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:rounded-b-lg">
+        <div className="container flex h-screen flex-col gap-2 overflow-auto rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:h-full sm:rounded-b-lg">
           <Select
             size="sm"
             variant="bordered"
@@ -104,7 +104,7 @@ export default function Game() {
               aria-label="Игровое меню"
               placement="bottom"
               classNames={{
-                panel: "py-0",
+                panel: "py-0 mb-auto",
                 tab: "p-1 w-min",
                 tabList: "w-full",
                 wrapper: "flex-grow",
