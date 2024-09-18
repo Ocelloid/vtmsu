@@ -15,7 +15,7 @@ export default function QRScanner({
         fps: 10,
         qrbox: { width: 250, height: 250 },
       },
-      true,
+      false,
     );
 
     html5QrcodeScanner.render(handleSuccess, onScanError);
