@@ -76,7 +76,7 @@ export const itemRouter = createTRPCRouter({
         typeId: z.number().optional(),
         image: z.string().optional(),
         usage: z.number().optional(),
-        ownedById: z.number(),
+        ownedById: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
