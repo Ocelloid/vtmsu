@@ -304,9 +304,11 @@ function CompanyForm({
           <ModalBody>
             <p>
               по координатам:{" "}
-              {location
-                ? `(${degreesToCoordinate(location.latitude)}, ${degreesToCoordinate(location.longitude)})`
-                : error}
+              {editId
+                ? `(${degreesToCoordinate(companyData?.coordX ?? 0)}, ${degreesToCoordinate(companyData?.coordY ?? 0)})`
+                : location
+                  ? `(${degreesToCoordinate(location.latitude)}, ${degreesToCoordinate(location.longitude)})`
+                  : error}
             </p>
             {!editId && (
               <>
