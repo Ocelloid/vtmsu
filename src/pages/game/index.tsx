@@ -17,6 +17,7 @@ import Money from "~/components/game/Money";
 import Character from "~/components/game/Character";
 import Inventory from "~/components/game/Inventory";
 import Inquiries from "~/components/game/Inquiries";
+import CharQRCode from "~/components/game/CharQRCode";
 
 export default function Game() {
   const { data: sessionData } = useSession();
@@ -183,13 +184,13 @@ export default function Game() {
                   <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                     <FaQrcode size={28} />
                     <span className="hidden text-lg font-bold md:flex">
-                      QR-коды
+                      QR-код
                     </span>
                   </div>
                 }
                 className="flex flex-col gap-2"
               >
-                QR-коды
+                <CharQRCode id={selectedCharacter} />
               </Tab>
             </Tabs>
           )}
