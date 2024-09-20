@@ -6,6 +6,14 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
+  rewrites: async () => {
+    return [
+      {
+        source: "/mailru-domain2wEuCM9vtowojPgm.html",
+        destination: "/mailru-domain2wEuCM9vtowojPgm.html",
+      },
+    ];
+  },
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx", "html"],
   reactStrictMode: true,
   images: {
