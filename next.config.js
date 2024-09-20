@@ -6,6 +6,7 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
+  pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx", "html"],
   reactStrictMode: true,
   images: {
     remotePatterns: [
