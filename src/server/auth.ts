@@ -162,7 +162,7 @@ function html(params: { url: string; host: string }) {
     <tr>
       <td align="center" style="padding: 0px 0px 10px 0px; font-size: 16px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
         <p>Добро пожаловать на ролевую игру Маскарад Вампиров!</p>
-        <p>В этом письме Вы можете найти ссылку на вход в личный кабинет.</p>
+        <p>В этом письме вы можете найти ссылку на вход в личный кабинет.</p>
       </td>
     </tr>
     <tr>
