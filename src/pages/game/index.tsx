@@ -38,7 +38,7 @@ export default function Game() {
     return (
       <div className="flex h-[100vh] w-[100vw] flex-col items-center justify-center">
         <Link href="/characters/new">Сначала&nbsp;создайте&nbsp;персонажа</Link>
-        <br />и дождитесь верификации
+        и дождитесь верификации
       </div>
     );
 
