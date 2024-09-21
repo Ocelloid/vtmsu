@@ -200,7 +200,7 @@ const EditProduct = ({
               }
               onClick={handleFormSubmit}
             >
-              {isUpdatePending ? <LoadingSpinner /> : "Обновить"}
+              {isUpdatePending ? <LoadingSpinner height={24} /> : "Обновить"}
             </Button>
           </ModalFooter>
         </ModalContent>

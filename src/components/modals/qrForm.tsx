@@ -73,7 +73,7 @@ const QRForm = ({
       );
   };
 
-  if (isItemLoading) return <LoadingSpinner />;
+  if (isItemLoading) return <LoadingSpinner height={24} />;
 
   return (
     <>

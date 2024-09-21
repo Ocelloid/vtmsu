@@ -868,7 +868,7 @@ const EditCharacterTrait = ({
               isKnowledgePending ||
               isKnowledgeUpdatePending ||
               isKnowledgeDeletePending ? (
-                <LoadingSpinner />
+                <LoadingSpinner height={24} />
               ) : (
                 `${editing ? "Обновить" : "Добавить"}`
               )}

@@ -151,7 +151,7 @@ const AddProduct = ({ onClose }: { onClose: () => void }) => {
               }
               onClick={handleFormSubmit}
             >
-              {isPending ? <LoadingSpinner /> : "Добавить"}
+              {isPending ? <LoadingSpinner height={24} /> : "Добавить"}
             </Button>
           </ModalFooter>
         </ModalContent>

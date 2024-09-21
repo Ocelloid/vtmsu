@@ -95,7 +95,7 @@ const FormOrder = () => {
               onClick={handleFormSubmit}
             >
               Оплатить
-              {/* {isPending ? <LoadingSpinner /> : "Оплатить"} */}
+              {/* {isPending ? <LoadingSpinner height={24}/> : "Оплатить"} */}
             </Button>
           </ModalFooter>
         </ModalContent>

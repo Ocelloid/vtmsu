@@ -3,10 +3,12 @@ import { FaDiscord, FaYandex, FaVk } from "react-icons/fa";
 import { Input, Button } from "@nextui-org/react";
 import { useState, useMemo } from "react";
 import { signIn } from "next-auth/react";
+import { LoadingSpinner } from "~/components/Loading";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
 
   const isEmailInvalid = useMemo(() => {
     if (email === "") return false;
@@ -36,6 +38,16 @@ export default function SignIn() {
             errorMessage="Некорректный адрес электронной почты"
             isInvalid={emailError}
             value={email}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !!email && !isEmailInvalid) {
+                setSigningIn(true);
+                void signIn("email", {
+                  email,
+                  callbackUrl: "/settings",
+                  redirect: true,
+                });
+              }
+            }}
             onValueChange={setEmail}
           />
           <div
@@ -47,15 +59,16 @@ export default function SignIn() {
             <Button
               variant="solid"
               isDisabled={!email || isEmailInvalid}
-              onClick={() =>
-                signIn("email", {
+              onClick={() => {
+                setSigningIn(true);
+                void signIn("email", {
                   email,
                   callbackUrl: "/settings",
                   redirect: true,
-                })
-              }
+                });
+              }}
             >
-              Войти
+              {signingIn ? <LoadingSpinner height={24} /> : "Войти"}
             </Button>
           </div>
           <div className="flex justify-between gap-2">
