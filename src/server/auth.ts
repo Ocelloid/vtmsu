@@ -142,12 +142,12 @@ function html(params: { url: string; host: string }) {
   const escapedHost = host.replace(/\./g, "&#8203;.");
 
   const color = {
-    background: "#fee2e2",
-    text: "#11181C",
-    mainBackground: "#fee2e2",
-    buttonBackground: "#11181C",
-    buttonBorder: "#11181C",
-    buttonText: "#fee2e2",
+    background: "#450a0a",
+    text: "#fee2e2",
+    mainBackground: "#450a0a",
+    buttonBackground: "#fee2e2",
+    buttonBorder: "#fee2e2",
+    buttonText: "#450a0a",
   };
 
   return `
@@ -161,7 +161,7 @@ function html(params: { url: string; host: string }) {
       </td>
     </tr>
     <tr>
-      <td align="center" style="padding: 0px 0px 10px 0px; font-size: 16px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
+      <td align="center" style="font-size: 16px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
         <p>Добро пожаловать на ролевую игру Маскарад Вампиров!</p>
         <p>В этом письме вы можете найти ссылку на вход в личный кабинет.</p>
       </td>
