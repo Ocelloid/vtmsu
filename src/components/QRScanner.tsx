@@ -24,10 +24,6 @@ export default function QRScanner({
       void html5QrcodeScanner.clear();
       onScanSuccess(decodedText);
     }
-
-    return () => {
-      void html5QrcodeScanner.clear();
-    };
   }, [onScanSuccess, onScanError]);
 
   return <div id="qr-scanner" />;
