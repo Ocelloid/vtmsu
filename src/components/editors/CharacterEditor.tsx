@@ -211,7 +211,7 @@ export default function CharacterEditor() {
       (!!userData?.phone ? `телефон: ${userData?.phone}` : null) ??
       (!!userData?.email ? `электронная почта: ${userData?.email}` : null) ??
       "";
-    if (!!characterData && characterData !== "404" && !!traitsData) {
+    if (!!characterData && !!traitsData) {
       setValue("visible", characterData.visible);
       setValue("image", characterData.image ?? "");
       setValue("playerName", characterData.playerName ?? playerName);
