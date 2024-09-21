@@ -71,7 +71,7 @@ export default function SignIn() {
             >
               <Button
                 variant="solid"
-                isDisabled={!email || isEmailInvalid}
+                isDisabled={!email || isEmailInvalid || signingIn}
                 onClick={() => {
                   setSigningIn(true);
                   void signIn("email", {
