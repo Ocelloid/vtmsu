@@ -2,13 +2,17 @@ import { Card, CardBody, CardHeader } from "@nextui-org/react";
 import { FaDiscord, FaYandex, FaVk } from "react-icons/fa";
 import { Input, Button } from "@nextui-org/react";
 import { useState, useMemo } from "react";
-import { signIn } from "next-auth/react";
-import { LoadingSpinner } from "~/components/Loading";
+import { signIn, useSession } from "next-auth/react";
+import { LoadingSpinner, LoadingPage } from "~/components/Loading";
+import { useRouter } from "next/router";
 
 export default function SignIn() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
+  const { data: session, status } = useSession();
+  if (session) void router.replace("/settings");
 
   const isEmailInvalid = useMemo(() => {
     if (email === "") return false;
@@ -21,6 +25,8 @@ export default function SignIn() {
     setEmailError(true);
     setTimeout(() => setEmailError(false), 1000);
   };
+
+  if (status === "loading") return <LoadingPage />;
 
   return (
     <div className="flex h-full w-full items-center justify-center ">
