@@ -3,8 +3,6 @@ import { useSession } from "next-auth/react";
 import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
 import { Select, SelectItem, Tabs, Tab, Link } from "@nextui-org/react";
-import default_char from "~/../public/default_char.png";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
   GiRestingVampire,
@@ -18,12 +16,12 @@ import Character from "~/components/game/Character";
 import Inventory from "~/components/game/Inventory";
 import Inquiries from "~/components/game/Inquiries";
 import CharQRCode from "~/components/game/CharQRCode";
+import CharacterCard from "~/components/CharacterCard";
 
 export default function Game() {
   const { data: sessionData } = useSession();
   const { data: myCharacterData, isLoading: isMyCharactersLoading } =
     api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
-
   const [selectedCharacter, setSelectedCharacter] = useState<number>();
 
   useEffect(() => {
@@ -38,8 +36,8 @@ export default function Game() {
     );
   if (!myCharacterData?.filter((c) => c.verified).length)
     return (
-      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
-        Сначала&nbsp;<Link href="/characters/new">создайте&nbsp;персонажа</Link>
+      <div className="flex h-[100vh] w-[100vw] flex-col items-center justify-center">
+        <Link href="/characters/new">Сначала&nbsp;создайте&nbsp;персонажа</Link>
         и дождитесь верификации
       </div>
     );
@@ -78,24 +76,7 @@ export default function Game() {
                   value={c.id.toString()}
                   textValue={c.name}
                 >
-                  <div className="flex flex-col gap-1">
-                    <div className="text-small dark:text-red-100">{c.name}</div>
-                    <div className="flex flex-row gap-1">
-                      <Image
-                        alt="icon"
-                        className="mr-2 max-h-36 min-w-36 max-w-36 object-contain"
-                        src={!!c.image ? c.image : default_char}
-                        height={128}
-                        width={128}
-                      />
-                      <div
-                        className="tiptap-display whitespace-normal text-tiny dark:text-red-100"
-                        dangerouslySetInnerHTML={{
-                          __html: c.publicInfo ?? "",
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <CharacterCard character={c} isSelect={true} />
                 </SelectItem>
               ))}
           </Select>
@@ -120,7 +101,7 @@ export default function Game() {
                 }
                 className="flex flex-col gap-2"
               >
-                <Character />
+                <Character characterId={selectedCharacter} />
               </Tab>
               <Tab
                 key="hunt"

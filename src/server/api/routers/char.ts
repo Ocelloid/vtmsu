@@ -7,6 +7,7 @@ import {
 } from "~/server/api/trpc";
 
 import type { User } from "~/server/api/routers/user";
+import type { ItemEffects } from "~/server/api/routers/item";
 
 export type Character = {
   id: number;
@@ -17,6 +18,8 @@ export type Character = {
   createdAt: Date;
   updatedAt: Date;
   createdById: string;
+  bloodAmount?: number;
+  bloodPool?: number;
   additionalAbilities?: number | null;
   playerId?: string | null;
   comment?: string | null;
@@ -113,12 +116,54 @@ export type ClanInFaction = {
 export type Ability = {
   id: number;
   name: string;
+  cost: number;
   icon?: string | null;
   content: string;
   expertise: boolean;
   requirementId?: number | null;
   visibleToPlayer: boolean;
   AbilityAvailable?: AbilityAvailable[];
+  AbilityEffects?: AbilityEffects[];
+};
+
+export type Effect = {
+  id?: number;
+  name: string;
+  description?: string | null;
+  expiration: number;
+  color?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  CharacterEffects?: CharacterEffects[];
+  ItemEffects?: ItemEffects[];
+  RitualEffects?: RitualEffects[];
+};
+
+export type AbilityEffects = {
+  id: number;
+  abilityId: number;
+  effectId: number;
+  expires?: Date | null;
+  effect?: Effect;
+  Ability?: Ability;
+};
+
+export type CharacterEffects = {
+  id?: number;
+  characterId: number;
+  effectId: number;
+  expires?: Date;
+  effect?: Effect;
+  Char?: Character;
+};
+
+export type RitualEffects = {
+  id?: number;
+  ritualId: number;
+  effectId: number;
+  expires?: Date;
+  effect?: Effect;
+  Ritual?: Ritual;
 };
 
 export type Feature = {
@@ -167,6 +212,47 @@ export type FeatureAvailable = {
 };
 
 export const charRouter = createTRPCRouter({
+  applyAbility: protectedProcedure
+    .input(z.object({ id: z.number(), charId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.charId },
+        include: {
+          abilities: {
+            include: {
+              abilitiy: {
+                include: { AbilityEffects: { include: { effect: true } } },
+              },
+            },
+          },
+        },
+      });
+      if (!char) return;
+
+      const ability = char.abilities.find((a) => a.abilityId === input.id);
+      if (!ability) return;
+      if (ability.abilitiy.cost > char.bloodAmount) return;
+
+      await ctx.db.char.update({
+        where: { id: input.charId },
+        data: {
+          bloodAmount: char.bloodAmount - ability.abilitiy.cost,
+        },
+      });
+
+      await ctx.db.characterEffects.createMany({
+        data: ability.abilitiy.AbilityEffects.map((e) => ({
+          characterId: input.charId,
+          effectId: e.effect.id,
+          expires: new Date(
+            new Date().getTime() + e.effect.expiration * 60 * 1000,
+          ),
+          effect: e.effect,
+          Char: { connect: { id: input.charId } },
+        })),
+      });
+    }),
+
   getCharTraits: protectedProcedure.query(async ({ ctx }) => {
     const features = await ctx.db.feature.findMany({
       orderBy: { cost: "asc" },
@@ -433,6 +519,7 @@ export const charRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
+        cost: z.number(),
         content: z.string(),
         expertise: z.boolean(),
         icon: z.string().optional(),
@@ -445,6 +532,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.ability.create({
         data: {
           name: input.name,
+          cost: input.cost,
           icon: input.icon,
           content: input.content,
           expertise: input.expertise,
@@ -466,6 +554,7 @@ export const charRouter = createTRPCRouter({
       z.object({
         id: z.number(),
         name: z.string(),
+        cost: z.number(),
         content: z.string(),
         expertise: z.boolean(),
         icon: z.string().optional(),
@@ -479,6 +568,7 @@ export const charRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+          cost: input.cost,
           icon: input.icon,
           content: input.content,
           expertise: input.expertise,
@@ -1038,9 +1128,10 @@ export const charRouter = createTRPCRouter({
           features: { include: { feature: true } },
           knowledges: { include: { knowledge: true } },
           rituals: { include: { ritual: true } },
+          effects: { include: { effect: true } },
         },
       });
-      return char ?? "404";
+      return char;
     }),
 
   getPrivateDataById: protectedProcedure

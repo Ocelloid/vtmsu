@@ -23,21 +23,25 @@ model Post {
 }
 
 model Item {
-  id          Int      @id @default(autoincrement())
-  name        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  content     String?  @db.LongText
-  image       String?
-  usage       Int      @default(-1)
-  typeId      Int      @default(1)
-  coordX      Float?
-  coordY      Float?
-  type        ItemType @relation(fields: [typeId], references: [id])
-  createdBy   User     @relation(fields: [createdById], references: [id])
-  createdById String
-  ownedById   Int?
-  ownedBy     Char?    @relation(fields: [ownedById], references: [id])
+  id            Int      @id @default(autoincrement())
+  name          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  content       String?  @db.LongText
+  image         String?
+  usage         Int      @default(-1)
+  typeId        Int      @default(1)
+  coordX        Float?
+  coordY        Float?
+  isTrash       Boolean  @default(false)
+  isTradable    Boolean  @default(true)
+  type          ItemType @relation(fields: [typeId], references: [id])
+  createdBy     User     @relation(fields: [createdById], references: [id])
+  createdById   String
+  ownedById     Int?
+  lastOwnedById Int?
+  lastUsedById  Int?
+  ownedBy       Char?    @relation(fields: [ownedById], references: [id])
 }
 
 model ItemType {
@@ -46,6 +50,8 @@ model ItemType {
   image           String?
   cost            Int
   usage           Int               @default(-1)
+  isTrash         Boolean           @default(false)
+  isTradable      Boolean           @default(true)
   content         String            @db.LongText
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -59,6 +65,7 @@ model ItemType {
   AddingAbility   AddingAbility[]
   RemovingAbility RemovingAbility[]
   UsingAbility    UsingAbility[]
+  ItemEffects     ItemEffects[]
 }
 
 model AddingAbility {
@@ -211,6 +218,8 @@ model Char {
   clanId              Int
   visible             Boolean               @default(false)
   additionalAbilities Int                   @default(0)
+  bloodAmount         Int                   @default(10)
+  bloodPool           Int                   @default(10)
   playerId            String
   playerName          String?
   playerContact       String?
@@ -237,12 +246,66 @@ model Char {
   features            CharacterFeatures[]
   rituals             CharacterRituals[]
   knowledges          CharacterKnowledges[]
+  effects             CharacterEffects[]
   hunts               Hunt[]
   createdById         String
   active              Boolean               @default(false)
   bankAccount         BankAccount[]
   Company             Company[]
   Item                Item[]
+}
+
+model CharacterEffects {
+  id          Int       @id @default(autoincrement())
+  characterId Int
+  effectId    Int
+  expires     DateTime?
+  effect      Effect    @relation(fields: [effectId], references: [id])
+  Char        Char      @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+model ItemEffects {
+  id       Int       @id @default(autoincrement())
+  typeId   Int
+  effectId Int
+  expires  DateTime?
+  duration Int?
+  effect   Effect    @relation(fields: [effectId], references: [id])
+  ItemType ItemType  @relation(fields: [typeId], references: [id], onDelete: Cascade)
+}
+
+model RitualEffects {
+  id       Int       @id @default(autoincrement())
+  ritualId Int
+  effectId Int
+  expires  DateTime?
+  duration Int?
+  effect   Effect    @relation(fields: [effectId], references: [id])
+  Ritual   Ritual    @relation(fields: [ritualId], references: [id], onDelete: Cascade)
+}
+
+model AbilityEffects {
+  id        Int       @id @default(autoincrement())
+  abilityId Int
+  effectId  Int
+  expires   DateTime?
+  duration  Int?
+  effect    Effect    @relation(fields: [effectId], references: [id])
+  Ability   Ability   @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+}
+
+model Effect {
+  id               Int                @id @default(autoincrement())
+  name             String
+  expiration       Int                @default(1)
+  description      String?            @db.LongText
+  color            String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  CharacterEffects CharacterEffects[]
+  ItemEffects      ItemEffects[]
+  RitualEffects    RitualEffects[]
+  AbilityEffects   AbilityEffects[]
 }
 
 model ClanInFaction {
@@ -327,6 +390,7 @@ model Ritual {
   visibleToPlayer  Boolean            @default(false)
   CharacterRituals CharacterRituals[]
   ritualKnowledges RitualKnowledges[]
+  RitualEffects    RitualEffects[]
 }
 
 model RitualKnowledges {
@@ -348,6 +412,7 @@ model CharacterAbilities {
 model Ability {
   id                 Int                  @id @default(autoincrement())
   name               String
+  cost               Int                  @default(1)
   icon               String?
   content            String               @db.LongText
   expertise          Boolean
@@ -358,6 +423,7 @@ model Ability {
   AddingAbility      AddingAbility[]
   RemovingAbility    RemovingAbility[]
   UsingAbility       UsingAbility[]
+  AbilityEffects     AbilityEffects[]
 }
 
 model CharacterFeatures {

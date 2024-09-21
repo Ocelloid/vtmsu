@@ -28,11 +28,12 @@ import {
   useDisclosure,
   ModalHeader,
   ModalFooter,
+  Input,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { type Character } from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
-import { useGeolocation } from "~/utils/hooks";
+import { useGeolocation, type Location } from "~/utils/hooks";
 import Image from "next/image";
 import { type Item } from "~/server/api/routers/item";
 import QRScanner from "~/components/QRScanner";
@@ -169,6 +170,7 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
       {
         ids: itemsToGive.map((item) => item.id),
         ownerId: char.id,
+        previousOwnerId: currentChar,
       },
       {
         onSuccess() {
@@ -308,19 +310,40 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
             {items
               .filter((item) => item.box === 0)
               .map((item) => (
-                <Item key={item.id} item={item} />
+                <Item
+                  key={item.id}
+                  item={item}
+                  refetchItems={refetchItems}
+                  currentChar={currentChar}
+                  location={location}
+                />
               ))}
           </ItemBox>
           <ItemBox id={-1}>
             {items
               .filter((item) => item.box === -1)
               .map((item) => (
-                <Item key={item.id} item={item} />
+                <Item
+                  key={item.id}
+                  item={item}
+                  refetchItems={refetchItems}
+                  currentChar={currentChar}
+                  location={location}
+                />
               ))}
           </ItemBox>
         </SortableContext>
         {createPortal(
-          <DragOverlay>{activeItem && <Item item={activeItem} />}</DragOverlay>,
+          <DragOverlay>
+            {activeItem && (
+              <Item
+                item={activeItem}
+                refetchItems={refetchItems}
+                currentChar={currentChar}
+                location={location}
+              />
+            )}
+          </DragOverlay>,
           document.body,
         )}
       </DndContext>
@@ -373,6 +396,9 @@ const ItemBox = ({ id, children }: { id: number; children: ReactNode }) => {
 
 const Item = ({
   item,
+  refetchItems,
+  currentChar,
+  location,
 }: {
   item: {
     id: number;
@@ -381,6 +407,9 @@ const Item = ({
     box: number;
     data: Item;
   };
+  refetchItems: () => void;
+  currentChar: number;
+  location: Location | null;
 }) => {
   const {
     setNodeRef,
@@ -406,9 +435,14 @@ const Item = ({
         style={style}
         {...attributes}
         {...listeners}
-        className="relative flex w-full cursor-move flex-col justify-between rounded border border-primary p-2 opacity-50"
+        className="relative flex w-full cursor-move flex-col rounded border border-primary p-2 opacity-50"
       >
-        <Content item={item.data} />
+        <Content
+          item={item.data}
+          refetchItems={refetchItems}
+          currentChar={currentChar}
+          location={location}
+        />
       </div>
     );
   }
@@ -419,30 +453,133 @@ const Item = ({
       style={style}
       {...attributes}
       {...listeners}
-      className={`relative flex w-full cursor-move flex-col justify-between rounded border p-2 transition hover:shadow-md hover:brightness-110`}
+      className={`relative flex w-full cursor-move flex-col rounded border p-2 transition hover:shadow-md hover:brightness-[1.2]`}
     >
-      <Content item={item.data} />
+      <Content
+        item={item.data}
+        refetchItems={refetchItems}
+        currentChar={currentChar}
+        location={location}
+      />
     </div>
   );
 };
 
-const Content = ({ item }: { item: Item }) => {
+const Content = ({
+  item,
+  refetchItems,
+  currentChar,
+  location,
+}: {
+  item: Item;
+  refetchItems: () => void;
+  currentChar: number;
+  location: Location | null;
+}) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [companyId, setCompanyId] = useState<string>("");
+  const { mutate: applyItem, isPending } = api.item.applyItem.useMutation();
+  const handleUseItem = () => {
+    if (item.usage === 0) return;
+    if (!item.id) return;
+    const confirmation = confirm(
+      `Вы уверены, что хотите использовать предмет "${item.name}"?`,
+    );
+    if (!confirmation) return;
+    applyItem(
+      {
+        id: item.id,
+        charId: currentChar,
+        coordX: location?.latitude ?? 0,
+        coordY: location?.longitude ?? 0,
+        companyId,
+      },
+      {
+        onSuccess: () => {
+          void refetchItems();
+          onClose();
+        },
+      },
+    );
+  };
   return (
-    <div className="flex flex-row gap-2">
-      <Image
-        src={item.image ?? ""}
-        alt=""
-        width="128"
-        height="128"
-        objectFit="contain"
-      />
-      <div className="flex flex-col gap-1">
-        <p className="text-sm">{item.name}</p>
-        <p
-          className="text-xs"
-          dangerouslySetInnerHTML={{ __html: item.content ?? "" }}
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} className="relative" size="sm">
+        <ModalContent>
+          <ModalHeader>Использование предмета</ModalHeader>
+          <ModalBody>
+            <div className="flex w-full flex-row gap-2">
+              <Image
+                src={item.image ?? ""}
+                alt=""
+                width="128"
+                height="128"
+                objectFit="contain"
+              />
+              <div className="flex w-full flex-col">
+                <p className="text-sm">{item.name}</p>
+                <p
+                  className="text-xs"
+                  dangerouslySetInnerHTML={{ __html: item.content ?? "" }}
+                />
+              </div>
+            </div>
+            {!!item.type?.companyLevels && (
+              <Input
+                placeholder="Введите ID компании"
+                label="ID компании"
+                value={companyId}
+                onChange={(e) => setCompanyId(e.target.value)}
+              />
+            )}
+          </ModalBody>
+          <ModalFooter className="flex flex-row justify-between gap-2">
+            <Button color="danger" onClick={onClose}>
+              Отменить
+            </Button>
+            <Button
+              color="success"
+              onClick={handleUseItem}
+              isDisabled={
+                (!!item.type?.companyLevels && !companyId) || isPending
+              }
+            >
+              Использовать
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <div className="flex h-full w-full flex-row gap-2">
+        <Image
+          src={item.image ?? ""}
+          alt=""
+          width="128"
+          height="128"
+          objectFit="contain"
         />
+        <div className="flex h-full w-full flex-col gap-1">
+          <p className="text-sm">{item.name}</p>
+          <p
+            className="text-xs"
+            dangerouslySetInnerHTML={{ __html: item.content ?? "" }}
+          />
+          <div className="mt-auto flex w-full flex-col">
+            {item.usage > 0 && (
+              <p className="text-xs">Использований:&nbsp;{item.usage}</p>
+            )}
+            {item.usage !== 0 && (
+              <Button
+                variant="light"
+                color="warning"
+                size="sm"
+                onClick={onOpen}
+              >
+                Использовать
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

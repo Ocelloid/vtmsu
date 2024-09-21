@@ -1,6 +1,6 @@
 import { z } from "zod";
+import type { Ability, Effect } from "~/server/api/routers/char";
 import type { User } from "~/server/api/routers/user";
-import type { Ability } from "~/server/api/routers/char";
 
 import {
   createTRPCRouter,
@@ -41,6 +41,16 @@ export type ItemType = {
   AddingAbility?: AddingAbility[];
   RemovingAbility?: RemovingAbility[];
   UsingAbility?: UsingAbility[];
+  ItemEffects?: ItemEffects[];
+};
+
+export type ItemEffects = {
+  id?: number;
+  typeId: number;
+  effectId: number;
+  expires?: Date;
+  effect?: Effect;
+  ItemType?: ItemType;
 };
 
 export type AddingAbility = {
@@ -68,6 +78,189 @@ export type UsingAbility = {
 };
 
 export const itemRouter = createTRPCRouter({
+  applyItem: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        charId: z.number(),
+        coordX: z.number(),
+        coordY: z.number(),
+        companyId: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const item = await ctx.db.item.findUnique({
+        where: { id: input.id },
+        include: {
+          type: {
+            include: {
+              AddingAbility: true,
+              RemovingAbility: true,
+              UsingAbility: {
+                include: {
+                  ability: {
+                    include: { AbilityEffects: { include: { effect: true } } },
+                  },
+                },
+              },
+              ItemEffects: { include: { effect: true } },
+            },
+          },
+        },
+      });
+      if (!item) return { message: "Предмет не найден" };
+
+      if (item.usage === 0) return { message: "Предмет нельзя использовать" };
+
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.charId },
+      });
+      if (!char) return { message: "Персонаж не найден" };
+
+      await ctx.db.item.update({
+        where: { id: input.id },
+        data: {
+          usage: item.usage > 0 ? item.usage - 1 : -1,
+          isTrash: item.usage - 1 === 0,
+          lastUsedById: input.charId,
+        },
+      });
+
+      if (!!item.type.ItemEffects?.length) {
+        const effects = item.type.ItemEffects.map((a) => ({
+          id: a.effectId,
+          expiration: a.effect.expiration,
+        }));
+        await ctx.db.characterEffects.createMany({
+          data: effects.map((effect) => ({
+            effectId: effect.id,
+            expires: new Date(
+              new Date().getTime() + effect.expiration * 60 * 1000,
+            ),
+            characterId: input.charId,
+          })),
+        });
+      }
+
+      if (!!item.type.UsingAbility?.length) {
+        const abilityEffects = item.type.UsingAbility.map((a) =>
+          a.ability.AbilityEffects.map((ae) => ae.effectId),
+        );
+        const effects = abilityEffects.flat();
+        await ctx.db.characterEffects.createMany({
+          data: effects.map((effectId) => ({
+            effectId,
+            characterId: input.charId,
+          })),
+        });
+      }
+
+      if (!!item.type.RemovingAbility?.length) {
+        await ctx.db.characterAbilities.deleteMany({
+          where: {
+            characterId: input.charId,
+            abilityId: {
+              in: item.type.RemovingAbility.map((a) => {
+                return a.abilityId;
+              }),
+            },
+          },
+        });
+      }
+
+      if (!!item.type.AddingAbility?.length) {
+        await ctx.db.char.update({
+          where: { id: input.charId },
+          data: {
+            additionalAbilities: char.additionalAbilities + 1,
+            abilities: {
+              createMany: {
+                data: item.type.AddingAbility.map((a) => {
+                  return { abilityId: a.abilityId };
+                }),
+              },
+            },
+          },
+        });
+      }
+
+      if (!!item.type.companyLevels && !!input.companyId) {
+        const company = await ctx.db.company.findUnique({
+          where: { id: input.companyId },
+        });
+        if (!company) return { message: "Компания не найдена" };
+        await ctx.db.company.update({
+          where: { id: input.companyId },
+          data: {
+            level: company.level + item.type.companyLevels,
+          },
+        });
+      }
+
+      if (!!item.type.status) {
+        await ctx.db.char.update({
+          where: { id: input.charId },
+          data: {
+            status: char.status + ", " + item.type.status,
+          },
+        });
+      }
+
+      if (!!item.type.bloodAmount) {
+        const newBloodAmount = char.bloodAmount + item.type.bloodAmount;
+        await ctx.db.char.update({
+          where: { id: input.charId },
+          data: {
+            bloodAmount:
+              newBloodAmount > char.bloodPool ? char.bloodPool : newBloodAmount,
+          },
+        });
+      }
+
+      if (!!item.type.bloodPool) {
+        await ctx.db.char.update({
+          where: { id: input.charId },
+          data: {
+            bloodPool: char.bloodPool + item.type.bloodPool,
+          },
+        });
+      }
+
+      if (!!item.type.violation) {
+        const huntData = await ctx.db.huntingData.create({
+          data: {
+            name: "Нарушение маскарада",
+            descs: {
+              createMany: {
+                data: [
+                  {
+                    content: item.type.violation,
+                  },
+                ],
+              },
+            },
+          },
+        });
+        const newInstance = await ctx.db.huntingInstance.create({
+          data: {
+            coordX: input.coordX,
+            coordY: input.coordY,
+            targetId: huntData.id,
+          },
+        });
+        await ctx.db.hunt.create({
+          data: {
+            instanceId: newInstance.id,
+            characterId: input.charId,
+            createdById: ctx.session.user.id,
+            status: "masq_failure",
+          },
+        });
+      }
+
+      return { message: "Предмет использован" };
+    }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -88,6 +281,7 @@ export const itemRouter = createTRPCRouter({
             image: input.image,
             usage: input.usage,
             ownedById: input.ownedById,
+            lastOwnedById: input.ownedById,
             createdById: ctx.session.user.id,
           },
         })
@@ -125,6 +319,10 @@ export const itemRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const item = await ctx.db.item.findUnique({
+        where: { id: input.id },
+      });
+      if (!item) return { message: "Предмет не найден" };
       return ctx.db.item.update({
         where: { id: input.id },
         data: {
@@ -134,6 +332,10 @@ export const itemRouter = createTRPCRouter({
           content: input.content,
           usage: input.usage,
           ownedById: input.ownedById,
+          lastOwnedById:
+            input.ownedById === item.ownedById
+              ? item.lastOwnedById
+              : item.ownedById,
         },
       });
     }),
@@ -158,10 +360,10 @@ export const itemRouter = createTRPCRouter({
   }),
 
   getByOwnerId: protectedProcedure
-    .input(z.object({ ownerId: z.number() }))
+    .input(z.object({ ownerId: z.number(), getTrash: z.boolean().optional() }))
     .query(({ ctx, input }) => {
       return ctx.db.item.findMany({
-        where: { ownedById: input.ownerId },
+        where: { ownedById: input.ownerId, isTrash: input.getTrash ?? false },
       });
     }),
 
@@ -170,6 +372,7 @@ export const itemRouter = createTRPCRouter({
       z.object({
         ids: z.array(z.number()),
         ownerId: z.number(),
+        previousOwnerId: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -177,6 +380,7 @@ export const itemRouter = createTRPCRouter({
         where: { id: { in: input.ids } },
         data: {
           ownedById: input.ownerId,
+          lastOwnedById: input.previousOwnerId,
         },
       });
     }),

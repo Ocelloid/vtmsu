@@ -53,7 +53,7 @@ const EditCharacterTrait = ({
   const [recipe, setRecipe] = useState("");
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
-  const [cost, setCost] = useState<number>(0);
+  const [cost, setCost] = useState<number>(1);
   const [requirement, setRequirement] = useState<number>();
   const [knowledgeIds, setKnowledgeIds] = useState<number[]>([]);
   const [factionIds, setfactionIds] = useState<number[]>([]);
@@ -421,6 +421,7 @@ const EditCharacterTrait = ({
           createAbility({
             icon: icon.replace("_white", ""),
             name: title,
+            cost: cost,
             content: content,
             expertise: isExpert,
             requirementId: requirement,
@@ -432,6 +433,7 @@ const EditCharacterTrait = ({
             id: trait.id ?? "",
             icon: icon.replace("_white", ""),
             name: title,
+            cost: cost,
             content: content,
             expertise: isExpert,
             requirementId: requirement,
@@ -578,12 +580,12 @@ const EditCharacterTrait = ({
                 </Button>
               )}
             </div>
-            {traitType === "Feature" && (
+            {(traitType === "Feature" || traitType === "Ability") && (
               <Input
                 type="number"
                 variant="underlined"
                 label="Стоимость"
-                placeholder={"Введите стоимость дополнения"}
+                placeholder={"Введите стоимость"}
                 value={cost.toString()}
                 onValueChange={(e) => handleCostChange(Number(e))}
               />

@@ -103,7 +103,7 @@ export const econRouter = createTRPCRouter({
       });
     }),
 
-  transfer: protectedProcedure
+  transferByCharId: protectedProcedure
     .input(
       z.object({
         fromId: z.number(),
@@ -122,6 +122,39 @@ export const econRouter = createTRPCRouter({
 
       const toAccount = await ctx.db.bankAccount.findFirst({
         where: { characterId: input.toId },
+        select: { balance: true, id: true },
+      });
+      if (!toAccount) return { message: "Не найден счёт получателя" };
+
+      await ctx.db.bankAccount.update({
+        where: { id: fromAccount.id },
+        data: { balance: fromAccount.balance - input.amount },
+      });
+      await ctx.db.bankAccount.update({
+        where: { id: toAccount.id },
+        data: { balance: toAccount.balance + input.amount },
+      });
+    }),
+
+  transferByAddress: protectedProcedure
+    .input(
+      z.object({
+        fromAddress: z.string(),
+        toAddress: z.string(),
+        amount: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const fromAccount = await ctx.db.bankAccount.findFirst({
+        where: { address: input.fromAddress },
+        select: { balance: true, id: true },
+      });
+      if (!fromAccount) return { message: "Не найден счёт отправителя" };
+      if (fromAccount.balance < input.amount)
+        return { message: "Недостаточно средств на счёте отправителя" };
+
+      const toAccount = await ctx.db.bankAccount.findFirst({
+        where: { address: input.toAddress },
         select: { balance: true, id: true },
       });
       if (!toAccount) return { message: "Не найден счёт получателя" };
