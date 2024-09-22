@@ -55,7 +55,7 @@ const Effects = ({ effects }: { effects: Effect[] }) => {
       {effects.map((e) => (
         <div key={e.id + "_effect"} className="flex flex-col">
           <p className="text-xs">{e.name}</p>
-          <p className="text-xs italic">{e.description}</p>
+          <p className="text-xs italic">{e.content}</p>
         </div>
       ))}
     </div>
