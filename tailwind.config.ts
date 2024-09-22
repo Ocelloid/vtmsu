@@ -26,11 +26,11 @@ export default withUt({
       themes: {
         light: {
           layout: {}, // light theme layout tokens
-          colors: {}, // light theme colors
+          colors: { secondary: "#F1F5FB" }, // light theme colors
         },
         dark: {
           layout: {}, // dark theme layout tokens
-          colors: {}, // dark theme colors
+          colors: { secondary: "#F1F5FB" }, // dark theme colors
         },
         // ... custom themes
       },

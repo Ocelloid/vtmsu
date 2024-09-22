@@ -1,4 +1,4 @@
-import { Tabs, Tab } from "@nextui-org/react";
+import { Tabs, Tab, CircularProgress } from "@nextui-org/react";
 import EditCharacterTrait from "~/components/modals/editCharacterTrait";
 import { FaPencilAlt, FaPlusCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import type {
   Feature,
   Ritual,
   Knowledge,
+  Effect,
 } from "~/server/api/routers/char";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
@@ -20,7 +21,14 @@ import { LoadingPage } from "~/components/Loading";
 type characterTraitsType = {
   label: string;
   type: string;
-  list: Faction[] | Clan[] | Ability[] | Feature[] | Ritual[] | Knowledge[];
+  list:
+    | Faction[]
+    | Clan[]
+    | Ability[]
+    | Feature[]
+    | Ritual[]
+    | Knowledge[]
+    | Effect[];
 }[];
 
 const CharacterTraits = () => {
@@ -33,6 +41,7 @@ const CharacterTraits = () => {
     { label: "Дополнения", type: "Feature", list: [] },
     { label: "Знания", type: "Knowledge", list: [] },
     { label: "Ритуалы", type: "Ritual", list: [] },
+    { label: "Эффекты", type: "Effect", list: [] },
   ]);
 
   const discKeys = Object.keys(disciplines);
@@ -78,47 +87,37 @@ const CharacterTraits = () => {
       {
         label: "Фракции",
         type: "Faction",
-        list:
-          charTraitsData?.factions.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
+        list: charTraitsData?.factions ?? [],
       },
       {
         label: "Кланы",
         type: "Clan",
-        list:
-          charTraitsData?.clans.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
+        list: charTraitsData?.clans ?? [],
       },
       {
         label: "Способности",
         type: "Ability",
-        list:
-          charTraitsData?.abilities.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
+        list: charTraitsData?.abilities ?? [],
       },
       {
         label: "Дополнения",
         type: "Feature",
-        list: charTraitsData?.features.sort((a, b) => a.cost - b.cost) ?? [],
+        list: charTraitsData?.features ?? [],
       },
       {
         label: "Знания",
         type: "Knowledge",
-        list:
-          charTraitsData?.knowledges.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
+        list: charTraitsData?.knowledges ?? [],
       },
       {
         label: "Ритуалы",
         type: "Ritual",
-        list:
-          charTraitsData?.rituals.sort((a, b) =>
-            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-          ) ?? [],
+        list: charTraitsData?.rituals ?? [],
+      },
+      {
+        label: "Эффекты",
+        type: "Effect",
+        list: charTraitsData?.effects ?? [],
       },
     ]);
   }, [charTraitsData]);
@@ -158,10 +157,11 @@ const CharacterTraits = () => {
               Добавить
             </EditCharacterTrait>
             {cs.list.map((trait) => (
-              <div key={trait.id} className="flex flex-col">
-                <div className="flex flex-row">
+              <div key={trait.id} className="flex flex-col ">
+                <div className="flex flex-row items-center">
                   {cs.type !== "Feature" &&
                     cs.type !== "Ritual" &&
+                    cs.type !== "Effect" &&
                     cs.type !== "Knowledge" && (
                       <Image
                         alt="icon"
@@ -177,6 +177,26 @@ const CharacterTraits = () => {
                         width={128}
                       />
                     )}
+                  {cs.type === "Effect" && (
+                    <CircularProgress
+                      size="md"
+                      strokeWidth={2}
+                      showValueLabel={true}
+                      value={(trait as Effect).expiration ?? 1}
+                      maxValue={(trait as Effect).expiration ?? 1}
+                      valueLabel={`${(trait as Effect).expiration ?? 1} мин`}
+                      color={
+                        (trait as Effect).color as
+                          | "default"
+                          | "success"
+                          | "warning"
+                          | "primary"
+                          | "secondary"
+                          | "danger"
+                      }
+                      className={`mr-2`}
+                    />
+                  )}
                   <div className="mr-auto flex flex-col">
                     <p className="text-2xl">{trait.name}</p>
                     <p className="text-sm italic">
@@ -202,7 +222,7 @@ const CharacterTraits = () => {
                     trait={trait}
                     traitType={cs.type}
                     onClose={refetchTraits}
-                    className="-mt-2 h-10 w-10 min-w-10 rounded-full p-0 text-black dark:text-white"
+                    className="h-10 w-10 min-w-10 rounded-full p-0 text-black dark:text-white"
                   >
                     <FaPencilAlt size={16} />
                   </EditCharacterTrait>

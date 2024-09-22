@@ -333,12 +333,12 @@ const CharacterSheet = ({
                   </div>
                 )}
                 <div
-                  className={`flex flex-row items-center justify-center gap-2 ${publicChar.verified ? "text-success" : publicChar.pending ? "text-secondary" : "text-danger"}`}
+                  className={`flex flex-row items-center justify-center gap-2 ${publicChar.verified ? "text-success" : publicChar.pending ? "text-primary" : "text-danger"}`}
                 >
                   {publicChar.verified ? (
                     <VscVerified size={32} className="text-success" />
                   ) : publicChar.pending ? (
-                    <VscUnverified size={32} className="text-secondary" />
+                    <VscUnverified size={32} className="text-primary" />
                   ) : (
                     <VscWarning size={32} className="text-danger" />
                   )}

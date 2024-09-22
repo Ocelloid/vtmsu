@@ -13,6 +13,7 @@ import {
   RadioGroup,
   Radio,
 } from "@nextui-org/react";
+import { FaCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "~/components/Loading";
@@ -23,6 +24,7 @@ import type {
   Feature,
   Ritual,
   Knowledge,
+  Effect,
 } from "~/server/api/routers/char";
 import Image from "next/image";
 import { LoadingPage } from "~/components/Loading";
@@ -42,7 +44,7 @@ const EditCharacterTrait = ({
   children,
 }: {
   onClose: () => void;
-  trait?: Faction | Clan | Ability | Feature | Ritual | Knowledge;
+  trait?: Faction | Clan | Ability | Feature | Ritual | Knowledge | Effect;
   traitType?: string;
   className?: string;
   children?: string | JSX.Element | JSX.Element[] | (string | JSX.Element)[];
@@ -66,6 +68,24 @@ const EditCharacterTrait = ({
   const [isClanSelectOpen, setIsClanSelectOpen] = useState(false);
   const [isFactionSelectOpen, setIsFactionSelectOpen] = useState(false);
   const [icon, setIcon] = useState<string>("");
+  const [expiration, setExpiration] = useState<number>(1);
+  const [color, setColor] = useState<
+    | "default"
+    | "success"
+    | "warning"
+    | "primary"
+    | "secondary"
+    | "danger"
+    | undefined
+  >("default");
+  const colors = [
+    "default",
+    "success",
+    "warning",
+    "primary",
+    "secondary",
+    "danger",
+  ];
   const editing = !!trait;
 
   const abilityKeys = Object.keys(disciplines);
@@ -183,6 +203,18 @@ const EditCharacterTrait = ({
         );
         setRecipe((trait as Ritual).recipe ?? "");
       }
+      if (traitType === "Effect") {
+        setColor(
+          ((trait as Effect).color ?? "default") as
+            | "default"
+            | "success"
+            | "warning"
+            | "primary"
+            | "secondary"
+            | "danger",
+        );
+        setExpiration((trait as Effect).expiration ?? 1);
+      }
     }
   }, [trait, traitType]);
 
@@ -195,6 +227,8 @@ const EditCharacterTrait = ({
   const handleSuccess = () => {
     onClose();
     setRecipe("");
+    setExpiration(1);
+    setColor("default");
     setIsExpert(false);
     setKnowledgeIds([]);
     setfactionIds([]);
@@ -253,6 +287,20 @@ const EditCharacterTrait = ({
       },
     });
 
+  const { mutate: createEffect, isPending: isEffectPending } =
+    api.char.createEffect.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
+  const { mutate: updateEffect, isPending: isEffectUpdatePending } =
+    api.char.updateEffect.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
   const { mutate: updateFaction, isPending: isFactionUpdatePending } =
     api.char.updateFaction.useMutation({
       onSuccess() {
@@ -290,6 +338,13 @@ const EditCharacterTrait = ({
 
   const { mutate: updateKnowledge, isPending: isKnowledgeUpdatePending } =
     api.char.updateKnowledge.useMutation({
+      onSuccess() {
+        handleSuccess();
+      },
+    });
+
+  const { mutate: deleteEffect, isPending: isEffectDeletePending } =
+    api.char.deleteEffect.useMutation({
       onSuccess() {
         handleSuccess();
       },
@@ -350,11 +405,16 @@ const EditCharacterTrait = ({
                 ? "ритуал"
                 : traitType === "Knowledge"
                   ? "знание"
-                  : "дополнение") +
+                  : traitType === "Effect"
+                    ? "эффект"
+                    : "дополнение") +
         "?",
     );
     if (confirmDeletion)
       switch (traitType) {
+        case "Effect":
+          deleteEffect({ id: trait!.id });
+          return;
         case "Faction":
           deleteFaction({ id: trait!.id });
           return;
@@ -378,6 +438,26 @@ const EditCharacterTrait = ({
 
   const handleFormSubmit = () => {
     switch (traitType) {
+      case "Effect":
+        if (!editing) {
+          createEffect({
+            name: title,
+            content: content,
+            color: color,
+            visibleToPlayer: isVisibleToPlayer,
+            expiration: expiration,
+          });
+        } else {
+          updateEffect({
+            id: trait.id ?? "",
+            name: title,
+            content: content,
+            color: color,
+            visibleToPlayer: isVisibleToPlayer,
+            expiration: expiration,
+          });
+        }
+        return;
       case "Faction":
         if (!editing) {
           createFaction({
@@ -540,7 +620,9 @@ const EditCharacterTrait = ({
                     ? "ритуал"
                     : traitType === "Knowledge"
                       ? "знание"
-                      : "дополнение"}
+                      : traitType === "Effect"
+                        ? "эффект"
+                        : "дополнение"}
           </ModalHeader>
           <ModalBody>
             <div className={"flex flex-row"}>
@@ -558,7 +640,9 @@ const EditCharacterTrait = ({
                           ? "ритуала"
                           : traitType === "Knowledge"
                             ? "знания"
-                            : "дополнения"
+                            : traitType === "Effect"
+                              ? "эффекта"
+                              : "дополнения"
                 }`}
                 value={title}
                 onValueChange={setTitle}
@@ -604,7 +688,9 @@ const EditCharacterTrait = ({
                         ? "ритуала"
                         : traitType === "Knowledge"
                           ? "знания"
-                          : "дополнения"
+                          : traitType === "Effect"
+                            ? "эффекта"
+                            : "дополнения"
               }`}
               value={content}
               onValueChange={setContent}
@@ -810,6 +896,50 @@ const EditCharacterTrait = ({
                 ))}
               </Select>
             )}
+            {traitType === "Effect" && (
+              <>
+                <Select
+                  label="Цвет"
+                  color={color}
+                  placeholder="Выберите цвет"
+                  variant="underlined"
+                  className={`text-${color}`}
+                  selectionMode="single"
+                  startContent={<FaCircle size={24} />}
+                  selectedKeys={color ? [color] : [colors[0]!]}
+                  onChange={(e) => {
+                    if (!!e.target.value) {
+                      setColor(
+                        e.target.value as
+                          | "default"
+                          | "success"
+                          | "warning"
+                          | "primary"
+                          | "secondary"
+                          | "danger"
+                          | undefined,
+                      );
+                    }
+                  }}
+                >
+                  {colors.map((color) => (
+                    <SelectItem
+                      key={color}
+                      value={color}
+                      className={`bg-${color}`}
+                    />
+                  ))}
+                </Select>
+                <Input
+                  type="number"
+                  variant="underlined"
+                  label="Время действия в минутах"
+                  placeholder="Введите время действия в минутах"
+                  value={expiration.toString()}
+                  onValueChange={(e) => setExpiration(Number(e))}
+                />
+              </>
+            )}
             <Checkbox
               isSelected={isVisibleToPlayer}
               onValueChange={setIsVisibleToPlayer}
@@ -848,7 +978,10 @@ const EditCharacterTrait = ({
                 isRitualDeletePending ||
                 isKnowledgePending ||
                 isKnowledgeUpdatePending ||
-                isKnowledgeDeletePending
+                isKnowledgeDeletePending ||
+                isEffectPending ||
+                isEffectUpdatePending ||
+                isEffectDeletePending
               }
               onClick={handleFormSubmit}
             >
@@ -869,7 +1002,10 @@ const EditCharacterTrait = ({
               isFeatureDeletePending ||
               isKnowledgePending ||
               isKnowledgeUpdatePending ||
-              isKnowledgeDeletePending ? (
+              isKnowledgeDeletePending ||
+              isEffectPending ||
+              isEffectUpdatePending ||
+              isEffectDeletePending ? (
                 <LoadingSpinner height={24} />
               ) : (
                 `${editing ? "Обновить" : "Добавить"}`

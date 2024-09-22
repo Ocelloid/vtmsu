@@ -127,11 +127,12 @@ export type Ability = {
 };
 
 export type Effect = {
-  id?: number;
+  id: number;
   name: string;
-  description?: string | null;
+  content?: string | null;
   expiration: number;
   color?: string | null;
+  visibleToPlayer: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   CharacterEffects?: CharacterEffects[];
@@ -282,6 +283,9 @@ export const charRouter = createTRPCRouter({
     const knowledges = await ctx.db.knowledge.findMany({
       orderBy: { name: "asc" },
     });
+    const effects = await ctx.db.effect.findMany({
+      orderBy: { name: "asc" },
+    });
     return {
       knowledges: knowledges,
       rituals: rituals,
@@ -289,6 +293,7 @@ export const charRouter = createTRPCRouter({
       abilities: abilities,
       factions: factions,
       clans: clans,
+      effects: effects,
     };
   }),
 
@@ -400,6 +405,58 @@ export const charRouter = createTRPCRouter({
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.feature.delete({ where: { id: input.id } });
+    }),
+
+  createEffect: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        content: z.string(),
+        color: z.string().optional(),
+        visibleToPlayer: z.boolean(),
+        expiration: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.effect.create({
+        data: {
+          name: input.name,
+          content: input.content,
+          color: input.color,
+          visibleToPlayer: input.visibleToPlayer,
+          expiration: input.expiration,
+        },
+      });
+    }),
+
+  updateEffect: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        content: z.string(),
+        color: z.string().optional(),
+        visibleToPlayer: z.boolean(),
+        expiration: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.effect.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          content: input.content,
+          color: input.color,
+          visibleToPlayer: input.visibleToPlayer,
+          expiration: input.expiration,
+        },
+      });
+    }),
+
+  deleteEffect: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.effect.delete({ where: { id: input.id } });
     }),
 
   createRitual: protectedProcedure
