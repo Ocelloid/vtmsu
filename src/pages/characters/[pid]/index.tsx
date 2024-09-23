@@ -42,7 +42,7 @@ const Display = ({
           }}
         />
       ) : (
-        children
+        <div className="text-wrap break-all">{children}</div>
       )}
     </div>
   );
