@@ -2,10 +2,11 @@ import Image from "next/image";
 import { api } from "~/utils/api";
 import { BsDroplet, BsDropletFill } from "react-icons/bs";
 import { LoadingPage } from "~/components/Loading";
-import type { Ability, Effect } from "~/server/api/routers/char";
+import type { Ability, CharacterEffects } from "~/server/api/routers/char";
 import { disciplines } from "~/assets";
-import { Button } from "@nextui-org/react";
+import { Button, CircularProgress } from "@nextui-org/react";
 import default_char from "~/../public/default_char.png";
+import { useEffect, useState } from "react";
 
 export default function Character({ characterId }: { characterId: number }) {
   const { data: char, refetch: refetchChar } = api.char.getById.useQuery({
@@ -22,11 +23,13 @@ export default function Character({ characterId }: { characterId: number }) {
   };
 
   if (!char) return <LoadingPage />;
+
+  console.log(char.features.map((f) => f.feature.FeatureEffects).flat());
   return (
     <div className="flex flex-col gap-4 py-2">
       <BloodMeter amount={char.bloodAmount} pool={char.bloodPool} />
       <div className="flex flex-row gap-2">
-        <div className="flex max-w-32 flex-col">
+        <div className="flex min-w-32 max-w-32 flex-col">
           <Image
             className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
             alt="char_photo"
@@ -37,7 +40,30 @@ export default function Character({ characterId }: { characterId: number }) {
         </div>
         <div className="flex flex-col">
           <p className="text-sm">{char.name}</p>
-          <Effects effects={char.effects.map((e) => e.effect)} />
+          <div className="flex max-h-32 flex-col overflow-y-auto">
+            {char.features
+              .map((f) => f.feature.FeatureEffects)
+              .flat()
+              .map((e) => (
+                <Effect
+                  key={e.id + "_feature_effect"}
+                  e={{
+                    characterId: char.id,
+                    effectId: e.effectId,
+                    effect: e.effect,
+                  }}
+                />
+              ))}
+            {char.effects
+              .filter(
+                (e) =>
+                  e.effect?.visibleToPlayer &&
+                  (e.expires ? e.expires > new Date() : true),
+              )
+              .map((e) => (
+                <Effect key={e.id + "_ability_effect"} e={e} />
+              ))}
+          </div>
         </div>
       </div>
       <Disciplines
@@ -48,16 +74,56 @@ export default function Character({ characterId }: { characterId: number }) {
   );
 }
 
-const Effects = ({ effects }: { effects: Effect[] }) => {
+const Effect = ({ e }: { e: CharacterEffects }) => {
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
+
+  useEffect(() => {
+    const now = new Date();
+    const diffMs = (e.expires?.getTime() ?? now.getTime()) - now.getTime();
+    setTimeRemaining(Math.round(diffMs / 1000));
+
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      const diffMs = (e.expires?.getTime() ?? now.getTime()) - now.getTime();
+      setTimeRemaining(Math.round(diffMs / 1000));
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [e.expires]);
+
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining % 60;
+
   return (
-    <div className="flex flex-col gap-2">
-      {!!effects.length && <p>Эффекты:</p>}
-      {effects.map((e) => (
-        <div key={e.id + "_effect"} className="flex flex-col">
-          <p className="text-xs">{e.name}</p>
-          <p className="text-xs italic">{e.content}</p>
-        </div>
-      ))}
+    <div className="flex flex-row items-center gap-1">
+      <CircularProgress
+        size="md"
+        strokeWidth={2}
+        showValueLabel={true}
+        value={!!timeRemaining ? timeRemaining : 60}
+        maxValue={!!e.effect?.expiration ? e.effect?.expiration * 60 : 60}
+        classNames={{
+          value: !!timeRemaining ? "" : "text-3xl",
+        }}
+        valueLabel={
+          !!timeRemaining
+            ? `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`
+            : "∞"
+        }
+        color={
+          e.effect?.color as
+            | "default"
+            | "success"
+            | "warning"
+            | "primary"
+            | "secondary"
+            | "danger"
+        }
+      />
+      <div className="flex flex-col">
+        <p className="text-xs">{e.effect?.name}</p>
+        <p className="text-xs">{e.effect?.content}</p>
+      </div>
     </div>
   );
 };

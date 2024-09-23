@@ -60,13 +60,16 @@ const EditCharacterTrait = ({
   const [knowledgeIds, setKnowledgeIds] = useState<number[]>([]);
   const [factionIds, setfactionIds] = useState<number[]>([]);
   const [clanIds, setclanIds] = useState<number[]>([]);
+  const [effectIds, setEffectIds] = useState<number[]>([]);
   const [knowledges, setKnowledges] = useState<Knowledge[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [abilities, setAbilities] = useState<Ability[]>([]);
   const [clans, setClans] = useState<Clan[]>([]);
+  const [effects, setEffects] = useState<Effect[]>([]);
   const [isVisibleToPlayer, setIsVisibleToPlayer] = useState(false);
   const [isClanSelectOpen, setIsClanSelectOpen] = useState(false);
   const [isFactionSelectOpen, setIsFactionSelectOpen] = useState(false);
+  const [isEffectSelectOpen, setIsEffectSelectOpen] = useState(false);
   const [icon, setIcon] = useState<string>("");
   const [expiration, setExpiration] = useState<number>(1);
   const [color, setColor] = useState<
@@ -171,6 +174,18 @@ const EditCharacterTrait = ({
     );
   }, [knowledgeData]);
 
+  const { data: effectsData } = api.char.getEffects.useQuery();
+
+  useEffect(() => {
+    setEffects(
+      !!effectsData
+        ? effectsData.sort((a, b) =>
+            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
+          )
+        : [],
+    );
+  }, [effectsData]);
+
   useEffect(() => {
     if (!!trait) {
       setTitle(trait.name ?? "");
@@ -181,6 +196,9 @@ const EditCharacterTrait = ({
         setclanIds(
           (trait as Feature).FeatureAvailable!.map((v) => v.clanId) ?? [],
         );
+        setEffectIds(
+          (trait as Feature).FeatureEffects?.map((v) => v.effectId) ?? [],
+        );
       }
       if (traitType === "Ability") {
         setIcon((trait as Ability).icon ?? "");
@@ -188,6 +206,9 @@ const EditCharacterTrait = ({
         setRequirement((trait as Ability).requirementId ?? undefined);
         setclanIds(
           (trait as Ability).AbilityAvailable!.map((v) => v.clanId) ?? [],
+        );
+        setEffectIds(
+          (trait as Ability).AbilityEffects?.map((v) => v.effectId) ?? [],
         );
       }
       if (traitType === "Faction") setIcon((trait as Faction).icon ?? "");
@@ -202,6 +223,9 @@ const EditCharacterTrait = ({
           (trait as Ritual).ritualKnowledges!.map((v) => v.knowledgeId) ?? [],
         );
         setRecipe((trait as Ritual).recipe ?? "");
+        setEffectIds(
+          (trait as Ritual).RitualEffects?.map((v) => v.effectId) ?? [],
+        );
       }
       if (traitType === "Effect") {
         setColor(
@@ -239,6 +263,7 @@ const EditCharacterTrait = ({
     setCost(0);
     setIsModalOpen(false);
     setIsClanSelectOpen(false);
+    setIsEffectSelectOpen(false);
     setIsFactionSelectOpen(false);
     if (traitType === "Clan") void refetchFactions();
     if (traitType === "Ability") void refetchAbilities();
@@ -507,6 +532,7 @@ const EditCharacterTrait = ({
             requirementId: requirement,
             visibleToPlayer: isVisibleToPlayer,
             clanIds: clanIds ?? [1],
+            effectIds: effectIds ?? [],
           });
         } else {
           updateAbility({
@@ -519,6 +545,7 @@ const EditCharacterTrait = ({
             requirementId: requirement,
             visibleToPlayer: isVisibleToPlayer,
             clanIds: clanIds ?? [1],
+            effectIds: effectIds ?? [],
           });
         }
         return;
@@ -530,6 +557,7 @@ const EditCharacterTrait = ({
             cost: cost,
             visibleToPlayer: isVisibleToPlayer,
             clanIds: clanIds ?? [1],
+            effectIds: effectIds ?? [],
           });
         } else {
           updateFeature({
@@ -539,6 +567,7 @@ const EditCharacterTrait = ({
             cost: cost,
             visibleToPlayer: isVisibleToPlayer,
             clanIds: clanIds ?? [1],
+            effectIds: effectIds ?? [],
           });
         }
         return;
@@ -551,6 +580,7 @@ const EditCharacterTrait = ({
             content: content,
             visibleToPlayer: isVisibleToPlayer,
             ritualKnowledges: knowledgeIds,
+            effectIds: effectIds ?? [],
           });
         } else {
           updateRitual({
@@ -561,6 +591,7 @@ const EditCharacterTrait = ({
             content: content,
             visibleToPlayer: isVisibleToPlayer,
             ritualKnowledges: knowledgeIds,
+            effectIds: effectIds ?? [],
           });
         }
         return;
@@ -717,6 +748,34 @@ const EditCharacterTrait = ({
                 {factions.map((faction) => (
                   <SelectItem key={faction.id} value={faction.id}>
                     {faction.name}
+                  </SelectItem>
+                ))}
+              </Select>
+            )}
+            {(traitType === "Ability" ||
+              traitType === "Feature" ||
+              traitType === "Ritual") && (
+              <Select
+                label="Эффекты"
+                variant="underlined"
+                placeholder="Выберите эффекты"
+                selectionMode="multiple"
+                isOpen={isEffectSelectOpen}
+                onOpenChange={(open) =>
+                  open !== isEffectSelectOpen && setIsEffectSelectOpen(open)
+                }
+                selectedKeys={effectIds.map((f) => f.toString())}
+                onChange={(e) => {
+                  if (!!e.target.value) {
+                    setEffectIds(
+                      e.target.value.split(",").map((s) => Number(s)),
+                    );
+                  }
+                }}
+              >
+                {effects.map((effect) => (
+                  <SelectItem key={effect.id} value={effect.id}>
+                    {effect.name}
                   </SelectItem>
                 ))}
               </Select>

@@ -138,6 +138,16 @@ export type Effect = {
   CharacterEffects?: CharacterEffects[];
   ItemEffects?: ItemEffects[];
   RitualEffects?: RitualEffects[];
+  FeatureEffects?: FeatureEffects[];
+};
+
+export type FeatureEffects = {
+  id: number;
+  featureId: number;
+  effectId: number;
+  expires?: Date | null;
+  effect?: Effect;
+  Feature?: Feature;
 };
 
 export type AbilityEffects = {
@@ -153,7 +163,7 @@ export type CharacterEffects = {
   id?: number;
   characterId: number;
   effectId: number;
-  expires?: Date;
+  expires?: Date | null;
   effect?: Effect;
   Char?: Character;
 };
@@ -174,6 +184,7 @@ export type Feature = {
   cost: number;
   visibleToPlayer: boolean;
   FeatureAvailable?: FeatureAvailable[];
+  FeatureEffects?: FeatureEffects[];
 };
 
 export type Ritual = {
@@ -186,6 +197,7 @@ export type Ritual = {
   createdAt?: Date;
   updatedAt?: Date;
   ritualKnowledges?: RitualKnowledges[];
+  RitualEffects?: RitualEffects[];
 };
 
 export type RitualKnowledges = {
@@ -257,11 +269,17 @@ export const charRouter = createTRPCRouter({
   getCharTraits: protectedProcedure.query(async ({ ctx }) => {
     const features = await ctx.db.feature.findMany({
       orderBy: { cost: "asc" },
-      include: { FeatureAvailable: { include: { clan: true } } },
+      include: {
+        FeatureAvailable: { include: { clan: true } },
+        FeatureEffects: { include: { effect: true } },
+      },
     });
     const abilities = await ctx.db.ability.findMany({
       orderBy: { name: "asc" },
-      include: { AbilityAvailable: { include: { clan: true } } },
+      include: {
+        AbilityAvailable: { include: { clan: true } },
+        AbilityEffects: { include: { effect: true } },
+      },
     });
     const factions = await ctx.db.faction.findMany({
       orderBy: { name: "desc" },
@@ -278,6 +296,7 @@ export const charRouter = createTRPCRouter({
       orderBy: { name: "asc" },
       include: {
         ritualKnowledges: { include: { knowledge: true } },
+        RitualEffects: { include: { effect: true } },
       },
     });
     const knowledges = await ctx.db.knowledge.findMany({
@@ -342,6 +361,12 @@ export const charRouter = createTRPCRouter({
     });
   }),
 
+  getEffects: publicProcedure.query(({ ctx }) => {
+    return ctx.db.effect.findMany({
+      orderBy: { name: "asc" },
+    });
+  }),
+
   createFeature: protectedProcedure
     .input(
       z.object({
@@ -350,6 +375,7 @@ export const charRouter = createTRPCRouter({
         cost: z.number(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
+        effectIds: z.array(z.number()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -366,6 +392,13 @@ export const charRouter = createTRPCRouter({
               }),
             },
           },
+          FeatureEffects: {
+            createMany: {
+              data: input.effectIds.map((a) => {
+                return { effectId: a };
+              }),
+            },
+          },
         },
       });
     }),
@@ -379,6 +412,7 @@ export const charRouter = createTRPCRouter({
         cost: z.number(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
+        effectIds: z.array(z.number()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -394,6 +428,14 @@ export const charRouter = createTRPCRouter({
             createMany: {
               data: input.clanIds.map((a) => {
                 return { clanId: a };
+              }),
+            },
+          },
+          FeatureEffects: {
+            deleteMany: {},
+            createMany: {
+              data: input.effectIds.map((a) => {
+                return { effectId: a };
               }),
             },
           },
@@ -468,6 +510,7 @@ export const charRouter = createTRPCRouter({
         content: z.string(),
         visibleToPlayer: z.boolean(),
         ritualKnowledges: z.array(z.number()),
+        effectIds: z.array(z.number()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -485,6 +528,13 @@ export const charRouter = createTRPCRouter({
               }),
             },
           },
+          RitualEffects: {
+            createMany: {
+              data: input.effectIds.map((a) => {
+                return { effectId: a };
+              }),
+            },
+          },
         },
       });
     }),
@@ -499,6 +549,7 @@ export const charRouter = createTRPCRouter({
         content: z.string(),
         visibleToPlayer: z.boolean(),
         ritualKnowledges: z.array(z.number()),
+        effectIds: z.array(z.number()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -515,6 +566,14 @@ export const charRouter = createTRPCRouter({
             createMany: {
               data: input.ritualKnowledges.map((a) => {
                 return { knowledgeId: a };
+              }),
+            },
+          },
+          RitualEffects: {
+            deleteMany: {},
+            createMany: {
+              data: input.effectIds.map((a) => {
+                return { effectId: a };
               }),
             },
           },
@@ -583,6 +642,7 @@ export const charRouter = createTRPCRouter({
         requirementId: z.number().optional(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
+        effectIds: z.array(z.number()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -602,6 +662,13 @@ export const charRouter = createTRPCRouter({
               }),
             },
           },
+          AbilityEffects: {
+            createMany: {
+              data: input.effectIds.map((a) => {
+                return { effectId: a };
+              }),
+            },
+          },
         },
       });
     }),
@@ -618,6 +685,7 @@ export const charRouter = createTRPCRouter({
         requirementId: z.number().optional(),
         visibleToPlayer: z.boolean(),
         clanIds: z.array(z.number()),
+        effectIds: z.array(z.number()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -636,6 +704,14 @@ export const charRouter = createTRPCRouter({
             createMany: {
               data: input.clanIds.map((a) => {
                 return { clanId: a };
+              }),
+            },
+          },
+          AbilityEffects: {
+            deleteMany: {},
+            createMany: {
+              data: input.effectIds.map((a) => {
+                return { effectId: a };
               }),
             },
           },
@@ -1182,7 +1258,13 @@ export const charRouter = createTRPCRouter({
           faction: true,
           clan: true,
           abilities: { include: { abilitiy: true } },
-          features: { include: { feature: true } },
+          features: {
+            include: {
+              feature: {
+                include: { FeatureEffects: { include: { effect: true } } },
+              },
+            },
+          },
           knowledges: { include: { knowledge: true } },
           rituals: { include: { ritual: true } },
           effects: { include: { effect: true } },

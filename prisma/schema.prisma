@@ -294,6 +294,16 @@ model AbilityEffects {
   Ability   Ability   @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 }
 
+model FeatureEffects {
+  id        Int       @id @default(autoincrement())
+  featureId Int
+  effectId  Int
+  expires   DateTime?
+  duration  Int?
+  effect    Effect    @relation(fields: [effectId], references: [id])
+  Feature   Feature   @relation(fields: [featureId], references: [id], onDelete: Cascade)
+}
+
 model Effect {
   id               Int                @id @default(autoincrement())
   name             String
@@ -307,6 +317,8 @@ model Effect {
   ItemEffects      ItemEffects[]
   RitualEffects    RitualEffects[]
   AbilityEffects   AbilityEffects[]
+
+  FeatureEffects FeatureEffects[]
 }
 
 model ClanInFaction {
@@ -445,6 +457,8 @@ model Feature {
   visibleToPlayer   Boolean             @default(false)
   CharacterFeatures CharacterFeatures[]
   FeatureAvailable  FeatureAvailable[]
+
+  FeatureEffects FeatureEffects[]
 }
 
 model Rule {
