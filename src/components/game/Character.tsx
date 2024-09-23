@@ -24,7 +24,6 @@ export default function Character({ characterId }: { characterId: number }) {
 
   if (!char) return <LoadingPage />;
 
-  console.log(char.features.map((f) => f.feature.FeatureEffects).flat());
   return (
     <div className="flex flex-col gap-4 py-2">
       <BloodMeter amount={char.bloodAmount} pool={char.bloodPool} />
@@ -95,7 +94,9 @@ const Effect = ({ e }: { e: CharacterEffects }) => {
   const seconds = timeRemaining % 60;
 
   return (
-    <div className="flex flex-row items-center gap-1">
+    <div
+      className={`flex-row items-center gap-1 ${!!e.effect?.expiration && timeRemaining <= 0 ? "hidden" : "flex"}`}
+    >
       <CircularProgress
         size="md"
         strokeWidth={2}
