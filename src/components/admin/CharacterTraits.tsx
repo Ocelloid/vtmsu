@@ -212,6 +212,14 @@ const CharacterTraits = () => {
                       {cs.type === "Ritual" &&
                         `${(trait as Ritual).ritualKnowledges?.map((k) => k.knowledge?.name).join(", ")}`}
                     </p>
+                    <p className="text-tiny">
+                      {cs.type === "Ability" &&
+                        `${(trait as Ability).AbilityEffects?.map((a) => a.effect?.name).join(", ")}`}
+                      {cs.type === "Feature" &&
+                        `${(trait as Feature).FeatureEffects?.map((a) => a.effect?.name).join(", ")}`}
+                      {cs.type === "Ritual" &&
+                        `${(trait as Ritual).RitualEffects?.map((a) => a.effect?.name).join(", ")}`}
+                    </p>
                   </div>
                   {trait.visibleToPlayer ? (
                     <FaEye size={24} className="mr-2" />

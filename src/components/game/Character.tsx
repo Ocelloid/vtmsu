@@ -28,6 +28,7 @@ export default function Character({ characterId }: { characterId: number }) {
   return (
     <div className="flex flex-col gap-4 py-2">
       <BloodMeter amount={char.bloodAmount} pool={char.bloodPool} />
+      <p className="text-lg font-semibold">{char.name}</p>
       <div className="flex flex-row gap-2">
         <div className="flex min-w-32 max-w-32 flex-col">
           <Image
@@ -38,9 +39,17 @@ export default function Character({ characterId }: { characterId: number }) {
             width="128"
           />
         </div>
-        <div className="flex flex-col">
-          <p className="text-sm">{char.name}</p>
-          <div className="flex max-h-32 flex-col overflow-y-auto">
+        <div className="flex w-full flex-col">
+          <div className="flex max-h-32 w-full flex-col gap-1 overflow-y-auto">
+            {char.effects
+              .filter(
+                (e) =>
+                  e.effect?.visibleToPlayer &&
+                  (e.expires ? e.expires > new Date() : true),
+              )
+              .map((e) => (
+                <Effect key={e.id + "_ability_effect"} e={e} />
+              ))}
             {char.features
               .map((f) => f.feature.FeatureEffects)
               .flat()
@@ -53,15 +62,6 @@ export default function Character({ characterId }: { characterId: number }) {
                     effect: e.effect,
                   }}
                 />
-              ))}
-            {char.effects
-              .filter(
-                (e) =>
-                  e.effect?.visibleToPlayer &&
-                  (e.expires ? e.expires > new Date() : true),
-              )
-              .map((e) => (
-                <Effect key={e.id + "_ability_effect"} e={e} />
               ))}
           </div>
         </div>
@@ -121,7 +121,7 @@ const Effect = ({ e }: { e: CharacterEffects }) => {
         }
       />
       <div className="flex flex-col">
-        <p className="text-xs">{e.effect?.name}</p>
+        <p className="text-xs font-semibold">{e.effect?.name}</p>
         <p className="text-xs">{e.effect?.content}</p>
       </div>
     </div>
@@ -140,12 +140,12 @@ const Disciplines = ({
     return { value: disc, key: discKeys[i] };
   });
   return (
-    <div className="flex flex-row flex-wrap gap-2">
+    <div className="flex flex-row flex-wrap gap-0">
       {abilities.map((a) => (
         <Button
           key={a.id + "_ability"}
           onClick={() => handleUseAbility(a.id)}
-          className="flex h-16 w-full min-w-80 flex-col items-start text-start sm:w-auto"
+          className="flex h-14 w-full min-w-80 flex-col items-start text-start sm:w-auto"
           variant="light"
           color="warning"
         >
