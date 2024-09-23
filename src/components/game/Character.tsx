@@ -118,6 +118,11 @@ const Effect = ({ e }: { e: CharacterEffects }) => {
             | "primary"
             | "secondary"
             | "danger"
+          // - Канализация и Превращение: белый
+          // - Могущество: оранжевый
+          // - Затемнение: синий
+          // - Очарование: зелёный
+          // - Тауматургия: красный
         }
       />
       <div className="flex flex-col">

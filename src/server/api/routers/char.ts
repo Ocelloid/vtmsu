@@ -260,8 +260,6 @@ export const charRouter = createTRPCRouter({
           expires: new Date(
             new Date().getTime() + e.effect.expiration * 60 * 1000,
           ),
-          effect: e.effect,
-          Char: { connect: { id: input.charId } },
         })),
       });
     }),
