@@ -172,7 +172,7 @@ export type RitualEffects = {
   id?: number;
   ritualId: number;
   effectId: number;
-  expires?: Date;
+  expires?: Date | null;
   effect?: Effect;
   Ritual?: Ritual;
 };
