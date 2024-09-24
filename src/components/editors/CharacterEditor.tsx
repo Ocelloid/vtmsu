@@ -87,6 +87,13 @@ export default function CharacterEditor() {
   const { theme } = useTheme();
   const router = useRouter();
 
+  const { data: appData } = api.util.getAppData.useQuery();
+  useEffect(() => {
+    if (appData) {
+      if (!appData.createAllowed) void router.push("/characters");
+    }
+  }, [appData, router]);
+
   const discKeys = Object.keys(disciplines);
   const discIcons = Object.values(disciplines).map((disc, i) => {
     return { value: disc, key: discKeys[i] };

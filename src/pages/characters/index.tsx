@@ -29,12 +29,15 @@ export default function Characters() {
   const [clans, setClans] = useState<Clan[]>([]);
   const [name, setName] = useState("");
 
+  const { data: isAdmin } = api.user.userIsAdmin.useQuery();
   const { data: characterData, isLoading: isCharactersLoading } =
     api.char.getAll.useQuery(undefined, { enabled: !!sessionData });
   const { data: myCharacterData, isLoading: isMyCharactersLoading } =
     api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
   const { data: traitsData, isLoading: isTraitsLoading } =
     api.char.getCharTraits.useQuery();
+
+  const { data: appData } = api.util.getAppData.useQuery();
 
   useEffect(() => {
     if (!!traitsData) {
@@ -230,22 +233,24 @@ export default function Characters() {
               }
             >
               <div className="flex flex-col gap-2">
-                <Button
-                  variant="ghost"
-                  className="mx-auto h-8 w-full rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white sm:w-64"
-                  onClick={() => {
-                    void router.push(
-                      {
-                        pathname: `/characters/new`,
-                      },
-                      undefined,
-                      { shallow: false },
-                    );
-                  }}
-                >
-                  <FaPlus />
-                  Добавить персонажа
-                </Button>
+                {!!(isAdmin ?? appData?.createAllowed) && (
+                  <Button
+                    variant="ghost"
+                    className="mx-auto h-8 w-full rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white sm:w-64"
+                    onClick={() => {
+                      void router.push(
+                        {
+                          pathname: `/characters/new`,
+                        },
+                        undefined,
+                        { shallow: false },
+                      );
+                    }}
+                  >
+                    <FaPlus />
+                    Добавить персонажа
+                  </Button>
+                )}
 
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                   {myCharacters.map((character) => (

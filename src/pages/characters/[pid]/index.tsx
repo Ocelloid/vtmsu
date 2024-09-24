@@ -72,6 +72,8 @@ const CharacterSheet = ({
 
   const { data: isAdmin } = api.user.userIsAdmin.useQuery();
 
+  const { data: appData } = api.util.getAppData.useQuery();
+
   const { data: playersData, isLoading: isPlayersLoading } =
     api.user.getUserList.useQuery(undefined, { enabled: isAdmin });
 
@@ -350,22 +352,24 @@ const CharacterSheet = ({
                         : "Отказан"}
                   </span>
                 </div>
-                <Button
-                  variant="light"
-                  color="warning"
-                  className="text-md text-black dark:text-warning"
-                  onClick={() => {
-                    void router.push(
-                      {
-                        pathname: `/characters/${characterId?.toString()}/edit`,
-                      },
-                      undefined,
-                      { shallow: false },
-                    );
-                  }}
-                >
-                  <FaPencilAlt size={24} /> Редактировать
-                </Button>
+                {!!(isAdmin ?? appData?.editAllowed) && (
+                  <Button
+                    variant="light"
+                    color="warning"
+                    className="text-md text-black dark:text-warning"
+                    onClick={() => {
+                      void router.push(
+                        {
+                          pathname: `/characters/${characterId?.toString()}/edit`,
+                        },
+                        undefined,
+                        { shallow: false },
+                      );
+                    }}
+                  >
+                    <FaPencilAlt size={24} /> Редактировать
+                  </Button>
+                )}
               </div>
             </div>
           )}

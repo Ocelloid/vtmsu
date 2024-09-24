@@ -12,6 +12,8 @@ import Users from "~/components/admin/Users";
 import Items from "~/components/admin/Items";
 import ItemTypes from "~/components/admin/ItemTypes";
 import Economy from "~/components/admin/Economy";
+import Controls from "~/components/admin/Controls";
+import Tickets from "~/components/admin/Tickets";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -184,11 +186,44 @@ export default function Admin() {
               key={"tasks"}
               title={
                 <div className="flex items-center space-x-2">
-                  <span>Заявки</span>
+                  <span>Управление</span>
                 </div>
               }
             >
-              Заявки
+              <Tabs
+                aria-label="tickets-tabs"
+                variant="underlined"
+                disabledKeys={isAdmin ? [] : ["users", "chars", "char_traits"]}
+                classNames={{
+                  tabList:
+                    "gap-0 grid grid-cols-4 md:grid-cols-8 w-full relative rounded-none p-0 border-b border-divider",
+                  cursor: "w-full bg-[#dc2626]",
+                  tab: "max-w-full px-0 h-8",
+                  base: "bg-danger/5 w-full",
+                  panel: "px-0 py-0",
+                }}
+              >
+                <Tab
+                  key={"tickets"}
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Заявки</span>
+                    </div>
+                  }
+                >
+                  <Tickets />
+                </Tab>
+                <Tab
+                  key={"controls"}
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Контроль</span>
+                    </div>
+                  }
+                >
+                  <Controls />
+                </Tab>
+              </Tabs>
             </Tab>
           </Tabs>
         </div>

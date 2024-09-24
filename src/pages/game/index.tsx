@@ -12,13 +12,15 @@ import Money from "~/components/game/Money";
 import AbilityPage from "~/components/game/AbilityPage";
 import EffectsPage from "~/components/game/EffectsPage";
 import Inventory from "~/components/game/Inventory";
-import Inquiries from "~/components/game/Inquiries";
+import Tickets from "~/components/game/Tickets";
 import CharQRCode from "~/components/game/CharQRCode";
 import CharacterCard from "~/components/CharacterCard";
 import BloodMeter from "~/components/game/BloodMeter";
 import HealthMeter from "~/components/game/HealthMeter";
+import { useRouter } from "next/router";
 
 export default function Game() {
+  const router = useRouter();
   const { data: sessionData } = useSession();
   const { data: myCharacterData, isLoading: isMyCharactersLoading } =
     api.char.getMine.useQuery(undefined, {
@@ -37,6 +39,13 @@ export default function Game() {
       refetchOnMount: false,
     },
   );
+
+  const { data: appData } = api.util.getAppData.useQuery();
+  useEffect(() => {
+    if (appData) {
+      if (!appData.gameAllowed) void router.push("/characters");
+    }
+  }, [appData, router]);
 
   useEffect(() => {
     if (!!myCharacterData) setSelectedCharacter(myCharacterData[0]?.id);
@@ -207,7 +216,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <Inquiries />
+                  <Tickets />
                 </Tab>
                 <Tab
                   key="qrcode"

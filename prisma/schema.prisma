@@ -10,6 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AppData {
+  id            Int      @id @default(autoincrement())
+  createAllowed Boolean  @default(true)
+  editAllowed   Boolean  @default(true)
+  gameAllowed   Boolean  @default(false)
+  timestamp     DateTime @default(now())
+  ticketsLimit  Int      @default(3)
+  changedById   String
+  user          User     @relation(fields: [changedById], references: [id])
+}
+
 model Post {
   id          Int      @id @default(autoincrement())
   name        String
@@ -211,6 +222,27 @@ model Hunt {
   instance    HuntingInstance? @relation(fields: [instanceId], references: [id], onDelete: SetNull)
 }
 
+model Ticket {
+  id          Int       @id @default(autoincrement())
+  name        String
+  isResolved  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  characterId Int
+  character   Char      @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  Message     Message[]
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  name      String
+  content   String?  @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
 model Char {
   id                  Int                   @id @default(autoincrement())
   name                String
@@ -238,6 +270,12 @@ model Char {
   ambition            String?               @db.LongText
   publicInfo          String?               @db.LongText
   content             String?               @db.LongText
+  timeout             Boolean               @default(false)
+  timeoutReason       String?
+  timeoutAt           DateTime?
+  timeoutDuration     Int?
+  banned              Boolean               @default(false)
+  bannedReason        String?
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
   createdBy           User                  @relation(fields: [playerId], references: [id])
@@ -254,6 +292,7 @@ model Char {
   bankAccount         BankAccount[]
   Company             Company[]
   Item                Item[]
+  Ticket              Ticket[]
 }
 
 model CharacterEffects {
@@ -544,6 +583,7 @@ model User {
   characters    Char[]
   hunts         Hunt[]
   Item          Item[]
+  AppData       AppData[]
 }
 
 model VerificationToken {

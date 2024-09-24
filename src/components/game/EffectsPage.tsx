@@ -8,31 +8,27 @@ export default function EffectsPage({ char }: { char: Character }) {
   if (!char) return <LoadingPage />;
 
   return (
-    <div className="flex flex-col gap-4 py-2">
-      <div className="flex flex-row gap-2">
-        <div className="flex w-full flex-col gap-2">
-          {char.effects
-            ?.filter(
-              (e) =>
-                e.effect?.visibleToPlayer &&
-                (e.expires ? e.expires > new Date() : true),
-            )
-            .map((e) => <Effect key={e.id + "_ability_effect"} e={e} />)}
-          {char.features
-            ?.map((f) => f.feature?.FeatureEffects)
-            .flat()
-            .map((e) => (
-              <Effect
-                key={e?.id + "_feature_effect"}
-                e={{
-                  characterId: char.id,
-                  effectId: e?.effectId ?? 0,
-                  effect: e?.effect,
-                }}
-              />
-            ))}
-        </div>
-      </div>
+    <div className="flex w-full flex-col gap-2">
+      {char.effects
+        ?.filter(
+          (e) =>
+            e.effect?.visibleToPlayer &&
+            (e.expires ? e.expires > new Date() : true),
+        )
+        .map((e) => <Effect key={e.id + "_ability_effect"} e={e} />)}
+      {char.features
+        ?.map((f) => f.feature?.FeatureEffects)
+        .flat()
+        .map((e) => (
+          <Effect
+            key={e?.id + "_feature_effect"}
+            e={{
+              characterId: char.id,
+              effectId: e?.effectId ?? 0,
+              effect: e?.effect,
+            }}
+          />
+        ))}
     </div>
   );
 }

@@ -18,6 +18,7 @@ const Navigation = () => {
   const router = useRouter();
   const { data: sessionData } = useSession();
   const { data: isPersonnel } = api.user.userIsPersonnel.useQuery();
+  const { data: appData } = api.util.getAppData.useQuery();
   const pathOpen = (pathname: string) => {
     void router.push(`/${pathname}`, `/${pathname}`, { shallow: false });
   };
@@ -64,7 +65,7 @@ const Navigation = () => {
         </Button>
         {!!sessionData && (
           <>
-            {isPersonnel && (
+            {!!(isPersonnel ?? appData?.gameAllowed) && (
               <Button
                 onClick={() => {
                   setIsOpen(false);
@@ -175,9 +176,6 @@ const Navigation = () => {
                   ],
                 }}
               >
-                {/* <DropdownItem key="admin" onClick={() => pathOpen("admin")}>
-                  Управление
-                </DropdownItem> */}
                 <DropdownItem
                   key="settings"
                   onClick={() => pathOpen("settings")}
