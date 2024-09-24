@@ -4,19 +4,18 @@ import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
 import { Select, SelectItem, Tabs, Tab, Link } from "@nextui-org/react";
 import { useState, useEffect } from "react";
-import {
-  GiRestingVampire,
-  GiLightBackpack,
-  GiMoneyStack,
-} from "react-icons/gi";
+import { GiLightBackpack, GiMoneyStack } from "react-icons/gi";
+import { CgShapeRhombus, CgInfinity } from "react-icons/cg";
 import { FaQrcode, FaMap } from "react-icons/fa";
 import { IoMdChatboxes } from "react-icons/io";
 import Money from "~/components/game/Money";
-import Character from "~/components/game/Character";
+import AbilityPage from "~/components/game/AbilityPage";
+import EffectsPage from "~/components/game/EffectsPage";
 import Inventory from "~/components/game/Inventory";
 import Inquiries from "~/components/game/Inquiries";
 import CharQRCode from "~/components/game/CharQRCode";
 import CharacterCard from "~/components/CharacterCard";
+import BloodMeter from "~/components/game/BloodMeter";
 
 export default function Game() {
   const { data: sessionData } = useSession();
@@ -81,27 +80,48 @@ export default function Game() {
               ))}
           </Select>
           {!!selectedCharacter && (
+            <BloodMeter characterId={selectedCharacter} />
+          )}
+          {!!selectedCharacter && (
             <Tabs
               aria-label="Игровое меню"
               placement="bottom"
               classNames={{
-                panel: "py-0 mb-auto",
+                panel: "py-0 mb-auto overflow-y-auto max-h-[calc(100vh-128px)]",
                 tab: "p-1 w-min",
                 tabList: "w-full",
                 wrapper: "flex-grow",
               }}
             >
               <Tab
-                key="main"
+                key="disc"
                 title={
-                  <GiRestingVampire
-                    size={28}
-                    className="text-red-900 dark:text-red-700"
-                  />
+                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                    <CgShapeRhombus size={28} />
+                    <span className="hidden text-lg font-bold md:flex">
+                      Дисциплины
+                    </span>
+                  </div>
                 }
                 className="flex flex-col gap-2"
               >
-                <Character characterId={selectedCharacter} />
+                <AbilityPage characterId={selectedCharacter} />
+              </Tab>
+              <Tab
+                key="effects"
+                title={
+                  <div className="flex min-w-7 flex-row items-center justify-center gap-1 text-red-900 dark:text-red-700">
+                    <div className="rounded-full border-2 border-red-900 p-0.5 dark:border-red-700">
+                      <CgInfinity size={16} />
+                    </div>
+                    <span className="hidden text-lg font-bold md:flex">
+                      Эффекты
+                    </span>
+                  </div>
+                }
+                className="flex flex-col gap-2"
+              >
+                <EffectsPage characterId={selectedCharacter} />
               </Tab>
               <Tab
                 key="hunt"
