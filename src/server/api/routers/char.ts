@@ -45,6 +45,7 @@ export type Character = {
   faction?: Faction;
   createdBy?: User;
   active?: boolean | null;
+  effects?: CharacterEffects[];
 };
 
 export type CharacterKnowledges = {

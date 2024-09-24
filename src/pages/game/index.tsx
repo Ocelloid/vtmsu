@@ -86,16 +86,16 @@ export default function Game() {
                 </SelectItem>
               ))}
           </Select>
-          {!!selectedCharacter && !!char && (
+          {!!char && (
             <>
-              <BloodMeter characterId={selectedCharacter} />
+              <BloodMeter char={char} />
               <HealthMeter char={char} refetch={refetch} />
               <Tabs
                 aria-label="Игровое меню"
                 placement="bottom"
                 classNames={{
                   panel:
-                    "py-0 mb-auto overflow-y-auto max-h-[calc(100vh-128px)]",
+                    "py-0 mb-auto overflow-y-auto max-h-[calc(100vh-172px)]",
                   tab: "p-1 w-min",
                   tabList: "w-full",
                   wrapper: "flex-grow",
@@ -113,7 +113,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <AbilityPage characterId={selectedCharacter} />
+                  <AbilityPage char={char} refetch={refetch} />
                 </Tab>
                 <Tab
                   key="effects"
@@ -129,7 +129,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <EffectsPage characterId={selectedCharacter} />
+                  <EffectsPage char={char} />
                 </Tab>
                 <Tab
                   key="hunt"
@@ -157,7 +157,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2 overflow-y-auto "
                 >
-                  <Inventory currentChar={selectedCharacter} />
+                  <Inventory char={char} />
                 </Tab>
                 <Tab
                   key="money"
@@ -171,7 +171,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <Money characterId={selectedCharacter} />
+                  <Money characterId={char.id} />
                 </Tab>
                 <Tab
                   key="chat"
@@ -199,7 +199,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <CharQRCode characterId={selectedCharacter} />
+                  <CharQRCode characterId={char.id} />
                 </Tab>
               </Tabs>
             </>

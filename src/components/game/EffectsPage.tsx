@@ -1,12 +1,10 @@
-import { api } from "~/utils/api";
 import { LoadingPage } from "~/components/Loading";
 import type { CharacterEffects } from "~/server/api/routers/char";
 import { CircularProgress } from "@nextui-org/react";
 import { useEffect, useState } from "react";
+import type { Character } from "~/server/api/routers/char";
 
-export default function EffectsPage({ characterId }: { characterId: number }) {
-  const { data: char } = api.char.getById.useQuery({ id: characterId });
-
+export default function EffectsPage({ char }: { char: Character }) {
   if (!char) return <LoadingPage />;
 
   return (
@@ -14,24 +12,22 @@ export default function EffectsPage({ characterId }: { characterId: number }) {
       <div className="flex flex-row gap-2">
         <div className="flex w-full flex-col gap-2">
           {char.effects
-            .filter(
+            ?.filter(
               (e) =>
                 e.effect?.visibleToPlayer &&
                 (e.expires ? e.expires > new Date() : true),
             )
-            .map((e) => (
-              <Effect key={e.id + "_ability_effect"} e={e} />
-            ))}
+            .map((e) => <Effect key={e.id + "_ability_effect"} e={e} />)}
           {char.features
-            .map((f) => f.feature.FeatureEffects)
+            ?.map((f) => f.feature?.FeatureEffects)
             .flat()
             .map((e) => (
               <Effect
-                key={e.id + "_feature_effect"}
+                key={e?.id + "_feature_effect"}
                 e={{
                   characterId: char.id,
-                  effectId: e.effectId,
-                  effect: e.effect,
+                  effectId: e?.effectId ?? 0,
+                  effect: e?.effect,
                 }}
               />
             ))}

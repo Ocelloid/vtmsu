@@ -39,7 +39,7 @@ import { type Item } from "~/server/api/routers/item";
 import QRScanner from "~/components/QRScanner";
 import { degreesToCoordinate } from "~/utils/text";
 
-export default function Inventory({ currentChar }: { currentChar: number }) {
+export default function Inventory({ char }: { char: Character }) {
   const { location, error, isLoading } = useGeolocation();
   const {
     isOpen: isDropOpen,
@@ -56,14 +56,14 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
     data: itemsData,
     isLoading: itemsLoading,
     refetch: refetchItems,
-  } = api.item.getByOwnerId.useQuery({ ownerId: currentChar });
+  } = api.item.getByOwnerId.useQuery({ ownerId: char.id });
 
   const { mutate: giveItems, isPending: isGiveItemPending } =
     api.item.giveItems.useMutation();
   const { mutate: dropItems, isPending: isDropItemPending } =
     api.item.dropItems.useMutation();
 
-  const [char, setChar] = useState<Character>();
+  const [scannedChar, setScannedChar] = useState<Character>();
   const [items, setItems] = useState<
     Array<{
       id: number;
@@ -163,14 +163,14 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
   };
 
   const handleTrade = () => {
-    if (!char) return;
+    if (!scannedChar) return;
     const itemsToGive = items.filter((item) => item.box === -1);
     if (!itemsToGive.length) return;
     giveItems(
       {
         ids: itemsToGive.map((item) => item.id),
-        ownerId: char.id,
-        previousOwnerId: currentChar,
+        ownerId: scannedChar.id,
+        previousOwnerId: char.id,
       },
       {
         onSuccess() {
@@ -224,12 +224,12 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
       alert("QR-код устарел");
       return;
     }
-    const char = chars.find((c) => c.id === Number(charId));
-    if (!char) {
+    const scanned = chars.find((c) => c.id === Number(charId));
+    if (!scanned) {
       alert("Персонаж не найден");
       return;
     }
-    setChar(char);
+    setScannedChar(scanned);
   };
 
   if (
@@ -251,7 +251,9 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
               onScanSuccess={handleScanSuccess}
               onScanError={(e) => console.error(e)}
             />
-            <p>Вы отправите персонажу {char?.name} следующие предметы:</p>
+            <p>
+              Вы отправите персонажу {scannedChar?.name} следующие предметы:
+            </p>
             <ul className="list-inside list-disc">
               {items
                 .filter((item) => item.box === -1)
@@ -264,7 +266,11 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
             <Button color="danger" onClick={onTradeClose}>
               Отменить
             </Button>
-            <Button color="success" onClick={handleTrade} isDisabled={!char}>
+            <Button
+              color="success"
+              onClick={handleTrade}
+              isDisabled={!scannedChar}
+            >
               Отправить
             </Button>
           </ModalFooter>
@@ -314,7 +320,7 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
                   key={item.id}
                   item={item}
                   refetchItems={refetchItems}
-                  currentChar={currentChar}
+                  currentChar={char.id}
                   location={location}
                 />
               ))}
@@ -327,7 +333,7 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
                   key={item.id}
                   item={item}
                   refetchItems={refetchItems}
-                  currentChar={currentChar}
+                  currentChar={char.id}
                   location={location}
                 />
               ))}
@@ -339,7 +345,7 @@ export default function Inventory({ currentChar }: { currentChar: number }) {
               <Item
                 item={activeItem}
                 refetchItems={refetchItems}
-                currentChar={currentChar}
+                currentChar={char.id}
                 location={location}
               />
             )}

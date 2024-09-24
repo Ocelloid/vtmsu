@@ -4,13 +4,10 @@ import {
   GiFangsCircle,
   GiRestingVampire,
 } from "react-icons/gi";
-import { api } from "~/utils/api";
 import { BsDroplet, BsDropletFill } from "react-icons/bs";
+import type { Character } from "~/server/api/routers/char";
 
-export default function BloodMeter({ characterId }: { characterId: number }) {
-  const { data: char } = api.char.getById.useQuery({
-    id: characterId,
-  });
+export default function BloodMeter({ char }: { char: Character }) {
   const pool = char?.bloodPool ?? 0;
   const amount = char?.bloodAmount ?? 0;
 
