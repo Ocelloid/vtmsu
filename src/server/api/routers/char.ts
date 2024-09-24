@@ -20,6 +20,7 @@ export type Character = {
   createdById: string;
   bloodAmount?: number;
   bloodPool?: number;
+  health?: number;
   additionalAbilities?: number | null;
   playerId?: string | null;
   comment?: string | null;
@@ -225,6 +226,40 @@ export type FeatureAvailable = {
 };
 
 export const charRouter = createTRPCRouter({
+  heal: protectedProcedure
+    .input(z.object({ id: z.number(), amount: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+      if (!char) return;
+      if (char.health + input.amount > 10) return;
+      if (char.bloodAmount <= input.amount) return;
+      await ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          health: char.health + input.amount,
+          bloodAmount: char.bloodAmount - input.amount,
+        },
+      });
+    }),
+
+  damage: protectedProcedure
+    .input(z.object({ id: z.number(), amount: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+      if (!char) return;
+      if (char.health - input.amount < 0) return;
+      await ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          health: char.health - input.amount,
+        },
+      });
+    }),
+
   applyAbility: protectedProcedure
     .input(z.object({ id: z.number(), charId: z.number() }))
     .mutation(async ({ ctx, input }) => {

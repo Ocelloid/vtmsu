@@ -16,12 +16,19 @@ import Inquiries from "~/components/game/Inquiries";
 import CharQRCode from "~/components/game/CharQRCode";
 import CharacterCard from "~/components/CharacterCard";
 import BloodMeter from "~/components/game/BloodMeter";
+import HealthMeter from "~/components/game/HealthMeter";
 
 export default function Game() {
   const { data: sessionData } = useSession();
   const { data: myCharacterData, isLoading: isMyCharactersLoading } =
     api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
   const [selectedCharacter, setSelectedCharacter] = useState<number>();
+  const { data: char, refetch } = api.char.getById.useQuery(
+    {
+      id: selectedCharacter!,
+    },
+    { enabled: !!selectedCharacter },
+  );
 
   useEffect(() => {
     if (!!myCharacterData) setSelectedCharacter(myCharacterData[0]?.id);
@@ -51,7 +58,7 @@ export default function Game() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="fixed flex h-full w-full flex-grow basis-full flex-col sm:static sm:mt-24 sm:pb-2">
-        <div className="container flex h-screen flex-col gap-2 overflow-auto rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:h-full sm:rounded-b-lg">
+        <div className="container flex h-screen flex-col gap-1 overflow-auto rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:h-full sm:rounded-b-lg">
           <Select
             size="sm"
             variant="bordered"
@@ -79,121 +86,123 @@ export default function Game() {
                 </SelectItem>
               ))}
           </Select>
-          {!!selectedCharacter && (
-            <BloodMeter characterId={selectedCharacter} />
-          )}
-          {!!selectedCharacter && (
-            <Tabs
-              aria-label="Игровое меню"
-              placement="bottom"
-              classNames={{
-                panel: "py-0 mb-auto overflow-y-auto max-h-[calc(100vh-128px)]",
-                tab: "p-1 w-min",
-                tabList: "w-full",
-                wrapper: "flex-grow",
-              }}
-            >
-              <Tab
-                key="disc"
-                title={
-                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                    <CgShapeRhombus size={28} />
-                    <span className="hidden text-lg font-bold md:flex">
-                      Дисциплины
-                    </span>
-                  </div>
-                }
-                className="flex flex-col gap-2"
+          {!!selectedCharacter && !!char && (
+            <>
+              <BloodMeter characterId={selectedCharacter} />
+              <HealthMeter char={char} refetch={refetch} />
+              <Tabs
+                aria-label="Игровое меню"
+                placement="bottom"
+                classNames={{
+                  panel:
+                    "py-0 mb-auto overflow-y-auto max-h-[calc(100vh-128px)]",
+                  tab: "p-1 w-min",
+                  tabList: "w-full",
+                  wrapper: "flex-grow",
+                }}
               >
-                <AbilityPage characterId={selectedCharacter} />
-              </Tab>
-              <Tab
-                key="effects"
-                title={
-                  <div className="flex min-w-7 flex-row items-center justify-center gap-1 text-red-900 dark:text-red-700">
-                    <div className="rounded-full border-2 border-red-900 p-0.5 dark:border-red-700">
-                      <CgInfinity size={16} />
+                <Tab
+                  key="disc"
+                  title={
+                    <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                      <CgShapeRhombus size={28} />
+                      <span className="hidden text-lg font-bold md:flex">
+                        Дисциплины
+                      </span>
                     </div>
-                    <span className="hidden text-lg font-bold md:flex">
-                      Эффекты
-                    </span>
-                  </div>
-                }
-                className="flex flex-col gap-2"
-              >
-                <EffectsPage characterId={selectedCharacter} />
-              </Tab>
-              <Tab
-                key="hunt"
-                title={
-                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                    <FaMap size={28} />
-                    <span className="hidden text-lg font-bold md:flex">
-                      Карта
-                    </span>
-                  </div>
-                }
-                className="flex flex-col gap-2"
-              >
-                Карта
-              </Tab>
-              <Tab
-                key="items"
-                title={
-                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                    <GiLightBackpack size={28} />
-                    <span className="hidden text-lg font-bold md:flex">
-                      Инвентарь
-                    </span>
-                  </div>
-                }
-                className="flex flex-col gap-2 overflow-y-auto "
-              >
-                <Inventory currentChar={selectedCharacter} />
-              </Tab>
-              <Tab
-                key="money"
-                title={
-                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                    <GiMoneyStack size={28} />
-                    <span className="hidden text-lg font-bold md:flex">
-                      Экономика
-                    </span>
-                  </div>
-                }
-                className="flex flex-col gap-2"
-              >
-                <Money characterId={selectedCharacter} />
-              </Tab>
-              <Tab
-                key="chat"
-                title={
-                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                    <IoMdChatboxes size={28} />
-                    <span className="hidden text-lg font-bold md:flex">
-                      Заявки
-                    </span>
-                  </div>
-                }
-                className="flex flex-col gap-2"
-              >
-                <Inquiries />
-              </Tab>
-              <Tab
-                key="qrcode"
-                title={
-                  <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                    <FaQrcode size={28} />
-                    <span className="hidden text-lg font-bold md:flex">
-                      QR-код
-                    </span>
-                  </div>
-                }
-                className="flex flex-col gap-2"
-              >
-                <CharQRCode characterId={selectedCharacter} />
-              </Tab>
-            </Tabs>
+                  }
+                  className="flex flex-col gap-2"
+                >
+                  <AbilityPage characterId={selectedCharacter} />
+                </Tab>
+                <Tab
+                  key="effects"
+                  title={
+                    <div className="flex min-w-7 flex-row items-center justify-center gap-1 text-red-900 dark:text-red-700">
+                      <div className="rounded-full border-2 border-red-900 p-0.5 dark:border-red-700">
+                        <CgInfinity size={16} />
+                      </div>
+                      <span className="hidden text-lg font-bold md:flex">
+                        Эффекты
+                      </span>
+                    </div>
+                  }
+                  className="flex flex-col gap-2"
+                >
+                  <EffectsPage characterId={selectedCharacter} />
+                </Tab>
+                <Tab
+                  key="hunt"
+                  title={
+                    <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                      <FaMap size={28} />
+                      <span className="hidden text-lg font-bold md:flex">
+                        Карта
+                      </span>
+                    </div>
+                  }
+                  className="flex flex-col gap-2"
+                >
+                  Карта
+                </Tab>
+                <Tab
+                  key="items"
+                  title={
+                    <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                      <GiLightBackpack size={28} />
+                      <span className="hidden text-lg font-bold md:flex">
+                        Инвентарь
+                      </span>
+                    </div>
+                  }
+                  className="flex flex-col gap-2 overflow-y-auto "
+                >
+                  <Inventory currentChar={selectedCharacter} />
+                </Tab>
+                <Tab
+                  key="money"
+                  title={
+                    <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                      <GiMoneyStack size={28} />
+                      <span className="hidden text-lg font-bold md:flex">
+                        Экономика
+                      </span>
+                    </div>
+                  }
+                  className="flex flex-col gap-2"
+                >
+                  <Money characterId={selectedCharacter} />
+                </Tab>
+                <Tab
+                  key="chat"
+                  title={
+                    <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                      <IoMdChatboxes size={28} />
+                      <span className="hidden text-lg font-bold md:flex">
+                        Заявки
+                      </span>
+                    </div>
+                  }
+                  className="flex flex-col gap-2"
+                >
+                  <Inquiries />
+                </Tab>
+                <Tab
+                  key="qrcode"
+                  title={
+                    <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                      <FaQrcode size={28} />
+                      <span className="hidden text-lg font-bold md:flex">
+                        QR-код
+                      </span>
+                    </div>
+                  }
+                  className="flex flex-col gap-2"
+                >
+                  <CharQRCode characterId={selectedCharacter} />
+                </Tab>
+              </Tabs>
+            </>
           )}
         </div>
       </main>

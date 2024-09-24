@@ -220,6 +220,7 @@ model Char {
   additionalAbilities Int                   @default(0)
   bloodAmount         Int                   @default(10)
   bloodPool           Int                   @default(10)
+  health              Int                   @default(10)
   playerId            String
   playerName          String?
   playerContact       String?

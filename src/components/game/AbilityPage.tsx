@@ -30,6 +30,7 @@ export default function AbilityPage({ characterId }: { characterId: number }) {
         {char.abilities.map((a) => (
           <Button
             key={a.id + "_ability"}
+            isDisabled={char.bloodAmount < a.abilitiy.cost + 1}
             onClick={() => handleUseAbility(a.abilitiy.id)}
             className="flex h-14 w-full min-w-80 flex-col items-start text-start sm:w-auto"
             variant="light"

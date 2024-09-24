@@ -64,45 +64,14 @@ const CharacterCard = ({
               <p className="mr-auto max-w-[90%] break-words text-xl text-default-300 dark:text-default-700">
                 {character.name}
               </p>
-              <div className="flex flex-row">
-                <Tooltip
-                  className="text-tiny text-black dark:text-white"
-                  content={character.faction?.name}
-                  placement="bottom"
-                >
-                  <Image
-                    alt="faction"
-                    className="max-h-8 min-h-8 min-w-8 object-contain"
-                    src={
-                      iconSelection.find(
-                        (is) => is!.value === character.faction?.icon,
-                      )?.image ?? ""
-                    }
-                    width={32}
-                    height={32}
-                  />
-                </Tooltip>
-                <Tooltip
-                  className="text-tiny text-black dark:text-white"
-                  content={character.clan?.name}
-                  placement="bottom"
-                >
-                  <Image
-                    alt="faction"
-                    className="max-h-8 min-h-8 min-w-8 object-contain"
-                    src={
-                      iconSelection.find(
-                        (is) => is!.value === character.clan?.icon,
-                      )?.image ?? ""
-                    }
-                    width={32}
-                    height={32}
-                  />
-                </Tooltip>
-              </div>
               <div>
                 <p className="trucate text-xs italic">{character.status}</p>
                 <p className="trucate text-xs italic">{character.title}</p>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: character.publicInfo ?? "",
+                  }}
+                />
               </div>
             </div>
           </div>
