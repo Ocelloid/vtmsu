@@ -1,10 +1,6 @@
 import { api } from "~/utils/api";
-import {
-  GiHeartPlus,
-  GiHeartMinus,
-  GiHeartOrgan,
-  GiRestingVampire,
-} from "react-icons/gi";
+import { FaMinus, FaPlus } from "react-icons/fa";
+import { GiHeartOrgan, GiRestingVampire } from "react-icons/gi";
 import type { Character } from "~/server/api/routers/char";
 
 export default function BloodMeter({
@@ -20,7 +16,7 @@ export default function BloodMeter({
   return (
     <div className="flex w-full flex-col gap-0 text-red-900 dark:text-red-700">
       <div className="flex w-full flex-row justify-between rounded-lg bg-red-200/50 p-2 transition-all dark:bg-red-950/50">
-        <GiHeartMinus
+        <FaMinus
           size={20}
           className={char.health === 0 ? "opacity-10" : "cursor-pointer"}
           onClick={() =>
@@ -34,7 +30,7 @@ export default function BloodMeter({
             <GiHeartOrgan size={20} key={i} className="opacity-10" />
           ),
         )}
-        <GiHeartPlus
+        <FaPlus
           size={20}
           className={
             char.health === 10 || (char.bloodAmount ?? 0) < 2
