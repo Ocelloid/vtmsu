@@ -21,13 +21,21 @@ import HealthMeter from "~/components/game/HealthMeter";
 export default function Game() {
   const { data: sessionData } = useSession();
   const { data: myCharacterData, isLoading: isMyCharactersLoading } =
-    api.char.getMine.useQuery(undefined, { enabled: !!sessionData });
+    api.char.getMine.useQuery(undefined, {
+      enabled: !!sessionData,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    });
   const [selectedCharacter, setSelectedCharacter] = useState<number>();
   const { data: char, refetch } = api.char.getById.useQuery(
     {
       id: selectedCharacter!,
     },
-    { enabled: !!selectedCharacter },
+    {
+      enabled: !!selectedCharacter,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
   );
 
   useEffect(() => {
