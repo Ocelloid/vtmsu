@@ -6,7 +6,7 @@ import { Select, SelectItem, Tabs, Tab, Link } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { GiLightBackpack, GiMoneyStack } from "react-icons/gi";
 import { CgShapeRhombus, CgInfinity } from "react-icons/cg";
-import { FaQrcode, FaMap } from "react-icons/fa";
+import { FaQrcode, FaMap, FaShoppingBasket } from "react-icons/fa";
 import { IoMdChatboxes } from "react-icons/io";
 import Money from "~/components/game/Money";
 import AbilityPage from "~/components/game/AbilityPage";
@@ -114,7 +114,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <CgShapeRhombus size={28} />
-                      <span className="hidden text-lg font-bold md:flex">
+                      <span className="hidden text-lg font-bold lg:flex">
                         Дисциплины
                       </span>
                     </div>
@@ -130,7 +130,7 @@ export default function Game() {
                       <div className="rounded-full border-2 border-red-900 p-0.5 dark:border-red-700">
                         <CgInfinity size={16} />
                       </div>
-                      <span className="hidden text-lg font-bold md:flex">
+                      <span className="hidden text-lg font-bold lg:flex">
                         Эффекты
                       </span>
                     </div>
@@ -144,7 +144,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <FaMap size={28} />
-                      <span className="hidden text-lg font-bold md:flex">
+                      <span className="hidden text-lg font-bold lg:flex">
                         Карта
                       </span>
                     </div>
@@ -158,8 +158,8 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <GiLightBackpack size={28} />
-                      <span className="hidden text-lg font-bold md:flex">
-                        Инвентарь
+                      <span className="hidden text-lg font-bold lg:flex">
+                        Вещи
                       </span>
                     </div>
                   }
@@ -168,11 +168,25 @@ export default function Game() {
                   <Inventory char={char} />
                 </Tab>
                 <Tab
+                  key="shop"
+                  title={
+                    <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                      <FaShoppingBasket size={28} />
+                      <span className="hidden text-lg font-bold lg:flex">
+                        Магазин
+                      </span>
+                    </div>
+                  }
+                  className="flex flex-col gap-2 overflow-y-auto "
+                >
+                  Магазин
+                </Tab>
+                <Tab
                   key="money"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <GiMoneyStack size={28} />
-                      <span className="hidden text-lg font-bold md:flex">
+                      <span className="hidden text-lg font-bold lg:flex">
                         Экономика
                       </span>
                     </div>
@@ -186,7 +200,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <IoMdChatboxes size={28} />
-                      <span className="hidden text-lg font-bold md:flex">
+                      <span className="hidden text-lg font-bold lg:flex">
                         Заявки
                       </span>
                     </div>
@@ -200,7 +214,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <FaQrcode size={28} />
-                      <span className="hidden text-lg font-bold md:flex">
+                      <span className="hidden text-lg font-bold lg:flex">
                         QR-код
                       </span>
                     </div>
