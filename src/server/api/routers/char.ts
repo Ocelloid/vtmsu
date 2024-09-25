@@ -1341,6 +1341,8 @@ export const charRouter = createTRPCRouter({
           content: true,
           comment: true,
           p_comment: true,
+          timeout: true,
+          banned: true,
           abilities: { include: { abilitiy: true } },
           features: { include: { feature: true } },
           knowledges: { include: { knowledge: true } },
@@ -1374,6 +1376,8 @@ export const charRouter = createTRPCRouter({
           verified: true,
           pending: true,
           clan: true,
+          timeout: true,
+          banned: true,
         },
       });
     }),
