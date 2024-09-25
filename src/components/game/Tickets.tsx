@@ -298,7 +298,7 @@ export default function Tickets({ char }: { char: Character }) {
         </div>
         <div className="hidden max-h-[calc(100vh-296px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
           <Button
-            variant="faded"
+            variant="bordered"
             color="warning"
             className={`flex h-10 min-h-10 cursor-pointer flex-row items-center gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
               !selectedTicket ? "bg-red-900/75" : ""
