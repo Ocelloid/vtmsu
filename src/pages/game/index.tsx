@@ -48,7 +48,7 @@ export default function Game() {
       if (!appData.gameAllowed && !isAdmin && !isUserAdminLoading)
         void router.push("/characters");
     }
-  }, [appData, isAdmin, router]);
+  }, [appData, isAdmin, isUserAdminLoading, router]);
 
   useEffect(() => {
     if (!!myCharacterData) setSelectedCharacter(myCharacterData[0]?.id);
@@ -233,15 +233,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <p className="text-justify text-sm">
-                    Это код вашего персонажа. Он может быть использован для
-                    передачи предметов, предприятий, очков влияния, скана ауры
-                    или применения эффектов. В случае гибели персонажа он
-                    используется для лута и диаблери. При каждом открытии этой
-                    страницы генерируется новый QR-код - сохранять старые не
-                    нужно, так как они вскоре потеряют действие.
-                  </p>
-                  <CharQRCode characterId={char.id} />
+                  <CharQRCode char={char} />
                 </Tab>
               </Tabs>
             </>

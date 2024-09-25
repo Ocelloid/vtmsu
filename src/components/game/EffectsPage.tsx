@@ -15,7 +15,25 @@ export default function EffectsPage({ char }: { char: Character }) {
             e.effect?.visibleToPlayer &&
             (e.expires ? e.expires > new Date() : true),
         )
-        .map((e) => <Effect key={e.id + "_ability_effect"} e={e} />)}
+        .map((e) => <Effect key={e.id + "_char_effect"} e={e} />)}
+      {char.abilities
+        ?.map((a) => a.abilitiy?.AbilityEffects)
+        .flat()
+        .filter(
+          (e) =>
+            e?.effect?.visibleToPlayer &&
+            (e.expires ? e.expires > new Date() : true),
+        )
+        .map((e) => (
+          <Effect
+            key={e?.effect?.id + "_ability_effect"}
+            e={{
+              characterId: char.id,
+              effectId: e?.effect?.id ?? 0,
+              effect: e?.effect,
+            }}
+          />
+        ))}
       {char.features
         ?.map((f) => f.feature?.FeatureEffects)
         .flat()
