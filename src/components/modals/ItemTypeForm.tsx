@@ -78,7 +78,7 @@ const ItemTypeForm = ({
   useEffect(() => {
     if (!!itemType) {
       setTitle(itemType?.name ?? "");
-      setAuspexData(itemData?.auspexData ?? "");
+      setAuspexData(itemType?.auspexData ?? "");
       setDescription(itemType?.content ?? "");
       setImage(itemType?.image ?? "");
       setCost(itemType?.cost ?? 0);
