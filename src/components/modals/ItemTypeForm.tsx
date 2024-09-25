@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   Input,
   Modal,
   ModalBody,
@@ -8,7 +9,6 @@ import {
   ModalHeader,
   Select,
   SelectItem,
-  Textarea,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FaBoxes } from "react-icons/fa";
@@ -37,7 +37,9 @@ const ItemTypeForm = ({
   const [usage, setUsage] = useState(-1);
   const [bloodAmount, setBloodAmount] = useState(0);
   const [bloodPool, setBloodPool] = useState(0);
-  // const [violation, setViolation] = useState("");
+  const [costIncrease, setCostIncrease] = useState(0);
+  const [isPurchasable, setIsPurchasable] = useState(false);
+  const [violation, setViolation] = useState("");
   // const [status, setStatus] = useState("");
   // const [boon, setBoon] = useState("");
   const [companyLevels, setCompanyLevels] = useState(0);
@@ -77,6 +79,8 @@ const ItemTypeForm = ({
 
   useEffect(() => {
     if (!!itemType) {
+      setCostIncrease(itemType?.costIncrease ?? 0);
+      setIsPurchasable(itemType?.isPurchasable ?? false);
       setTitle(itemType?.name ?? "");
       setAuspexData(itemType?.auspexData ?? "");
       setDescription(itemType?.content ?? "");
@@ -114,7 +118,9 @@ const ItemTypeForm = ({
           bloodAmount,
           bloodPool,
           auspexData,
-          // violation,
+          violation,
+          isPurchasable,
+          costIncrease,
           // status,
           // boon,
           companyLevels,
@@ -142,7 +148,9 @@ const ItemTypeForm = ({
           usage,
           bloodAmount,
           bloodPool,
-          // violation,
+          violation,
+          isPurchasable,
+          costIncrease,
           // status,
           // boon,
           companyLevels,
@@ -170,7 +178,7 @@ const ItemTypeForm = ({
         isDismissable={false}
         isKeyboardDismissDisabled={true}
         onOpenChange={() => setIsModalOpen(!isModalOpen)}
-        size="2xl"
+        size="full"
         placement="top-center"
         backdrop="blur"
         classNames={{
@@ -235,6 +243,14 @@ const ItemTypeForm = ({
                 size="sm"
                 type="number"
                 variant="underlined"
+                label="Увеличение стоимости в %"
+                value={costIncrease.toString()}
+                onValueChange={(v) => setCostIncrease(Number(v))}
+              />
+              <Input
+                size="sm"
+                type="number"
+                variant="underlined"
                 label="Количество использований"
                 value={usage.toString()}
                 onValueChange={(v) => setUsage(Number(v))}
@@ -257,15 +273,7 @@ const ItemTypeForm = ({
                 value={bloodPool.toString()}
                 onValueChange={(v) => setBloodPool(Number(v))}
               />
-              <Textarea
-                size="sm"
-                variant="underlined"
-                label="Информация для прорицания"
-                value={auspexData}
-                onValueChange={setAuspexData}
-              />
-              {/* <Input label="Нарущение маскарада" value={violation} />
-            <Input label="Статус" value={status} />
+              {/* <Input label="Статус" value={status} />
             <Input label="Услуга" value={boon} /> */}
               <Input
                 size="sm"
@@ -276,69 +284,96 @@ const ItemTypeForm = ({
                 onValueChange={(v) => setCompanyLevels(Number(v))}
               />
             </div>
-            <Select
+            <Checkbox
               size="sm"
-              label="Добавление способностей"
-              variant="underlined"
-              placeholder="Выберите способности"
-              selectionMode="multiple"
-              selectedKeys={addingAbilities.map((a) => a.toString())}
-              onChange={(e) => {
-                setAddingAbilities(
-                  !!e.target.value
-                    ? e.target.value.split(",").map((s) => Number(s))
-                    : [],
-                );
-              }}
+              isSelected={isPurchasable}
+              onValueChange={setIsPurchasable}
             >
-              {abilities.map((ability) => (
-                <SelectItem key={ability.id} value={ability.id}>
-                  {ability.name}
-                </SelectItem>
-              ))}
-            </Select>
-            <Select
-              size="sm"
-              label="Удаление способностей"
-              variant="underlined"
-              placeholder="Выберите способности"
-              selectionMode="multiple"
-              selectedKeys={removingAbilities.map((a) => a.toString())}
-              onChange={(e) => {
-                setRemovingAbilities(
-                  !!e.target.value
-                    ? e.target.value.split(",").map((s) => Number(s))
-                    : [],
-                );
-              }}
-            >
-              {abilities.map((ability) => (
-                <SelectItem key={ability.id} value={ability.id}>
-                  {ability.name}
-                </SelectItem>
-              ))}
-            </Select>
-            <Select
-              size="sm"
-              label="Использование способностей"
-              variant="underlined"
-              placeholder="Выберите способности"
-              selectionMode="multiple"
-              selectedKeys={usingAbilities.map((a) => a.toString())}
-              onChange={(e) => {
-                setUsingAbilities(
-                  !!e.target.value
-                    ? e.target.value.split(",").map((s) => Number(s))
-                    : [],
-                );
-              }}
-            >
-              {abilities.map((ability) => (
-                <SelectItem key={ability.id} value={ability.id}>
-                  {ability.name}
-                </SelectItem>
-              ))}
-            </Select>
+              Доступно для покупки
+            </Checkbox>
+            <div className="flex flex-row gap-2">
+              <Input
+                size="sm"
+                variant="underlined"
+                label="Нарушение маскарада"
+                placeholder="Заполните, если предмет нарушает маскарад"
+                value={violation}
+                onValueChange={setViolation}
+              />
+              <Input
+                size="sm"
+                variant="underlined"
+                label="Информация для прорицания"
+                placeholder="Заполните, если предмет можно прорицать"
+                value={auspexData}
+                onValueChange={setAuspexData}
+              />
+            </div>
+            <div className="flex flex-row gap-2">
+              <Select
+                size="sm"
+                label="Добавление способностей"
+                variant="underlined"
+                placeholder="Выберите способности"
+                selectionMode="multiple"
+                selectedKeys={addingAbilities.map((a) => a.toString())}
+                onChange={(e) => {
+                  setAddingAbilities(
+                    !!e.target.value
+                      ? e.target.value.split(",").map((s) => Number(s))
+                      : [],
+                  );
+                }}
+              >
+                {abilities.map((ability) => (
+                  <SelectItem key={ability.id} value={ability.id}>
+                    {ability.name}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Select
+                size="sm"
+                label="Удаление способностей"
+                variant="underlined"
+                placeholder="Выберите способности"
+                selectionMode="multiple"
+                selectedKeys={removingAbilities.map((a) => a.toString())}
+                onChange={(e) => {
+                  setRemovingAbilities(
+                    !!e.target.value
+                      ? e.target.value.split(",").map((s) => Number(s))
+                      : [],
+                  );
+                }}
+              >
+                {abilities.map((ability) => (
+                  <SelectItem key={ability.id} value={ability.id}>
+                    {ability.name}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Select
+                size="sm"
+                label="Использование способностей"
+                variant="underlined"
+                placeholder="Выберите способности"
+                selectionMode="multiple"
+                selectedKeys={usingAbilities.map((a) => a.toString())}
+                onChange={(e) => {
+                  setUsingAbilities(
+                    !!e.target.value
+                      ? e.target.value.split(",").map((s) => Number(s))
+                      : [],
+                  );
+                }}
+              >
+                {abilities.map((ability) => (
+                  <SelectItem key={ability.id} value={ability.id}>
+                    {ability.name}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
           </ModalBody>
           <ModalFooter>
             <Button

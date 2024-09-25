@@ -61,7 +61,9 @@ model ItemType {
   name            String
   image           String?
   cost            Int
+  costIncrease    Int               @default(0)
   usage           Int               @default(-1)
+  isPurchasable   Boolean           @default(false)
   isTrash         Boolean           @default(false)
   isTradable      Boolean           @default(true)
   content         String            @db.LongText

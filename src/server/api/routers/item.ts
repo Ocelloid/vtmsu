@@ -40,6 +40,8 @@ export type ItemType = {
   content: string;
   createdAt?: Date;
   updatedAt?: Date;
+  costIncrease?: number | null;
+  isPurchasable?: boolean | null;
   bloodAmount: number;
   bloodPool: number;
   violation?: string | null;
@@ -451,6 +453,8 @@ export const itemRouter = createTRPCRouter({
         cost: z.number(),
         usage: z.number().optional(),
         content: z.string(),
+        isPurchasable: z.boolean().optional(),
+        costIncrease: z.number().optional(),
         bloodAmount: z.number().optional(),
         bloodPool: z.number().optional(),
         violation: z.string().optional(),
@@ -471,6 +475,8 @@ export const itemRouter = createTRPCRouter({
           cost: input.cost,
           usage: input.usage,
           content: input.content,
+          isPurchasable: input.isPurchasable,
+          costIncrease: input.costIncrease,
           bloodAmount: input.bloodAmount,
           auspexData: input.auspexData,
           bloodPool: input.bloodPool,
@@ -544,7 +550,9 @@ export const itemRouter = createTRPCRouter({
         cost: z.number(),
         usage: z.number().optional(),
         content: z.string(),
+        isPurchasable: z.boolean().optional(),
         auspexData: z.string().optional(),
+        costIncrease: z.number().optional(),
         bloodAmount: z.number().optional(),
         bloodPool: z.number().optional(),
         violation: z.string().optional(),
@@ -565,6 +573,8 @@ export const itemRouter = createTRPCRouter({
           cost: input.cost,
           usage: input.usage,
           content: input.content,
+          isPurchasable: input.isPurchasable,
+          costIncrease: input.costIncrease,
           bloodAmount: input.bloodAmount,
           auspexData: input.auspexData,
           bloodPool: input.bloodPool,
