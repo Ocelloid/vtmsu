@@ -4,8 +4,13 @@ import { CircularProgress } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import type { Character } from "~/server/api/routers/char";
 
-export default function EffectsPage({ char }: { char: Character }) {
-  console.log(char);
+export default function EffectsPage({
+  char,
+  auspex,
+}: {
+  char: Character;
+  auspex: boolean;
+}) {
   if (!char) return <LoadingPage />;
 
   return (
@@ -13,21 +18,26 @@ export default function EffectsPage({ char }: { char: Character }) {
       {char.effects
         ?.filter(
           (e) =>
+            (auspex ? !!e.effect?.auspexData : true) &&
             e.effect?.visibleToPlayer &&
             (e.expires ? e.expires > new Date() : true),
         )
-        .map((e) => <Effect key={e.id + "_char_effect"} e={e} />)}
+        .map((e) => (
+          <Effect key={e.id + "_char_effect"} e={e} auspex={auspex} />
+        ))}
       {char.abilities
         ?.map((a) => a.abilitiy?.AbilityEffects)
         .flat()
         .filter(
           (e) =>
+            (auspex ? !!e?.effect?.auspexData : true) &&
             e?.effect?.visibleToPlayer &&
             (e.expires ? e.expires > new Date() : true),
         )
         .map((e) => (
           <Effect
             key={e?.effect?.id + "_ability_effect"}
+            auspex={auspex}
             e={{
               characterId: char.id,
               effectId: e?.effect?.id ?? 0,
@@ -35,12 +45,38 @@ export default function EffectsPage({ char }: { char: Character }) {
             }}
           />
         ))}
-      {char.features
-        ?.map((f) => f.feature?.FeatureEffects)
+      {char.Item?.map((i) => i?.type?.ItemEffects)
         .flat()
+        .filter(
+          (e) =>
+            (auspex ? !!e?.effect?.auspexData : true) &&
+            e?.effect?.visibleToPlayer &&
+            (e.expires ? e.expires > new Date() : true),
+        )
         .map((e) => (
           <Effect
             key={e?.id + "_feature_effect"}
+            auspex={auspex}
+            e={{
+              characterId: char.id,
+              effectId: e?.effectId ?? 0,
+              effect: e?.effect,
+            }}
+          />
+        ))}
+      {char.features
+        ?.map((f) => f.feature?.FeatureEffects)
+        .flat()
+        .filter(
+          (e) =>
+            (auspex ? !!e?.effect?.auspexData : true) &&
+            e?.effect?.visibleToPlayer &&
+            (e.expires ? e.expires > new Date() : true),
+        )
+        .map((e) => (
+          <Effect
+            key={e?.id + "_feature_effect"}
+            auspex={auspex}
             e={{
               characterId: char.id,
               effectId: e?.effectId ?? 0,
@@ -52,7 +88,7 @@ export default function EffectsPage({ char }: { char: Character }) {
   );
 }
 
-const Effect = ({ e }: { e: CharacterEffects }) => {
+const Effect = ({ auspex, e }: { auspex: boolean; e: CharacterEffects }) => {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
   useEffect(() => {
@@ -100,10 +136,16 @@ const Effect = ({ e }: { e: CharacterEffects }) => {
             | "danger"
         }
       />
-      <div className="flex flex-col">
-        <p className="text-xs font-semibold">{e.effect?.name}</p>
-        <p className="text-xs">{e.effect?.content}</p>
-      </div>
+      {auspex ? (
+        <div className="flex flex-col">
+          <p className="text-xs">{e.effect?.auspexData}</p>
+        </div>
+      ) : (
+        <div className="flex flex-col">
+          <p className="text-xs font-semibold">{e.effect?.name}</p>
+          <p className="text-xs">{e.effect?.content}</p>
+        </div>
+      )}
     </div>
   );
 };

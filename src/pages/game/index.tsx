@@ -149,7 +149,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <EffectsPage char={char} />
+                  <EffectsPage char={char} auspex={false} />
                 </Tab>
                 <Tab
                   key="hunt"

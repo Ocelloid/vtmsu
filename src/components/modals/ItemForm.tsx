@@ -8,6 +8,7 @@ import {
   ModalHeader,
   Select,
   SelectItem,
+  Textarea,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FaDropbox } from "react-icons/fa";
@@ -35,6 +36,7 @@ const ItemForm = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
+  const [auspexData, setAuspexData] = useState("");
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [usage, setUsage] = useState(-1);
@@ -52,6 +54,7 @@ const ItemForm = ({
 
   const resetForm = () => {
     setTitle("");
+    setAuspexData("");
     setDescription("");
     setImage("");
     setUsage(-1);
@@ -61,6 +64,7 @@ const ItemForm = ({
   useEffect(() => {
     if (!!itemData) {
       setTitle(itemData?.name ?? "");
+      setAuspexData(itemData?.auspexData ?? "");
       setDescription(itemData?.content ?? "");
       setImage(itemData?.image ?? "");
       setUsage(itemData?.usage ?? -1);
@@ -78,6 +82,7 @@ const ItemForm = ({
           image,
           usage,
           typeId: selectedType,
+          auspexData,
           ownedById: selectedCharacter ?? 1,
         },
         {
@@ -97,6 +102,7 @@ const ItemForm = ({
           image,
           usage,
           typeId: selectedType,
+          auspexData,
           ownedById: selectedCharacter,
         },
         {
@@ -169,6 +175,13 @@ const ItemForm = ({
                 className="mx-auto"
               />
             )}
+            <Textarea
+              size="sm"
+              variant="underlined"
+              label="Информация для прорицания"
+              value={auspexData}
+              onValueChange={setAuspexData}
+            />
             <Input
               size="sm"
               type="number"

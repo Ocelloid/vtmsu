@@ -8,6 +8,7 @@ import {
   ModalHeader,
   Select,
   SelectItem,
+  Textarea,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FaBoxes } from "react-icons/fa";
@@ -29,6 +30,7 @@ const ItemTypeForm = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
+  const [auspexData, setAuspexData] = useState("");
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [cost, setCost] = useState(0);
@@ -60,6 +62,7 @@ const ItemTypeForm = ({
 
   const resetForm = () => {
     setTitle("");
+    setAuspexData("");
     setDescription("");
     setAddingAbilities([]);
     setRemovingAbilities([]);
@@ -75,6 +78,7 @@ const ItemTypeForm = ({
   useEffect(() => {
     if (!!itemType) {
       setTitle(itemType?.name ?? "");
+      setAuspexData(itemData?.auspexData ?? "");
       setDescription(itemType?.content ?? "");
       setImage(itemType?.image ?? "");
       setCost(itemType?.cost ?? 0);
@@ -109,6 +113,7 @@ const ItemTypeForm = ({
           usage,
           bloodAmount,
           bloodPool,
+          auspexData,
           // violation,
           // status,
           // boon,
@@ -131,6 +136,7 @@ const ItemTypeForm = ({
           id: editId,
           name: title,
           content: description,
+          auspexData,
           image,
           cost,
           usage,
@@ -250,6 +256,13 @@ const ItemTypeForm = ({
                 label="Изменение пула крови"
                 value={bloodPool.toString()}
                 onValueChange={(v) => setBloodPool(Number(v))}
+              />
+              <Textarea
+                size="sm"
+                variant="underlined"
+                label="Информация для прорицания"
+                value={auspexData}
+                onValueChange={setAuspexData}
               />
               {/* <Input label="Нарущение маскарада" value={violation} />
             <Input label="Статус" value={status} />

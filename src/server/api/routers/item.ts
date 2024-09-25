@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Ability, Effect } from "~/server/api/routers/char";
+import type { Ability, Effect, Character } from "~/server/api/routers/char";
 import type { User } from "~/server/api/routers/user";
 
 import {
@@ -15,11 +15,20 @@ export type Item = {
   usage: number;
   image?: string | null;
   content?: string | null;
+  auspexData?: string | null;
   createdById: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  createdBy?: User;
-  type?: ItemType;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  createdBy?: User | null;
+  type?: ItemType | null;
+  coordX?: number | null;
+  coordY?: number | null;
+  isTrash?: boolean | null;
+  isTradable?: boolean | null;
+  ownedById?: number | null;
+  lastOwnedById?: number | null;
+  lastUsedById?: number | null;
+  ownedBy?: Character | null;
 };
 
 export type ItemType = {
@@ -37,11 +46,13 @@ export type ItemType = {
   status?: string | null;
   boon?: string | null;
   companyLevels: number;
-  Item?: Item[];
-  AddingAbility?: AddingAbility[];
-  RemovingAbility?: RemovingAbility[];
-  UsingAbility?: UsingAbility[];
-  ItemEffects?: ItemEffects[];
+  Item?: Item[] | null;
+  isTrash?: boolean | null;
+  isTradable?: boolean | null;
+  AddingAbility?: AddingAbility[] | null;
+  RemovingAbility?: RemovingAbility[] | null;
+  UsingAbility?: UsingAbility[] | null;
+  ItemEffects?: ItemEffects[] | null;
 };
 
 export type ItemEffects = {
@@ -270,6 +281,7 @@ export const itemRouter = createTRPCRouter({
         image: z.string().optional(),
         usage: z.number().optional(),
         ownedById: z.number().optional(),
+        auspexData: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -283,6 +295,7 @@ export const itemRouter = createTRPCRouter({
             ownedById: input.ownedById,
             lastOwnedById: input.ownedById,
             createdById: ctx.session.user.id,
+            auspexData: input.auspexData,
           },
         })
         .then((item) => {
@@ -316,6 +329,7 @@ export const itemRouter = createTRPCRouter({
         content: z.string().nullish(),
         usage: z.number().optional(),
         ownedById: z.number().optional(),
+        auspexData: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -332,6 +346,7 @@ export const itemRouter = createTRPCRouter({
           content: input.content,
           usage: input.usage,
           ownedById: input.ownedById,
+          auspexData: input.auspexData,
           lastOwnedById:
             input.ownedById === item.ownedById
               ? item.lastOwnedById
@@ -441,6 +456,7 @@ export const itemRouter = createTRPCRouter({
         violation: z.string().optional(),
         status: z.string().optional(),
         boon: z.string().optional(),
+        auspexData: z.string().optional(),
         companyLevels: z.number().optional(),
         addingAbilities: z.array(z.number()).optional(),
         removingAbilities: z.array(z.number()).optional(),
@@ -456,6 +472,7 @@ export const itemRouter = createTRPCRouter({
           usage: input.usage,
           content: input.content,
           bloodAmount: input.bloodAmount,
+          auspexData: input.auspexData,
           bloodPool: input.bloodPool,
           violation: input.violation,
           status: input.status,
@@ -527,6 +544,7 @@ export const itemRouter = createTRPCRouter({
         cost: z.number(),
         usage: z.number().optional(),
         content: z.string(),
+        auspexData: z.string().optional(),
         bloodAmount: z.number().optional(),
         bloodPool: z.number().optional(),
         violation: z.string().optional(),
@@ -548,6 +566,7 @@ export const itemRouter = createTRPCRouter({
           usage: input.usage,
           content: input.content,
           bloodAmount: input.bloodAmount,
+          auspexData: input.auspexData,
           bloodPool: input.bloodPool,
           violation: input.violation,
           status: input.status,

@@ -7,7 +7,7 @@ import {
 } from "~/server/api/trpc";
 
 import type { User } from "~/server/api/routers/user";
-import type { ItemEffects } from "~/server/api/routers/item";
+import type { Item, ItemEffects } from "~/server/api/routers/item";
 
 export type Character = {
   id: number;
@@ -53,6 +53,7 @@ export type Character = {
   createdBy?: User;
   active?: boolean | null;
   effects?: CharacterEffects[];
+  Item?: Item[];
 };
 
 export type CharacterKnowledges = {
@@ -144,6 +145,7 @@ export type Effect = {
   visibleToPlayer: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  auspexData?: string | null;
   CharacterEffects?: CharacterEffects[];
   ItemEffects?: ItemEffects[];
   RitualEffects?: RitualEffects[];
@@ -498,6 +500,7 @@ export const charRouter = createTRPCRouter({
         color: z.string().optional(),
         visibleToPlayer: z.boolean(),
         expiration: z.number(),
+        auspexData: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -508,6 +511,7 @@ export const charRouter = createTRPCRouter({
           color: input.color,
           visibleToPlayer: input.visibleToPlayer,
           expiration: input.expiration,
+          auspexData: input.auspexData,
         },
       });
     }),
@@ -521,6 +525,7 @@ export const charRouter = createTRPCRouter({
         color: z.string().optional(),
         visibleToPlayer: z.boolean(),
         expiration: z.number(),
+        auspexData: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -532,6 +537,7 @@ export const charRouter = createTRPCRouter({
           color: input.color,
           visibleToPlayer: input.visibleToPlayer,
           expiration: input.expiration,
+          auspexData: input.auspexData,
         },
       });
     }),
@@ -1309,6 +1315,11 @@ export const charRouter = createTRPCRouter({
           knowledges: { include: { knowledge: true } },
           rituals: { include: { ritual: true } },
           effects: { include: { effect: true } },
+          Item: {
+            include: {
+              type: { include: { ItemEffects: { include: { effect: true } } } },
+            },
+          },
         },
       });
       return char;

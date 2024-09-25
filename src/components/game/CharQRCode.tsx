@@ -113,7 +113,7 @@ export default function CharQRCode({ char }: { char: Character }) {
                 {!!hasAuspex && (
                   <div className="flex w-full flex-col">
                     Эффекты персонажа в ауре:
-                    <EffectsPage char={scannedChar} />
+                    <EffectsPage char={scannedChar} auspex={true} />
                   </div>
                 )}
               </div>

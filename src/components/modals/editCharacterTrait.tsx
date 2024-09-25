@@ -55,6 +55,7 @@ const EditCharacterTrait = ({
   const [recipe, setRecipe] = useState("");
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
+  const [auspexData, setAuspexData] = useState("");
   const [cost, setCost] = useState<number>(1);
   const [requirement, setRequirement] = useState<number>();
   const [knowledgeIds, setKnowledgeIds] = useState<number[]>([]);
@@ -471,6 +472,7 @@ const EditCharacterTrait = ({
             color: color,
             visibleToPlayer: isVisibleToPlayer,
             expiration: expiration,
+            auspexData: auspexData,
           });
         } else {
           updateEffect({
@@ -480,6 +482,7 @@ const EditCharacterTrait = ({
             color: color,
             visibleToPlayer: isVisibleToPlayer,
             expiration: expiration,
+            auspexData: auspexData,
           });
         }
         return;
@@ -996,6 +999,13 @@ const EditCharacterTrait = ({
                   placeholder="Введите время действия в минутах"
                   value={expiration.toString()}
                   onValueChange={(e) => setExpiration(Number(e))}
+                />
+                <Textarea
+                  variant="underlined"
+                  label="Эффект в ауре"
+                  placeholder="Введите описание эффекта в ауре"
+                  value={auspexData}
+                  onValueChange={setAuspexData}
                 />
               </>
             )}
