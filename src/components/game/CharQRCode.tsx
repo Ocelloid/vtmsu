@@ -10,6 +10,7 @@ import {
   ModalFooter,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
+import { FaQrcode } from "react-icons/fa";
 import type { Character } from "~/server/api/routers/char";
 import EffectsPage from "~/components/game/EffectsPage";
 import { LoadingPage } from "~/components/Loading";
@@ -69,9 +70,10 @@ export default function CharQRCode({ char }: { char: Character }) {
 
   if (charsLoading) return <LoadingPage />;
 
-  const hasAuspex = char?.effects?.find((e) =>
-    e.effect?.name.includes("Прорицание"),
-  );
+  const now = new Date();
+  const hasAuspex = char?.effects
+    ?.filter((e) => (e.expires?.getTime() ?? now.getTime()) - now.getTime() > 0)
+    .find((e) => e.effect?.name.includes("Прорицание"));
 
   return (
     <>
@@ -116,7 +118,7 @@ export default function CharQRCode({ char }: { char: Character }) {
         color="warning"
         className="mx-auto mb-auto max-w-64"
       >
-        Сканировать чужой-код
+        <FaQrcode size={24} /> Сканировать чужой QR-код
       </Button>
     </>
   );
