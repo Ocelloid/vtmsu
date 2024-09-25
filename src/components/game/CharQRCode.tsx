@@ -77,24 +77,46 @@ export default function CharQRCode({ char }: { char: Character }) {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+        size="full"
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
-          <ModalHeader>Передача предметов</ModalHeader>
+          <ModalHeader>Сканировать код</ModalHeader>
           <ModalBody>
-            {!scannedChar ? (
-              <QRScanner
-                onScanSuccess={handleScanSuccess}
-                onScanError={(e) => console.error(e)}
-              />
-            ) : (
-              <>
+            <QRScanner
+              onScanSuccess={handleScanSuccess}
+              onScanError={(e) => console.error(e)}
+            />
+            {!!scannedChar && (
+              <div className="flex w-full flex-col">
+                <p>Информация о персонаже {scannedChar.name}:</p>
+                <p>
+                  {char.alive
+                    ? char.bloodAmount === 0 || char.health === 0
+                      ? "Торпор"
+                      : "Персонаж нежив"
+                    : "Финальная смерть"}
+                </p>
                 {!!hasAuspex && (
                   <div className="flex w-full flex-col">
                     Эффекты персонажа в ауре:
                     <EffectsPage char={scannedChar} />
                   </div>
                 )}
-              </>
+              </div>
             )}
           </ModalBody>
           <ModalFooter className="flex flex-row justify-center gap-2">
@@ -113,7 +135,10 @@ export default function CharQRCode({ char }: { char: Character }) {
       </p>
       <canvas id="canvas" className="mx-auto"></canvas>
       <Button
-        onClick={onOpen}
+        onClick={() => {
+          setScannedChar(undefined);
+          onOpen();
+        }}
         variant="ghost"
         color="warning"
         className="mx-auto mb-auto max-w-64"

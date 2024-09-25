@@ -265,6 +265,7 @@ model Char {
   hunt_req            String?
   comment             String?               @db.LongText
   p_comment           String?               @db.LongText
+  alive               Boolean               @default(true)
   pending             Boolean?              @default(false)
   verified            Boolean?              @default(false)
   ambition            String?               @db.LongText

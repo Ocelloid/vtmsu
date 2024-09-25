@@ -1,30 +1,25 @@
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect } from "react";
+import QrReader from "react-qr-reader-es6";
+import { useEffect, useState } from "react";
 
 export default function QRScanner({
   onScanSuccess,
   onScanError,
 }: {
-  onScanSuccess: (decodedText: string) => void;
-  onScanError?: (error: string) => void;
+  onScanSuccess: (data: string) => void;
+  onScanError: (error: string) => void;
 }) {
+  const [scan, setScan] = useState<string | null>(null);
   useEffect(() => {
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      "qr-scanner",
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-      },
-      false,
-    );
-
-    html5QrcodeScanner.render(handleSuccess, onScanError);
-
-    function handleSuccess(decodedText: string) {
-      void html5QrcodeScanner.clear();
-      onScanSuccess(decodedText);
+    if (!!scan) {
+      onScanSuccess(scan);
     }
-  }, [onScanSuccess, onScanError]);
-
-  return <div id="qr-scanner" />;
+  }, [onScanSuccess, scan]);
+  return (
+    <QrReader
+      delay={300}
+      onError={onScanError}
+      onScan={(e) => setScan(e)}
+      style={{ width: "50%", marginLeft: "auto", marginRight: "auto" }}
+    />
+  );
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { Character } from "~/server/api/routers/char";
 
 export default function EffectsPage({ char }: { char: Character }) {
+  console.log(char);
   if (!char) return <LoadingPage />;
 
   return (

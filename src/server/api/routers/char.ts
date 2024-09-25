@@ -33,6 +33,7 @@ export type Character = {
   timeoutAt?: Date | null;
   timeoutDuration?: number | null;
   banned: boolean;
+  alive: boolean;
   bannedReason?: string | null;
   title?: string | null;
   status?: string | null;
@@ -1343,6 +1344,7 @@ export const charRouter = createTRPCRouter({
           p_comment: true,
           timeout: true,
           banned: true,
+          alive: true,
           abilities: { include: { abilitiy: true } },
           features: { include: { feature: true } },
           knowledges: { include: { knowledge: true } },
@@ -1378,6 +1380,7 @@ export const charRouter = createTRPCRouter({
           clan: true,
           timeout: true,
           banned: true,
+          alive: true,
         },
       });
     }),
@@ -1389,6 +1392,8 @@ export const charRouter = createTRPCRouter({
         faction: true,
         clan: true,
         features: { include: { feature: true } },
+        abilities: { include: { abilitiy: true } },
+        effects: { include: { effect: true } },
       },
     });
   }),
