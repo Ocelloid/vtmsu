@@ -263,11 +263,11 @@ export default function Tickets({ char }: { char: Character }) {
         </ModalContent>
       </Modal>
       <div className="flex h-full max-h-[calc(100vh-176px)] flex-row gap-2 py-2">
-        <div className="flex w-full flex-col-reverse gap-2 md:hidden">
+        <div className="flex w-full flex-col-reverse gap-2 overflow-y-auto md:hidden">
           <Button
             variant="bordered"
             color="warning"
-            className={`w-full items-center gap-2 rounded-lg p-2`}
+            className={`h-10 min-h-10 w-full items-center gap-2 rounded-lg p-2`}
             onClick={() => {
               setSelectedTicket(undefined);
               onOpen();
@@ -280,7 +280,7 @@ export default function Tickets({ char }: { char: Character }) {
               key={t.id}
               variant="faded"
               color="warning"
-              className={`justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
+              className={`h-10 min-h-10 justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
                 t.id === selectedTicket?.id ? "bg-red-900/75" : ""
               }`}
               onClick={() => {
