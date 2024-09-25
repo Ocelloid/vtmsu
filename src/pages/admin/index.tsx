@@ -40,7 +40,7 @@ export default function Admin() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className=" flex min-h-[calc(100vh-1.5rem)] flex-col pt-24">
-        <div className="container flex flex-col px-4">
+        <div className="container flex h-full flex-col px-4">
           <Tabs
             aria-label="tabs"
             variant="underlined"
@@ -51,7 +51,7 @@ export default function Admin() {
               cursor: "w-full bg-[#dc2626]",
               tab: "max-w-full px-0 h-8",
               base: "bg-danger/5",
-              panel: "px-0 py-0",
+              panel: "px-0 py-0 h-full",
             }}
           >
             <Tab
@@ -123,7 +123,7 @@ export default function Admin() {
                   cursor: "w-full bg-[#dc2626]",
                   tab: "max-w-full px-0 h-8",
                   base: "bg-danger/5 w-full",
-                  panel: "px-0 py-0",
+                  panel: "px-0 py-0 h-full",
                 }}
               >
                 <Tab
@@ -200,7 +200,7 @@ export default function Admin() {
                   cursor: "w-full bg-[#dc2626]",
                   tab: "max-w-full px-0 h-8",
                   base: "bg-danger/5 w-full",
-                  panel: "px-0 py-0",
+                  panel: "px-0 py-0 h-full",
                 }}
               >
                 <Tab

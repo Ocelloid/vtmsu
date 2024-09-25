@@ -112,7 +112,7 @@ export default function Game() {
                 placement="bottom"
                 classNames={{
                   panel:
-                    "py-0 mb-auto overflow-y-auto max-h-[calc(100vh-172px)]",
+                    "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
                   tab: "p-1 w-min",
                   tabList: "w-full",
                   wrapper: "flex-grow",
@@ -216,7 +216,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <Tickets />
+                  <Tickets char={char} />
                 </Tab>
                 <Tab
                   key="qrcode"

@@ -28,6 +28,12 @@ export type Character = {
   verified?: boolean | null;
   playerName?: string | null;
   playerContact?: string | null;
+  timeout: boolean;
+  timeoutReason?: string | null;
+  timeoutAt?: Date | null;
+  timeoutDuration?: number | null;
+  banned: boolean;
+  bannedReason?: string | null;
   title?: string | null;
   status?: string | null;
   image?: string | null;
