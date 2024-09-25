@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { FaCheck } from "react-icons/fa";
 import { MdSend, MdCancelScheduleSend, MdScheduleSend } from "react-icons/md";
@@ -22,6 +22,17 @@ export default function Tickets({ char }: { char: Character }) {
   const [selectedTicket, setSelectedTicket] = useState<Ticket>();
   const [newMessage, setNewMessage] = useState<string>("");
   const [newName, setNewName] = useState<string>("");
+  const [timeoutUntil, setTimeoutUntil] = useState<Date>();
+
+  useEffect(() => {
+    if (char.timeout && char.timeoutAt && char.timeoutDuration) {
+      const until = new Date(
+        char.timeoutAt.getTime() + char.timeoutDuration * 60 * 60 * 1000,
+      );
+      console.log(char.timeoutAt, char.timeoutDuration, until);
+      setTimeoutUntil(until > new Date() ? until : undefined);
+    }
+  }, [char]);
 
   const { data: appData } = api.util.getAppData.useQuery();
   const { data: tickets, refetch: refetchTickets } =
@@ -163,11 +174,10 @@ export default function Tickets({ char }: { char: Character }) {
                   )}
                 </>
               )}
-              {char.timeout && (
+              {timeoutUntil && (
                 <p className="text-sm text-warning">
-                  Вы не можете отправлять сообщения и создавать новые заявки в
-                  течение {char.timeoutDuration ?? 0} часов по следующей
-                  причине:
+                  Вы не можете отправлять сообщения и создавать новые заявки до{" "}
+                  {formatDate(timeoutUntil)} по следующей причине:
                   <br />
                   {char.timeoutReason ?? ""}
                 </p>
@@ -202,7 +212,7 @@ export default function Tickets({ char }: { char: Character }) {
                         isPending ||
                         !newMessage ||
                         (!newName && !selectedTicket) ||
-                        char.timeout ||
+                        !!timeoutUntil ||
                         char.banned
                       )
                     ) {
@@ -240,7 +250,7 @@ export default function Tickets({ char }: { char: Character }) {
                     isPending ||
                     !newMessage ||
                     (!newName && !selectedTicket) ||
-                    char.timeout ||
+                    !!timeoutUntil ||
                     char.banned
                   }
                   onClick={() =>
@@ -249,7 +259,7 @@ export default function Tickets({ char }: { char: Character }) {
                 >
                   {isNewTicketPending || isPending ? (
                     <LoadingSpinner width={24} height={24} />
-                  ) : char.timeout ? (
+                  ) : !!timeoutUntil ? (
                     <MdScheduleSend size={24} />
                   ) : char.banned ? (
                     <MdCancelScheduleSend size={24} />
@@ -365,10 +375,10 @@ export default function Tickets({ char }: { char: Character }) {
               )}
             </>
           )}
-          {char.timeout && (
+          {timeoutUntil && (
             <p className="text-sm text-warning">
-              Вы не можете отправлять сообщения и создавать новые заявки в
-              течение {char.timeoutDuration ?? 0} часов по следующей причине:
+              Вы не можете отправлять сообщения и создавать новые заявки до{" "}
+              {formatDate(timeoutUntil)} по следующей причине:
               <br />
               {char.timeoutReason ?? ""}
             </p>
@@ -401,7 +411,7 @@ export default function Tickets({ char }: { char: Character }) {
                         isPending ||
                         !newMessage ||
                         (!newName && !selectedTicket) ||
-                        char.timeout ||
+                        !!timeoutUntil ||
                         char.banned
                       )
                     ) {
@@ -439,7 +449,7 @@ export default function Tickets({ char }: { char: Character }) {
                     isPending ||
                     !newMessage ||
                     (!newName && !selectedTicket) ||
-                    char.timeout ||
+                    !!timeoutUntil ||
                     char.banned
                   }
                   onClick={() =>
@@ -448,7 +458,7 @@ export default function Tickets({ char }: { char: Character }) {
                 >
                   {isNewTicketPending || isPending ? (
                     <LoadingSpinner width={24} height={24} />
-                  ) : char.timeout ? (
+                  ) : !!timeoutUntil ? (
                     <MdScheduleSend size={24} />
                   ) : char.banned ? (
                     <MdCancelScheduleSend size={24} />

@@ -94,6 +94,7 @@ export const utilRouter = createTRPCRouter({
       z.object({
         ticketId: z.number(),
         content: z.string(),
+        isAdmin: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -105,6 +106,7 @@ export const utilRouter = createTRPCRouter({
         data: {
           ticketId: input.ticketId,
           content: input.content,
+          isAdmin: input.isAdmin ?? false,
         },
       });
     }),
@@ -114,6 +116,7 @@ export const utilRouter = createTRPCRouter({
         characterId: z.number(),
         content: z.string(),
         name: z.string(),
+        isAdmin: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -121,17 +124,19 @@ export const utilRouter = createTRPCRouter({
         where: { id: input.characterId },
       });
       if (!character) return;
-      await ctx.db.ticket.create({
+      const ticket = await ctx.db.ticket.create({
         data: {
           name: input.name,
           characterId: input.characterId,
           Message: {
             create: {
               content: input.content,
+              isAdmin: input.isAdmin ?? false,
             },
           },
         },
       });
+      return { ...ticket, character: character };
     }),
   closeTicket: protectedProcedure
     .input(z.object({ ticketId: z.number() }))
@@ -143,6 +148,51 @@ export const utilRouter = createTRPCRouter({
       return ctx.db.ticket.update({
         where: { id: input.ticketId },
         data: { isResolved: true },
+        include: { character: { include: { faction: true, clan: true } } },
+      });
+    }),
+  banCharacter: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        reason: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const character = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+      if (!character) return;
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          banned: character.banned ? false : true,
+          bannedReason: input.reason ?? "",
+        },
+      });
+    }),
+  timeoutCharacter: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        duration: z.number(),
+        reason: z.string().optional(),
+        timeoutAt: z.date().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const character = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+      if (!character) return;
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          timeout: character.timeout ? false : true,
+          timeoutDuration: input.duration,
+          timeoutReason: input.reason ?? "",
+          timeoutAt: input.timeoutAt ?? new Date(),
+        },
       });
     }),
 });

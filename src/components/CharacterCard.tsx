@@ -49,7 +49,7 @@ const CharacterCard = ({
   if (isSelect)
     return (
       <div className="flex max-h-52 min-h-44 flex-row gap-2 rounded-md bg-red-950/50 p-2 text-default transition-all duration-300 hover:shadow-md hover:shadow-red-950/50 hover:brightness-110 hover:drop-shadow-xl dark:text-white sm:grid-cols-3">
-        <div className="flex max-w-32 flex-col">
+        <div className="flex min-w-16 max-w-16 flex-col md:min-w-32 md:max-w-32">
           <Image
             className="mx-auto mt-1 aspect-square h-full w-full rounded-md object-cover"
             alt="char_photo"
@@ -61,13 +61,14 @@ const CharacterCard = ({
         <div className="relative col-span-2 flex flex-1 flex-col">
           <div className="flex h-full flex-row">
             <div className="flex w-[85%] flex-1 flex-col gap-1">
-              <p className="mr-auto max-w-[90%] break-words text-xl text-default-300 dark:text-default-700">
+              <p className="mr-auto max-w-[90%] text-wrap break-words text-xl text-default-300 dark:text-default-700">
                 {character.name}
               </p>
               <div>
                 <p className="trucate text-xs italic">{character.status}</p>
                 <p className="trucate text-xs italic">{character.title}</p>
                 <div
+                  className="text-wrap"
                   dangerouslySetInnerHTML={{
                     __html: character.publicInfo ?? "",
                   }}

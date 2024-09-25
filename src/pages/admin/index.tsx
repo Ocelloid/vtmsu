@@ -39,7 +39,7 @@ export default function Admin() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-[calc(100vh-1.5rem)] flex-col pt-24">
+      <main className=" flex min-h-[calc(100vh-3em)] flex-col pt-24">
         <div className="container flex h-full flex-col px-4">
           <Tabs
             aria-label="tabs"
