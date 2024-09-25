@@ -392,231 +392,242 @@ export default function Tickets() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <div className="flex flex-row items-center justify-between gap-1 py-2">
-        <Autocomplete
-          size="md"
-          variant="bordered"
-          placeholder="Выберите персонажа"
-          aria-label="characters"
-          className="w-full rounded-sm"
-          selectedKey={char ? char.id.toString() : undefined}
-          onSelectionChange={(e) => {
-            const charId = Number(e);
-            const newChar = characters.find((c) => c.id === charId);
-            setChar(newChar);
-          }}
-        >
-          {characters.map((c) => (
-            <AutocompleteItem
-              key={c.id.toString()}
-              value={c.id.toString()}
-              textValue={c.name}
-            >
-              <CharacterCard character={c} isSelect={true} />
-            </AutocompleteItem>
-          ))}
-        </Autocomplete>
-        <Button
-          className="w-10 min-w-10 p-1"
-          variant="solid"
-          color="warning"
-          onClick={() => {
-            onTimeoutOpen();
-            setReason(char?.timeoutReason ?? "");
-            setDuration(char?.timeoutDuration ?? 0);
-          }}
-          isDisabled={!char || isTimeoutPending}
-        >
-          <FaStopwatch size={24} />
-        </Button>
-        <Button
-          className="w-10 min-w-10 p-1"
-          variant="solid"
-          color="danger"
-          isDisabled={!char || isBanPending}
-          onClick={() => {
-            onBanOpen();
-            setReason(char?.bannedReason ?? "");
-            setDuration(0);
-          }}
-        >
-          <FaBan size={24} />
-        </Button>
-      </div>
-      <Button
-        variant="bordered"
-        color="warning"
-        isDisabled={!char}
-        className={`h-10 min-h-10 w-full items-center gap-2 rounded-lg p-2 md:hidden`}
-        onClick={() => {
-          setSelectedTicket(undefined);
-          onOpen();
-        }}
-      >
-        <p className="text-sm font-semibold">Новая заявка</p>
-      </Button>
-      <div className="flex h-full max-h-[calc(100vh-372px)] flex-row gap-2 pt-2 md:max-h-[calc(100vh-300px)]">
-        <div className="flex w-full flex-col gap-2 overflow-y-auto md:hidden">
-          {tickets
-            ?.filter((t) => (!!char ? t.characterId === char?.id : true))
-            .map((t) => (
-              <Button
-                key={t.id}
-                variant="faded"
-                color="warning"
-                className={`h-10 min-h-10 justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
-                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
-                }`}
-                onClick={() => {
-                  setSelectedTicket(t);
-                  setChar(t?.character);
-                  onOpen();
-                }}
-              >
-                <p className="w-full truncate text-start text-sm">{t.name}</p>
-                {t.isResolved && <FaCheck size={16} />}
-                <p className="h-8 w-8 text-wrap text-xs opacity-50">
-                  {formatDate(t.createdAt)}
-                </p>
-              </Button>
-            ))}
-        </div>
-        <div className="hidden max-h-[calc(100vh-206px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
-          <Button
+      <div className="container flex flex-col gap-1 rounded-b-lg bg-white/75 p-2 dark:bg-red-950/50 sm:h-full">
+        <div className="flex flex-row items-center justify-between gap-1 py-2">
+          <Autocomplete
+            size="md"
             variant="bordered"
+            placeholder="Выберите персонажа"
+            aria-label="characters"
+            className="w-full rounded-sm"
+            selectedKey={char ? char.id.toString() : undefined}
+            onSelectionChange={(e) => {
+              const charId = Number(e);
+              const newChar = characters.find((c) => c.id === charId);
+              setChar(newChar);
+            }}
+          >
+            {characters.map((c) => (
+              <AutocompleteItem
+                key={c.id.toString()}
+                value={c.id.toString()}
+                textValue={c.name}
+              >
+                <CharacterCard character={c} isSelect={true} />
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
+          <Button
+            className="w-10 min-w-10 p-1"
+            variant="solid"
             color="warning"
-            isDisabled={!char}
-            className={`flex h-10 min-h-10 cursor-pointer flex-row items-center gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
-              !selectedTicket ? "bg-red-900/75" : ""
-            }`}
-            onClick={() => setSelectedTicket(undefined)}
+            onClick={() => {
+              onTimeoutOpen();
+              setReason(char?.timeoutReason ?? "");
+              setDuration(char?.timeoutDuration ?? 0);
+            }}
+            isDisabled={!char || isTimeoutPending}
           >
-            <p className="text-sm font-semibold">Новая заявка</p>
+            <FaStopwatch size={24} />
           </Button>
-          {tickets
-            ?.filter((t) => (!!char ? t.characterId === char?.id : true))
-            .map((t) => (
-              <Button
-                key={t.id}
-                variant="faded"
-                color="warning"
-                className={`h-10 min-h-10 justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
-                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
-                }`}
-                onClick={() => {
-                  setSelectedTicket(t);
-                  setChar(t?.character);
-                }}
-              >
-                <p className="w-full truncate text-start text-sm">{t.name}</p>
-                {t.isResolved && <FaCheck size={16} />}
-                <p className="h-8 w-8 text-wrap text-xs opacity-50">
-                  {formatDate(t.createdAt)}
-                </p>
-              </Button>
-            ))}
-        </div>
-        <div className="hidden h-full w-full flex-col gap-2 md:flex">
-          <div
-            className={`${
-              selectedTicket?.isResolved
-                ? "max-h-[calc(100vh-112px) sm:max-h-[calc(100vh-320px)]"
-                : "max-h-[calc(100vh-176px)] sm:max-h-[calc(100vh-400px)]"
-            } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
+          <Button
+            className="w-10 min-w-10 p-1"
+            variant="solid"
+            color="danger"
+            isDisabled={!char || isBanPending}
+            onClick={() => {
+              onBanOpen();
+              setReason(char?.bannedReason ?? "");
+              setDuration(0);
+            }}
           >
-            {messages?.map((m) => (
-              <div
-                key={m.id}
-                className="flex flex-row rounded-lg border-2 border-red-700/50 p-2"
-              >
-                <div className="flex w-full flex-col text-sm">{m.content}</div>
-                <div className="flex w-8 flex-col text-xs opacity-50">
-                  {formatDate(m.createdAt)}
-                </div>
-              </div>
-            ))}
+            <FaBan size={24} />
+          </Button>
+        </div>
+        <Button
+          variant="bordered"
+          color="warning"
+          isDisabled={!char}
+          className={`h-10 min-h-10 w-full items-center gap-2 rounded-lg bg-red-950 p-2 md:hidden`}
+          onClick={() => {
+            setSelectedTicket(undefined);
+            onOpen();
+          }}
+        >
+          <p className="text-sm font-semibold">Новая заявка</p>
+        </Button>
+        <div className="flex h-full max-h-[calc(100vh-372px)] flex-row gap-2 pt-2 md:max-h-[calc(100vh-300px)]">
+          <div className="flex w-full flex-col gap-2 overflow-y-auto md:hidden">
+            {tickets
+              ?.filter((t) => (!!char ? t.characterId === char?.id : true))
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
+                    setChar(t?.character);
+                    onOpen();
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  {t.isResolved && <FaCheck size={16} />}
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
           </div>
-          {!selectedTicket && (
-            <>
-              <Input
-                value={newName}
-                color="warning"
-                onChange={(e) => setNewName(e.target.value)}
-                variant="underlined"
-                label="Название заявки"
-                placeholder="Введите название заявки"
-              />
-            </>
-          )}
-          {selectedTicket?.isResolved && (
-            <p className="text-sm text-warning">Заявка закрыта</p>
-          )}
-          {!selectedTicket?.isResolved && (
-            <div className="flex flex-row items-center gap-2">
-              <Textarea
-                maxRows={3}
-                color="warning"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(event) => {
-                  if (event.ctrlKey && event.key === "Enter") {
-                    event.preventDefault(); // Prevent default newline behavior
-                    if (
-                      !(
-                        (tooManyTickets && !selectedTicket) ||
-                        isNewTicketPending ||
-                        isPending ||
-                        !newMessage ||
-                        (!newName && !selectedTicket)
-                      )
-                    ) {
-                      if (!selectedTicket) handleAddTicket();
-                      else handleSendMessage();
+          <div className="hidden max-h-[calc(100vh-206px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
+            <Button
+              variant="bordered"
+              color="warning"
+              isDisabled={!char}
+              className={`flex h-10 min-h-10 cursor-pointer flex-row items-center gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                !selectedTicket ? "bg-red-900/75" : ""
+              }`}
+              onClick={() => setSelectedTicket(undefined)}
+            >
+              <p className="text-sm font-semibold">Новая заявка</p>
+            </Button>
+            {tickets
+              ?.filter((t) => (!!char ? t.characterId === char?.id : true))
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
+                    setChar(t?.character);
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  {t.isResolved && <FaCheck size={16} />}
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
+          </div>
+          <div className="hidden h-full w-full flex-col gap-2 md:flex">
+            <div
+              className={`${
+                selectedTicket?.isResolved
+                  ? "max-h-[calc(100vh-112px) sm:max-h-[calc(100vh-320px)]"
+                  : "max-h-[calc(100vh-176px)] sm:max-h-[calc(100vh-400px)]"
+              } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
+            >
+              {messages?.map((m) => (
+                <div
+                  key={m.id}
+                  className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
+                >
+                  <div className="flex w-full flex-row">
+                    <div className="flex w-full flex-col text-sm">
+                      <p className="flex w-full flex-col text-lg">
+                        {m.isAdmin ? "Расссказчик:" : char?.name + ":"}
+                      </p>
+                      {m.content}
+                    </div>
+                    <div className="flex w-8 flex-col text-xs opacity-50">
+                      {formatDate(m.createdAt)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {!selectedTicket && (
+              <>
+                <Input
+                  value={newName}
+                  color="warning"
+                  onChange={(e) => setNewName(e.target.value)}
+                  variant="underlined"
+                  label="Название заявки"
+                  placeholder="Введите название заявки"
+                />
+              </>
+            )}
+            {selectedTicket?.isResolved && (
+              <p className="text-sm text-danger dark:text-warning">
+                Заявка закрыта
+              </p>
+            )}
+            {!selectedTicket?.isResolved && (
+              <div className="flex flex-row items-center gap-2">
+                <Textarea
+                  maxRows={3}
+                  color="warning"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.ctrlKey && event.key === "Enter") {
+                      event.preventDefault(); // Prevent default newline behavior
+                      if (
+                        !(
+                          (tooManyTickets && !selectedTicket) ||
+                          isNewTicketPending ||
+                          isPending ||
+                          !newMessage ||
+                          (!newName && !selectedTicket)
+                        )
+                      ) {
+                        if (!selectedTicket) handleAddTicket();
+                        else handleSendMessage();
+                      }
                     }
-                  }
-                }}
-                variant="underlined"
-                label="Сообщение"
-                placeholder="Введите сообщение"
-              />
-              <div className="flex h-full flex-col gap-2">
-                {!!selectedTicket && (
+                  }}
+                  variant="underlined"
+                  label="Сообщение"
+                  placeholder="Введите сообщение"
+                />
+                <div className="flex h-full flex-col gap-2">
+                  {!!selectedTicket && (
+                    <Button
+                      variant="light"
+                      color="warning"
+                      className="text-md h-full min-w-10 text-black dark:text-warning"
+                      onClick={() => handleCloseTicket()}
+                    >
+                      {isCloseTicketPending ? (
+                        <LoadingSpinner width={24} height={24} />
+                      ) : (
+                        <FaCheck size={24} />
+                      )}
+                    </Button>
+                  )}
                   <Button
                     variant="light"
                     color="warning"
                     className="text-md h-full min-w-10 text-black dark:text-warning"
-                    onClick={() => handleCloseTicket()}
+                    isDisabled={
+                      isNewTicketPending ||
+                      isPending ||
+                      !newMessage ||
+                      (!newName && !selectedTicket)
+                    }
+                    onClick={() =>
+                      !!selectedTicket ? handleSendMessage() : handleAddTicket()
+                    }
                   >
-                    {isCloseTicketPending ? (
+                    {isNewTicketPending || isPending ? (
                       <LoadingSpinner width={24} height={24} />
                     ) : (
-                      <FaCheck size={24} />
+                      <MdSend size={24} />
                     )}
                   </Button>
-                )}
-                <Button
-                  variant="light"
-                  color="warning"
-                  className="text-md h-full min-w-10 text-black dark:text-warning"
-                  isDisabled={
-                    isNewTicketPending ||
-                    isPending ||
-                    !newMessage ||
-                    (!newName && !selectedTicket)
-                  }
-                  onClick={() =>
-                    !!selectedTicket ? handleSendMessage() : handleAddTicket()
-                  }
-                >
-                  {isNewTicketPending || isPending ? (
-                    <LoadingSpinner width={24} height={24} />
-                  ) : (
-                    <MdSend size={24} />
-                  )}
-                </Button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </>

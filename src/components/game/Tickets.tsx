@@ -167,7 +167,7 @@ export default function Tickets({ char }: { char: Character }) {
                     placeholder="Введите название заявки"
                   />
                   {tooManyTickets && (
-                    <p className="text-sm text-warning">
+                    <p className="text-sm text-danger dark:text-warning">
                       У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
                       открытых заявок
                     </p>
@@ -175,7 +175,7 @@ export default function Tickets({ char }: { char: Character }) {
                 </>
               )}
               {timeoutUntil && (
-                <p className="text-sm text-warning">
+                <p className="text-sm text-danger dark:text-warning">
                   Вы не можете отправлять сообщения и создавать новые заявки до{" "}
                   {formatDate(timeoutUntil)} по следующей причине:
                   <br />
@@ -183,7 +183,7 @@ export default function Tickets({ char }: { char: Character }) {
                 </p>
               )}
               {char.banned && (
-                <p className="text-sm text-warning">
+                <p className="text-sm text-danger dark:text-warning">
                   Вы не можете отправлять сообщения и создавать новые заявки по
                   следующей причине:
                   <br />
@@ -191,7 +191,9 @@ export default function Tickets({ char }: { char: Character }) {
                 </p>
               )}
               {selectedTicket?.isResolved && (
-                <p className="text-sm text-warning">Заявка закрыта</p>
+                <p className="text-sm text-danger dark:text-warning">
+                  Заявка закрыта
+                </p>
               )}
             </div>
           </ModalBody>
@@ -230,7 +232,7 @@ export default function Tickets({ char }: { char: Character }) {
                   <Button
                     variant="light"
                     color="warning"
-                    className="text-md h-full min-w-10 text-black dark:text-warning"
+                    className="text-md h-full min-w-10 text-danger dark:text-warning"
                     onClick={() => handleCloseTicket()}
                   >
                     {isCloseTicketPending ? (
@@ -243,7 +245,7 @@ export default function Tickets({ char }: { char: Character }) {
                 <Button
                   variant="light"
                   color="warning"
-                  className="text-md h-full min-w-10 text-black dark:text-warning"
+                  className="text-md h-full min-w-10 text-danger dark:text-warning"
                   isDisabled={
                     (tooManyTickets && !selectedTicket) ||
                     isNewTicketPending ||
@@ -277,7 +279,7 @@ export default function Tickets({ char }: { char: Character }) {
           <Button
             variant="bordered"
             color="warning"
-            className={`h-10 min-h-10 w-full items-center gap-2 rounded-lg p-2`}
+            className={`h-10 min-h-10 w-full items-center gap-2 rounded-lg bg-red-950 p-2`}
             onClick={() => {
               setSelectedTicket(undefined);
               onOpen();
@@ -290,7 +292,7 @@ export default function Tickets({ char }: { char: Character }) {
               key={t.id}
               variant="faded"
               color="warning"
-              className={`h-10 min-h-10 justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
+              className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
                 t.id === selectedTicket?.id ? "bg-red-900/75" : ""
               }`}
               onClick={() => {
@@ -310,7 +312,7 @@ export default function Tickets({ char }: { char: Character }) {
           <Button
             variant="bordered"
             color="warning"
-            className={`flex h-10 min-h-10 cursor-pointer flex-row items-center gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
+            className={`flex h-10 min-h-10 cursor-pointer flex-row items-center gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
               !selectedTicket ? "bg-red-900/75" : ""
             }`}
             onClick={() => setSelectedTicket(undefined)}
@@ -322,7 +324,7 @@ export default function Tickets({ char }: { char: Character }) {
               key={t.id}
               variant="faded"
               color="warning"
-              className={`h-10 min-h-10 justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
+              className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
                 t.id === selectedTicket?.id ? "bg-red-900/75" : ""
               }`}
               onClick={() => {
@@ -368,7 +370,7 @@ export default function Tickets({ char }: { char: Character }) {
                 placeholder="Введите название заявки"
               />
               {tooManyTickets && (
-                <p className="text-sm text-warning">
+                <p className="text-sm text-danger dark:text-warning">
                   У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
                   открытых заявок
                 </p>
@@ -376,7 +378,7 @@ export default function Tickets({ char }: { char: Character }) {
             </>
           )}
           {timeoutUntil && (
-            <p className="text-sm text-warning">
+            <p className="text-sm text-danger dark:text-warning">
               Вы не можете отправлять сообщения и создавать новые заявки до{" "}
               {formatDate(timeoutUntil)} по следующей причине:
               <br />
@@ -384,7 +386,7 @@ export default function Tickets({ char }: { char: Character }) {
             </p>
           )}
           {char.banned && (
-            <p className="text-sm text-warning">
+            <p className="text-sm text-danger dark:text-warning">
               Вы не можете отправлять сообщения и создавать новые заявки по
               следующей причине:
               <br />
@@ -392,7 +394,9 @@ export default function Tickets({ char }: { char: Character }) {
             </p>
           )}
           {selectedTicket?.isResolved && (
-            <p className="text-sm text-warning">Заявка закрыта</p>
+            <p className="text-sm text-danger dark:text-warning">
+              Заявка закрыта
+            </p>
           )}
           {!selectedTicket?.isResolved && (
             <div className="flex flex-row items-center gap-2">
@@ -429,7 +433,7 @@ export default function Tickets({ char }: { char: Character }) {
                   <Button
                     variant="light"
                     color="warning"
-                    className="text-md h-full min-w-10 text-black dark:text-warning"
+                    className="text-md h-full min-w-10 text-danger dark:text-warning"
                     onClick={() => handleCloseTicket()}
                   >
                     {isCloseTicketPending ? (
@@ -442,7 +446,7 @@ export default function Tickets({ char }: { char: Character }) {
                 <Button
                   variant="light"
                   color="warning"
-                  className="text-md h-full min-w-10 text-black dark:text-warning"
+                  className="text-md h-full min-w-10 text-danger dark:text-warning"
                   isDisabled={
                     (tooManyTickets && !selectedTicket) ||
                     isNewTicketPending ||
