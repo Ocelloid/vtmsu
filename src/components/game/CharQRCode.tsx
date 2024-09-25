@@ -12,7 +12,6 @@ export default function CharQRCode({ characterId }: { characterId: number }) {
       },
       function (error) {
         if (error) console.error(error);
-        console.log("success!");
       },
     );
   }, [characterId]);

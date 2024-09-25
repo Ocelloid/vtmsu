@@ -200,7 +200,6 @@ const ItemForm = ({
               label="Тип предмета"
               selectedKeys={selectedType ? [selectedType.toString()] : []}
               onChange={(e) => {
-                console.log(e.target.value, itemTypes);
                 const newType = !!e.target.value
                   ? Number(e.target.value)
                   : selectedType;

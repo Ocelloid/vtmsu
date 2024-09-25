@@ -26,7 +26,6 @@ const Navigation = () => {
   const pathOpen = (pathname: string) => {
     void router.push(`/${pathname}`, `/${pathname}`, { shallow: false });
   };
-  console.log(appData);
 
   return (
     <nav

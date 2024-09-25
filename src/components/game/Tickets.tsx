@@ -29,7 +29,6 @@ export default function Tickets({ char }: { char: Character }) {
       const until = new Date(
         char.timeoutAt.getTime() + char.timeoutDuration * 60 * 60 * 1000,
       );
-      console.log(char.timeoutAt, char.timeoutDuration, until);
       setTimeoutUntil(until > new Date() ? until : undefined);
     }
   }, [char]);

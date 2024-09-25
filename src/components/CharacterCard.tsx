@@ -166,7 +166,10 @@ const CharacterCard = ({
                   variant="light"
                   color="warning"
                   className="h-8 w-8 min-w-8 rounded-full p-0 text-default dark:text-warning"
-                  onClick={() => handleEditCharacter(character.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleEditCharacter(character.id);
+                  }}
                 >
                   <FaPencilAlt size={16} />
                 </Button>

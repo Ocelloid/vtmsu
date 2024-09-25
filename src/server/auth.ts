@@ -113,7 +113,6 @@ async function sendVerificationRequest(params: {
 }) {
   const { identifier, url, provider } = params;
   const { host } = new URL(url);
-  console.log(provider.server);
   const transport = createTransport(provider.server);
   const result = await transport.sendMail({
     to: identifier,
