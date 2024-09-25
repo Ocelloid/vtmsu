@@ -22,6 +22,8 @@ import { useRouter } from "next/router";
 export default function Game() {
   const router = useRouter();
   const { data: sessionData } = useSession();
+  const { data: isAdmin, isLoading: isUserAdminLoading } =
+    api.user.userIsAdmin.useQuery(undefined, { enabled: !!sessionData });
   const { data: myCharacterData, isLoading: isMyCharactersLoading } =
     api.char.getMine.useQuery(undefined, {
       enabled: !!sessionData,
@@ -43,9 +45,10 @@ export default function Game() {
   const { data: appData } = api.util.getAppData.useQuery();
   useEffect(() => {
     if (appData) {
-      if (!appData.gameAllowed) void router.push("/characters");
+      if (!appData.gameAllowed && !isAdmin && !isUserAdminLoading)
+        void router.push("/characters");
     }
-  }, [appData, router]);
+  }, [appData, isAdmin, router]);
 
   useEffect(() => {
     if (!!myCharacterData) setSelectedCharacter(myCharacterData[0]?.id);
