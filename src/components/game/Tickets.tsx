@@ -4,13 +4,22 @@ import { FaCheck } from "react-icons/fa";
 import { MdSend, MdCancelScheduleSend, MdScheduleSend } from "react-icons/md";
 import type { Ticket } from "~/server/api/routers/util";
 import type { Character } from "~/server/api/routers/char";
-import { Button, Input, Textarea } from "@nextui-org/react";
-import CartDrawer from "~/components/products/CartDrawer";
+import {
+  Button,
+  Input,
+  Textarea,
+  Modal,
+  ModalHeader,
+  ModalContent,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/react";
 import { LoadingSpinner } from "../Loading";
 
 export default function Tickets({ char }: { char: Character }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedTicket, setSelectedTicket] = useState<Ticket>();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [newMessage, setNewMessage] = useState<string>("");
   const [newName, setNewName] = useState<string>("");
 
@@ -37,6 +46,7 @@ export default function Tickets({ char }: { char: Character }) {
         onSuccess: () => {
           setNewMessage("");
           setNewName("");
+          onClose();
           void refetchTickets();
         },
       },
@@ -52,6 +62,7 @@ export default function Tickets({ char }: { char: Character }) {
       },
       {
         onSuccess: () => {
+          onClose();
           setNewMessage("");
           void refetchMessages();
         },
@@ -68,6 +79,7 @@ export default function Tickets({ char }: { char: Character }) {
       },
       {
         onSuccess: (t) => {
+          onClose();
           void refetchTickets();
           setSelectedTicket(t);
         },
@@ -88,171 +100,367 @@ export default function Tickets({ char }: { char: Character }) {
     (tickets?.filter((t) => !t.isResolved).length ?? 0) >=
     (appData?.ticketsLimit ?? 0);
 
-  const handleCartIconClick = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
-
   return (
-    <div className="flex h-full max-h-[calc(100vh-176px)] flex-row gap-2 py-2">
-      <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
-      <div className="hidden w-80 flex-col gap-2 md:flex">
-        <div
-          className={`flex cursor-pointer flex-row items-center gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
-            !selectedTicket ? "bg-red-900/75" : ""
-          }`}
-          onClick={() => setSelectedTicket(undefined)}
-        >
-          <p className="text-sm font-semibold">Новая заявка</p>
-        </div>
-        {tickets?.map((t) => (
-          <div
-            key={t.id}
-            className={`flex cursor-pointer flex-row items-center gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
-              t.id === selectedTicket?.id ? "bg-red-900/75" : ""
-            }`}
-            onClick={() => setSelectedTicket(t)}
-          >
-            <div className="flex flex-row items-center gap-2">
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold">{t.name}</p>
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+        size="full"
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
+        <ModalContent>
+          <ModalHeader>
+            {!selectedTicket ? "Новая заявка" : selectedTicket.name}
+          </ModalHeader>
+          <ModalBody>
+            <div className="flex h-full w-full flex-col gap-2">
+              <div
+                className={`${
+                  selectedTicket?.isResolved
+                    ? "max-h-[calc(100vh-140px)]"
+                    : "max-h-[calc(100vh-240px)]"
+                } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
+              >
+                {messages?.map((m) => (
+                  <div
+                    key={m.id}
+                    className="flex flex-row rounded-lg border-2 border-red-700/50 p-2"
+                  >
+                    <div className="flex w-full flex-col text-sm">
+                      {m.content}
+                    </div>
+                    <div className="flex w-8 flex-col text-xs opacity-50">
+                      {formatDate(m.createdAt)}
+                    </div>
+                  </div>
+                ))}
               </div>
+              {!selectedTicket && (
+                <>
+                  <Input
+                    value={newName}
+                    color="warning"
+                    onChange={(e) => setNewName(e.target.value)}
+                    variant="underlined"
+                    label="Название заявки"
+                    placeholder="Введите название заявки"
+                  />
+                  {tooManyTickets && (
+                    <p className="text-sm text-warning">
+                      У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
+                      открытых заявок
+                    </p>
+                  )}
+                </>
+              )}
+              {char.timeout && (
+                <p className="text-sm text-warning">
+                  Вы не можете отправлять сообщения и создавать новые заявки в
+                  течение {char.timeoutDuration ?? 0} часов по следующей
+                  причине:
+                  <br />
+                  {char.timeoutReason ?? ""}
+                </p>
+              )}
+              {char.banned && (
+                <p className="text-sm text-warning">
+                  Вы не можете отправлять сообщения и создавать новые заявки по
+                  следующей причине:
+                  <br />
+                  {char.bannedReason ?? ""}
+                </p>
+              )}
+              {selectedTicket?.isResolved && (
+                <p className="text-sm text-warning">Заявка закрыта</p>
+              )}
             </div>
-          </div>
-        ))}
-      </div>
-      <div className="flex h-full w-full flex-col gap-2">
-        <div
-          className={`${
-            selectedTicket?.isResolved
-              ? "max-h-[calc(100vh-112px) sm:max-h-[calc(100vh-320px)]"
-              : "max-h-[calc(100vh-176px)] sm:max-h-[calc(100vh-400px)]"
-          } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
-        >
-          {messages?.map((m) => (
-            <div
-              key={m.id}
-              className="flex flex-row rounded-lg border-2 border-red-700/50 p-2"
-            >
-              <div className="flex w-full flex-col text-sm">{m.content}</div>
-              <div className="flex w-8 flex-col text-xs opacity-50">
-                {formatDate(m.createdAt)}
-              </div>
-            </div>
-          ))}
-        </div>
-        {!selectedTicket && (
-          <>
-            <Input
-              value={newName}
-              color="warning"
-              onChange={(e) => setNewName(e.target.value)}
-              variant="underlined"
-              label="Название заявки"
-              placeholder="Введите название заявки"
-            />
-            {tooManyTickets && (
-              <p className="text-sm text-warning">
-                У вас не может быть больше {appData?.ticketsLimit ?? 0} открытых
-                заявок
-              </p>
-            )}
-          </>
-        )}
-        {char.timeout && (
-          <p className="text-sm text-warning">
-            Вы не можете отправлять сообщения и создавать новые заявки в течение{" "}
-            {char.timeoutDuration ?? 0} часов по следующей причине:
-            <br />
-            {char.timeoutReason ?? ""}
-          </p>
-        )}
-        {char.banned && (
-          <p className="text-sm text-warning">
-            Вы не можете отправлять сообщения и создавать новые заявки по
-            следующей причине:
-            <br />
-            {char.bannedReason ?? ""}
-          </p>
-        )}
-        {selectedTicket?.isResolved && (
-          <p className="text-sm text-warning">Заявка разрешена</p>
-        )}
-        {!selectedTicket?.isResolved && (
-          <div className="flex flex-row items-center gap-2">
-            <Textarea
-              maxRows={3}
-              color="warning"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(event) => {
-                if (event.ctrlKey && event.key === "Enter") {
-                  event.preventDefault(); // Prevent default newline behavior
-                  if (
-                    !(
-                      (tooManyTickets && !selectedTicket) ||
-                      isNewTicketPending ||
-                      isPending ||
-                      !newMessage ||
-                      (!newName && !selectedTicket) ||
-                      char.timeout ||
-                      char.banned
-                    )
-                  ) {
-                    if (!selectedTicket) handleAddTicket();
-                    else handleSendMessage();
+          </ModalBody>
+          {!selectedTicket?.isResolved && (
+            <ModalFooter className="flex flex-row items-center gap-2">
+              <Textarea
+                maxRows={3}
+                color="warning"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(event) => {
+                  if (event.ctrlKey && event.key === "Enter") {
+                    event.preventDefault(); // Prevent default newline behavior
+                    if (
+                      !(
+                        (tooManyTickets && !selectedTicket) ||
+                        isNewTicketPending ||
+                        isPending ||
+                        !newMessage ||
+                        (!newName && !selectedTicket) ||
+                        char.timeout ||
+                        char.banned
+                      )
+                    ) {
+                      if (!selectedTicket) handleAddTicket();
+                      else handleSendMessage();
+                    }
                   }
-                }
-              }}
-              variant="underlined"
-              label="Сообщение"
-              placeholder="Введите сообщение"
-            />
-            <div className="flex h-full flex-col gap-2">
-              {!!selectedTicket && (
+                }}
+                variant="underlined"
+                label="Сообщение"
+                placeholder="Введите сообщение"
+              />
+              <div className="flex h-full flex-col gap-2">
+                {!!selectedTicket && (
+                  <Button
+                    variant="light"
+                    color="warning"
+                    className="text-md h-full min-w-10 text-black dark:text-warning"
+                    onClick={() => handleCloseTicket()}
+                  >
+                    {isCloseTicketPending ? (
+                      <LoadingSpinner width={24} height={24} />
+                    ) : (
+                      <FaCheck size={24} />
+                    )}
+                  </Button>
+                )}
                 <Button
                   variant="light"
                   color="warning"
                   className="text-md h-full min-w-10 text-black dark:text-warning"
-                  onClick={() => handleCloseTicket()}
+                  isDisabled={
+                    (tooManyTickets && !selectedTicket) ||
+                    isNewTicketPending ||
+                    isPending ||
+                    !newMessage ||
+                    (!newName && !selectedTicket) ||
+                    char.timeout ||
+                    char.banned
+                  }
+                  onClick={() =>
+                    !!selectedTicket ? handleSendMessage() : handleAddTicket()
+                  }
                 >
-                  {isCloseTicketPending ? (
+                  {isNewTicketPending || isPending ? (
                     <LoadingSpinner width={24} height={24} />
+                  ) : char.timeout ? (
+                    <MdScheduleSend size={24} />
+                  ) : char.banned ? (
+                    <MdCancelScheduleSend size={24} />
                   ) : (
-                    <FaCheck size={24} />
+                    <MdSend size={24} />
                   )}
                 </Button>
-              )}
-              <Button
-                variant="light"
-                color="warning"
-                className="text-md h-full min-w-10 text-black dark:text-warning"
-                isDisabled={
-                  (tooManyTickets && !selectedTicket) ||
-                  isNewTicketPending ||
-                  isPending ||
-                  !newMessage ||
-                  (!newName && !selectedTicket) ||
-                  char.timeout ||
-                  char.banned
-                }
-                onClick={() =>
-                  !!selectedTicket ? handleSendMessage() : handleAddTicket()
-                }
+              </div>
+            </ModalFooter>
+          )}
+        </ModalContent>
+      </Modal>
+      <div className="flex h-full max-h-[calc(100vh-176px)] flex-row gap-2 py-2">
+        <div className="flex w-full flex-col-reverse gap-2 md:hidden">
+          <Button
+            variant="bordered"
+            color="warning"
+            className={`w-full items-center gap-2 rounded-lg p-2`}
+            onClick={() => {
+              setSelectedTicket(undefined);
+              onOpen();
+            }}
+          >
+            <p className="text-sm font-semibold">Новая заявка</p>
+          </Button>
+          {tickets?.map((t) => (
+            <Button
+              key={t.id}
+              variant="faded"
+              color="warning"
+              className={`justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
+                t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+              }`}
+              onClick={() => {
+                setSelectedTicket(t);
+                onOpen();
+              }}
+            >
+              <p className="w-full truncate text-start text-sm">{t.name}</p>
+              {t.isResolved && <FaCheck size={16} />}
+              <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                {formatDate(t.createdAt)}
+              </p>
+            </Button>
+          ))}
+        </div>
+        <div className="hidden max-h-[calc(100vh-296px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
+          <Button
+            variant="faded"
+            color="warning"
+            className={`flex h-10 min-h-10 cursor-pointer flex-row items-center gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
+              !selectedTicket ? "bg-red-900/75" : ""
+            }`}
+            onClick={() => setSelectedTicket(undefined)}
+          >
+            <p className="text-sm font-semibold">Новая заявка</p>
+          </Button>
+          {tickets?.map((t) => (
+            <Button
+              key={t.id}
+              variant="faded"
+              color="warning"
+              className={`h-10 min-h-10 justify-between gap-2 rounded-lg p-2 transition hover:bg-red-900/25 hover:brightness-125 ${
+                t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+              }`}
+              onClick={() => {
+                setSelectedTicket(t);
+              }}
+            >
+              <p className="w-full truncate text-start text-sm">{t.name}</p>
+              {t.isResolved && <FaCheck size={16} />}
+              <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                {formatDate(t.createdAt)}
+              </p>
+            </Button>
+          ))}
+        </div>
+        <div className="hidden h-full w-full flex-col gap-2 md:flex">
+          <div
+            className={`${
+              selectedTicket?.isResolved
+                ? "max-h-[calc(100vh-112px) sm:max-h-[calc(100vh-320px)]"
+                : "max-h-[calc(100vh-176px)] sm:max-h-[calc(100vh-400px)]"
+            } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
+          >
+            {messages?.map((m) => (
+              <div
+                key={m.id}
+                className="flex flex-row rounded-lg border-2 border-red-700/50 p-2"
               >
-                {isNewTicketPending || isPending ? (
-                  <LoadingSpinner width={24} height={24} />
-                ) : char.timeout ? (
-                  <MdScheduleSend size={24} />
-                ) : char.banned ? (
-                  <MdCancelScheduleSend size={24} />
-                ) : (
-                  <MdSend size={24} />
-                )}
-              </Button>
-            </div>
+                <div className="flex w-full flex-col text-sm">{m.content}</div>
+                <div className="flex w-8 flex-col text-xs opacity-50">
+                  {formatDate(m.createdAt)}
+                </div>
+              </div>
+            ))}
           </div>
-        )}
+          {!selectedTicket && (
+            <>
+              <Input
+                value={newName}
+                color="warning"
+                onChange={(e) => setNewName(e.target.value)}
+                variant="underlined"
+                label="Название заявки"
+                placeholder="Введите название заявки"
+              />
+              {tooManyTickets && (
+                <p className="text-sm text-warning">
+                  У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
+                  открытых заявок
+                </p>
+              )}
+            </>
+          )}
+          {char.timeout && (
+            <p className="text-sm text-warning">
+              Вы не можете отправлять сообщения и создавать новые заявки в
+              течение {char.timeoutDuration ?? 0} часов по следующей причине:
+              <br />
+              {char.timeoutReason ?? ""}
+            </p>
+          )}
+          {char.banned && (
+            <p className="text-sm text-warning">
+              Вы не можете отправлять сообщения и создавать новые заявки по
+              следующей причине:
+              <br />
+              {char.bannedReason ?? ""}
+            </p>
+          )}
+          {selectedTicket?.isResolved && (
+            <p className="text-sm text-warning">Заявка закрыта</p>
+          )}
+          {!selectedTicket?.isResolved && (
+            <div className="flex flex-row items-center gap-2">
+              <Textarea
+                maxRows={3}
+                color="warning"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(event) => {
+                  if (event.ctrlKey && event.key === "Enter") {
+                    event.preventDefault(); // Prevent default newline behavior
+                    if (
+                      !(
+                        (tooManyTickets && !selectedTicket) ||
+                        isNewTicketPending ||
+                        isPending ||
+                        !newMessage ||
+                        (!newName && !selectedTicket) ||
+                        char.timeout ||
+                        char.banned
+                      )
+                    ) {
+                      if (!selectedTicket) handleAddTicket();
+                      else handleSendMessage();
+                    }
+                  }
+                }}
+                variant="underlined"
+                label="Сообщение"
+                placeholder="Введите сообщение"
+              />
+              <div className="flex h-full flex-col gap-2">
+                {!!selectedTicket && (
+                  <Button
+                    variant="light"
+                    color="warning"
+                    className="text-md h-full min-w-10 text-black dark:text-warning"
+                    onClick={() => handleCloseTicket()}
+                  >
+                    {isCloseTicketPending ? (
+                      <LoadingSpinner width={24} height={24} />
+                    ) : (
+                      <FaCheck size={24} />
+                    )}
+                  </Button>
+                )}
+                <Button
+                  variant="light"
+                  color="warning"
+                  className="text-md h-full min-w-10 text-black dark:text-warning"
+                  isDisabled={
+                    (tooManyTickets && !selectedTicket) ||
+                    isNewTicketPending ||
+                    isPending ||
+                    !newMessage ||
+                    (!newName && !selectedTicket) ||
+                    char.timeout ||
+                    char.banned
+                  }
+                  onClick={() =>
+                    !!selectedTicket ? handleSendMessage() : handleAddTicket()
+                  }
+                >
+                  {isNewTicketPending || isPending ? (
+                    <LoadingSpinner width={24} height={24} />
+                  ) : char.timeout ? (
+                    <MdScheduleSend size={24} />
+                  ) : char.banned ? (
+                    <MdCancelScheduleSend size={24} />
+                  ) : (
+                    <MdSend size={24} />
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
