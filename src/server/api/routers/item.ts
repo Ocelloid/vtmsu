@@ -59,7 +59,7 @@ export type ItemEffects = {
   id?: number;
   typeId: number;
   effectId: number;
-  expires?: Date;
+  expires?: Date | null;
   effect?: Effect;
   ItemType?: ItemType;
 };
