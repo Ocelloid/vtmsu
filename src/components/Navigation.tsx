@@ -17,11 +17,16 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const { data: sessionData } = useSession();
-  const { data: isPersonnel } = api.user.userIsPersonnel.useQuery();
-  const { data: appData } = api.util.getAppData.useQuery();
+  const { data: isPersonnel } = api.user.userIsPersonnel.useQuery(undefined, {
+    enabled: !!sessionData,
+  });
+  const { data: appData } = api.util.getAppData.useQuery(undefined, {
+    enabled: !!sessionData,
+  });
   const pathOpen = (pathname: string) => {
     void router.push(`/${pathname}`, `/${pathname}`, { shallow: false });
   };
+  console.log(appData);
 
   return (
     <nav
@@ -65,7 +70,7 @@ const Navigation = () => {
         </Button>
         {!!sessionData && (
           <>
-            {!!(isPersonnel ?? appData?.gameAllowed) && (
+            {!!(!!appData?.gameAllowed || !!isPersonnel) && (
               <Button
                 onClick={() => {
                   setIsOpen(false);

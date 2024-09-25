@@ -352,7 +352,7 @@ const CharacterSheet = ({
                         : "Отказан"}
                   </span>
                 </div>
-                {!!(isAdmin ?? appData?.editAllowed) && (
+                {!!(!!isAdmin || !!appData?.editAllowed) && (
                   <Button
                     variant="light"
                     color="warning"

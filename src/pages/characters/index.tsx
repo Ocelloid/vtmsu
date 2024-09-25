@@ -233,7 +233,7 @@ export default function Characters() {
               }
             >
               <div className="flex flex-col gap-2">
-                {!!(isAdmin ?? appData?.createAllowed) && (
+                {!!(!!isAdmin || !!appData?.createAllowed) && (
                   <Button
                     variant="ghost"
                     className="mx-auto h-8 w-full rounded-lg border-white hover:!bg-red-950/50 hover:text-white dark:border-warning dark:text-white sm:w-64"
