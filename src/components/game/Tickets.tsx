@@ -145,13 +145,18 @@ export default function Tickets({ char }: { char: Character }) {
                 {messages?.map((m) => (
                   <div
                     key={m.id}
-                    className="flex flex-row rounded-lg border-2 border-red-700/50 p-2"
+                    className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
                   >
-                    <div className="flex w-full flex-col text-sm">
-                      {m.content}
-                    </div>
-                    <div className="flex w-8 flex-col text-xs opacity-50">
-                      {formatDate(m.createdAt)}
+                    <div className="flex w-full flex-row">
+                      <div className="flex w-full flex-col text-sm">
+                        <p className="flex w-full flex-col text-lg">
+                          {m.isAdmin ? "Расссказчик:" : char?.name + ":"}
+                        </p>
+                        {m.content}
+                      </div>
+                      <div className="flex w-8 flex-col text-xs opacity-50">
+                        {formatDate(m.createdAt)}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -350,11 +355,18 @@ export default function Tickets({ char }: { char: Character }) {
             {messages?.map((m) => (
               <div
                 key={m.id}
-                className="flex flex-row rounded-lg border-2 border-red-700/50 p-2"
+                className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
               >
-                <div className="flex w-full flex-col text-sm">{m.content}</div>
-                <div className="flex w-8 flex-col text-xs opacity-50">
-                  {formatDate(m.createdAt)}
+                <div className="flex w-full flex-row">
+                  <div className="flex w-full flex-col text-sm">
+                    <p className="flex w-full flex-col text-lg">
+                      {m.isAdmin ? "Расссказчик:" : char?.name + ":"}
+                    </p>
+                    {m.content}
+                  </div>
+                  <div className="flex w-8 flex-col text-xs opacity-50">
+                    {formatDate(m.createdAt)}
+                  </div>
                 </div>
               </div>
             ))}
