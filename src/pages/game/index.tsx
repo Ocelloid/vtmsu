@@ -17,6 +17,7 @@ import CharQRCode from "~/components/game/CharQRCode";
 import CharacterCard from "~/components/CharacterCard";
 import BloodMeter from "~/components/game/BloodMeter";
 import HealthMeter from "~/components/game/HealthMeter";
+import GameStore from "~/components/game/GameStore";
 import { useRouter } from "next/router";
 
 export default function Game() {
@@ -171,13 +172,13 @@ export default function Game() {
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <GiLightBackpack size={28} />
                       <span className="hidden text-lg font-bold lg:flex">
-                        Вещи
+                        Предметы
                       </span>
                     </div>
                   }
                   className="flex flex-col gap-2 overflow-y-auto "
                 >
-                  <Inventory char={char} />
+                  <Inventory char={char} refetchChar={refetch} />
                 </Tab>
                 <Tab
                   key="shop"
@@ -191,7 +192,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2 overflow-y-auto "
                 >
-                  Магазин
+                  <GameStore char={char} />
                 </Tab>
                 <Tab
                   key="money"
@@ -199,13 +200,49 @@ export default function Game() {
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <GiMoneyStack size={28} />
                       <span className="hidden text-lg font-bold lg:flex">
-                        Экономика
+                        Бизнес
                       </span>
                     </div>
                   }
                   className="flex flex-col gap-2"
                 >
-                  <Money characterId={char.id} />
+                  <Tabs
+                    aria-label="Меню предприятий"
+                    placement="bottom"
+                    classNames={{
+                      panel:
+                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
+                      tab: "p-1 w-min",
+                      tabList:
+                        "w-full justify-between rounded-none rounded-t-lg mx-2",
+                      wrapper: "flex-grow",
+                    }}
+                  >
+                    <Tab
+                      key="companies"
+                      title={
+                        <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                          <span className="text-lg font-semibold">
+                            Предприятия
+                          </span>
+                        </div>
+                      }
+                      className="flex flex-col gap-2"
+                    >
+                      <Money characterId={char.id} />
+                    </Tab>
+                    <Tab
+                      key="accounts"
+                      title={
+                        <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                          <span className="text-lg font-semibold">Счета</span>
+                        </div>
+                      }
+                      className="flex flex-col gap-2"
+                    >
+                      <Money characterId={char.id} />
+                    </Tab>
+                  </Tabs>
                 </Tab>
                 <Tab
                   key="chat"

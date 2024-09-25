@@ -91,6 +91,63 @@ export type UsingAbility = {
 };
 
 export const itemRouter = createTRPCRouter({
+  purchase: protectedProcedure
+    .input(z.object({ id: z.number(), charId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findFirst({
+        where: { id: input.charId },
+        include: {
+          bankAccount: true,
+        },
+      });
+      if (!char) return { message: "Персонаж не найден", item: undefined };
+
+      const itemType = await ctx.db.itemType.findFirst({
+        where: { id: input.id },
+      });
+      if (!itemType) return { message: "Товар не найден", item: undefined };
+      if (!itemType.isPurchasable)
+        return { message: "Товар не доступен", item: undefined };
+
+      const accountToUse = char.bankAccount.sort(
+        (a, b) => b.balance - a.balance,
+      )[0];
+      if (!accountToUse)
+        return { message: "Не найден счет для покупки", item: undefined };
+      if (itemType.cost > accountToUse.balance)
+        return { message: "Недостаточно средств", item: undefined };
+      await ctx.db.bankAccount.update({
+        where: { id: accountToUse.id },
+        data: {
+          balance: accountToUse.balance - itemType.cost,
+        },
+      });
+      await ctx.db.itemType.update({
+        where: { id: itemType.id },
+        data: {
+          cost: Math.floor(itemType.cost * (1 + itemType.costIncrease / 100)),
+        },
+      });
+      const item = await ctx.db.item.create({
+        data: {
+          name: itemType.name,
+          content: itemType.content,
+          auspexData: itemType.auspexData,
+          image: itemType.image,
+          usage: itemType.usage,
+          typeId: itemType.id,
+          ownedById: input.charId,
+          lastOwnedById: input.charId,
+          createdById: ctx.session.user.id,
+        },
+      });
+      return { message: "Предмет куплен", item: item };
+    }),
+  getPurchasables: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.itemType.findMany({
+      where: { isPurchasable: true },
+    });
+  }),
   applyItem: protectedProcedure
     .input(
       z.object({

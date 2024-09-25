@@ -39,7 +39,13 @@ import { type Item } from "~/server/api/routers/item";
 import QRScanner from "~/components/QRScanner";
 import { degreesToCoordinate } from "~/utils/text";
 
-export default function Inventory({ char }: { char: Character }) {
+export default function Inventory({
+  char,
+  refetchChar,
+}: {
+  char: Character;
+  refetchChar: () => void;
+}) {
   const { location, error, isLoading } = useGeolocation();
   const {
     isOpen: isDropOpen,
@@ -232,6 +238,11 @@ export default function Inventory({ char }: { char: Character }) {
     setScannedChar(scanned);
   };
 
+  const refetch = () => {
+    void refetchItems();
+    void refetchChar();
+  };
+
   if (
     charsLoading ||
     isLoading ||
@@ -319,7 +330,7 @@ export default function Inventory({ char }: { char: Character }) {
                 <Item
                   key={item.id}
                   item={item}
-                  refetchItems={refetchItems}
+                  refetch={refetch}
                   currentChar={char.id}
                   location={location}
                 />
@@ -332,7 +343,7 @@ export default function Inventory({ char }: { char: Character }) {
                 <Item
                   key={item.id}
                   item={item}
-                  refetchItems={refetchItems}
+                  refetch={refetch}
                   currentChar={char.id}
                   location={location}
                 />
@@ -344,7 +355,7 @@ export default function Inventory({ char }: { char: Character }) {
             {activeItem && (
               <Item
                 item={activeItem}
-                refetchItems={refetchItems}
+                refetch={refetch}
                 currentChar={char.id}
                 location={location}
               />
@@ -402,7 +413,7 @@ const ItemBox = ({ id, children }: { id: number; children: ReactNode }) => {
 
 const Item = ({
   item,
-  refetchItems,
+  refetch,
   currentChar,
   location,
 }: {
@@ -413,7 +424,7 @@ const Item = ({
     box: number;
     data: Item;
   };
-  refetchItems: () => void;
+  refetch: () => void;
   currentChar: number;
   location: Location | null;
 }) => {
@@ -445,7 +456,7 @@ const Item = ({
       >
         <Content
           item={item.data}
-          refetchItems={refetchItems}
+          refetch={refetch}
           currentChar={currentChar}
           location={location}
         />
@@ -463,7 +474,7 @@ const Item = ({
     >
       <Content
         item={item.data}
-        refetchItems={refetchItems}
+        refetch={refetch}
         currentChar={currentChar}
         location={location}
       />
@@ -473,12 +484,12 @@ const Item = ({
 
 const Content = ({
   item,
-  refetchItems,
+  refetch,
   currentChar,
   location,
 }: {
   item: Item;
-  refetchItems: () => void;
+  refetch: () => void;
   currentChar: number;
   location: Location | null;
 }) => {
@@ -488,10 +499,6 @@ const Content = ({
   const handleUseItem = () => {
     if (item.usage === 0) return;
     if (!item.id) return;
-    const confirmation = confirm(
-      `Вы уверены, что хотите использовать предмет "${item.name}"?`,
-    );
-    if (!confirmation) return;
     applyItem(
       {
         id: item.id,
@@ -502,7 +509,7 @@ const Content = ({
       },
       {
         onSuccess: () => {
-          void refetchItems();
+          void refetch();
           onClose();
         },
       },
