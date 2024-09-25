@@ -103,7 +103,7 @@ const Navigation = () => {
         >
           Правила
         </Button>
-        <Button
+        {/* <Button
           onClick={() => {
             setIsOpen(false);
             pathOpen("shop");
@@ -112,7 +112,7 @@ const Navigation = () => {
           className="w-min min-w-10 border-none py-2 text-medium hover:text-gray-700 dark:hover:text-gray-300"
         >
           Магазин
-        </Button>
+        </Button> */}
         {!!sessionData && (
           <>
             {isPersonnel && (
