@@ -1,8 +1,9 @@
 import { api } from "~/utils/api";
-import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import QRScanner from "~/components/QRScanner";
 import { LoadingPage } from "~/components/Loading";
+import CharacterCard from "~/components/CharacterCard";
+import type { Character } from "~/server/api/routers/char";
 import { FaPlus, FaArrowRight, FaQrcode } from "react-icons/fa";
 import {
   Button,
@@ -15,14 +16,17 @@ import {
   Select,
   SelectItem,
   useDisclosure,
+  Autocomplete,
+  AutocompleteItem,
 } from "@nextui-org/react";
 
-export default function BankAccounts({ characterId }: { characterId: number }) {
+export default function BankAccounts() {
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [characterId, setCharacterId] = useState<number>();
   const [receiverId, setReceiverId] = useState<string>();
   const [accountId, setAccountId] = useState<number>();
   const [address, setAddress] = useState<string>();
   const [amount, setAmount] = useState<number>(0);
-  const { data: sessionData } = useSession();
   const {
     isOpen: isTransferOpen,
     onOpen: onTransferOpen,
@@ -37,18 +41,21 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
     data: bankAccounts,
     isLoading: bankAccountsLoading,
     refetch: refetchBankAccounts,
-  } = api.econ.getAcconutsByCharId.useQuery(
-    { characterId },
-    { enabled: !!sessionData },
-  );
+  } = api.econ.getBankAccounts.useQuery();
+  const { data: charactersData, isLoading: charactersLoading } =
+    api.char.getAll.useQuery();
   const { mutate: transfer, isPending: isTransferPending } =
     api.econ.transferByAddress.useMutation();
   const { mutate: transferByCharId, isPending: isTransferByCharIdPending } =
     api.econ.transferByCharId.useMutation();
   const { mutate: createBankAccount, isPending: isCreateBankAccountPending } =
     api.econ.createBankAccount.useMutation();
+  useEffect(() => {
+    if (!!charactersData) setCharacters(charactersData);
+  }, [charactersData]);
 
   const handleNewAccount = () => {
+    if (!characterId) return;
     const confirmed = confirm("Вы уверены, что хотите создать новый счёт?");
     if (!confirmed) return;
     createBankAccount(
@@ -122,7 +129,8 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
     );
   };
 
-  if (bankAccountsLoading || isCreateBankAccountPending) return <LoadingPage />;
+  if (bankAccountsLoading || isCreateBankAccountPending || charactersLoading)
+    return <LoadingPage />;
   return (
     <>
       <Modal isOpen={isTransferOpen} onClose={onTransferClose}>
@@ -285,37 +293,72 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <div className="flex h-full flex-col gap-2 pb-2">
-        <Button onClick={handleNewAccount} variant="light" color="warning">
-          <FaPlus size={16} /> Создать счёт
-        </Button>
-        {bankAccounts?.map((account) => (
-          <div key={account.id} className="flex flex-col gap-2">
-            <div className="font-bold">
-              {!!account.company
-                ? `Счёт компании ${account.company.name}`
-                : `Счёт персонажа ${account.character?.name}`}
-            </div>
-            <div className="text-sm text-gray-500">
-              Адрес: {account.address}
-            </div>
-            <div className="text-sm text-gray-500">
-              Баланс: {account.balance} ОВ
-            </div>
-          </div>
-        ))}
-        <div className="mt-auto flex flex-row justify-between gap-2">
+      <div className="container flex h-full flex-col gap-1 rounded-b-lg bg-white/75 p-2 dark:bg-red-950/50 sm:h-full">
+        {!!characters && (
+          <Autocomplete
+            size="md"
+            variant="bordered"
+            placeholder="Выберите персонажа"
+            aria-label="characters"
+            className="w-full rounded-sm"
+            selectedKey={characterId ? characterId.toString() : undefined}
+            onSelectionChange={(e) => {
+              const charId = Number(e);
+              setCharacterId(charId);
+            }}
+          >
+            {characters.map((c) => (
+              <AutocompleteItem
+                key={c.id.toString()}
+                value={c.id.toString()}
+                textValue={c.name}
+              >
+                <CharacterCard character={c} isSelect={true} />
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
+        )}
+        {!!characterId && (
           <Button
-            onClick={onTransferByCharOpen}
+            onClick={handleNewAccount}
             variant="light"
             color="warning"
+            className="w-min"
           >
-            <FaQrcode size={24} /> Перевод по QR
+            <FaPlus size={16} /> Создать счёт
           </Button>
-          <Button onClick={onTransferOpen} variant="light" color="warning">
-            Перевод на счёт <FaArrowRight size={16} />
-          </Button>
-        </div>
+        )}
+        {bankAccounts
+          ?.filter((a) => (characterId ? a.characterId === characterId : true))
+          .map((account) => (
+            <div key={account.id} className="flex flex-col gap-2">
+              <div className="font-bold">
+                {!!account.company
+                  ? `Счёт компании ${account.company.name}`
+                  : `Счёт персонажа ${account.character?.name}`}
+              </div>
+              <div className="text-sm text-gray-500">
+                Адрес: {account.address}
+              </div>
+              <div className="text-sm text-gray-500">
+                Баланс: {account.balance} ОВ
+              </div>
+            </div>
+          ))}
+        {!!characterId && (
+          <div className="mt-auto flex flex-row justify-between gap-2">
+            <Button
+              onClick={onTransferByCharOpen}
+              variant="light"
+              color="warning"
+            >
+              <FaQrcode size={24} /> Перевод по QR
+            </Button>
+            <Button onClick={onTransferOpen} variant="light" color="warning">
+              Перевод на счёт <FaArrowRight size={16} />
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

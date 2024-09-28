@@ -1,5 +1,4 @@
 import { api } from "~/utils/api";
-import { useSession } from "next-auth/react";
 import { LoadingPage, LoadingSpinner } from "~/components/Loading";
 import { useState, useEffect, type ReactNode } from "react";
 import DefaultEditor from "~/components/editors/DefaultEditor";
@@ -13,70 +12,136 @@ import {
   ModalBody,
   Input,
   Button,
+  Autocomplete,
+  AutocompleteItem,
 } from "@nextui-org/react";
-import { FaPencilAlt, FaPlus, FaGift } from "react-icons/fa";
+import { FaPencilAlt, FaPlus, FaGift, FaTrashAlt } from "react-icons/fa";
 import { useGeolocation } from "~/utils/hooks";
 import { degreesToCoordinate } from "~/utils/text";
 import { type Company } from "~/server/api/routers/econ";
 import { type Character } from "~/server/api/routers/char";
+import CharacterCard from "~/components/CharacterCard";
 import QRScanner from "~/components/QRScanner";
 
-export default function Companies({ characterId }: { characterId: number }) {
-  const { data: sessionData } = useSession();
+export default function Companies() {
+  const [characterId, setCharacterId] = useState<number>();
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const { data: charactersData, isLoading: charactersLoading } =
+    api.char.getAll.useQuery();
+  useEffect(() => {
+    if (!!charactersData) setCharacters(charactersData);
+  }, [charactersData]);
   const {
     data: companies,
     isLoading: companiesLoading,
     refetch: refetchCompanies,
-  } = api.econ.getByCharacterId.useQuery(
-    { characterId },
-    { enabled: !!sessionData },
-  );
+  } = api.econ.getAll.useQuery();
+  const { mutate: deleteMutation, isPending: isDeletePending } =
+    api.econ.delete.useMutation();
 
-  if (companiesLoading) return <LoadingPage />;
+  const handleDelete = (id: string) => {
+    const confirmed = confirm("Вы уверены, что хотите удалить компанию?");
+    if (!confirmed) return;
+    deleteMutation(
+      {
+        id,
+      },
+      {
+        onSuccess: () => {
+          void refetchCompanies();
+        },
+      },
+    );
+  };
+
+  if (companiesLoading || charactersLoading || isDeletePending)
+    return <LoadingPage />;
 
   return (
-    <div className="flex flex-col gap-2">
-      <CompanyForm characterId={characterId} onRefetch={refetchCompanies} />
+    <div className="container flex h-full flex-col gap-1 rounded-b-lg bg-white/75 p-2 dark:bg-red-950/50 sm:h-full">
+      {!!characters && (
+        <Autocomplete
+          size="md"
+          variant="bordered"
+          placeholder="Выберите персонажа"
+          aria-label="characters"
+          className="w-full rounded-sm"
+          selectedKey={characterId ? characterId.toString() : undefined}
+          onSelectionChange={(e) => {
+            const charId = Number(e);
+            setCharacterId(charId);
+          }}
+        >
+          {characters.map((c) => (
+            <AutocompleteItem
+              key={c.id.toString()}
+              value={c.id.toString()}
+              textValue={c.name}
+            >
+              <CharacterCard character={c} isSelect={true} />
+            </AutocompleteItem>
+          ))}
+        </Autocomplete>
+      )}
+      {!!characterId && (
+        <CompanyForm
+          characterId={characterId}
+          onRefetch={refetchCompanies}
+          className="mx-auto w-min"
+        />
+      )}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
-        {companies?.map((company) => (
-          <div
-            className="flex w-full flex-col rounded border border-warning p-2"
-            key={company.id}
-          >
-            <div className="text-lg font-bold">Название: {company.name}</div>
-            <div className="text-lg font-bold">
-              Координаты: {degreesToCoordinate(company.coordX)},{" "}
-              {degreesToCoordinate(company.coordY)}
-            </div>
-            <div className="text-muted text-sm">
-              Счета:
-              <div className="flex flex-col gap-2 pl-4">
-                {company.BankAccount?.map((bankAccount) => (
-                  <div key={bankAccount.id} className="flex flex-col gap-0">
-                    <div className="font-bold">
-                      Адрес: {bankAccount.address}
+        {companies
+          ?.filter((c) => (characterId ? c.characterId === characterId : true))
+          .map((company) => (
+            <div
+              className="flex w-full flex-col rounded border border-warning p-2"
+              key={company.id}
+            >
+              <div className="text-lg font-bold">Название: {company.name}</div>
+              <div className="text-lg font-bold">
+                Координаты: {degreesToCoordinate(company.coordX)},{" "}
+                {degreesToCoordinate(company.coordY)}
+              </div>
+              <div className="text-muted text-sm">
+                Счета:
+                <div className="flex flex-col gap-2 pl-4">
+                  {company.BankAccount?.map((bankAccount) => (
+                    <div key={bankAccount.id} className="flex flex-col gap-0">
+                      <div className="font-bold">
+                        Адрес: {bankAccount.address}
+                      </div>
+                      <div className="text-muted text-sm">
+                        Баланс: {bankAccount.balance}
+                      </div>
                     </div>
-                    <div className="text-muted text-sm">
-                      Баланс: {bankAccount.balance}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-row items-center justify-between gap-2">
+                <Button
+                  onClick={() => handleDelete(company.id)}
+                  variant="light"
+                  color="danger"
+                  size="sm"
+                >
+                  <FaTrashAlt size={12} /> Удалить
+                </Button>
+                {!!characterId && (
+                  <CompanyForm
+                    characterId={characterId}
+                    onRefetch={refetchCompanies}
+                    editId={company.id}
+                  >
+                    <FaPencilAlt size={12} /> Редактировать
+                  </CompanyForm>
+                )}
+                <CompanySend company={company} onRefetch={refetchCompanies}>
+                  <FaGift size={12} /> Передать
+                </CompanySend>
               </div>
             </div>
-            <div className="flex flex-row items-center justify-between gap-2">
-              <CompanyForm
-                characterId={characterId}
-                onRefetch={refetchCompanies}
-                editId={company.id}
-              >
-                <FaPencilAlt size={12} /> Редактировать
-              </CompanyForm>
-              <CompanySend company={company} onRefetch={refetchCompanies}>
-                <FaGift size={12} /> Передать
-              </CompanySend>
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );
@@ -185,11 +250,13 @@ function CompanySend({
 }
 
 function CompanyForm({
+  className,
   characterId,
   onRefetch,
   children,
   editId,
 }: {
+  className?: string;
   characterId: number;
   onRefetch?: () => void;
   children?: ReactNode;
@@ -368,8 +435,9 @@ function CompanyForm({
       <Button
         onClick={onModalOpen}
         variant="light"
+        size="sm"
         color="warning"
-        className="mx-auto w-min"
+        className={className}
       >
         {children ? (
           children

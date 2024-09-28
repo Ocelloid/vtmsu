@@ -268,6 +268,16 @@ export const econRouter = createTRPCRouter({
         },
       });
     }),
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.company.delete({
+        where: { id: input.id },
+      });
+      await ctx.db.bankAccount.deleteMany({
+        where: { companyId: input.id },
+      });
+    }),
   setLevel: protectedProcedure
     .input(
       z.object({
