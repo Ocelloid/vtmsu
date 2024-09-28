@@ -10,11 +10,19 @@ import type { Character } from "~/server/api/routers/char";
 export default function BloodMeter({ char }: { char: Character }) {
   const pool = char?.bloodPool ?? 0;
   const amount = char?.bloodAmount ?? 0;
+  const featureEffects = char?.features
+    ?.map((f) => f.feature?.FeatureEffects)
+    .flat();
+  const hasConcentratedBlood = !!featureEffects?.find(
+    (e) => e?.effect?.name === "Концентрированная кровь",
+  );
 
   return (
     <div className="flex w-full flex-col gap-0 text-red-900 dark:text-red-700">
       <div className="flex w-full flex-row justify-between rounded-lg bg-red-200/50 p-2 transition-all dark:bg-red-950/50">
-        {Array.from({ length: pool }).map((_, i) =>
+        {Array.from({
+          length: pool + (hasConcentratedBlood ? 2 : 0),
+        }).map((_, i) =>
           i < (amount ?? 0) ? (
             <BsDropletFill size={20} key={i} />
           ) : (
