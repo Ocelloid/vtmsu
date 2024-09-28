@@ -6,6 +6,8 @@ import { api } from "~/utils/api";
 
 export default function Controls() {
   const { mutate: setAppData, isPending } = api.util.setAppData.useMutation();
+  const { mutate: sunrise, isPending: isSunrisePending } =
+    api.util.sunrise.useMutation();
   const { data: appData, isLoading: isAppDataLoading } =
     api.util.getAppData.useQuery();
   const [data, setData] = useState<AppData>({
@@ -22,7 +24,7 @@ export default function Controls() {
 
   if (isAppDataLoading) return <LoadingPage />;
   return (
-    <div className="flex flex-col gap-2 py-2">
+    <div className="flex h-full flex-col gap-2 py-2 pb-4">
       <Input
         variant="underlined"
         value={data.ticketsLimit.toString()}
@@ -57,6 +59,19 @@ export default function Controls() {
         isDisabled={isPending}
       >
         Сохранить
+      </Button>
+      <Button
+        variant="bordered"
+        className="mt-auto"
+        onClick={() => {
+          const confirmed = confirm(
+            "Вы уверены, что хотите продвинуть день вперёд?",
+          );
+          if (confirmed) sunrise();
+        }}
+        isDisabled={isSunrisePending}
+      >
+        Продвинуть день вперёд
       </Button>
     </div>
   );

@@ -195,4 +195,9 @@ export const utilRouter = createTRPCRouter({
         },
       });
     }),
+  sunrise: protectedProcedure.mutation(async ({ ctx }) => {
+    await ctx.db.char.updateMany({
+      data: { bloodAmount: { decrement: 1 } },
+    });
+  }),
 });
