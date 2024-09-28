@@ -387,12 +387,7 @@ const ItemTypeForm = ({
               variant="solid"
               color="success"
               isDisabled={
-                isPending ||
-                isPendingUpdate ||
-                !title ||
-                !description ||
-                !cost ||
-                !usage
+                isPending || isPendingUpdate || !title || !description || !usage
               }
               onClick={handleFormSubmit}
             >

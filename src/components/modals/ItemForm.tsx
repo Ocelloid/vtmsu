@@ -106,7 +106,8 @@ const ItemForm = ({
           ownedById: selectedCharacter,
         },
         {
-          onSuccess() {
+          onSuccess(e) {
+            if (e?.message) alert(e.message);
             resetForm();
             if (onRefetch) onRefetch();
             setIsModalOpen(false);

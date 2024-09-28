@@ -109,7 +109,8 @@ function CompanySend({
         characterId: char.id,
       },
       {
-        onSuccess() {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
           void onRefetch?.();
           onTradeClose();
         },

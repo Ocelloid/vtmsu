@@ -217,7 +217,8 @@ export default function Inventory({
     bleed(
       { charId: char.id },
       {
-        onSuccess() {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
           void refetchItems();
           void refetchChar();
           onBleedClose();
@@ -555,7 +556,8 @@ const Content = ({
         companyId,
       },
       {
-        onSuccess: () => {
+        onSuccess: (e) => {
+          if (e?.message) alert(e.message);
           void refetch();
           onClose();
         },

@@ -141,7 +141,7 @@ export const itemRouter = createTRPCRouter({
           createdById: ctx.session.user.id,
         },
       });
-      return { message: "Предмет куплен", item: item };
+      return { message: "", item: item };
     }),
   getPurchasables: publicProcedure.query(async ({ ctx }) => {
     return ctx.db.itemType.findMany({
@@ -184,6 +184,7 @@ export const itemRouter = createTRPCRouter({
 
       const char = await ctx.db.char.findUnique({
         where: { id: input.charId },
+        include: { features: { include: { feature: true } } },
       });
       if (!char) return { message: "Персонаж не найден" };
 
@@ -277,6 +278,16 @@ export const itemRouter = createTRPCRouter({
       }
 
       if (!!item.type.bloodAmount) {
+        if (
+          !!char.features.find((f) => f.featureId === 36) &&
+          (item.type.id === 2 || item.type.id === 3 || item.type.id === 4)
+        )
+          return { message: "Вас насыщает только кровь вампиров" };
+        if (
+          !!char.features.find((f) => f.featureId === 31) &&
+          (item.type.id === 2 || item.type.id === 3 || item.type.id === 4)
+        )
+          return { message: "Вас не насыщает кровь из пакетов" };
         const newBloodAmount = char.bloodAmount + item.type.bloodAmount;
         await ctx.db.char.update({
           where: { id: input.charId },
@@ -328,7 +339,7 @@ export const itemRouter = createTRPCRouter({
         });
       }
 
-      return { message: "Предмет использован" };
+      return { message: "" };
     }),
 
   create: protectedProcedure
@@ -396,7 +407,7 @@ export const itemRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (!item) return { message: "Предмет не найден" };
-      return ctx.db.item.update({
+      const newItem = await ctx.db.item.update({
         where: { id: input.id },
         data: {
           name: input.name,
@@ -412,6 +423,7 @@ export const itemRouter = createTRPCRouter({
               : item.ownedById,
         },
       });
+      return { message: "Предмет изменён", item: newItem };
     }),
 
   getById: publicProcedure
@@ -480,9 +492,9 @@ export const itemRouter = createTRPCRouter({
           name: "Витэ",
           content: `Витэ персонажа ${char.name}`,
           image:
-            "https://utfs.io/f/7d1b4dba-9755-479f-b3ba-3c88c8a41b26-r55bkn.png",
+            "https://utfs.io/f/49b78d7d-4bd0-4ebe-b8f4-4be4eb593fe3-1ut81x.png",
           usage: 1,
-          typeId: 2,
+          typeId: 5,
           ownedById: input.charId,
           lastOwnedById: input.charId,
           createdById: ctx.session.user.id,

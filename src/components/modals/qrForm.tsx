@@ -64,7 +64,8 @@ const QRForm = ({
       updateMutation(
         { id: editId, name: title, content: description },
         {
-          onSuccess() {
+          onSuccess(e) {
+            if (e?.message) alert(e.message);
             resetForm();
             if (onRefetch) onRefetch();
             setIsModalOpen(false);

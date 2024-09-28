@@ -72,7 +72,8 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
         amount,
       },
       {
-        onSuccess() {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
           void refetchBankAccounts();
           onTransferClose();
         },
@@ -112,7 +113,8 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
         amount,
       },
       {
-        onSuccess() {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
           void refetchBankAccounts();
           onTransferByCharClose();
         },

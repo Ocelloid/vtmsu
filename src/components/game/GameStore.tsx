@@ -31,6 +31,7 @@ export default function GameStore({ char }: { char: Character }) {
       { id: purchase.id, charId: char.id },
       {
         onSuccess(res: { message: string; item: Item | undefined }) {
+          if (res?.message) alert(res.message);
           if (!!res.item) {
             setPurchase(undefined);
             void refetchItems();
