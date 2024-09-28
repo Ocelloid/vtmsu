@@ -464,7 +464,36 @@ export default function Tickets() {
         <div className="flex h-full max-h-[calc(100vh-372px)] flex-row gap-2 pt-2 md:max-h-[calc(100vh-300px)]">
           <div className="flex w-full flex-col gap-2 overflow-y-auto md:hidden">
             {tickets
-              ?.filter((t) => (!!char ? t.characterId === char?.id : true))
+              ?.filter(
+                (t) =>
+                  (!!char ? t.characterId === char?.id : true) && !t.isResolved,
+              )
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
+                    setChar(t?.character);
+                    onOpen();
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  {t.isResolved && <FaCheck size={16} />}
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
+            {tickets
+              ?.filter(
+                (t) =>
+                  (!!char ? t.characterId === char?.id : true) && t.isResolved,
+              )
               .map((t) => (
                 <Button
                   key={t.id}
