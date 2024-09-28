@@ -57,6 +57,11 @@ export default function Inventory({
     onOpen: onTradeOpen,
     onClose: onTradeClose,
   } = useDisclosure();
+  const {
+    isOpen: isBleedOpen,
+    onOpen: onBleedOpen,
+    onClose: onBleedClose,
+  } = useDisclosure();
   const { data: chars, isLoading: charsLoading } = api.char.getAll.useQuery();
   const {
     data: itemsData,
@@ -68,6 +73,8 @@ export default function Inventory({
     api.item.giveItems.useMutation();
   const { mutate: dropItems, isPending: isDropItemPending } =
     api.item.dropItems.useMutation();
+  const { mutate: bleed, isPending: isCreateItemPending } =
+    api.item.bleed.useMutation();
 
   const [scannedChar, setScannedChar] = useState<Character>();
   const [items, setItems] = useState<
@@ -206,6 +213,19 @@ export default function Inventory({
     );
   };
 
+  const handleBleed = () => {
+    bleed(
+      { charId: char.id },
+      {
+        onSuccess() {
+          void refetchItems();
+          void refetchChar();
+          onBleedClose();
+        },
+      },
+    );
+  };
+
   const handleScanSuccess = (decodedText: string) => {
     if (!chars) {
       alert("Отсутствует список персонажей");
@@ -248,7 +268,8 @@ export default function Inventory({
     isLoading ||
     itemsLoading ||
     isGiveItemPending ||
-    isDropItemPending
+    isDropItemPending ||
+    isCreateItemPending
   )
     return <LoadingPage />;
 
@@ -316,6 +337,23 @@ export default function Inventory({
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <Modal isOpen={isBleedOpen} onClose={onDropClose}>
+        <ModalContent>
+          <ModalHeader>Кровотечение</ModalHeader>
+          <ModalBody>
+            Хотите ли вы слить с себя витэ? Вы потеряете 1 пункт крови и
+            нанесёте себе 1 очко урона.
+          </ModalBody>
+          <ModalFooter className="flex flex-row justify-between gap-2">
+            <Button color="danger" onClick={onBleedClose}>
+              Отменить
+            </Button>
+            <Button color="success" onClick={handleBleed}>
+              Слить
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
@@ -367,11 +405,19 @@ export default function Inventory({
       <div className="flex flex-row justify-between gap-2">
         <Button
           variant="ghost"
-          color="danger"
+          color="primary"
           onClick={onDropOpen}
           isDisabled={!items.filter((i) => i.box === -1).length}
         >
           Сбросить
+        </Button>
+        <Button
+          variant="ghost"
+          color="danger"
+          onClick={onBleedOpen}
+          isDisabled={(char.bloodAmount ?? 0) < 2}
+        >
+          Кровотечение
         </Button>
         <Button
           variant="ghost"

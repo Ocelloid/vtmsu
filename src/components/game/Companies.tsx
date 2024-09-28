@@ -21,7 +21,7 @@ import { type Company } from "~/server/api/routers/econ";
 import { type Character } from "~/server/api/routers/char";
 import QRScanner from "~/components/QRScanner";
 
-export default function Money({ characterId }: { characterId: number }) {
+export default function Companies({ characterId }: { characterId: number }) {
   const { data: sessionData } = useSession();
   const {
     data: companies,
@@ -364,13 +364,18 @@ function CompanyForm({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Button onClick={onModalOpen} variant="light" size="sm" color="warning">
+      <Button
+        onClick={onModalOpen}
+        variant="light"
+        color="warning"
+        className="mx-auto w-min"
+      >
         {children ? (
           children
         ) : (
-          <div className="m-auto flex flex-row items-center gap-2 text-lg">
-            <FaPlus size={24} />
-            Добавить компанию
+          <div className="m-auto flex flex-row items-center gap-2">
+            <FaPlus size={16} />
+            Добавить предприятие
           </div>
         )}
       </Button>

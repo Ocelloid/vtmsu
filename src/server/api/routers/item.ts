@@ -459,6 +459,37 @@ export const itemRouter = createTRPCRouter({
       });
     }),
 
+  bleed: protectedProcedure
+    .input(z.object({ charId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findFirst({
+        where: { id: input.charId },
+      });
+      if (!char) return { message: "Персонаж не найден" };
+      if (char.bloodAmount < 2) return { message: "Недостаточно крови" };
+      if (char.health < 2) return { message: "Недостаточно здоровья" };
+      await ctx.db.char.update({
+        where: { id: input.charId },
+        data: {
+          bloodAmount: char.bloodAmount - 1,
+          health: char.health - 1,
+        },
+      });
+      await ctx.db.item.create({
+        data: {
+          name: "Витэ",
+          content: `Витэ персонажа ${char.name}`,
+          image:
+            "https://utfs.io/f/7d1b4dba-9755-479f-b3ba-3c88c8a41b26-r55bkn.png",
+          usage: 1,
+          typeId: 2,
+          ownedById: input.charId,
+          lastOwnedById: input.charId,
+          createdById: ctx.session.user.id,
+        },
+      });
+    }),
+
   dropItems: protectedProcedure
     .input(
       z.object({

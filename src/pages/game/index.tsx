@@ -8,7 +8,8 @@ import { GiLightBackpack, GiMoneyStack } from "react-icons/gi";
 import { CgShapeRhombus, CgInfinity } from "react-icons/cg";
 import { FaQrcode, FaMap, FaShoppingBasket } from "react-icons/fa";
 import { IoMdChatboxes } from "react-icons/io";
-import Money from "~/components/game/Money";
+import BankAccounts from "~/components/game/BankAccounts";
+import Companies from "~/components/game/Companies";
 import AbilityPage from "~/components/game/AbilityPage";
 import EffectsPage from "~/components/game/EffectsPage";
 import Inventory from "~/components/game/Inventory";
@@ -214,7 +215,7 @@ export default function Game() {
                         "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
                       tab: "p-1 w-min",
                       tabList:
-                        "w-full justify-between rounded-none rounded-t-lg mx-2",
+                        "w-full justify-between rounded-none rounded-t-lg mx-2 ",
                       wrapper: "flex-grow",
                     }}
                   >
@@ -229,7 +230,7 @@ export default function Game() {
                       }
                       className="flex flex-col gap-2"
                     >
-                      <Money characterId={char.id} />
+                      <Companies characterId={char.id} />
                     </Tab>
                     <Tab
                       key="accounts"
@@ -240,7 +241,7 @@ export default function Game() {
                       }
                       className="flex flex-col gap-2"
                     >
-                      <Money characterId={char.id} />
+                      <BankAccounts characterId={char.id} />
                     </Tab>
                   </Tabs>
                 </Tab>

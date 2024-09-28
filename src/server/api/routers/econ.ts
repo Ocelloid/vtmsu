@@ -77,12 +77,46 @@ export const econRouter = createTRPCRouter({
       });
       return account?.balance ?? 0;
     }),
+  createBankAccount: protectedProcedure
+    .input(
+      z.object({
+        characterId: z.number(),
+        companyId: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.bankAccount.create({
+        data: {
+          characterId: input.characterId,
+          companyId: input.companyId,
+          address: (
+            (Date.now() % 1000000) * 100 +
+            Math.floor(Math.random() * 100)
+          ).toString(),
+          balance: 0,
+        },
+      });
+    }),
   getBankAccounts: protectedProcedure.query(async ({ ctx }) => {
     const balances = await ctx.db.bankAccount.findMany({
       include: { character: true, company: true },
     });
     return balances;
   }),
+  getAcconutsByCharId: protectedProcedure
+    .input(z.object({ characterId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const balances = await ctx.db.bankAccount.findMany({
+        where: {
+          OR: [
+            { characterId: input.characterId, companyId: null },
+            { company: { characterId: input.characterId } },
+          ],
+        },
+        include: { company: true, character: true },
+      });
+      return balances;
+    }),
 
   setOwner: protectedProcedure
     .input(
@@ -101,19 +135,23 @@ export const econRouter = createTRPCRouter({
         where: { id: company.id },
         data: { characterId: input.characterId },
       });
+      await ctx.db.bankAccount.updateMany({
+        where: { companyId: company.id },
+        data: { characterId: input.characterId },
+      });
     }),
 
   transferByCharId: protectedProcedure
     .input(
       z.object({
-        fromId: z.number(),
+        fromAddress: z.string(),
         toId: z.number(),
         amount: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const fromAccount = await ctx.db.bankAccount.findFirst({
-        where: { characterId: input.fromId },
+        where: { address: input.fromAddress },
         select: { balance: true, id: true },
       });
       if (!fromAccount) return { message: "Не найден счёт отправителя" };
@@ -182,8 +220,8 @@ export const econRouter = createTRPCRouter({
         characterId: z.number(),
       }),
     )
-    .mutation(({ ctx, input }) => {
-      return ctx.db.company.create({
+    .mutation(async ({ ctx, input }) => {
+      const company = await ctx.db.company.create({
         data: {
           name: input.name,
           image: input.image,
@@ -193,6 +231,17 @@ export const econRouter = createTRPCRouter({
           coordX: input.coordX,
           coordY: input.coordY,
           characterId: input.characterId,
+        },
+      });
+      await ctx.db.bankAccount.create({
+        data: {
+          characterId: input.characterId,
+          companyId: company.id,
+          address: (
+            (Date.now() % 1000000) * 100 +
+            Math.floor(Math.random() * 100)
+          ).toString(),
+          balance: 0,
         },
       });
     }),
