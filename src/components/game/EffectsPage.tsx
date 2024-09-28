@@ -12,6 +12,7 @@ export default function EffectsPage({
   auspex: boolean;
 }) {
   if (!char) return <LoadingPage />;
+  console.log(char.abilities);
 
   return (
     <div className="flex w-full flex-col gap-2">
@@ -116,6 +117,7 @@ const Effect = ({ auspex, e }: { auspex: boolean; e: CharacterEffects }) => {
         size="md"
         strokeWidth={2}
         showValueLabel={true}
+        aria-label="progress"
         value={!!timeRemaining ? timeRemaining : 60}
         maxValue={!!e.effect?.expiration ? e.effect?.expiration * 60 : 60}
         classNames={{

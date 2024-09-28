@@ -1304,7 +1304,13 @@ export const charRouter = createTRPCRouter({
         include: {
           faction: true,
           clan: true,
-          abilities: { include: { abilitiy: true } },
+          abilities: {
+            include: {
+              abilitiy: {
+                include: { AbilityEffects: { include: { effect: true } } },
+              },
+            },
+          },
           features: {
             include: {
               feature: {

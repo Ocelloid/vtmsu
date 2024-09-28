@@ -36,7 +36,11 @@ export default function Companies({ characterId }: { characterId: number }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <CompanyForm characterId={characterId} onRefetch={refetchCompanies} />
+      <CompanyForm
+        characterId={characterId}
+        onRefetch={refetchCompanies}
+        className="mx-auto w-min"
+      />
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
         {companies?.map((company) => (
           <div
@@ -44,18 +48,11 @@ export default function Companies({ characterId }: { characterId: number }) {
             key={company.id}
           >
             <div className="text-lg font-bold">Название: {company.name}</div>
-            <div className="text-lg font-bold">
-              Координаты: {degreesToCoordinate(company.coordX)},{" "}
-              {degreesToCoordinate(company.coordY)}
-            </div>
             <div className="text-muted text-sm">
-              Счета:
-              <div className="flex flex-col gap-2 pl-4">
+              <div className="flex flex-col gap-2">
                 {company.BankAccount?.map((bankAccount) => (
                   <div key={bankAccount.id} className="flex flex-col gap-0">
-                    <div className="font-bold">
-                      Адрес: {bankAccount.address}
-                    </div>
+                    <div className="font-bold">Счёт: {bankAccount.address}</div>
                     <div className="text-muted text-sm">
                       Баланс: {bankAccount.balance}
                     </div>
@@ -185,11 +182,13 @@ function CompanySend({
 }
 
 function CompanyForm({
+  className,
   characterId,
   onRefetch,
   children,
   editId,
 }: {
+  className?: string;
   characterId: number;
   onRefetch?: () => void;
   children?: ReactNode;
@@ -369,7 +368,8 @@ function CompanyForm({
         onClick={onModalOpen}
         variant="light"
         color="warning"
-        className="mx-auto w-min"
+        size="sm"
+        className={className}
       >
         {children ? (
           children
