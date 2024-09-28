@@ -219,6 +219,8 @@ const CharacterTraits = () => {
                         `${(trait as Feature).FeatureEffects?.map((a) => a.effect?.name).join(", ")}`}
                       {cs.type === "Ritual" &&
                         `${(trait as Ritual).RitualEffects?.map((a) => a.effect?.name).join(", ")}`}
+                      {cs.type === "Ability" &&
+                        `${(trait as Ability).cost ? ` - ${(trait as Ability).cost} ПК` : ""}`}
                     </p>
                   </div>
                   {trait.visibleToPlayer ? (

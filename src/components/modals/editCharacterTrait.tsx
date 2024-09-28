@@ -203,6 +203,7 @@ const EditCharacterTrait = ({
       }
       if (traitType === "Ability") {
         setIcon((trait as Ability).icon ?? "");
+        setCost((trait as Ability).cost ?? 0);
         setIsExpert((trait as Ability).expertise ?? false);
         setRequirement((trait as Ability).requirementId ?? undefined);
         setclanIds(
