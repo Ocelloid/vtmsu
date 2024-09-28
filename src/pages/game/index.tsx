@@ -159,13 +159,13 @@ export default function Game() {
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <FaMap size={28} />
                       <span className="hidden text-lg font-bold lg:flex">
-                        Карта
+                        Город
                       </span>
                     </div>
                   }
                   className="flex flex-col gap-2"
                 >
-                  Карта
+                  Город
                 </Tab>
                 <Tab
                   key="items"

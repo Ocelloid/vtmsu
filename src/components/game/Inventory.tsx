@@ -342,7 +342,8 @@ export default function Inventory({
           <ModalHeader>Кровотечение</ModalHeader>
           <ModalBody>
             Хотите ли вы слить с себя витэ? Вы потеряете 1 пункт крови и
-            нанесёте себе 1 очко урона.
+            нанесёте себе 1 очко урона. После этого в вашем инвентаре появится 1
+            порция витэ вашего персонажа.
           </ModalBody>
           <ModalFooter className="flex flex-row justify-between gap-2">
             <Button color="danger" onClick={onBleedClose}>
@@ -417,7 +418,7 @@ export default function Inventory({
           onClick={onBleedOpen}
           isDisabled={(char.bloodAmount ?? 0) < 2}
         >
-          Кровотечение
+          Слить
         </Button>
         <Button
           variant="ghost"
