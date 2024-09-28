@@ -236,6 +236,43 @@ export type FeatureAvailable = {
 };
 
 export const charRouter = createTRPCRouter({
+  forceEffect: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        effectId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+      if (!char) return;
+      const effect = await ctx.db.effect.findUnique({
+        where: { id: input.effectId },
+      });
+      if (!effect) return;
+      await ctx.db.characterEffects.create({
+        data: {
+          characterId: input.id,
+          effectId: input.effectId,
+          expires: effect.expiration
+            ? new Date(new Date().getTime() + 1000 * 60 * effect.expiration)
+            : null,
+        },
+      });
+    }),
+  removeForceEffect: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.characterEffects.deleteMany({
+        where: { id: input.id },
+      });
+    }),
   heal: protectedProcedure
     .input(z.object({ id: z.number(), amount: z.number() }))
     .mutation(async ({ ctx, input }) => {

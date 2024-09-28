@@ -12,7 +12,6 @@ export default function EffectsPage({
   auspex: boolean;
 }) {
   if (!char) return <LoadingPage />;
-  console.log(char.abilities);
 
   return (
     <div className="flex w-full flex-col gap-2">

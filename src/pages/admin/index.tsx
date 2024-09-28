@@ -14,6 +14,7 @@ import ItemTypes from "~/components/admin/ItemTypes";
 import Economy from "~/components/admin/Economy";
 import Controls from "~/components/admin/Controls";
 import Tickets from "~/components/admin/Tickets";
+import ForceEffects from "~/components/admin/ForceEffects";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -222,6 +223,16 @@ export default function Admin() {
                   }
                 >
                   <Controls />
+                </Tab>
+                <Tab
+                  key={"force_effects"}
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Эффекты</span>
+                    </div>
+                  }
+                >
+                  <ForceEffects />
                 </Tab>
               </Tabs>
             </Tab>
