@@ -1424,6 +1424,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.char.findUnique({
         where: { id: input.id },
         select: {
+          isFixed: true,
           createdAt: true,
           updatedAt: true,
           id: true,
