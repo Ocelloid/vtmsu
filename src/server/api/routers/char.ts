@@ -34,6 +34,7 @@ export type Character = {
   timeoutDuration?: number | null;
   banned: boolean;
   alive: boolean;
+  isFixed: boolean;
   bannedReason?: string | null;
   title?: string | null;
   status?: string | null;
