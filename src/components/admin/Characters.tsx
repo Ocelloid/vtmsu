@@ -127,6 +127,7 @@ export default function Characters() {
       </div>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {chars
+          .sort((a, b) => a.id - b.id)
           .filter((c) =>
             !!factionIds.length ? factionIds.includes(c.factionId) : true,
           )

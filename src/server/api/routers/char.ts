@@ -1368,6 +1368,15 @@ export const charRouter = createTRPCRouter({
       return char;
     }),
 
+  fix: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: { isFixed: true },
+      });
+    }),
+
   getPrivateDataById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -1380,6 +1389,7 @@ export const charRouter = createTRPCRouter({
       return ctx.db.char.findFirst({
         where: whereData,
         select: {
+          isFixed: true,
           active: true,
           createdAt: true,
           updatedAt: true,

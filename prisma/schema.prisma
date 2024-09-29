@@ -257,6 +257,7 @@ model Char {
   bloodAmount         Int                   @default(10)
   bloodPool           Int                   @default(10)
   health              Int                   @default(10)
+  isFixed             Boolean               @default(false)
   playerId            String
   playerName          String?
   playerContact       String?

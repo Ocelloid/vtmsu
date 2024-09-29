@@ -14,6 +14,7 @@ import {
   Divider,
   Select,
   SelectItem,
+  Checkbox,
 } from "@nextui-org/react";
 import { FaPencilAlt, FaEye, FaEyeSlash, FaTrashAlt } from "react-icons/fa";
 import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
@@ -69,6 +70,7 @@ const CharacterSheet = ({
   const [privateChar, setPrivateChar] = useState<Character>();
   const [privateVer, setPrivateVer] = useState<boolean>();
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
+  const [isFixed, setIsFixed] = useState<boolean>();
 
   const { data: isAdmin } = api.user.userIsAdmin.useQuery();
 
@@ -115,6 +117,9 @@ const CharacterSheet = ({
   const { mutate: playerMutation, isPending: isPlayerPending } =
     api.char.switchPlayer.useMutation();
 
+  const { mutate: fixMutation, isPending: isFixPending } =
+    api.char.fix.useMutation();
+
   useEffect(() => {
     if (!!router.query.pid) {
       setCharacterId(Number(router.query.pid));
@@ -143,6 +148,7 @@ const CharacterSheet = ({
       setPrivateChar(privateData);
       setComment(privateData.comment ?? "");
       setReceivedComment(privateData.p_comment ?? "");
+      setIsFixed(privateData.isFixed);
     }
   }, [privateData, setPrivateChar]);
 
@@ -151,6 +157,22 @@ const CharacterSheet = ({
       setPrivateVer(publicData.playerId === sessionData.user.id || isAdmin);
     }
   }, [publicData, sessionData, isAdmin, setPrivateVer]);
+
+  const handleFix = () => {
+    const fix = confirm("Фиксировать персонажа?");
+    if (!fix) return;
+    void fixMutation(
+      { id: Number(characterId) },
+      {
+        onSuccess: () => {
+          if (!!onChange) onChange();
+          void privateRefetch();
+          void publicRefetch();
+          setIsFixed(!isFixed);
+        },
+      },
+    );
+  };
 
   const handleDeny = () => {
     const deny = confirm("Вернуть персонажа на доработку?");
@@ -275,6 +297,14 @@ const CharacterSheet = ({
           )}
           {!!isAdmin && !!playersData && (
             <div className="flex flex-1 flex-col gap-2">
+              <Checkbox
+                isSelected={isFixed}
+                onValueChange={handleFix}
+                isDisabled={isFixPending}
+                className="w-full"
+              >
+                Фиксировать персонажа
+              </Checkbox>
               <Select
                 label="Игрок"
                 variant="underlined"
@@ -357,6 +387,7 @@ const CharacterSheet = ({
                     variant="light"
                     color="warning"
                     className="text-md text-black dark:text-warning"
+                    isDisabled={isFixed && !isAdmin}
                     onClick={() => {
                       void router.push(
                         {
