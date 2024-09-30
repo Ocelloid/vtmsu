@@ -35,7 +35,7 @@ import { type Character } from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
 import { useGeolocation, type Location } from "~/utils/hooks";
 import Image from "next/image";
-import { type Item } from "~/server/api/routers/item";
+import type { Item, Container } from "~/server/api/routers/item";
 import QRScanner from "~/components/QRScanner";
 import { degreesToCoordinate } from "~/utils/text";
 
@@ -63,6 +63,8 @@ export default function Inventory({
     onClose: onBleedClose,
   } = useDisclosure();
   const { data: chars, isLoading: charsLoading } = api.char.getAll.useQuery();
+  const { data: containers, isLoading: containersLoading } =
+    api.item.getAllContainers.useQuery();
   const {
     data: itemsData,
     isLoading: itemsLoading,
@@ -75,8 +77,11 @@ export default function Inventory({
     api.item.dropItems.useMutation();
   const { mutate: bleed, isPending: isCreateItemPending } =
     api.item.bleed.useMutation();
+  const { mutate: storeItems, isPending: isStoreItemPending } =
+    api.item.putItemsInContainer.useMutation();
 
   const [scannedChar, setScannedChar] = useState<Character>();
+  const [scannedContainer, setScannedContainer] = useState<Container>();
   const [items, setItems] = useState<
     Array<{
       id: number;
@@ -176,22 +181,37 @@ export default function Inventory({
   };
 
   const handleTrade = () => {
-    if (!scannedChar) return;
     const itemsToGive = items.filter((item) => item.box === -1);
     if (!itemsToGive.length) return;
-    giveItems(
-      {
-        ids: itemsToGive.map((item) => item.id),
-        ownerId: scannedChar.id,
-        previousOwnerId: char.id,
-      },
-      {
-        onSuccess() {
-          void refetchItems();
-          onTradeClose();
+    if (!!scannedChar)
+      giveItems(
+        {
+          ids: itemsToGive.map((item) => item.id),
+          ownerId: scannedChar.id,
+          previousOwnerId: char.id,
         },
-      },
-    );
+        {
+          onSuccess() {
+            void refetchItems();
+            setScannedChar(undefined);
+            onTradeClose();
+          },
+        },
+      );
+    if (!!scannedContainer)
+      storeItems(
+        {
+          itemIds: itemsToGive.map((item) => item.id),
+          containerId: scannedContainer.id,
+        },
+        {
+          onSuccess() {
+            void refetchItems();
+            setScannedContainer(undefined);
+            onTradeClose();
+          },
+        },
+      );
   };
 
   const handleDrop = () => {
@@ -238,8 +258,9 @@ export default function Inventory({
     }
     const charId = decodedText.split("-")[0];
     const timecode = decodedText.split("-")[1];
-    if (!charId) {
-      alert("Отсутствует ID персонажа");
+    const containerId = decodedText.split("/")[4];
+    if (!charId && !containerId) {
+      alert("Отсутствует ID персонажа или контейнера");
       return;
     }
     if (!timecode) {
@@ -252,10 +273,12 @@ export default function Inventory({
       return;
     }
     const scanned = chars.find((c) => c.id === Number(charId));
-    if (!scanned) {
-      alert("Персонаж не найден");
+    const container = containers?.find((c) => c.id === containerId);
+    if (!scanned && !container) {
+      alert("Персонаж или конетйнер не найдены");
       return;
     }
+    setScannedContainer(container);
     setScannedChar(scanned);
   };
 
@@ -270,7 +293,9 @@ export default function Inventory({
     itemsLoading ||
     isGiveItemPending ||
     isDropItemPending ||
-    isCreateItemPending
+    isCreateItemPending ||
+    isStoreItemPending ||
+    containersLoading
   )
     return <LoadingPage />;
 

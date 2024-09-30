@@ -8,6 +8,15 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
+export type Container = {
+  id: string;
+  name: string;
+  content?: string | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  Item?: Item[];
+};
+
 export type Item = {
   id?: number;
   name: string;
@@ -29,6 +38,8 @@ export type Item = {
   lastOwnedById?: number | null;
   lastUsedById?: number | null;
   ownedBy?: Character | null;
+  containerId?: string | null;
+  container?: Container | null;
 };
 
 export type ItemType = {
@@ -91,6 +102,133 @@ export type UsingAbility = {
 };
 
 export const itemRouter = createTRPCRouter({
+  createContainer: protectedProcedure
+    .input(
+      z.object({ name: z.string().min(1), content: z.string().optional() }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const container = await ctx.db.container.create({
+        data: {
+          name: input.name,
+          content: input.content,
+        },
+      });
+      return container;
+    }),
+
+  deleteContainer: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.container.delete({
+        where: { id: input.id },
+      });
+    }),
+
+  updateContainer: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1),
+        content: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.container.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          content: input.content,
+        },
+      });
+    }),
+
+  getAllContainers: protectedProcedure.query(({ ctx }) => {
+    return ctx.db.container.findMany({ include: { Item: true } });
+  }),
+
+  getContainerById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.container.findFirst({
+        where: { id: input.id },
+        include: { Item: true },
+      });
+    }),
+
+  putItemInContainer: protectedProcedure
+    .input(
+      z.object({
+        containerId: z.string(),
+        itemId: z.number(),
+        itemOwnerId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.item.update({
+        where: { id: input.itemId },
+        data: {
+          containerId: input.containerId,
+          lastOwnedById: input.itemOwnerId,
+          ownedById: undefined,
+          ownedBy: undefined,
+        },
+      });
+    }),
+
+  putItemsInContainer: protectedProcedure
+    .input(
+      z.object({
+        containerId: z.string(),
+        itemIds: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.item.updateMany({
+        where: { id: { in: input.itemIds } },
+        data: {
+          containerId: input.containerId,
+          lastOwnedById: undefined,
+          ownedById: undefined,
+        },
+      });
+    }),
+
+  takeItemFromContainer: protectedProcedure
+    .input(
+      z.object({
+        containerId: z.string(),
+        itemId: z.number(),
+        itemOwnerId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.item.update({
+        where: { id: input.itemId },
+        data: {
+          containerId: undefined,
+          ownedById: input.itemOwnerId,
+        },
+      });
+    }),
+
+  takeItemsFromContainer: protectedProcedure
+    .input(
+      z.object({
+        containerId: z.string(),
+        itemOwnerId: z.number(),
+        itemIds: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.item.updateMany({
+        where: { id: { in: input.itemIds } },
+        data: {
+          containerId: undefined,
+          ownedById: input.itemOwnerId,
+        },
+      });
+    }),
+
   purchase: protectedProcedure
     .input(z.object({ id: z.number(), charId: z.number() }))
     .mutation(async ({ ctx, input }) => {

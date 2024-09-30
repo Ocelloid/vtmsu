@@ -33,27 +33,38 @@ model Post {
   @@index([name])
 }
 
+model Container {
+  id        String   @id @default(cuid())
+  name      String
+  content   String?  @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Item      Item[]
+}
+
 model Item {
-  id            Int      @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   name          String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  content       String?  @db.LongText
-  auspexData    String?  @db.LongText
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  content       String?    @db.LongText
+  auspexData    String?    @db.LongText
   image         String?
-  usage         Int      @default(-1)
-  typeId        Int      @default(1)
+  usage         Int        @default(-1)
+  typeId        Int        @default(1)
   coordX        Float?
   coordY        Float?
-  isTrash       Boolean  @default(false)
-  isTradable    Boolean  @default(true)
-  type          ItemType @relation(fields: [typeId], references: [id])
-  createdBy     User     @relation(fields: [createdById], references: [id])
+  isTrash       Boolean    @default(false)
+  isTradable    Boolean    @default(true)
+  type          ItemType   @relation(fields: [typeId], references: [id])
+  createdBy     User       @relation(fields: [createdById], references: [id])
   createdById   String
   ownedById     Int?
   lastOwnedById Int?
   lastUsedById  Int?
-  ownedBy       Char?    @relation(fields: [ownedById], references: [id])
+  ownedBy       Char?      @relation(fields: [ownedById], references: [id])
+  containerId   String?
+  container     Container? @relation(fields: [containerId], references: [id])
 }
 
 model ItemType {

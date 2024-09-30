@@ -15,6 +15,7 @@ import Economy from "~/components/admin/Economy";
 import Controls from "~/components/admin/Controls";
 import Tickets from "~/components/admin/Tickets";
 import ForceEffects from "~/components/admin/ForceEffects";
+import Containers from "~/components/admin/Containers";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -154,7 +155,7 @@ export default function Admin() {
                   className="flex flex-col gap-8 md:gap-2"
                   title={
                     <div className="flex items-center space-x-2">
-                      <span>Типы предметов</span>
+                      <span>Типы вещей</span>
                     </div>
                   }
                 >
@@ -165,11 +166,22 @@ export default function Admin() {
                   className="flex flex-col gap-8 md:gap-2"
                   title={
                     <div className="flex items-center space-x-2">
-                      <span>Все предметы</span>
+                      <span>Все вещи</span>
                     </div>
                   }
                 >
                   <Items />
+                </Tab>
+                <Tab
+                  key={"containers"}
+                  className="flex flex-col gap-8 md:gap-2"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Контейнеры</span>
+                    </div>
+                  }
+                >
+                  <Containers />
                 </Tab>
               </Tabs>
             </Tab>
