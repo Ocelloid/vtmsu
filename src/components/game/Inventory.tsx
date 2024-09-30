@@ -263,23 +263,31 @@ export default function Inventory({
       alert("Отсутствует ID персонажа или контейнера");
       return;
     }
-    if (!timecode && !containerId) {
-      alert("Отсутствует таймкод");
-      return;
+    if (!!charId) {
+      if (!timecode) {
+        alert("Отсутствует таймкод");
+        return;
+      }
+      const diffMs = Date.now() - Number(timecode);
+      if (diffMs > 1000 * 60 * 60) {
+        alert("QR-код устарел");
+        return;
+      }
+      const scanned = chars.find((c) => c.id === Number(charId));
+      if (!scanned) {
+        alert("Персонаж не найден");
+        return;
+      }
+      setScannedChar(scanned);
     }
-    const diffMs = Date.now() - Number(timecode);
-    if (diffMs > 1000 * 60 * 60) {
-      alert("QR-код устарел");
-      return;
+    if (!!containerId) {
+      const container = containers?.find((c) => c.id === containerId);
+      if (!container) {
+        alert("Контейнер не найден");
+        return;
+      }
+      setScannedContainer(container);
     }
-    const scanned = chars.find((c) => c.id === Number(charId));
-    const container = containers?.find((c) => c.id === containerId);
-    if (!scanned && !container) {
-      alert("Персонаж или конетйнер не найдены");
-      return;
-    }
-    setScannedContainer(container);
-    setScannedChar(scanned);
   };
 
   const refetch = () => {
