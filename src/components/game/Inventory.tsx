@@ -263,7 +263,7 @@ export default function Inventory({
       alert("Отсутствует ID персонажа или контейнера");
       return;
     }
-    if (!timecode) {
+    if (!timecode && !containerId) {
       alert("Отсутствует таймкод");
       return;
     }
