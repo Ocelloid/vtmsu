@@ -22,12 +22,20 @@ import type { Company } from "~/server/api/routers/econ";
 import type { HuntingInstance } from "~/server/api/routers/hunt";
 import { LoadingSpinner } from "~/components/Loading";
 
-export default function City({ characterId }: { characterId: number }) {
+export default function City({
+  characterId,
+  refetch,
+}: {
+  characterId: number;
+  refetch: () => void;
+}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { mutate: lookAround, isPending: lookAroundPending } =
     api.util.getLookAround.useMutation();
   const { mutate: collectItem, isPending: collectItemPending } =
     api.item.collectItem.useMutation();
+  const { mutate: newHunt, isPending: isCreatePending } =
+    api.hunt.createHunt.useMutation();
 
   const [items, setItems] = useState<Item[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -64,6 +72,20 @@ export default function City({ characterId }: { characterId: number }) {
       `Вы хотите атаковать ${instance.target?.name ?? "Цель для охоты"}?`,
     );
     if (!confirmed) return;
+    newHunt(
+      { characterId, instanceId: instance.id! },
+      {
+        onSuccess(e) {
+          if (e?.hunt.status === "exp_failure") alert("Цель сбежала");
+          if (e?.hunt.status === "masq_failure") alert("Нарушение маскарада");
+          if (e?.hunt.status === "req_failure")
+            alert("Цель не соответствует предпочтениям персонажа");
+          if (e?.hunt.status === "success") alert("Успешная охота");
+          handleLookAround();
+          void refetch();
+        },
+      },
+    );
   };
 
   const handleCollectItem = (item: Item) => {
@@ -109,14 +131,23 @@ export default function City({ characterId }: { characterId: number }) {
                 key={violation.id + "_violation"}
                 className="flex flex-col gap-1"
               >
-                <div className="flex flex-row items-center gap-1 text-lg font-semibold">
-                  <GiChalkOutlineMurder size={16} />
-                  {violation.target?.name ?? "Нарушение маскарада"}
+                <div className="flex flex-row items-center gap-1 text-lg">
+                  <GiChalkOutlineMurder size={32} className="min-w-8" />
+                  <div className="flex flex-col gap-0">
+                    {violation.target?.name ?? "Нарушение маскарада"}
+                    <div className="text-justify text-sm">
+                      {
+                        violation.target?.descs![
+                          violation.target?.descs!.length - violation.remains!
+                        ]!.content
+                      }
+                    </div>
+                  </div>
                 </div>
                 <Button
                   size="sm"
                   variant="ghost"
-                  isDisabled={collectItemPending}
+                  isDisabled={collectItemPending || lookAroundPending}
                   onClick={() => handleAttack(violation)}
                 >
                   Расследовать
@@ -129,9 +160,9 @@ export default function City({ characterId }: { characterId: number }) {
                 key={instance.id + "_instance"}
                 className="flex flex-col gap-1"
               >
-                <div className="flex flex-row items-center gap-1 text-lg font-semibold">
+                <div className="flex flex-row items-center gap-1 text-lg">
                   <GiHumanTarget size={32} className="min-w-8" />
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-0">
                     {instance.target?.name ?? "Цель для охоты"}
                     <div className="text-justify text-sm">
                       {
@@ -146,7 +177,7 @@ export default function City({ characterId }: { characterId: number }) {
                   size="sm"
                   color="danger"
                   variant="ghost"
-                  isDisabled={collectItemPending}
+                  isDisabled={isCreatePending || lookAroundPending}
                   onClick={() => handleAttack(instance)}
                 >
                   Охота
@@ -156,9 +187,9 @@ export default function City({ characterId }: { characterId: number }) {
             {!!huntingInstances.length && <Divider />}
             {items.map((item) => (
               <div key={item.id + "_item"} className="flex flex-col gap-1">
-                <div className="flex flex-row items-center gap-1 text-lg font-semibold">
+                <div className="flex flex-row items-center gap-1 text-lg">
                   <GiCardboardBoxClosed size={32} className="min-w-8" />
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-0">
                     {item.name}
                     <div
                       className="text-justify text-sm"
@@ -170,7 +201,7 @@ export default function City({ characterId }: { characterId: number }) {
                   size="sm"
                   color="success"
                   variant="ghost"
-                  isDisabled={collectItemPending}
+                  isDisabled={collectItemPending || lookAroundPending}
                   onClick={() => handleCollectItem(item)}
                 >
                   Подобрать
@@ -183,9 +214,9 @@ export default function City({ characterId }: { characterId: number }) {
                 key={company.id + "_company"}
                 className="flex flex-col gap-1"
               >
-                <div className="flex flex-row items-center gap-1 text-lg font-semibold">
+                <div className="flex flex-row items-center gap-1 text-lg">
                   <GiFactory size={32} className="min-w-8" />
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-0">
                     {company.name}
                     <div className="text-justify text-sm">
                       Владелец: {company.character?.name}
@@ -197,7 +228,7 @@ export default function City({ characterId }: { characterId: number }) {
                     size="sm"
                     color="primary"
                     variant="ghost"
-                    isDisabled={collectItemPending}
+                    isDisabled={collectItemPending || lookAroundPending}
                     onClick={() => handleSabotage(company)}
                   >
                     Саботаж
@@ -206,7 +237,7 @@ export default function City({ characterId }: { characterId: number }) {
                     size="sm"
                     color="danger"
                     variant="ghost"
-                    isDisabled={collectItemPending}
+                    isDisabled={collectItemPending || lookAroundPending}
                     onClick={() => handleRacket(company)}
                   >
                     Рэкет

@@ -132,6 +132,12 @@ export const huntRouter = createTRPCRouter({
         },
       });
 
+      if (status === "success" || status === "masq_failure")
+        await ctx.db.char.update({
+          where: { id: input.characterId },
+          data: { bloodAmount: character?.bloodPool ?? 10 },
+        });
+
       return { hunt: newHunt, instance: newInstance };
     }),
 
