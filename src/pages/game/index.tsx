@@ -120,7 +120,7 @@ export default function Game() {
                 classNames={{
                   panel:
                     "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
-                  tab: "h-8 p-0 w-full overflow-hidden overflow-y-hidden rounded-sm",
+                  tab: "h-8 p-0 w-full overflow-hidden overflow-y-hidden",
                   tabList: "w-full justify-between",
                   wrapper: "flex-grow",
                   tabContent:
@@ -302,7 +302,7 @@ export default function Game() {
                         }
                         showOutline={false}
                         classNames={{
-                          badge: "mb-1 sm:mb-2 text-xs rounded-md",
+                          badge: "mb-1 sm:mb-2 text-xs rounded-lg",
                         }}
                       >
                         <IoMdChatboxes size={24} />
