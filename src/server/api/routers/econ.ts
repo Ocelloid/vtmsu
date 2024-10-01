@@ -65,6 +65,7 @@ export const econRouter = createTRPCRouter({
     .query(({ ctx, input }) => {
       return ctx.db.company.findUnique({
         where: { id: input.id },
+        include: { BankAccount: true },
       });
     }),
 
@@ -130,7 +131,7 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
         select: { BankAccount: true, id: true },
       });
-      if (!company) return { message: "Не найдена компания" };
+      if (!company) return { message: "Не найдено предприятие" };
       await ctx.db.company.update({
         where: { id: company.id },
         data: { characterId: input.characterId },
@@ -286,6 +287,35 @@ export const econRouter = createTRPCRouter({
         where: { companyId: input.id },
       });
     }),
+  upgrade: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const company = await ctx.db.company.findFirst({
+        where: { id: input.id },
+      });
+      if (!company) return { message: "Не найдено предприятие" };
+      const upgradeCost = company.level * 1000 - 500;
+      console.log(upgradeCost);
+      if (company.level >= 10)
+        return { message: "Предприятие уже вышло на 10 уровень" };
+      const bankAccount = await ctx.db.bankAccount.findFirst({
+        where: { companyId: input.id },
+      });
+      if (!bankAccount) return { message: "Отсутствует счёт предприятия" };
+      if (bankAccount.balance < upgradeCost)
+        return { message: "Недостаточно средств для повышения уровня" };
+      await ctx.db.bankAccount.update({
+        where: { id: bankAccount.id },
+        data: {
+          balance: bankAccount.balance - upgradeCost,
+        },
+      });
+      await ctx.db.company.update({
+        where: { id: input.id },
+        data: { level: company.level + 1 },
+      });
+      return { message: "Уровень предрпиятия успешно повышен" };
+    }),
   setLevel: protectedProcedure
     .input(
       z.object({
@@ -298,7 +328,7 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
         select: { level: true, id: true },
       });
-      if (!company) return { message: "Не найдена компания" };
+      if (!company) return { message: "Не найдено предприятие" };
       await ctx.db.company.update({
         where: { id: company.id },
         data: { level: input.level },
@@ -315,7 +345,7 @@ export const econRouter = createTRPCRouter({
       const company = await ctx.db.company.findFirst({
         where: { id: input.id },
       });
-      if (!company) return { message: "Не найдена компания" };
+      if (!company) return { message: "Не найдено предприятие" };
       await ctx.db.company.update({
         where: { id: company.id },
         data: { isActive: input.disabled },

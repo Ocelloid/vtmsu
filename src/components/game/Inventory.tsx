@@ -624,8 +624,8 @@ const Content = ({
             </div>
             {!!item.type?.companyLevels && (
               <Input
-                placeholder="Введите ID компании"
-                label="ID компании"
+                placeholder="Введите ID предприятия"
+                label="ID предприятия"
                 value={companyId}
                 onChange={(e) => setCompanyId(e.target.value)}
               />

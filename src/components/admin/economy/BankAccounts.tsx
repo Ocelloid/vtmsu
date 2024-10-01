@@ -139,7 +139,7 @@ export default function BankAccounts() {
           <ModalBody>
             <p>
               Вы можете перевести средства с одного счёта на другой. Вы можете
-              перевести средства из компании в счёт персонажа или наоборот.
+              перевести средства из предприятия в счёт персонажа или наоборот.
             </p>
             {!!bankAccounts && (
               <Select
@@ -161,14 +161,14 @@ export default function BankAccounts() {
                     value={account.id.toString()}
                     textValue={
                       !!account.company
-                        ? `Счёт компании ${account.company.name}`
+                        ? `Счёт предприятия ${account.company.name}`
                         : `Счёт персонажа ${account.character?.name}`
                     }
                   >
                     <div className="flex flex-col gap-1">
                       <div className="font-bold">
                         {!!account.company
-                          ? `Счёт компании ${account.company.name}`
+                          ? `Счёт предприятия ${account.company.name}`
                           : `Счёт персонажа ${account.character?.name}`}
                       </div>
                       <div className="text-sm text-gray-500">
@@ -241,14 +241,14 @@ export default function BankAccounts() {
                     value={account.id.toString()}
                     textValue={
                       !!account.company
-                        ? `Счёт компании ${account.company.name}`
+                        ? `Счёт предприятия ${account.company.name}`
                         : `Счёт персонажа ${account.character?.name}`
                     }
                   >
                     <div className="flex flex-col gap-1">
                       <div className="font-bold">
                         {!!account.company
-                          ? `Счёт компании ${account.company.name}`
+                          ? `Счёт предприятия ${account.company.name}`
                           : `Счёт персонажа ${account.character?.name}`}
                       </div>
                       <div className="text-sm text-gray-500">
@@ -334,7 +334,7 @@ export default function BankAccounts() {
             <div key={account.id} className="flex flex-col gap-2">
               <div className="font-bold">
                 {!!account.company
-                  ? `Счёт компании ${account.company.name}`
+                  ? `Счёт предприятия ${account.company.name}`
                   : `Счёт персонажа ${account.character?.name}`}
               </div>
               <div className="text-sm text-gray-500">

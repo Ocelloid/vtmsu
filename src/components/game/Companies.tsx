@@ -14,7 +14,7 @@ import {
   Input,
   Button,
 } from "@nextui-org/react";
-import { FaPencilAlt, FaPlus, FaGift } from "react-icons/fa";
+import { FaPencilAlt, FaPlus, FaGift, FaArrowUp, FaCopy } from "react-icons/fa";
 import { useGeolocation } from "~/utils/hooks";
 import { degreesToCoordinate } from "~/utils/text";
 import { type Company } from "~/server/api/routers/econ";
@@ -48,13 +48,23 @@ export default function Companies({ characterId }: { characterId: number }) {
             key={company.id}
           >
             <div className="text-lg font-bold">Название: {company.name}</div>
+            <div className="text-muted text-sm">Уровень: {company.level}</div>
             <div className="text-muted text-sm">
               <div className="flex flex-col gap-2">
                 {company.BankAccount?.map((bankAccount) => (
                   <div key={bankAccount.id} className="flex flex-col gap-0">
-                    <div className="font-bold">Счёт: {bankAccount.address}</div>
-                    <div className="text-muted text-sm">
-                      Баланс: {bankAccount.balance}
+                    <Button
+                      size="sm"
+                      variant="light"
+                      className="flex w-min flex-row items-center gap-1 text-sm text-gray-500"
+                      onClick={() =>
+                        navigator.clipboard.writeText(bankAccount.address)
+                      }
+                    >
+                      Адрес счёта: {bankAccount.address} <FaCopy size={12} />
+                    </Button>
+                    <div className="px-3 text-sm text-gray-500">
+                      Баланс: {bankAccount.balance} ОВ
                     </div>
                   </div>
                 ))}
@@ -154,14 +164,14 @@ function CompanySend({
     <>
       <Modal isOpen={isTradeOpen} onClose={onTradeClose}>
         <ModalContent>
-          <ModalHeader>Передача компании</ModalHeader>
+          <ModalHeader>Передача предприятия</ModalHeader>
           <ModalBody>
             <QRScanner
               onScanSuccess={handleScanSuccess}
               onScanError={(e) => console.error(e)}
             />
             <p>
-              Вы отправите персонажу {char?.name} компанию: {company.name}
+              Вы отправите персонажу {char?.name} предприятие: {company.name}
             </p>
           </ModalBody>
           <ModalFooter className="flex flex-row justify-between gap-2">
@@ -200,23 +210,34 @@ function CompanyForm({
     onOpen: onModalOpen,
     onClose: onModalClose,
   } = useDisclosure();
+
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [isWarrens, setIsWarrens] = useState(false);
-  const { data: balance, isLoading: isBalanceLoading } =
-    api.econ.getBalance.useQuery({ characterId });
+
+  const {
+    data: balance,
+    isLoading: isBalanceLoading,
+    refetch: refetchBalance,
+  } = api.econ.getBalance.useQuery({ characterId });
+  const {
+    data: companyData,
+    isLoading: isCompanyLoading,
+    refetch: refetchCompany,
+  } = api.econ.getById.useQuery(
+    {
+      id: editId!,
+    },
+    { enabled: !!editId },
+  );
+
+  const { mutate: upgradeMutation, isPending: isUpgradePending } =
+    api.econ.upgrade.useMutation();
   const { mutate: createMutation, isPending } = api.econ.create.useMutation();
   const { mutate: updateMutation, isPending: isPendingUpdate } =
     api.econ.update.useMutation();
-  const { data: companyData, isLoading: isCompanyLoading } =
-    api.econ.getById.useQuery(
-      {
-        id: editId!,
-      },
-      { enabled: !!editId },
-    );
 
   const resetForm = () => {
     setName("");
@@ -254,6 +275,8 @@ function CompanyForm({
           onSuccess() {
             resetForm();
             if (onRefetch) onRefetch();
+            void refetchBalance();
+            if (!!companyData) void refetchCompany();
             onModalClose();
           },
         },
@@ -272,10 +295,34 @@ function CompanyForm({
           onSuccess() {
             resetForm();
             if (onRefetch) onRefetch();
+            void refetchBalance();
+            if (!!companyData) void refetchCompany();
             onModalClose();
           },
         },
       );
+  };
+
+  const handleUpgrade = () => {
+    if (!editId) {
+      alert("Вы не выбрали предприятие для улучшения");
+      return;
+    }
+    upgradeMutation(
+      {
+        id: editId,
+      },
+      {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
+          resetForm();
+          if (onRefetch) onRefetch();
+          void refetchBalance();
+          void refetchCompany();
+          onModalClose();
+        },
+      },
+    );
   };
 
   if (isCompanyLoading || isBalanceLoading || isLoading)
@@ -299,7 +346,7 @@ function CompanyForm({
       >
         <ModalContent>
           <ModalHeader>
-            {!!editId ? "Редактирование компании" : "Добавить компанию"}
+            {!!editId ? "Редактирование предприятия" : "Добавить предприятие"}
           </ModalHeader>
           <ModalBody>
             <p>
@@ -310,10 +357,29 @@ function CompanyForm({
                   ? `(${degreesToCoordinate(location.latitude)}, ${degreesToCoordinate(location.longitude)})`
                   : error}
             </p>
-            {!editId && (
+            {!editId ? (
               <>
                 <p>Ваш баланс: {balance ?? 0} ОВ</p>
-                <p>Стоимость компании: 500 ОВ</p>
+                <p>Стоимость предприятия: 500 ОВ</p>
+              </>
+            ) : (
+              <>
+                <p>
+                  Баланс предприятия:{" "}
+                  {companyData?.BankAccount[0]?.balance ?? 0} ОВ
+                </p>
+                <p>
+                  Стоимость повышения уровня предприятия:{" "}
+                  {(companyData?.level ?? 0) * 1000 - 500} ОВ
+                </p>
+                <Button
+                  onClick={handleUpgrade}
+                  variant="light"
+                  color="warning"
+                  isDisabled={isUpgradePending}
+                >
+                  <FaArrowUp size={16} /> Улучшить предприятие
+                </Button>
               </>
             )}
             <Input

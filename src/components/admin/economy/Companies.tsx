@@ -41,7 +41,7 @@ export default function Companies() {
     api.econ.delete.useMutation();
 
   const handleDelete = (id: string) => {
-    const confirmed = confirm("Вы уверены, что хотите удалить компанию?");
+    const confirmed = confirm("Вы уверены, что хотите удалить предприятие?");
     if (!confirmed) return;
     deleteMutation(
       {
@@ -223,14 +223,14 @@ function CompanySend({
     <>
       <Modal isOpen={isTradeOpen} onClose={onTradeClose}>
         <ModalContent>
-          <ModalHeader>Передача компании</ModalHeader>
+          <ModalHeader>Передача предприятия</ModalHeader>
           <ModalBody>
             <QRScanner
               onScanSuccess={handleScanSuccess}
               onScanError={(e) => console.error(e)}
             />
             <p>
-              Вы отправите персонажу {char?.name} компанию: {company.name}
+              Вы отправите персонажу {char?.name} предприятие: {company.name}
             </p>
           </ModalBody>
           <ModalFooter className="flex flex-row justify-between gap-2">
@@ -368,7 +368,7 @@ function CompanyForm({
       >
         <ModalContent>
           <ModalHeader>
-            {!!editId ? "Редактирование компании" : "Добавить компанию"}
+            {!!editId ? "Редактирование предприятия" : "Добавить предприятие"}
           </ModalHeader>
           <ModalBody>
             <p>
@@ -382,7 +382,7 @@ function CompanyForm({
             {!editId && (
               <>
                 <p>Ваш баланс: {balance ?? 0} ОВ</p>
-                <p>Стоимость компании: 500 ОВ</p>
+                <p>Стоимость предприятия: 500 ОВ</p>
               </>
             )}
             <Input
