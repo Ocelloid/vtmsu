@@ -613,6 +613,26 @@ export const itemRouter = createTRPCRouter({
       });
     }),
 
+  collectItem: protectedProcedure
+    .input(z.object({ id: z.number(), charId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const item = await ctx.db.item.findFirst({
+        where: { id: input.id },
+      });
+      if (!item) return { message: "Предмет не найден" };
+
+      await ctx.db.item.update({
+        where: { id: input.id },
+        data: {
+          ownedById: input.charId,
+          coordX: null,
+          coordY: null,
+        },
+      });
+
+      return { message: "" };
+    }),
+
   bleed: protectedProcedure
     .input(z.object({ charId: z.number() }))
     .mutation(async ({ ctx, input }) => {
@@ -656,6 +676,7 @@ export const itemRouter = createTRPCRouter({
       return ctx.db.item.updateMany({
         where: { id: { in: input.ids } },
         data: {
+          ownedById: null,
           coordX: input.coordX,
           coordY: input.coordY,
         },

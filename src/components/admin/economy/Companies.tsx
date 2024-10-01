@@ -29,6 +29,7 @@ import { type Company } from "~/server/api/routers/econ";
 import { type Character } from "~/server/api/routers/char";
 import CharacterCard from "~/components/CharacterCard";
 import QRScanner from "~/components/QRScanner";
+import DynamicCompaniesMap from "~/components/admin/economy/DynamicCompaniesMap";
 
 export default function Companies() {
   const [characterId, setCharacterId] = useState<number>();
@@ -97,6 +98,7 @@ export default function Companies() {
           className="mx-auto w-min"
         />
       )}
+      {!!companies && <DynamicCompaniesMap companies={companies} />}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
         {companies
           ?.filter((c) => (characterId ? c.characterId === characterId : true))
@@ -330,8 +332,8 @@ function CompanyForm({
           isVisible,
           isWarrens,
           characterId,
-          coordX: location.latitude,
-          coordY: location.longitude,
+          coordX: location.longitude,
+          coordY: location.latitude,
         },
         {
           onSuccess() {

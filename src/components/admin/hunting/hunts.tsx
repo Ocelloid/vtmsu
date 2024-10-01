@@ -185,9 +185,9 @@ const Hunts = () => {
                 if (!!e.target.value)
                   setDesc(
                     instances.find((i) => i.id === Number(e.target.value))
-                      ?.target!.descs![
-                      instances.find((i) => i.id === Number(e.target.value))!
-                        .target!.descs!.length -
+                      ?.target?.descs![
+                      (instances.find((i) => i.id === Number(e.target.value))!
+                        .target?.descs?.length ?? 0) -
                         instances.find((i) => i.id === Number(e.target.value))!
                           .remains!
                     ]?.content ?? "",
@@ -214,8 +214,9 @@ const Hunts = () => {
                   <p className="text-xs">
                     {
                       instance.target?.descs![
-                        instance.target?.descs!.length - instance.remains!
-                      ]!.content
+                        (instance.target?.descs?.length ?? 0) -
+                          instance.remains!
+                      ]?.content
                     }
                   </p>
                 </SelectItem>
@@ -258,7 +259,12 @@ const Hunts = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapControl />
-        <Draggable updatePosition={(p) => setPosition(p)} />
+        <Draggable
+          updatePosition={(p) => {
+            setPosition(p);
+            void navigator.clipboard.writeText(p.lat + "," + p.lng);
+          }}
+        />
         {instances
           .filter((i) => (!!i.expires ? i.expires < new Date() : true))
           .map((instance) => (
@@ -282,13 +288,13 @@ const Hunts = () => {
                 >
                   <Popup>
                     <div className="flex flex-col items-center gap-0">
-                      <span>{instance.target!.name}</span>
+                      <span>{instance.target?.name}</span>
                       <span className="pb-1 text-xs">Нарушение маскарада</span>
                       <span>
                         {
-                          instance.target!.descs![
-                            instance.target!.descs!.length - 1
-                          ]!.content
+                          instance.target?.descs![
+                            (instance.target?.descs?.length ?? 0) - 1
+                          ]?.content
                         }
                       </span>
                     </div>
@@ -321,7 +327,7 @@ const Hunts = () => {
         {hunts
           .filter((t) =>
             !!search
-              ? t.instance!.target!.name.toLowerCase().includes(search)
+              ? t.instance?.target?.name.toLowerCase().includes(search)
               : true,
           )
           .map((hunt) => (
@@ -338,7 +344,7 @@ const Hunts = () => {
                   <FaExclamationTriangle />
                 )}
                 &nbsp;
-                {hunt.instance!.target!.name}
+                {hunt.instance?.target?.name}
               </div>
               <div className="-mt-1 pb-1 text-xs">
                 Игрок:&nbsp;{hunt.createdBy?.name}
@@ -348,8 +354,8 @@ const Hunts = () => {
               </div>
               <div className="-mt-1 pb-1 text-xs">
                 Координаты:&nbsp;
-                {hunt.instance!.coordY.toFixed(5)},&nbsp;
-                {hunt.instance!.coordX.toFixed(5)}
+                {hunt.instance?.coordY.toFixed(5)},&nbsp;
+                {hunt.instance?.coordX.toFixed(5)}
               </div>
               <div className="-mt-1 pb-1 text-xs">
                 Дата:&nbsp;
@@ -365,9 +371,9 @@ const Hunts = () => {
                       ? "Срок цели истёк"
                       : "Нарушение маскарада"}
               </div>
-              {hunt.instance!.groundId && (
+              {hunt.instance?.groundId && (
                 <div className="-mt-1 pb-1 text-xs">
-                  {hunt.instance!.ground?.name}
+                  {hunt.instance?.ground?.name}
                 </div>
               )}
             </div>

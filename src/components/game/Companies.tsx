@@ -268,8 +268,8 @@ function CompanyForm({
           isVisible,
           isWarrens,
           characterId,
-          coordX: location.latitude,
-          coordY: location.longitude,
+          coordX: location.longitude,
+          coordY: location.latitude,
         },
         {
           onSuccess() {

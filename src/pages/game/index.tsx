@@ -204,7 +204,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <City />
+                  <City characterId={char.id} />
                 </Tab>
                 <Tab
                   key="items"
