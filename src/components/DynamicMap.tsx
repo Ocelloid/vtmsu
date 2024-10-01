@@ -7,10 +7,8 @@ import { RecenterAutomatically } from "~/components/map";
 function Map({ center }: { center: { lat: number; lng: number } }) {
   const [position, setPosition] = useState<LatLng>(new LatLng(58.0075, 56.23));
   useEffect(() => {
-    console.log("use effect");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        console.log(pos);
         setPosition(new LatLng(pos.coords.latitude, pos.coords.longitude));
       },
       (err) => {
