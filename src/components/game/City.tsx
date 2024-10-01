@@ -20,6 +20,7 @@ import {
 import type { Item } from "~/server/api/routers/item";
 import type { Company } from "~/server/api/routers/econ";
 import type { HuntingInstance } from "~/server/api/routers/hunt";
+import { LoadingSpinner } from "~/components/Loading";
 
 export default function City({ characterId }: { characterId: number }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -219,7 +220,7 @@ export default function City({ characterId }: { characterId: number }) {
         onClick={handleLookAround}
         isDisabled={lookAroundPending}
       >
-        Осмотреться
+        {lookAroundPending ? <LoadingSpinner height={24} /> : "Осмотреться"}
       </Button>
     </div>
   );
