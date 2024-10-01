@@ -45,7 +45,9 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
   const [position, setPosition] = useState<LatLng>(new LatLng(58.0075, 56.23));
   const [instances, setInstances] = useState<HuntingInstance[]>([]);
   const { data: huntingInstances, isLoading: isHuntingInstancesLoading } =
-    api.hunt.getAllHuntingInstances.useQuery();
+    api.hunt.getAllHuntingInstances.useQuery(undefined, {
+      refetchInterval: 10000,
+    });
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
