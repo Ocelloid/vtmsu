@@ -263,7 +263,14 @@ export default function Inventory({
       alert("Отсутствует ID персонажа или контейнера");
       return;
     }
-    if (!!charId) {
+    if (!!containerId) {
+      const container = containers?.find((c) => c.id === containerId);
+      if (!container) {
+        alert("Контейнер не найден");
+        return;
+      }
+      setScannedContainer(container);
+    } else if (!!charId) {
       if (!timecode) {
         alert("Отсутствует таймкод");
         return;
@@ -279,14 +286,6 @@ export default function Inventory({
         return;
       }
       setScannedChar(scanned);
-    }
-    if (!!containerId) {
-      const container = containers?.find((c) => c.id === containerId);
-      if (!container) {
-        alert("Контейнер не найден");
-        return;
-      }
-      setScannedContainer(container);
     }
   };
 
