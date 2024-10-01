@@ -64,6 +64,18 @@ export const utilRouter = createTRPCRouter({
       });
     }),
 
+  getActiveViolations: protectedProcedure.query(async ({ ctx }) => {
+    const violations = await ctx.db.huntingInstance.findMany({
+      where: { remains: { lt: 2 }, isVisible: true },
+      include: {
+        target: { include: { instances: true, descs: true } },
+        ground: true,
+        hunts: { include: { createdBy: true } },
+      },
+    });
+    return violations;
+  }),
+
   getLookAround: protectedProcedure
     .input(z.object({ x: z.number(), y: z.number(), charId: z.number() }))
     .mutation(async ({ ctx, input }) => {

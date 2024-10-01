@@ -27,6 +27,7 @@ export type HuntingInstance = {
   coordY: number;
   coordX: number;
   temporary: boolean;
+  isVisible: boolean;
   expires?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
