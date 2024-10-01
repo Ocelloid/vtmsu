@@ -14,6 +14,7 @@ import {
   Button,
   Autocomplete,
   AutocompleteItem,
+  Checkbox,
 } from "@nextui-org/react";
 import { FaPencilAlt, FaPlus, FaGift, FaTrashAlt } from "react-icons/fa";
 import { useGeolocation } from "~/utils/hooks";
@@ -399,6 +400,12 @@ function CompanyForm({
               onUpdate={setContent}
               placeholder="Введите описание"
             />
+            <Checkbox isSelected={isVisible} onValueChange={setIsVisible}>
+              Постоянно видно на карте
+            </Checkbox>
+            <Checkbox isSelected={isWarrens} onValueChange={setIsWarrens}>
+              Канализация
+            </Checkbox>
             <UploadButton
               content={{
                 button: "Загрузить",

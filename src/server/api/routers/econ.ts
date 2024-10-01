@@ -221,13 +221,21 @@ export const econRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const character = await ctx.db.char.findUnique({
+        where: { id: input.characterId },
+        include: { effects: { include: { effect: true } } },
+      });
+      if (!character) return { message: "Не найден персонаж" };
+      const characterIsWarrens = !!character.effects?.find((e) =>
+        e.effect.name.includes("Канализация"),
+      );
       const company = await ctx.db.company.create({
         data: {
           name: input.name,
           image: input.image,
           content: input.content,
           isVisible: input.isVisible ?? false,
-          isWarrens: input.isWarrens ?? false,
+          isWarrens: input.isWarrens ?? characterIsWarrens,
           coordX: input.coordX,
           coordY: input.coordY,
           characterId: input.characterId,
