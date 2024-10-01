@@ -1480,6 +1480,15 @@ export const charRouter = createTRPCRouter({
           timeout: true,
           banned: true,
           alive: true,
+          Company: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              content: true,
+              BankAccount: true,
+            },
+          },
         },
       });
     }),

@@ -16,12 +16,19 @@ import {
   SelectItem,
   Checkbox,
 } from "@nextui-org/react";
-import { FaPencilAlt, FaEye, FaEyeSlash, FaTrashAlt } from "react-icons/fa";
+import {
+  FaPencilAlt,
+  FaEye,
+  FaEyeSlash,
+  FaTrashAlt,
+  FaCopy,
+} from "react-icons/fa";
 import { VscUnverified, VscVerified, VscWarning } from "react-icons/vsc";
 import { disciplines } from "~/assets";
 import { api } from "~/utils/api";
 import Image from "next/image";
 import Head from "next/head";
+import type { BankAccount } from "~/server/api/routers/econ";
 
 const Display = ({
   label,
@@ -49,6 +56,14 @@ const Display = ({
   );
 };
 
+type CompanyList = {
+  id: string;
+  name: string;
+  image: string;
+  content: string;
+  BankAccount: BankAccount[];
+}[];
+
 const CharacterSheet = ({
   charId,
   onChange,
@@ -71,6 +86,7 @@ const CharacterSheet = ({
   const [privateVer, setPrivateVer] = useState<boolean>();
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
   const [isFixed, setIsFixed] = useState<boolean>();
+  const [companies, setCompanies] = useState<CompanyList>([]);
 
   const { data: isAdmin } = api.user.userIsAdmin.useQuery();
 
@@ -139,6 +155,7 @@ const CharacterSheet = ({
       } else {
         setPublicChar(publicData);
         setSelectedPlayer(publicData.playerId);
+        setCompanies(publicData.Company ?? []);
       }
     }
   }, [isAdmin, publicData, sessionData, router, setPublicChar]);
@@ -439,6 +456,42 @@ const CharacterSheet = ({
               </div>
             </div>
             <Display dangerouslySetInnerHTML={publicChar.publicInfo!} />
+            {!!companies.length && (
+              <>
+                <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
+                <span className="text-2xl text-default-600">Предприятия</span>
+              </>
+            )}
+            {companies.map((c) => (
+              <div className="flex flex-col" key={c.id + "_company"}>
+                <div className="flex flex-row items-center gap-2 text-xl">
+                  {c.name}
+                </div>
+                <div
+                  className="whitespace-break-spaces pt-2 text-justify text-xs"
+                  dangerouslySetInnerHTML={{ __html: c.content }}
+                />
+                <div className="text-muted text-sm">
+                  <div className="flex flex-col gap-2">
+                    {c.BankAccount?.map((bankAccount) => (
+                      <div key={bankAccount.id} className="flex flex-col gap-0">
+                        <Button
+                          size="sm"
+                          variant="light"
+                          className="flex w-min flex-row items-center gap-1 text-sm text-gray-500"
+                          onClick={() =>
+                            navigator.clipboard.writeText(bankAccount.address)
+                          }
+                        >
+                          Адрес счёта: {bankAccount.address}{" "}
+                          <FaCopy size={12} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
             {!!privateChar && (
               <div className="flex flex-1 flex-col gap-2">
                 <Divider className="mb-2 mt-3 bg-red-950 dark:bg-danger" />
