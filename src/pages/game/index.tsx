@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
-import { Select, SelectItem, Tabs, Tab, Link } from "@nextui-org/react";
+import { Select, SelectItem, Tabs, Tab, Link, Badge } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { GiLightBackpack, GiMoneyStack } from "react-icons/gi";
 import { CgShapeRhombus, CgInfinity } from "react-icons/cg";
@@ -288,10 +288,24 @@ export default function Game() {
                   key="chat"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <IoMdChatboxes size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
-                        Заявки
-                      </span>
+                      <Badge
+                        content={
+                          char.Ticket?.filter((t) => !t.isResolved).length
+                        }
+                        aria-label="Заявки"
+                        color="warning"
+                        size="sm"
+                        placement="top-right"
+                        showOutline={false}
+                        classNames={{
+                          badge: "mt-2 mr-2 text-xs",
+                        }}
+                      >
+                        <IoMdChatboxes size={24} />
+                        <span className="hidden text-lg font-bold lg:flex">
+                          Заявки
+                        </span>
+                      </Badge>
                     </div>
                   }
                   className="flex flex-col gap-2"

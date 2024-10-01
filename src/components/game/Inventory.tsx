@@ -308,7 +308,19 @@ export default function Inventory({
 
   return (
     <div className="flex flex-col gap-4 pb-4">
-      <Modal isOpen={isTradeOpen} onClose={onTradeClose}>
+      <Modal
+        isOpen={isTradeOpen}
+        onClose={onTradeClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Передача предметов</ModalHeader>
           <ModalBody>
@@ -345,7 +357,19 @@ export default function Inventory({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isDropOpen} onClose={onDropClose}>
+      <Modal
+        isOpen={isDropOpen}
+        onClose={onDropClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Сброс предметов</ModalHeader>
           <ModalBody>
@@ -374,7 +398,19 @@ export default function Inventory({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isBleedOpen} onClose={onDropClose}>
+      <Modal
+        isOpen={isBleedOpen}
+        onClose={onDropClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Кровотечение</ModalHeader>
           <ModalBody>
@@ -605,7 +641,21 @@ const Content = ({
   };
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} className="relative" size="sm">
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        className="relative"
+        size="sm"
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Использование предмета</ModalHeader>
           <ModalBody>

@@ -346,6 +346,7 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (!company) return { message: "Не найдено предприятие" };
+
       const character = await ctx.db.char.findUnique({
         where: { id: input.charId },
         include: {
@@ -356,15 +357,31 @@ export const econRouter = createTRPCRouter({
       if (!character) return { message: "Не найден персонаж" };
       if (!character.bankAccount.length)
         return { message: "Не найден счет для персонажа" };
+
       if (
         (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
         company.level * 1000 - 500
       )
         return { message: "Недостаточно средств" };
+
       await ctx.db.company.update({
         where: { id: company.id },
         data: { isActive: !company.isActive },
       });
+
+      await ctx.db.ticket.create({
+        data: {
+          name: "Саботаж предприятия",
+          characterId: company.characterId,
+          Message: {
+            create: {
+              content: `Ваше предприятие ${company.name} подверглось саботажу`,
+              isAdmin: true,
+            },
+          },
+        },
+      });
+
       return {
         message: company.isActive
           ? "Успешный саботаж"
@@ -383,6 +400,7 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (!company) return { message: "Не найдено предприятие" };
+
       const character = await ctx.db.char.findUnique({
         where: { id: input.charId },
         include: {
@@ -393,11 +411,26 @@ export const econRouter = createTRPCRouter({
       if (!character) return { message: "Не найден персонаж" };
       if (!character.bankAccount.length)
         return { message: "Не найден счет для персонажа" };
+
       if (
         (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
         (company.level - 1) * 4000 + 2000
       )
         return { message: "Недостаточно средств" };
+
+      await ctx.db.ticket.create({
+        data: {
+          name: "Рэкет предприятия",
+          characterId: company.characterId,
+          Message: {
+            create: {
+              content: `${character.name} захватывает ваше предприятие ${company.name}`,
+              isAdmin: true,
+            },
+          },
+        },
+      });
+
       await ctx.db.company.update({
         where: { id: company.id },
         data: { characterId: input.charId },

@@ -309,7 +309,19 @@ export default function Tickets() {
           )}
         </ModalContent>
       </Modal>
-      <Modal isOpen={isBanOpen} onClose={onBanClose}>
+      <Modal
+        isOpen={isBanOpen}
+        onClose={onBanClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>
             {char?.banned ? "Разблокировать" : "Заблокировать"} персонажа?
@@ -348,7 +360,19 @@ export default function Tickets() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isTimeoutOpen} onClose={onTimeoutClose}>
+      <Modal
+        isOpen={isTimeoutOpen}
+        onClose={onTimeoutClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>
             {char?.timeout ? "Отменить" : "Поставить на"} таймаут персонажа?

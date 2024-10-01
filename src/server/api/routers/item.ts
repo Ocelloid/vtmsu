@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Ability, Effect, Character } from "~/server/api/routers/char";
 import type { User } from "~/server/api/routers/user";
+import type { Ticket } from "~/server/api/routers/util";
 
 import {
   createTRPCRouter,
@@ -40,6 +41,7 @@ export type Item = {
   ownedBy?: Character | null;
   containerId?: string | null;
   container?: Container | null;
+  Ticket?: Ticket[];
 };
 
 export type ItemType = {

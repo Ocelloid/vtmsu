@@ -125,7 +125,19 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
   if (bankAccountsLoading || isCreateBankAccountPending) return <LoadingPage />;
   return (
     <>
-      <Modal isOpen={isTransferOpen} onClose={onTransferClose}>
+      <Modal
+        isOpen={isTransferOpen}
+        onClose={onTransferClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Перевод средств</ModalHeader>
           <ModalBody>
@@ -209,7 +221,19 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isTransferByCharOpen} onClose={onTransferByCharClose}>
+      <Modal
+        isOpen={isTransferByCharOpen}
+        onClose={onTransferByCharClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Перевод средств</ModalHeader>
           <ModalBody>

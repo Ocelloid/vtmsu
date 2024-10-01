@@ -132,7 +132,19 @@ function ForceEffectsForm({
 
   return (
     <>
-      <Modal isOpen={isApplyModalOpen} onClose={onApplyModalClose}>
+      <Modal
+        isOpen={isApplyModalOpen}
+        onClose={onApplyModalClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Применить эффект</ModalHeader>
           <ModalBody>
@@ -182,7 +194,19 @@ function ForceEffectsForm({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isRemoveModalOpen} onClose={onRemoveModalClose}>
+      <Modal
+        isOpen={isRemoveModalOpen}
+        onClose={onRemoveModalClose}
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
         <ModalContent>
           <ModalHeader>Убрать эффект</ModalHeader>
           <ModalBody>

@@ -1392,6 +1392,7 @@ export const charRouter = createTRPCRouter({
             },
           },
           effects: { include: { effect: true } },
+          Ticket: true,
           Item: {
             include: {
               type: { include: { ItemEffects: { include: { effect: true } } } },
