@@ -317,7 +317,11 @@ export default function Inventory({
               onScanError={(e) => console.error(e)}
             />
             <p>
-              Вы отправите персонажу {scannedChar?.name} следующие предметы:
+              Вы{" "}
+              {scannedChar
+                ? `отправите персонажу ${scannedChar.name}`
+                : `положите в контейнер ${scannedContainer?.name}`}{" "}
+              следующие предметы:
             </p>
             <ul className="list-inside list-disc">
               {items
@@ -334,7 +338,7 @@ export default function Inventory({
             <Button
               color="success"
               onClick={handleTrade}
-              isDisabled={!scannedChar}
+              isDisabled={!scannedChar && !scannedContainer}
             >
               Отправить
             </Button>
