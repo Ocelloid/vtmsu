@@ -102,7 +102,7 @@ export default function City({ characterId }: { characterId: number }) {
       <Modal isOpen={isOpen} onClose={onClose} size="full">
         <ModalContent>
           <ModalHeader>Осмотреться</ModalHeader>
-          <ModalBody className="flex flex-col gap-2">
+          <ModalBody className="flex max-h-[80vh] flex-col gap-2 overflow-y-auto">
             Вы видите рядом с собой...
             {violations.map((violation) => (
               <div
@@ -130,15 +130,17 @@ export default function City({ characterId }: { characterId: number }) {
                 className="flex flex-col gap-1"
               >
                 <div className="flex flex-row items-center gap-1 text-lg font-semibold">
-                  <GiHumanTarget size={16} />
-                  {instance.target?.name ?? "Цель для охоты"}
-                </div>
-                <div className="text-justify text-sm">
-                  {
-                    instance.target?.descs![
-                      instance.target?.descs!.length - instance.remains!
-                    ]!.content
-                  }
+                  <GiHumanTarget size={32} className="min-w-8" />
+                  <div className="flex flex-col gap-1">
+                    {instance.target?.name ?? "Цель для охоты"}
+                    <div className="text-justify text-sm">
+                      {
+                        instance.target?.descs![
+                          instance.target?.descs!.length - instance.remains!
+                        ]!.content
+                      }
+                    </div>
+                  </div>
                 </div>
                 <Button
                   size="sm"
@@ -155,8 +157,14 @@ export default function City({ characterId }: { characterId: number }) {
             {items.map((item) => (
               <div key={item.id + "_item"} className="flex flex-col gap-1">
                 <div className="flex flex-row items-center gap-1 text-lg font-semibold">
-                  <GiCardboardBoxClosed size={16} />
-                  {item.name}
+                  <GiCardboardBoxClosed size={32} className="min-w-8" />
+                  <div className="flex flex-col gap-1">
+                    {item.name}
+                    <div
+                      className="text-justify text-sm"
+                      dangerouslySetInnerHTML={{ __html: item.content ?? "" }}
+                    />
+                  </div>
                 </div>
                 <Button
                   size="sm"
@@ -176,11 +184,13 @@ export default function City({ characterId }: { characterId: number }) {
                 className="flex flex-col gap-1"
               >
                 <div className="flex flex-row items-center gap-1 text-lg font-semibold">
-                  <GiFactory size={16} />
-                  {company.name}
-                </div>
-                <div className="text-justify text-sm">
-                  Владелец: {company.character?.name}
+                  <GiFactory size={32} className="min-w-8" />
+                  <div className="flex flex-col gap-1">
+                    {company.name}
+                    <div className="text-justify text-sm">
+                      Владелец: {company.character?.name}
+                    </div>
+                  </div>
                 </div>
                 <div className={"flex flex-row justify-between gap-1"}>
                   <Button

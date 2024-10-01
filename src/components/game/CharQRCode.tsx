@@ -141,7 +141,7 @@ export default function CharQRCode({ char }: { char: Character }) {
         color="warning"
         className="mx-auto mb-auto max-w-64"
       >
-        <FaQrcode size={24} /> Сканировать чужой QR-код
+        <FaQrcode size={24} /> Сканировать QR-код
       </Button>
     </>
   );

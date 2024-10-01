@@ -216,13 +216,13 @@ export default function Inventory({
 
   const handleDrop = () => {
     if (!location) return;
-    const itemsToDrop = items.filter((item) => item.box === 0);
+    const itemsToDrop = items.filter((item) => item.box === -1);
     if (!itemsToDrop.length) return;
     dropItems(
       {
         ids: itemsToDrop.map((item) => item.id),
-        coordX: location.latitude,
-        coordY: location.longitude,
+        coordX: location.longitude,
+        coordY: location.latitude,
       },
       {
         onSuccess() {
@@ -590,8 +590,8 @@ const Content = ({
       {
         id: item.id,
         charId: currentChar,
-        coordX: location?.latitude ?? 0,
-        coordY: location?.longitude ?? 0,
+        coordX: location?.longitude ?? 0,
+        coordY: location?.latitude ?? 0,
         companyId,
       },
       {
