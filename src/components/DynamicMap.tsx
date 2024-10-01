@@ -1,5 +1,4 @@
 import {
-  CircleMarker,
   MapContainer,
   TileLayer,
   Polyline,
@@ -14,9 +13,10 @@ import { RecenterAutomatically } from "~/components/map";
 import { api } from "~/utils/api";
 import type { HuntingInstance } from "~/server/api/routers/hunt";
 import { LoadingPage } from "~/components/Loading";
+import { GiVampireCape } from "react-icons/gi";
 
-const marker_icon = L.icon({ iconUrl: "/map-marker.png" });
 const skull_icon = L.icon({ iconUrl: "/skull.png" });
+const cape_icon = L.icon({ iconUrl: "/cape.png" });
 const cityBorders = [
   new LatLng(57.984261983475534, 56.15550041198731),
   new LatLng(57.99408935391382, 56.157903671264656),
@@ -64,11 +64,11 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
 
   useEffect(() => {
     setTimeout(() => {
-      const red = document.getElementsByClassName("red-pulse");
+      const red = document.getElementsByClassName("animate-pulse");
       for (const item of red) {
         if (!!item)
           (item as HTMLElement).style.animationDuration =
-            Math.random() * 5 + 5 + "s";
+            Math.random() * 5 + 1 + "s";
       }
     }, 250);
   }, []);
@@ -109,9 +109,11 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
               center={[instance.coordY, instance.coordX]}
               pathOptions={{
                 color: "transparent",
+                opacity: 0.05,
                 fillColor: "red",
-                className: "red-pulse",
+                className: "animate-pulse",
               }}
+              fillOpacity={0.05}
               radius={100 * instance.remains!}
             />
           ))}
@@ -143,18 +145,14 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
               </Popup>
             </Marker>
           ))}
-        <CircleMarker
-          className="n h-[150px] w-[150px]"
-          center={position}
-          radius={10}
-          color="transparent"
-          fillColor="red"
-          fillOpacity={0.5}
-        >
-          <Popup className="-mt-5 h-[50px] w-[180px]">
-            <p className="text-[15px]">Вы здесь</p>
-          </Popup>
-        </CircleMarker>
+        {!!position && (
+          <Marker position={position} icon={cape_icon}>
+            <GiVampireCape />
+            <Popup className="-mt-5 h-[50px] w-[180px]">
+              <p className="text-[15px]">Вы здесь</p>
+            </Popup>
+          </Marker>
+        )}
       </MapContainer>
     </div>
   );
