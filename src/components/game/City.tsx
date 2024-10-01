@@ -17,6 +17,7 @@ import {
   GiChalkOutlineMurder,
   GiCardboardBoxClosed,
 } from "react-icons/gi";
+import { FcFactoryBreakdown } from "react-icons/fc";
 import type { Item } from "~/server/api/routers/item";
 import type { Company } from "~/server/api/routers/econ";
 import type { HuntingInstance } from "~/server/api/routers/hunt";
@@ -36,6 +37,10 @@ export default function City({
     api.item.collectItem.useMutation();
   const { mutate: newHunt, isPending: isHuntPending } =
     api.hunt.createHunt.useMutation();
+  const { mutate: toggleActive, isPending: isToggleActivePending } =
+    api.econ.toggleActive.useMutation();
+  const { mutate: racket, isPending: isRacketPending } =
+    api.econ.racket.useMutation();
 
   const [items, setItems] = useState<Item[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -107,9 +112,21 @@ export default function City({
 
   const handleSabotage = (company: Company) => {
     const confirmed = confirm(
-      `Вы хотите атаковать ${company.name}? Это будет стоить вам ${company.level * 1000 - 500} ОВ`,
+      `Вы хотите ${company.isActive ? "атаковать" : "восстановить"} ${company.name}? Это будет стоить вам ${company.level * 1000 - 500} ОВ`,
     );
     if (!confirmed) return;
+    toggleActive(
+      {
+        id: company.id,
+        charId: characterId,
+      },
+      {
+        onSuccess(e) {
+          if (!!e?.message) alert(e.message);
+          handleLookAround();
+        },
+      },
+    );
   };
 
   const handleRacket = (company: Company) => {
@@ -117,6 +134,18 @@ export default function City({
       `Вы хотите захватить ${company.name}? Это будет стоить вам ${(company.level - 1) * 4000 + 2000} ОВ`,
     );
     if (!confirmed) return;
+    racket(
+      {
+        id: company.id,
+        charId: characterId,
+      },
+      {
+        onSuccess(e) {
+          if (!!e?.message) alert(e.message);
+          handleLookAround();
+        },
+      },
+    );
   };
 
   return (
@@ -215,7 +244,11 @@ export default function City({
                 className="flex flex-col gap-1"
               >
                 <div className="flex flex-row items-center gap-1 text-lg">
-                  <GiFactory size={32} className="min-w-8" />
+                  {company.isActive ? (
+                    <GiFactory size={32} className="min-w-8" />
+                  ) : (
+                    <FcFactoryBreakdown size={32} className="min-w-8" />
+                  )}
                   <div className="flex flex-col gap-0">
                     {company.name}
                     <div className="text-justify text-sm">
@@ -223,26 +256,41 @@ export default function City({
                     </div>
                   </div>
                 </div>
-                <div className={"flex flex-row justify-between gap-1"}>
-                  <Button
-                    size="sm"
-                    color="primary"
-                    variant="ghost"
-                    isDisabled={collectItemPending || lookAroundPending}
-                    onClick={() => handleSabotage(company)}
-                  >
-                    Саботаж
-                  </Button>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    variant="ghost"
-                    isDisabled={collectItemPending || lookAroundPending}
-                    onClick={() => handleRacket(company)}
-                  >
-                    Рэкет
-                  </Button>
-                </div>
+                {company.character?.id !== characterId && company.isActive && (
+                  <div className={"flex flex-row justify-between gap-1"}>
+                    <Button
+                      size="sm"
+                      color="primary"
+                      variant="ghost"
+                      isDisabled={isToggleActivePending || lookAroundPending}
+                      onClick={() => handleSabotage(company)}
+                    >
+                      Саботаж
+                    </Button>
+                    <Button
+                      size="sm"
+                      color="danger"
+                      variant="ghost"
+                      isDisabled={isRacketPending || lookAroundPending}
+                      onClick={() => handleRacket(company)}
+                    >
+                      Рэкет
+                    </Button>
+                  </div>
+                )}
+                {company.character?.id === characterId && !company.isActive && (
+                  <div className={"flex flex-col"}>
+                    <Button
+                      size="sm"
+                      color="primary"
+                      variant="ghost"
+                      isDisabled={isToggleActivePending || lookAroundPending}
+                      onClick={() => handleSabotage(company)}
+                    >
+                      Восстановить
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </ModalBody>

@@ -334,11 +334,11 @@ export const econRouter = createTRPCRouter({
         data: { level: input.level },
       });
     }),
-  setActive: protectedProcedure
+  toggleActive: protectedProcedure
     .input(
       z.object({
         id: z.string(),
-        disabled: z.boolean(),
+        charId: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -346,9 +346,62 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (!company) return { message: "Не найдено предприятие" };
+      const character = await ctx.db.char.findUnique({
+        where: { id: input.charId },
+        include: {
+          features: { include: { feature: true } },
+          bankAccount: true,
+        },
+      });
+      if (!character) return { message: "Не найден персонаж" };
+      if (!character.bankAccount.length)
+        return { message: "Не найден счет для персонажа" };
+      if (
+        (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
+        company.level * 1000 - 500
+      )
+        return { message: "Недостаточно средств" };
       await ctx.db.company.update({
         where: { id: company.id },
-        data: { isActive: input.disabled },
+        data: { isActive: !company.isActive },
       });
+      return {
+        message: company.isActive
+          ? "Успешный саботаж"
+          : "Успешное восстановление",
+      };
+    }),
+  racket: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        charId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const company = await ctx.db.company.findFirst({
+        where: { id: input.id },
+      });
+      if (!company) return { message: "Не найдено предприятие" };
+      const character = await ctx.db.char.findUnique({
+        where: { id: input.charId },
+        include: {
+          features: { include: { feature: true } },
+          bankAccount: true,
+        },
+      });
+      if (!character) return { message: "Не найден персонаж" };
+      if (!character.bankAccount.length)
+        return { message: "Не найден счет для персонажа" };
+      if (
+        (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
+        (company.level - 1) * 4000 + 2000
+      )
+        return { message: "Недостаточно средств" };
+      await ctx.db.company.update({
+        where: { id: company.id },
+        data: { characterId: input.charId },
+      });
+      return { message: "Успешный рэкет" };
     }),
 });
