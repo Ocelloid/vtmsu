@@ -40,6 +40,8 @@ const ItemForm = ({
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [usage, setUsage] = useState(-1);
+  const [coordX, setCoordX] = useState(0);
+  const [coordY, setCoordY] = useState(0);
 
   const { mutate: createMutation, isPending } = api.item.create.useMutation();
   const { mutate: updateMutation, isPending: isPendingUpdate } =
@@ -59,6 +61,8 @@ const ItemForm = ({
     setImage("");
     setUsage(-1);
     setSelectedType(1);
+    setCoordX(0);
+    setCoordY(0);
   };
 
   useEffect(() => {
@@ -70,6 +74,8 @@ const ItemForm = ({
       setUsage(itemData?.usage ?? -1);
       setSelectedType(itemData?.typeId ?? 1);
       setSelectedCharacter(itemData?.ownedById ?? 1);
+      setCoordX(itemData?.coordX ?? 0);
+      setCoordY(itemData?.coordY ?? 0);
     }
   }, [itemData]);
 
@@ -81,6 +87,8 @@ const ItemForm = ({
           content: description,
           image,
           usage,
+          coordX,
+          coordY,
           typeId: selectedType,
           auspexData,
           ownedById: selectedCharacter ?? 1,
@@ -101,6 +109,8 @@ const ItemForm = ({
           content: description,
           image,
           usage,
+          coordX,
+          coordY,
           typeId: selectedType,
           auspexData,
           ownedById: selectedCharacter,
@@ -191,6 +201,24 @@ const ItemForm = ({
               value={usage.toString()}
               onValueChange={(v) => setUsage(Number(v))}
             />
+            <div className="flex w-full flex-row gap-2">
+              <Input
+                size="sm"
+                type="number"
+                variant="underlined"
+                label="Долгота"
+                value={coordX.toString()}
+                onValueChange={(v) => setCoordX(Number(v))}
+              />
+              <Input
+                size="sm"
+                type="number"
+                variant="underlined"
+                label="Широта"
+                value={coordY.toString()}
+                onValueChange={(v) => setCoordY(Number(v))}
+              />
+            </div>
             <Select
               label="Персонаж"
               selectedKeys={
