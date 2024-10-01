@@ -16,7 +16,13 @@ import {
   AutocompleteItem,
   Checkbox,
 } from "@nextui-org/react";
-import { FaPencilAlt, FaPlus, FaGift, FaTrashAlt } from "react-icons/fa";
+import {
+  FaPencilAlt,
+  FaPlus,
+  FaGift,
+  FaTrashAlt,
+  FaArrowUp,
+} from "react-icons/fa";
 import { useGeolocation } from "~/utils/hooks";
 import { degreesToCoordinate } from "~/utils/text";
 import { type Company } from "~/server/api/routers/econ";
@@ -274,18 +280,26 @@ function CompanyForm({
   const [image, setImage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [isWarrens, setIsWarrens] = useState(false);
-  const { data: balance, isLoading: isBalanceLoading } =
-    api.econ.getBalance.useQuery({ characterId });
+  const {
+    data: balance,
+    isLoading: isBalanceLoading,
+    refetch: refetchBalance,
+  } = api.econ.getBalance.useQuery({ characterId });
+  const {
+    data: companyData,
+    isLoading: isCompanyLoading,
+    refetch: refetchCompany,
+  } = api.econ.getById.useQuery(
+    {
+      id: editId!,
+    },
+    { enabled: !!editId },
+  );
   const { mutate: createMutation, isPending } = api.econ.create.useMutation();
   const { mutate: updateMutation, isPending: isPendingUpdate } =
     api.econ.update.useMutation();
-  const { data: companyData, isLoading: isCompanyLoading } =
-    api.econ.getById.useQuery(
-      {
-        id: editId!,
-      },
-      { enabled: !!editId },
-    );
+  const { mutate: upgradeMutation, isPending: isUpgradePending } =
+    api.econ.upgrade.useMutation();
 
   const resetForm = () => {
     setName("");
@@ -347,6 +361,28 @@ function CompanyForm({
       );
   };
 
+  const handleUpgrade = () => {
+    if (!editId) {
+      alert("Вы не выбрали предприятие для улучшения");
+      return;
+    }
+    upgradeMutation(
+      {
+        id: editId,
+      },
+      {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
+          resetForm();
+          if (onRefetch) onRefetch();
+          void refetchBalance();
+          void refetchCompany();
+          onModalClose();
+        },
+      },
+    );
+  };
+
   if (isCompanyLoading || isBalanceLoading || isLoading)
     return <LoadingSpinner height={24} className="m-auto" />;
 
@@ -379,10 +415,29 @@ function CompanyForm({
                   ? `(${degreesToCoordinate(location.latitude)}, ${degreesToCoordinate(location.longitude)})`
                   : error}
             </p>
-            {!editId && (
+            {!editId ? (
               <>
                 <p>Ваш баланс: {balance ?? 0} ОВ</p>
                 <p>Стоимость предприятия: 500 ОВ</p>
+              </>
+            ) : (
+              <>
+                <p>
+                  Баланс предприятия:{" "}
+                  {companyData?.BankAccount[0]?.balance ?? 0} ОВ
+                </p>
+                <p>
+                  Стоимость повышения уровня предприятия:{" "}
+                  {(companyData?.level ?? 0) * 1000 - 500} ОВ
+                </p>
+                <Button
+                  onClick={handleUpgrade}
+                  variant="light"
+                  color="warning"
+                  isDisabled={isUpgradePending}
+                >
+                  <FaArrowUp size={16} /> Улучшить предприятие
+                </Button>
               </>
             )}
             <Input
