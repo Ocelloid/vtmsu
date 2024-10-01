@@ -19,6 +19,7 @@ import CharacterCard from "~/components/CharacterCard";
 import BloodMeter from "~/components/game/BloodMeter";
 import HealthMeter from "~/components/game/HealthMeter";
 import GameStore from "~/components/game/GameStore";
+import RitualPage from "~/components/game/RitualPage";
 import { useRouter } from "next/router";
 
 export default function Game() {
@@ -124,18 +125,54 @@ export default function Game() {
                 }}
               >
                 <Tab
-                  key="disc"
+                  key="vamp"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <CgShapeRhombus size={28} />
                       <span className="hidden text-lg font-bold lg:flex">
-                        Дисциплины
+                        Вампиризм
                       </span>
                     </div>
                   }
                   className="flex flex-col gap-2"
                 >
-                  <AbilityPage char={char} refetch={refetch} />
+                  <Tabs
+                    aria-label="Вампиризм"
+                    placement="bottom"
+                    classNames={{
+                      panel:
+                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-216px)]",
+                      tab: "p-1 w-min",
+                      tabList:
+                        "w-full justify-between rounded-none rounded-t-lg mx-2 ",
+                      wrapper: "flex-grow",
+                    }}
+                  >
+                    <Tab
+                      key="disciplines"
+                      title={
+                        <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                          <span className="text-lg font-semibold">
+                            Дисциплины
+                          </span>
+                        </div>
+                      }
+                      className="flex flex-col gap-2"
+                    >
+                      <AbilityPage char={char} refetch={refetch} />
+                    </Tab>
+                    <Tab
+                      key="rituals"
+                      title={
+                        <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                          <span className="text-lg font-semibold">Ритуалы</span>
+                        </div>
+                      }
+                      className="flex flex-col gap-2"
+                    >
+                      <RitualPage char={char} refetch={refetch} />
+                    </Tab>
+                  </Tabs>
                 </Tab>
                 <Tab
                   key="effects"
@@ -212,7 +249,7 @@ export default function Game() {
                     placement="bottom"
                     classNames={{
                       panel:
-                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
+                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-216px)]",
                       tab: "p-1 w-min",
                       tabList:
                         "w-full justify-between rounded-none rounded-t-lg mx-2 ",

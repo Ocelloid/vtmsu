@@ -237,6 +237,33 @@ export type FeatureAvailable = {
 };
 
 export const charRouter = createTRPCRouter({
+  spendBlood: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        amount: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!char) return { message: "Нет персонажа с таким id" };
+
+      let blood = char.bloodAmount;
+
+      if (blood < input.amount) return { message: "Недостаточно крови" };
+
+      blood -= input.amount;
+
+      await ctx.db.char.update({
+        where: { id: input.id },
+        data: { bloodAmount: blood },
+      });
+
+      return { message: "" };
+    }),
   forceEffect: protectedProcedure
     .input(
       z.object({
@@ -1357,7 +1384,13 @@ export const charRouter = createTRPCRouter({
             },
           },
           knowledges: { include: { knowledge: true } },
-          rituals: { include: { ritual: true } },
+          rituals: {
+            include: {
+              ritual: {
+                include: { ritualKnowledges: { include: { knowledge: true } } },
+              },
+            },
+          },
           effects: { include: { effect: true } },
           Item: {
             include: {

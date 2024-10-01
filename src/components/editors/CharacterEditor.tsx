@@ -546,7 +546,7 @@ export default function CharacterEditor() {
                     isContinueDisabled ||
                     isCharacterCreatePending ||
                     isCharacterUpdatePending ||
-                    characterData?.isFixed
+                    (characterData?.isFixed && !isAdmin)
                   }
                   onClick={() =>
                     step > 1 || !!characterId
