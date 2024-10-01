@@ -120,7 +120,7 @@ export default function Game() {
                 classNames={{
                   panel:
                     "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
-                  tab: "h-8 p-0 w-full overflow-hidden overflow-y-hidden",
+                  tab: "h-8 p-0 w-full overflow-hidden overflow-y-hidden rounded-sm",
                   tabList: "w-full justify-between",
                   wrapper: "flex-grow",
                   tabContent:
