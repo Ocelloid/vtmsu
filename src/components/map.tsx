@@ -1,5 +1,5 @@
-import { Marker, useMapEvents } from "react-leaflet";
-import { useState, useMemo, useRef } from "react";
+import { Marker, useMapEvents, useMap } from "react-leaflet";
+import { useState, useMemo, useRef, useEffect } from "react";
 import L, {
   type LatLng,
   type LatLngExpression,
@@ -55,4 +55,18 @@ export const Draggable = ({
       icon={target_icon}
     />
   );
+};
+
+export const RecenterAutomatically = ({
+  lat,
+  lng,
+}: {
+  lat: number;
+  lng: number;
+}) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng]);
+  }, [lat, lng, map]);
+  return null;
 };

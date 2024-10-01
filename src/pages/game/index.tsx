@@ -20,6 +20,7 @@ import BloodMeter from "~/components/game/BloodMeter";
 import HealthMeter from "~/components/game/HealthMeter";
 import GameStore from "~/components/game/GameStore";
 import RitualPage from "~/components/game/RitualPage";
+import City from "~/components/game/City";
 import { useRouter } from "next/router";
 
 export default function Game() {
@@ -202,7 +203,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  Город
+                  <City />
                 </Tab>
                 <Tab
                   key="items"
