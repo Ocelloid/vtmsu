@@ -96,6 +96,53 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
           positions={cityBorders}
         />
         <RecenterAutomatically lat={position.lat} lng={position.lng} />
+        {instances
+          .filter(
+            (i) =>
+              (!!i.expires ? i.expires < new Date() : true) &&
+              i.isVisible &&
+              i.remains! > 1,
+          )
+          .map((instance) => (
+            <Circle
+              key={instance.id}
+              center={[instance.coordY, instance.coordX]}
+              pathOptions={{
+                color: "transparent",
+                fillColor: "red",
+                className: "red-pulse",
+              }}
+              radius={100 * instance.remains!}
+            />
+          ))}
+        {instances
+          .filter(
+            (i) =>
+              (!!i.expires ? i.expires < new Date() : true) &&
+              i.isVisible &&
+              i.remains! <= 1,
+          )
+          .map((instance) => (
+            <Marker
+              key={instance.id}
+              position={[instance.coordY, instance.coordX]}
+              icon={skull_icon}
+            >
+              <Popup>
+                <div className="flex flex-col items-center gap-0">
+                  <span>{instance.target?.name}</span>
+                  <span className="pb-1 text-xs">Нарушение маскарада</span>
+                  <span>
+                    {
+                      instance.target?.descs![
+                        (instance.target?.descs?.length ?? 0) - 1
+                      ]?.content
+                    }
+                  </span>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
         <CircleMarker
           className="n h-[150px] w-[150px]"
           center={position}
@@ -108,44 +155,6 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
             <p className="text-[15px]">Вы здесь</p>
           </Popup>
         </CircleMarker>
-        {instances
-          .filter((i) => (!!i.expires ? i.expires < new Date() : true))
-          .map((instance) => (
-            <>
-              {instance.remains! > 1 ? (
-                <Circle
-                  key={instance.id}
-                  center={[instance.coordY, instance.coordX]}
-                  pathOptions={{
-                    color: "transparent",
-                    fillColor: "red",
-                    className: "red-pulse",
-                  }}
-                  radius={100 * instance.remains!}
-                />
-              ) : (
-                <Marker
-                  key={instance.id}
-                  position={[instance.coordY, instance.coordX]}
-                  icon={instance.remains! > 1 ? marker_icon : skull_icon}
-                >
-                  <Popup>
-                    <div className="flex flex-col items-center gap-0">
-                      <span>{instance.target?.name}</span>
-                      <span className="pb-1 text-xs">Нарушение маскарада</span>
-                      <span>
-                        {
-                          instance.target?.descs![
-                            (instance.target?.descs?.length ?? 0) - 1
-                          ]?.content
-                        }
-                      </span>
-                    </div>
-                  </Popup>
-                </Marker>
-              )}
-            </>
-          ))}
       </MapContainer>
     </div>
   );
