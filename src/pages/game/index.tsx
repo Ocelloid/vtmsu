@@ -120,10 +120,11 @@ export default function Game() {
                 classNames={{
                   panel:
                     "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
-                  tab: "h-8 p-1 w-full overflow-hidden overflow-y-hidden",
+                  tab: "h-8 p-0 w-full overflow-hidden overflow-y-hidden",
                   tabList: "w-full justify-between",
                   wrapper: "flex-grow",
-                  tabContent: "overflow-hidden overflow-y-hidden",
+                  tabContent:
+                    "overflow-hidden overflow-y-hidden w-full h-8 items-center justify-center flex flex-col",
                 }}
               >
                 <Tab
@@ -295,10 +296,13 @@ export default function Game() {
                         aria-label="Заявки"
                         color="warning"
                         size="sm"
-                        placement="top-right"
+                        placement="bottom-left"
+                        isInvisible={
+                          !char.Ticket?.filter((t) => !t.isResolved).length
+                        }
                         showOutline={false}
                         classNames={{
-                          badge: "mt-2 mr-2 text-xs",
+                          badge: "mb-1 sm:mb-2 text-xs rounded-md",
                         }}
                       >
                         <IoMdChatboxes size={24} />
