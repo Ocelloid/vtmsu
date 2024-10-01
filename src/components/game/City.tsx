@@ -34,7 +34,7 @@ export default function City({
     api.util.getLookAround.useMutation();
   const { mutate: collectItem, isPending: collectItemPending } =
     api.item.collectItem.useMutation();
-  const { mutate: newHunt, isPending: isCreatePending } =
+  const { mutate: newHunt, isPending: isHuntPending } =
     api.hunt.createHunt.useMutation();
 
   const [items, setItems] = useState<Item[]>([]);
@@ -177,7 +177,7 @@ export default function City({
                   size="sm"
                   color="danger"
                   variant="ghost"
-                  isDisabled={isCreatePending || lookAroundPending}
+                  isDisabled={isHuntPending || lookAroundPending}
                   onClick={() => handleAttack(instance)}
                 >
                   Охота

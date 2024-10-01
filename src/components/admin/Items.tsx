@@ -1,4 +1,5 @@
 import ItemForm from "~/components/modals/ItemForm";
+import DynamicItemsMap from "~/components/admin/items/DynamicItemsMap";
 import { api } from "~/utils/api";
 import { LoadingPage } from "~/components/Loading";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
@@ -25,6 +26,9 @@ export default function Items() {
   return (
     <div className="flex flex-col gap-2 pt-2">
       <ItemForm onRefetch={refetchItems} />
+      <DynamicItemsMap
+        items={items?.filter((i) => i.ownedById === null) ?? []}
+      />
       {items?.map((item) => (
         <div
           key={item.id}
