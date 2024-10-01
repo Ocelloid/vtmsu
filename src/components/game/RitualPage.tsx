@@ -68,7 +68,9 @@ const RitualSlot = ({ ritual }: { ritual: Ritual | undefined }) => {
         {ritual?.ritualKnowledges?.map((a) => a.knowledge?.name).join(", ")}
       </p>
       <p className="pt-2 font-semibold">Рецепт:</p>
-      <p className="text-justify">{ritual?.recipe}</p>
+      <p className="whitespace-pre-wrap text-wrap text-justify">
+        {ritual?.recipe}
+      </p>
       <p className="pt-2 font-semibold">Результат:</p>
       <p className="text-justify">{ritual?.content}</p>
     </div>
