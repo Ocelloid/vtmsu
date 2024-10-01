@@ -81,7 +81,7 @@ export default function Game() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="fixed flex h-screen w-screen flex-grow basis-full flex-col sm:static sm:mt-24 sm:pb-2">
+      <main className="fixed flex h-full w-full flex-grow basis-full flex-col sm:static sm:mt-24 sm:pb-2">
         <div className="container flex h-screen flex-col gap-1 overflow-auto rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:h-full sm:rounded-b-lg">
           <Select
             size="sm"
