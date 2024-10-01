@@ -205,7 +205,7 @@ export const itemRouter = createTRPCRouter({
       return await ctx.db.item.update({
         where: { id: input.itemId },
         data: {
-          containerId: undefined,
+          containerId: null,
           ownedById: input.itemOwnerId,
         },
       });
@@ -220,10 +220,14 @@ export const itemRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const items = await ctx.db.item.findMany({
+        where: { id: { in: input.itemIds } },
+      });
+      console.log(items);
       return await ctx.db.item.updateMany({
         where: { id: { in: input.itemIds } },
         data: {
-          containerId: undefined,
+          containerId: null,
           ownedById: input.itemOwnerId,
         },
       });

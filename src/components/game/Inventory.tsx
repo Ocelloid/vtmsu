@@ -317,11 +317,11 @@ export default function Inventory({
               onScanError={(e) => console.error(e)}
             />
             <p>
-              Вы{" "}
               {scannedChar
-                ? `отправите персонажу ${scannedChar.name}`
-                : `положите в контейнер ${scannedContainer?.name}`}{" "}
-              следующие предметы:
+                ? `Вы отправите персонажу ${scannedChar.name} следующие предметы:`
+                : scannedContainer
+                  ? `Вы положите в контейнер ${scannedContainer?.name} следующие предметы:`
+                  : ""}
             </p>
             <ul className="list-inside list-disc">
               {items
