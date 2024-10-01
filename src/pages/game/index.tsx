@@ -120,16 +120,17 @@ export default function Game() {
                 classNames={{
                   panel:
                     "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
-                  tab: "p-1 w-min",
-                  tabList: "w-full",
+                  tab: "h-8 p-1 w-full overflow-hidden overflow-y-hidden",
+                  tabList: "w-full justify-between",
                   wrapper: "flex-grow",
+                  tabContent: "overflow-hidden overflow-y-hidden",
                 }}
               >
                 <Tab
                   key="vamp"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <CgShapeRhombus size={28} />
+                      <CgShapeRhombus size={24} />
                       <span className="hidden text-lg font-bold lg:flex">
                         Вампиризм
                       </span>
@@ -180,7 +181,7 @@ export default function Game() {
                   title={
                     <div className="flex min-w-7 flex-row items-center justify-center gap-1 text-red-900 dark:text-red-700">
                       <div className="rounded-full border-2 border-red-900 p-0.5 dark:border-red-700">
-                        <CgInfinity size={16} />
+                        <CgInfinity size={14} />
                       </div>
                       <span className="hidden text-lg font-bold lg:flex">
                         Эффекты
@@ -195,7 +196,7 @@ export default function Game() {
                   key="hunt"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <FaMap size={28} />
+                      <FaMap size={24} />
                       <span className="hidden text-lg font-bold lg:flex">
                         Город
                       </span>
@@ -209,7 +210,7 @@ export default function Game() {
                   key="items"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <GiLightBackpack size={28} />
+                      <GiLightBackpack size={24} />
                       <span className="hidden text-lg font-bold lg:flex">
                         Предметы
                       </span>
@@ -223,7 +224,7 @@ export default function Game() {
                   key="shop"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <FaShoppingBasket size={28} />
+                      <FaShoppingBasket size={24} />
                       <span className="hidden text-lg font-bold lg:flex">
                         Магазин
                       </span>
@@ -237,7 +238,7 @@ export default function Game() {
                   key="money"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <GiMoneyStack size={28} />
+                      <GiMoneyStack size={24} />
                       <span className="hidden text-lg font-bold lg:flex">
                         Бизнес
                       </span>
@@ -287,7 +288,7 @@ export default function Game() {
                   key="chat"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <IoMdChatboxes size={28} />
+                      <IoMdChatboxes size={24} />
                       <span className="hidden text-lg font-bold lg:flex">
                         Заявки
                       </span>
@@ -301,7 +302,7 @@ export default function Game() {
                   key="qrcode"
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                      <FaQrcode size={28} />
+                      <FaQrcode size={24} />
                       <span className="hidden text-lg font-bold lg:flex">
                         QR-код
                       </span>

@@ -35,6 +35,7 @@ export default function RitualPage({
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           size="sm"
+          type="number"
           variant="underlined"
           label="Кровь"
           color="warning"
@@ -46,11 +47,11 @@ export default function RitualPage({
         <Button
           onClick={handleSpendBlood}
           size="sm"
-          variant="ghost"
+          variant="faded"
           color="warning"
           className="sm:h-full"
         >
-          Портатить кровь
+          Потратить кровь
         </Button>
       </div>
       {char.rituals?.map((a) => (

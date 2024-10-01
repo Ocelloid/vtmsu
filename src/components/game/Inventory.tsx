@@ -442,24 +442,27 @@ export default function Inventory({
       </DndContext>
       <div className="flex flex-row justify-between gap-2">
         <Button
-          variant="ghost"
+          variant="faded"
           color="primary"
+          className="w-full sm:w-auto"
           onClick={onDropOpen}
           isDisabled={!items.filter((i) => i.box === -1).length}
         >
           Сбросить
         </Button>
         <Button
-          variant="ghost"
+          variant="faded"
           color="danger"
+          className="w-full sm:w-auto"
           onClick={onBleedOpen}
           isDisabled={(char.bloodAmount ?? 0) < 2}
         >
           Слить
         </Button>
         <Button
-          variant="ghost"
+          variant="faded"
           color="warning"
+          className="w-full sm:w-auto"
           onClick={onTradeOpen}
           isDisabled={!items.filter((i) => i.box === -1).length}
         >

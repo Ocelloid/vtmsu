@@ -286,11 +286,19 @@ export default function BankAccounts({ characterId }: { characterId: number }) {
         </ModalContent>
       </Modal>
       <div className="flex h-full flex-col gap-2 pb-2">
-        <Button onClick={handleNewAccount} variant="light" color="warning">
+        <Button
+          onClick={handleNewAccount}
+          variant="light"
+          color="warning"
+          size="sm"
+        >
           <FaPlus size={16} /> Создать счёт
         </Button>
         {bankAccounts?.map((account) => (
-          <div key={account.id} className="flex flex-col gap-2">
+          <div
+            key={account.id}
+            className="flex flex-col gap-2 rounded-md border-1 border-warning p-2"
+          >
             <div className="font-bold">
               {!!account.company
                 ? `Счёт предприятия ${account.company.name}`
