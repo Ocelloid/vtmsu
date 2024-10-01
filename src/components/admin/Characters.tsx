@@ -40,6 +40,21 @@ export default function Characters() {
   if (isCharListLoading || isUserPersonnelLoading || isTraitsLoading)
     return <LoadingPage />;
 
+  const filteredSorted = chars
+    .sort((a, b) => a.id - b.id)
+    .filter((c) =>
+      !!factionIds.length ? factionIds.includes(c.factionId) : true,
+    )
+    .filter((c) => (!!clanIds.length ? clanIds.includes(c.clanId) : true))
+    .filter((c) =>
+      !!name ? c.name.toLowerCase().includes(name.toLowerCase()) : true,
+    )
+    .filter((c) =>
+      !!hasNightmares
+        ? c.features?.find((f) => f.feature?.name === "Кошмары")
+        : true,
+    );
+
   return (
     <>
       <div className="flex flex-col justify-between gap-2 py-2 sm:flex-row">
@@ -126,20 +141,42 @@ export default function Characters() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {chars
-          .sort((a, b) => a.id - b.id)
-          .filter((c) =>
-            !!factionIds.length ? factionIds.includes(c.factionId) : true,
-          )
-          .filter((c) => (!!clanIds.length ? clanIds.includes(c.clanId) : true))
-          .filter((c) =>
-            !!name ? c.name.toLowerCase().includes(name.toLowerCase()) : true,
-          )
-          .filter((c) =>
-            !!hasNightmares
-              ? c.features?.find((f) => f.feature?.name === "Кошмары")
-              : true,
-          )
+        {filteredSorted
+          .filter((c) => !c.verified && c.pending)
+          .map((char) => (
+            <CharacterCard
+              key={char.id}
+              character={char}
+              handleEditCharacter={(cid: number) => {
+                void router.push(
+                  {
+                    pathname: `/characters/${cid}/edit`,
+                  },
+                  undefined,
+                  { shallow: false },
+                );
+              }}
+            />
+          ))}
+        {filteredSorted
+          .filter((c) => !c.verified && !c.pending)
+          .map((char) => (
+            <CharacterCard
+              key={char.id}
+              character={char}
+              handleEditCharacter={(cid: number) => {
+                void router.push(
+                  {
+                    pathname: `/characters/${cid}/edit`,
+                  },
+                  undefined,
+                  { shallow: false },
+                );
+              }}
+            />
+          ))}
+        {filteredSorted
+          .filter((c) => c.verified)
           .map((char) => (
             <CharacterCard
               key={char.id}
