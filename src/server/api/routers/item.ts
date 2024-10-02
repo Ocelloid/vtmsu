@@ -228,10 +228,6 @@ export const itemRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const items = await ctx.db.item.findMany({
-        where: { id: { in: input.itemIds } },
-      });
-      console.log(items);
       return await ctx.db.item.updateMany({
         where: { id: { in: input.itemIds } },
         data: {
@@ -283,10 +279,15 @@ export const itemRouter = createTRPCRouter({
       });
       const item = await ctx.db.item.create({
         data: {
-          name: itemType.name,
+          name:
+            itemType.name +
+            (itemType.id === 6
+              ? ` ${
+                  (Date.now() % 1000000) * 100 + Math.floor(Math.random() * 100)
+                }`
+              : ""),
           content: itemType.content,
           auspexData: itemType.auspexData,
-
           animalismData: itemType.animalismData,
           hackerData: itemType.hackerData,
           image: itemType.image,
@@ -502,6 +503,7 @@ export const itemRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string().min(1),
+        address: z.string().optional(),
         content: z.string().nullish(),
         typeId: z.number().optional(),
         image: z.string().optional(),
@@ -519,6 +521,7 @@ export const itemRouter = createTRPCRouter({
         .create({
           data: {
             name: input.name,
+            address: input.address,
             content: input.content,
             image: input.image,
             usage: input.usage,
@@ -558,6 +561,7 @@ export const itemRouter = createTRPCRouter({
       z.object({
         id: z.number(),
         name: z.string().min(1),
+        address: z.string().optional(),
         typeId: z.number().optional(),
         image: z.string().optional(),
         content: z.string().nullish(),
@@ -579,6 +583,7 @@ export const itemRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+          address: input.address,
           typeId: input.typeId,
           image: input.image,
           content: input.content,
@@ -603,6 +608,14 @@ export const itemRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.db.item.findFirst({
         where: { id: input.id },
+      });
+    }),
+
+  getByAddress: publicProcedure
+    .input(z.object({ address: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.item.findFirst({
+        where: { address: input.address },
       });
     }),
 

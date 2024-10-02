@@ -5,13 +5,14 @@ import { api } from "~/utils/api";
 
 export default function QRPage() {
   const router = useRouter();
-  const [itemId, setItemId] = useState("");
-  const { data: item, isLoading: isItemLoading } = api.item.getById.useQuery(
-    { id: parseInt(itemId) },
-    { enabled: !!itemId },
-  );
+  const [address, setAddress] = useState("");
+  const { data: item, isLoading: isItemLoading } =
+    api.item.getByAddress.useQuery(
+      { address: address },
+      { enabled: !!address },
+    );
   useEffect(() => {
-    if (router.query.pid) setItemId(router.query.pid.toString());
+    if (router.query.pid) setAddress(router.query.pid.toString());
   }, [router.query.pid]);
   if (isItemLoading) return <LoadingPage />;
 

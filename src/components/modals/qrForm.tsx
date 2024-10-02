@@ -24,6 +24,7 @@ const QRForm = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
   const [title, setTitle] = useState("");
 
   const { mutate: createMutation, isPending } = api.item.create.useMutation();
@@ -51,7 +52,7 @@ const QRForm = ({
   const handleFormSubmit = () => {
     if (!editId)
       createMutation(
-        { name: title, content: description },
+        { name: title, content: description, address },
         {
           onSuccess() {
             resetForm();
@@ -62,7 +63,7 @@ const QRForm = ({
       );
     else
       updateMutation(
-        { id: editId, name: title, content: description },
+        { id: editId, name: title, content: description, address },
         {
           onSuccess(e) {
             if (e?.message) alert(e.message);
@@ -103,6 +104,13 @@ const QRForm = ({
               placeholder="Введите название"
               value={title}
               onValueChange={setTitle}
+            />
+            <Input
+              variant="underlined"
+              label="Адрес"
+              placeholder="Введите адрес"
+              value={address}
+              onValueChange={setAddress}
             />
             <DefaultEditor
               label="Контент"

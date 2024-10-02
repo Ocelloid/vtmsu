@@ -46,7 +46,9 @@ export default function QRCodes() {
                 size="sm"
                 variant="light"
                 className="w-10 min-w-10"
-                onClick={() => generateQRCode(`https://vtm.su/qr/${item.id}`)}
+                onClick={() =>
+                  generateQRCode(`https://vtm.su/qr/${item.address}`)
+                }
               >
                 <FaDownload />
               </Button>

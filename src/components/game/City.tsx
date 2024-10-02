@@ -38,7 +38,7 @@ export default function City({
     onClose: geoOnClose,
   } = useDisclosure();
   const { mutate: lookAround, isPending: lookAroundPending } =
-    api.util.getLookAround.useMutation();
+    api.city.getLookAround.useMutation();
   const { mutate: collectItem, isPending: collectItemPending } =
     api.item.collectItem.useMutation();
   const { mutate: newHunt, isPending: isHuntPending } =

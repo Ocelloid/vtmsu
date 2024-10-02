@@ -34,12 +34,13 @@ model Post {
 }
 
 model Container {
-  id        String   @id @default(cuid())
-  name      String
-  content   String?  @db.LongText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Item      Item[]
+  id                 String               @id @default(cuid())
+  name               String
+  content            String?              @db.LongText
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Item               Item[]
+  GeoPointContainers GeoPointContainers[]
 }
 
 model Item {
@@ -52,6 +53,7 @@ model Item {
   hackerData    String?    @db.LongText
   animalismData String?    @db.LongText
   image         String?
+  address       String?
   usage         Int        @default(-1)
   typeId        Int        @default(1)
   coordX        Float?
@@ -150,6 +152,38 @@ model BankAccount {
   character   Char     @relation(fields: [characterId], references: [id], onDelete: Cascade)
   companyId   String?
   company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model GeoPoint {
+  id                 String               @id @default(cuid())
+  lat                Float
+  lng                Float
+  name               String
+  icon               String?
+  content            String?              @db.LongText
+  auspexData         String?              @db.LongText
+  animalismData      String?              @db.LongText
+  hackerData         String?              @db.LongText
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  GeoPointEffects    GeoPointEffects[]
+  GeoPointContainers GeoPointContainers[]
+}
+
+model GeoPointEffects {
+  id         Int       @id @default(autoincrement())
+  effectId   Int
+  geoPointId String
+  geoPoint   GeoPoint? @relation(fields: [geoPointId], references: [id])
+  effect     Effect?   @relation(fields: [effectId], references: [id])
+}
+
+model GeoPointContainers {
+  id          Int        @id @default(autoincrement())
+  containerId String
+  container   Container? @relation(fields: [containerId], references: [id])
+  geoPointId  String
+  geoPoint    GeoPoint?  @relation(fields: [geoPointId], references: [id])
 }
 
 model HuntingGround {
@@ -383,8 +417,8 @@ model Effect {
   ItemEffects      ItemEffects[]
   RitualEffects    RitualEffects[]
   AbilityEffects   AbilityEffects[]
-
-  FeatureEffects FeatureEffects[]
+  FeatureEffects   FeatureEffects[]
+  GeoPointEffects  GeoPointEffects[]
 }
 
 model ClanInFaction {

@@ -67,9 +67,10 @@ export default function GameStore({ char }: { char: Character }) {
           <ModalBody>
             <div className="flex flex-col gap-2">
               <div className="flex flex-row items-center gap-2">
-                <div className="h-16 w-16">
+                <div className="flex h-16 w-16 flex-col">
                   <Image
                     src={purchase?.image ?? ""}
+                    className="my-auto"
                     alt="item pic"
                     width="96"
                     height="96"
@@ -115,8 +116,14 @@ export default function GameStore({ char }: { char: Character }) {
             className="flex h-16 flex-row items-center justify-start gap-2"
           >
             {!!item.image && (
-              <div className="h-16 w-16">
-                <Image src={item.image} alt="item pic" width="96" height="96" />
+              <div className="flex h-16 w-16 flex-col">
+                <Image
+                  src={item.image}
+                  alt="item pic"
+                  width="96"
+                  height="96"
+                  className="my-auto"
+                />
               </div>
             )}
             <div className="flex flex-col items-start gap-1">
