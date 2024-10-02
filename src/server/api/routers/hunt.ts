@@ -106,6 +106,11 @@ export const huntRouter = createTRPCRouter({
         },
       });
       if (!character) return { message: "Персонаж не найден" };
+      if (!character.image)
+        return {
+          message:
+            "Для корректной работы функционала охоты у персонажа должно быть фото",
+        };
 
       let status = "success";
 
