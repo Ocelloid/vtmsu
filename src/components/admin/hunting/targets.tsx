@@ -107,6 +107,7 @@ const Targets = () => {
     setImage("");
     setName("");
     setReq("");
+    setId(undefined);
     setDescs(["", ""]);
   };
 
