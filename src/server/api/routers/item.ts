@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { z } from "zod";
 import type { Ability, Effect, Character } from "~/server/api/routers/char";
 import type { User } from "~/server/api/routers/user";
@@ -285,6 +286,7 @@ export const itemRouter = createTRPCRouter({
           name: itemType.name,
           content: itemType.content,
           auspexData: itemType.auspexData,
+
           animalismData: itemType.animalismData,
           hackerData: itemType.hackerData,
           image: itemType.image,
