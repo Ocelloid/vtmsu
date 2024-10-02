@@ -22,6 +22,7 @@ import type { Item } from "~/server/api/routers/item";
 import type { Company } from "~/server/api/routers/econ";
 import type { HuntingInstance } from "~/server/api/routers/hunt";
 import { LoadingSpinner } from "~/components/Loading";
+import Image from "next/image";
 
 export default function City({
   characterId,
@@ -57,6 +58,11 @@ export default function City({
     [],
   );
   const [violations, setViolations] = useState<HuntingInstance[]>([]);
+
+  const [auspexData, setAuspexData] = useState("");
+  const [animalismData, setAnimalismData] = useState("");
+  const [hackerData, setHackerData] = useState("");
+  const [hackerImage, setHackerImage] = useState("");
 
   const handleLookAround = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -184,9 +190,23 @@ export default function City({
       {
         onSuccess: (e) => {
           if (e?.message) alert(e.message);
+          if (e?.auspexData) setAuspexData(e.auspexData);
+          if (e?.hackerData) setHackerData(e.hackerData);
+          if (e?.hackerImage) setHackerImage(e.hackerImage);
+          if (e?.animalismData) setAnimalismData(e.animalismData);
+          geoOnOpen();
         },
       },
     );
+  };
+
+  const handleGeoClear = () => {
+    geoOnClose();
+    setAuspexData("");
+    setHackerData("");
+    setHackerImage("");
+    setAnimalismData("");
+    handleLookAround();
   };
 
   const handleCoverUp = (violation: HuntingInstance) => {
@@ -197,10 +217,61 @@ export default function City({
     );
     if (!confirmed) return;
     if (!violation.id) return;
+    coverUp(
+      {
+        id: violation.id,
+        charId: characterId,
+      },
+      {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
+          handleLookAround();
+        },
+      },
+    );
   };
 
   return (
     <div className="flex h-full w-full flex-col gap-1 pb-1">
+      <Modal
+        isOpen={geoOpen}
+        onClose={handleGeoClear}
+        size="full"
+        placement="top-center"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
+        <ModalContent>
+          <ModalHeader>Расследование</ModalHeader>
+          <ModalBody className="flex max-h-[80vh] flex-col gap-2 overflow-y-auto">
+            <p>Вам удалось узнать следующее:</p>
+            {!!auspexData && (
+              <p className="text-justify text-sm">{auspexData}</p>
+            )}
+            {!!animalismData && (
+              <p className="text-justify text-sm">{animalismData}</p>
+            )}
+            {!!hackerData && (
+              <p className="text-justify text-sm">{hackerData}</p>
+            )}
+            {!!hackerImage && (
+              <Image
+                src={hackerImage}
+                className="mx-auto my-auto mt-32 max-w-80 sm:max-w-96"
+                height={16}
+                priority
+                alt="hacker-image"
+              />
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <Modal
         isOpen={isOpen}
         onClose={onClose}

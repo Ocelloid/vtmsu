@@ -102,7 +102,7 @@ export const utilRouter = createTRPCRouter({
       );
 
       const huntingInstances = await ctx.db.huntingInstance.findMany({
-        where: { remains: { gt: 1 } },
+        where: { remains: { gt: 1 }, isVisible: true },
         include: {
           target: { include: { instances: true, descs: true } },
           ground: true,
@@ -111,7 +111,7 @@ export const utilRouter = createTRPCRouter({
       });
 
       const violations = await ctx.db.huntingInstance.findMany({
-        where: { remains: { lt: 2 } },
+        where: { remains: { lt: 2 }, isVisible: true },
         include: {
           target: { include: { instances: true, descs: true } },
           ground: true,
