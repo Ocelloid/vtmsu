@@ -259,7 +259,10 @@ export const itemRouter = createTRPCRouter({
       if (!accountToUse)
         return { message: "Не найден счет для покупки", item: undefined };
       if (itemType.cost > accountToUse.balance)
-        return { message: "Недостаточно средств", item: undefined };
+        return {
+          message: `Недостаточно средств на счёте ${accountToUse.address}`,
+          item: undefined,
+        };
       await ctx.db.bankAccount.update({
         where: { id: accountToUse.id },
         data: {

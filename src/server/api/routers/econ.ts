@@ -362,25 +362,28 @@ export const econRouter = createTRPCRouter({
         (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
         company.level * 1000 - 500
       )
-        return { message: "Недостаточно средств" };
+        return {
+          message: `Недостаточно средств на счёте ${character.bankAccount.sort((a, b) => a.id - b.id)[0]?.address}`,
+        };
 
       await ctx.db.company.update({
         where: { id: company.id },
         data: { isActive: !company.isActive },
       });
 
-      await ctx.db.ticket.create({
-        data: {
-          name: "Саботаж предприятия",
-          characterId: company.characterId,
-          Message: {
-            create: {
-              content: `Ваше предприятие ${company.name} подверглось саботажу`,
-              isAdmin: true,
+      if (company.isActive)
+        await ctx.db.ticket.create({
+          data: {
+            name: "Саботаж предприятия",
+            characterId: company.characterId,
+            Message: {
+              create: {
+                content: `Ваше предприятие ${company.name} подверглось саботажу`,
+                isAdmin: true,
+              },
             },
           },
-        },
-      });
+        });
 
       return {
         message: company.isActive
@@ -416,7 +419,9 @@ export const econRouter = createTRPCRouter({
         (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
         (company.level - 1) * 4000 + 2000
       )
-        return { message: "Недостаточно средств" };
+        return {
+          message: `Недостаточно средств на счёте ${character.bankAccount.sort((a, b) => a.id - b.id)[0]?.address}`,
+        };
 
       await ctx.db.ticket.create({
         data: {

@@ -55,7 +55,8 @@ export default function Game() {
   }, [appData, isAdmin, isUserAdminLoading, router]);
 
   useEffect(() => {
-    if (!!myCharacterData) setSelectedCharacter(myCharacterData[0]?.id);
+    if (!!myCharacterData)
+      setSelectedCharacter(myCharacterData.filter((c) => c.verified)[0]?.id);
   }, [myCharacterData]);
 
   if (!sessionData)

@@ -96,11 +96,44 @@ export const huntRouter = createTRPCRouter({
         where: { id: input.instanceId },
         include: { target: true },
       });
+      if (!instance) return { message: "Цель не найдена" };
+
       const character = await ctx.db.char.findUnique({
         where: { id: input.characterId },
+        include: {
+          features: { include: { feature: true } },
+          effects: { include: { effect: true } },
+        },
       });
+      if (!character) return { message: "Персонаж не найден" };
 
       let status = "success";
+
+      const hasConcentratedBlood = character.features.some(
+        (f) => f.feature.name === "Концентрированнная кровь",
+      );
+      const hasThaudron = character.effects.some(
+        (e) => e.effect.name === "Таудрон",
+      );
+      const hasHangover = character.effects.some(
+        (e) => e.effect.name === "Похмелье",
+      );
+
+      const characterHunts = await ctx.db.hunt.findMany({
+        where: {
+          characterId: input.characterId,
+          NOT: { status: "exp_failure" },
+        },
+      });
+      const characterHuntsInLast30Minutes = characterHunts.filter(
+        (h) => h.createdAt > new Date(new Date().getTime() - 30 * 60 * 1000),
+      );
+      if (characterHuntsInLast30Minutes.length)
+        return {
+          message:
+            "Вашему персонажу нужно отдохнуть хотя бы 30 минут между охотами",
+        };
+
       if (
         !!character &&
         !!instance &&
@@ -135,7 +168,13 @@ export const huntRouter = createTRPCRouter({
       if (status === "success" || status === "masq_failure")
         await ctx.db.char.update({
           where: { id: input.characterId },
-          data: { bloodAmount: character?.bloodPool ?? 10 },
+          data: {
+            bloodAmount:
+              10 +
+              (hasConcentratedBlood ? 2 : 0) +
+              (hasThaudron ? 5 : 0) +
+              (hasHangover ? -5 : 0),
+          },
         });
 
       return { hunt: newHunt, instance: newInstance };

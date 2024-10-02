@@ -81,11 +81,12 @@ export default function City({
       { characterId, instanceId: instance.id! },
       {
         onSuccess(e) {
-          if (e?.hunt.status === "exp_failure") alert("Цель сбежала");
-          if (e?.hunt.status === "masq_failure") alert("Нарушение маскарада");
-          if (e?.hunt.status === "req_failure")
+          if (e?.message) alert(e.message);
+          if (e?.hunt?.status === "exp_failure") alert("Цель сбежала");
+          if (e?.hunt?.status === "masq_failure") alert("Нарушение маскарада");
+          if (e?.hunt?.status === "req_failure")
             alert("Цель не соответствует предпочтениям персонажа");
-          if (e?.hunt.status === "success") alert("Успешная охота");
+          if (e?.hunt?.status === "success") alert("Успешная охота");
           handleLookAround();
           void refetch();
         },
@@ -112,7 +113,15 @@ export default function City({
 
   const handleSabotage = (company: Company) => {
     const confirmed = confirm(
-      `Вы хотите ${company.isActive ? "атаковать" : "восстановить"} ${company.name}? Это будет стоить вам ${company.level * 1000 - 500} ОВ. Владелец узнает о случившемся, но не будет знать, кто это сделал.`,
+      `Вы хотите ${
+        company.isActive ? "атаковать" : "восстановить"
+      } ${company.name}? Это будет стоить вам ${
+        company.level * 1000 - 500
+      } ОВ. ${
+        company.isActive
+          ? "Владелец узнает о случившемся, но не будет знать, кто это сделал."
+          : ""
+      }`,
     );
     if (!confirmed) return;
     toggleActive(
@@ -131,7 +140,9 @@ export default function City({
 
   const handleRacket = (company: Company) => {
     const confirmed = confirm(
-      `Вы хотите захватить ${company.name}? Это будет стоить вам ${(company.level - 1) * 4000 + 2000} ОВ. Владелец узнает, что это сделали вы.`,
+      `Вы хотите захватить ${company.name}? Это будет стоить вам ${
+        (company.level - 1) * 4000 + 2000
+      } ОВ. Владелец узнает, что это сделали вы.`,
     );
     if (!confirmed) return;
     racket(
@@ -146,6 +157,24 @@ export default function City({
         },
       },
     );
+  };
+
+  const handleInvestigate = (violation: HuntingInstance) => {
+    const confirmed = confirm(
+      `Вы хотите расследовать ${violation.target?.name}? Это будет стоить вам ${
+        (violation.target?.descs?.length ?? 0) * 10
+      } ОВ.`,
+    );
+    if (!confirmed) return;
+  };
+
+  const handleCoverUp = (violation: HuntingInstance) => {
+    const confirmed = confirm(
+      `Вы хотите прикрыть ${violation.target?.name}? Это будет стоить вам ${
+        (violation.target?.descs?.length ?? 0) * 50
+      } ОВ.`,
+    );
+    if (!confirmed) return;
   };
 
   return (
@@ -186,14 +215,26 @@ export default function City({
                     </div>
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  isDisabled={collectItemPending || lookAroundPending}
-                  onClick={() => handleAttack(violation)}
-                >
-                  Расследовать
-                </Button>
+                <div className={"flex flex-row justify-between gap-1"}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="w-full"
+                    isDisabled={collectItemPending || lookAroundPending}
+                    onClick={() => handleInvestigate(violation)}
+                  >
+                    Расследовать
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="w-full"
+                    isDisabled={collectItemPending || lookAroundPending}
+                    onClick={() => handleCoverUp(violation)}
+                  >
+                    Прикрыть
+                  </Button>
+                </div>
               </div>
             ))}
             {!!violations.length && <Divider />}
@@ -217,7 +258,6 @@ export default function City({
                 </div>
                 <Button
                   size="sm"
-                  color="danger"
                   variant="ghost"
                   isDisabled={isHuntPending || lookAroundPending}
                   onClick={() => handleAttack(instance)}
@@ -241,7 +281,6 @@ export default function City({
                 </div>
                 <Button
                   size="sm"
-                  color="success"
                   variant="ghost"
                   isDisabled={collectItemPending || lookAroundPending}
                   onClick={() => handleCollectItem(item)}
@@ -269,21 +308,23 @@ export default function City({
                     </div>
                   </div>
                 </div>
-                {company.character?.id !== characterId && company.isActive && (
+                {company.character?.id !== characterId && (
                   <div className={"flex flex-row justify-between gap-1"}>
+                    {company.isActive && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-full"
+                        isDisabled={isToggleActivePending || lookAroundPending}
+                        onClick={() => handleSabotage(company)}
+                      >
+                        Саботаж
+                      </Button>
+                    )}
                     <Button
                       size="sm"
-                      color="primary"
                       variant="ghost"
-                      isDisabled={isToggleActivePending || lookAroundPending}
-                      onClick={() => handleSabotage(company)}
-                    >
-                      Саботаж
-                    </Button>
-                    <Button
-                      size="sm"
-                      color="danger"
-                      variant="ghost"
+                      className="w-full"
                       isDisabled={isRacketPending || lookAroundPending}
                       onClick={() => handleRacket(company)}
                     >
