@@ -27,7 +27,6 @@ export default function GeoPoints() {
 
   const handleCopyPosition = (p: LatLng) => {
     setPosition(p);
-    void navigator.clipboard.writeText(p.lat + "," + p.lng);
   };
 
   if (isItemsLoading) return <LoadingPage />;
