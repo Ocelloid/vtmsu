@@ -32,6 +32,9 @@ export type Character = {
   timeoutReason?: string | null;
   timeoutAt?: Date | null;
   timeoutDuration?: number | null;
+  animalismData?: string | null;
+  auspexData?: string | null;
+  hackerData?: string | null;
   banned: boolean;
   alive: boolean;
   isFixed: boolean;
@@ -1069,6 +1072,9 @@ export const charRouter = createTRPCRouter({
         clanId: z.number().optional(),
         additionalAbilities: z.number(),
         factionId: z.number().optional(),
+        auspexData: z.string().optional(),
+        animalismData: z.string().optional(),
+        hackerData: z.string().optional(),
         image: z.string(),
         age: z.string(),
         sire: z.string(),
@@ -1260,6 +1266,9 @@ export const charRouter = createTRPCRouter({
           playerContact: input.playerContact,
           playerId: input.playerId ? input.playerId : char?.playerId,
           additionalAbilities: input.additionalAbilities,
+          animalismData: input.animalismData,
+          auspexData: input.auspexData,
+          hackerData: input.hackerData,
           name: input.name,
           title: input.title,
           status: input.status,
@@ -1481,6 +1490,9 @@ export const charRouter = createTRPCRouter({
           timeout: true,
           banned: true,
           alive: true,
+          animalismData: true,
+          auspexData: true,
+          hackerData: true,
           Company: {
             select: {
               id: true,
@@ -1490,6 +1502,26 @@ export const charRouter = createTRPCRouter({
               BankAccount: true,
             },
           },
+        },
+      });
+    }),
+
+  updateData: publicProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        auspexData: z.string().optional(),
+        animalismData: z.string().optional(),
+        hackerData: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          auspexData: input.auspexData,
+          animalismData: input.animalismData,
+          hackerData: input.hackerData,
         },
       });
     }),

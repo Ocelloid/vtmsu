@@ -119,16 +119,18 @@ export const huntRouter = createTRPCRouter({
         (e) => e.effect.name === "Похмелье",
       );
 
-      const characterHunts = await ctx.db.hunt.findMany({
+      const lastHunt = await ctx.db.hunt.findFirst({
         where: {
           characterId: input.characterId,
-          NOT: { status: "exp_failure" },
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       });
-      const characterHuntsInLast30Minutes = characterHunts.filter(
-        (h) => h.createdAt > new Date(new Date().getTime() - 30 * 60 * 1000),
-      );
-      if (characterHuntsInLast30Minutes.length)
+      if (
+        (lastHunt?.createdAt ?? new Date()) >
+        new Date(new Date().getTime() - 30 * 60 * 1000)
+      )
         return {
           message:
             "Вашему персонажу нужно отдохнуть хотя бы 30 минут между охотами",

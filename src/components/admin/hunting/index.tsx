@@ -2,6 +2,7 @@
 import { Tabs, Tab } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 import Targets from "~/components/admin/hunting/targets";
+import Hunters from "~/components/admin/hunting/hunters";
 
 const DynamicInstances = dynamic(
   () => import("~/components/admin/hunting/instances"),
@@ -29,13 +30,24 @@ const Hunting = () => {
         variant="underlined"
         classNames={{
           tabList:
-            "grid gap-0 grid-cols-4 w-full relative rounded-none p-0 border-b border-divider",
+            "grid gap-0 grid-cols-4 md:grid-cols-8 w-full relative rounded-none p-0 border-b border-divider",
           cursor: "w-full bg-[#dc2626]",
           tab: "max-w-full px-0 h-8",
           base: "w-full bg-danger/10",
           panel: "px-0",
         }}
       >
+        <Tab
+          key={"hunters"}
+          className="flex flex-col gap-8 md:gap-2"
+          title={
+            <div className="flex items-center space-x-2">
+              <span>Охотники</span>
+            </div>
+          }
+        >
+          <Hunters />
+        </Tab>
         <Tab
           key={"targets"}
           className="flex flex-col gap-8 md:gap-2"

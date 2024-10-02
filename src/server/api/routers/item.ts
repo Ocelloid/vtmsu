@@ -25,7 +25,9 @@ export type Item = {
   usage: number;
   image?: string | null;
   content?: string | null;
+  animalismData?: string | null;
   auspexData?: string | null;
+  hackerData?: string | null;
   createdById: string;
   createdAt?: Date | null;
   updatedAt?: Date | null;
@@ -55,6 +57,9 @@ export type ItemType = {
   updatedAt?: Date;
   costIncrease?: number | null;
   isPurchasable?: boolean | null;
+  animalismData?: string | null;
+  auspexData?: string | null;
+  hackerData?: string | null;
   bloodAmount: number;
   bloodPool: number;
   violation?: string | null;
@@ -280,6 +285,8 @@ export const itemRouter = createTRPCRouter({
           name: itemType.name,
           content: itemType.content,
           auspexData: itemType.auspexData,
+          animalismData: itemType.animalismData,
+          hackerData: itemType.hackerData,
           image: itemType.image,
           usage: itemType.usage,
           typeId: itemType.id,
@@ -501,6 +508,8 @@ export const itemRouter = createTRPCRouter({
         coordY: z.number().optional(),
         ownedById: z.number().optional(),
         auspexData: z.string().optional(),
+        animalismData: z.string().optional(),
+        hackerData: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -517,6 +526,8 @@ export const itemRouter = createTRPCRouter({
             lastOwnedById: input.ownedById,
             createdById: ctx.session.user.id,
             auspexData: input.auspexData,
+            animalismData: input.animalismData,
+            hackerData: input.hackerData,
           },
         })
         .then((item) => {
@@ -553,6 +564,8 @@ export const itemRouter = createTRPCRouter({
         coordY: z.number().optional(),
         ownedById: z.number().optional(),
         auspexData: z.string().optional(),
+        animalismData: z.string().optional(),
+        hackerData: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -572,6 +585,8 @@ export const itemRouter = createTRPCRouter({
           coordY: input.coordY,
           ownedById: input.ownedById,
           auspexData: input.auspexData,
+          animalismData: input.animalismData,
+          hackerData: input.hackerData,
           lastOwnedById:
             input.ownedById === item.ownedById
               ? item.lastOwnedById
@@ -737,6 +752,8 @@ export const itemRouter = createTRPCRouter({
         status: z.string().optional(),
         boon: z.string().optional(),
         auspexData: z.string().optional(),
+        animalismData: z.string().optional(),
+        hackerData: z.string().optional(),
         companyLevels: z.number().optional(),
         addingAbilities: z.array(z.number()).optional(),
         removingAbilities: z.array(z.number()).optional(),
@@ -755,6 +772,8 @@ export const itemRouter = createTRPCRouter({
           costIncrease: input.costIncrease,
           bloodAmount: input.bloodAmount,
           auspexData: input.auspexData,
+          animalismData: input.animalismData,
+          hackerData: input.hackerData,
           bloodPool: input.bloodPool,
           violation: input.violation,
           status: input.status,
@@ -828,6 +847,8 @@ export const itemRouter = createTRPCRouter({
         content: z.string(),
         isPurchasable: z.boolean().optional(),
         auspexData: z.string().optional(),
+        animalismData: z.string().optional(),
+        hackerData: z.string().optional(),
         costIncrease: z.number().optional(),
         bloodAmount: z.number().optional(),
         bloodPool: z.number().optional(),
@@ -853,6 +874,8 @@ export const itemRouter = createTRPCRouter({
           costIncrease: input.costIncrease,
           bloodAmount: input.bloodAmount,
           auspexData: input.auspexData,
+          animalismData: input.animalismData,
+          hackerData: input.hackerData,
           bloodPool: input.bloodPool,
           violation: input.violation,
           status: input.status,

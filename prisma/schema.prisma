@@ -49,6 +49,8 @@ model Item {
   updatedAt     DateTime   @updatedAt
   content       String?    @db.LongText
   auspexData    String?    @db.LongText
+  hackerData    String?    @db.LongText
+  animalismData String?    @db.LongText
   image         String?
   usage         Int        @default(-1)
   typeId        Int        @default(1)
@@ -79,6 +81,8 @@ model ItemType {
   isTradable      Boolean           @default(true)
   content         String            @db.LongText
   auspexData      String?           @db.LongText
+  hackerData      String?           @db.LongText
+  animalismData   String?           @db.LongText
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   Item            Item[]
@@ -292,6 +296,9 @@ model Char {
   timeoutReason       String?
   timeoutAt           DateTime?
   timeoutDuration     Int?
+  animalismData       String?               @db.LongText
+  hackerData          String?               @db.LongText
+  auspexData          String?               @db.LongText
   banned              Boolean               @default(false)
   bannedReason        String?
   createdAt           DateTime              @default(now())
