@@ -6,6 +6,7 @@ import type {
   Faction,
   Clan,
   Feature,
+  Knowledge,
 } from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
 import { useSession } from "next-auth/react";
@@ -17,6 +18,8 @@ export default function Characters() {
   const router = useRouter();
   const { data: sessionData } = useSession();
   const [chars, setChars] = useState<Character[]>([]);
+  const [knowledgeIds, setKnowledgeIds] = useState<number[]>([]);
+  const [knowledges, setKnowledges] = useState<Knowledge[]>([]);
   const [featureIds, setFeatureIds] = useState<number[]>([]);
   const [features, setFeatures] = useState<Feature[]>([]);
   const [factionIds, setFactionIds] = useState<number[]>([]);
@@ -35,6 +38,7 @@ export default function Characters() {
 
   useEffect(() => {
     if (!!traitsData) {
+      setKnowledges(traitsData.knowledges);
       setFeatures(traitsData.features);
       setFactions(traitsData.factions);
       setClans(traitsData.clans);
@@ -57,6 +61,13 @@ export default function Characters() {
       !!featureIds.length
         ? featureIds.every((fId) =>
             c.features?.map((f) => f.featureId).includes(fId),
+          )
+        : true,
+    )
+    .filter((c) =>
+      !!knowledgeIds.length
+        ? knowledgeIds.every((fId) =>
+            c.knowledges?.map((f) => f.knowledgeId).includes(fId),
           )
         : true,
     )
@@ -176,6 +187,31 @@ export default function Characters() {
               textValue={feature.name}
             >
               {feature.name}
+            </SelectItem>
+          ))}
+        </Select>
+        <Select
+          size="sm"
+          variant="bordered"
+          placeholder="Знания"
+          aria-label="Знания"
+          selectionMode="multiple"
+          selectedKeys={knowledgeIds.map((f) => f.toString())}
+          onChange={(e) => {
+            setKnowledgeIds(
+              !!e.target.value
+                ? e.target.value.split(",").map((s) => Number(s))
+                : [],
+            );
+          }}
+        >
+          {knowledges.map((knowledge) => (
+            <SelectItem
+              key={knowledge.id}
+              value={knowledge.id}
+              textValue={knowledge.name}
+            >
+              {knowledge.name}
             </SelectItem>
           ))}
         </Select>

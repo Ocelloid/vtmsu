@@ -1535,6 +1535,7 @@ export const charRouter = createTRPCRouter({
         features: { include: { feature: true } },
         abilities: { include: { abilitiy: true } },
         effects: { include: { effect: true } },
+        knowledges: { include: { knowledge: true } },
       },
     });
   }),
