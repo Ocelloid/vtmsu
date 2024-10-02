@@ -185,7 +185,7 @@ export default function Admin() {
                   <Containers />
                 </Tab>
                 <Tab
-                  key={"containers"}
+                  key={"geopoints"}
                   className="flex flex-col gap-8 md:gap-2"
                   title={
                     <div className="flex items-center space-x-2">

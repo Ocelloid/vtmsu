@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import GeoPointForm from "~/components/modals/GeoPointForm";
 import DynamicGeoPointsMap from "~/components/admin/items/DynamicGeoPointsMap";
 import { api } from "~/utils/api";
@@ -5,7 +6,7 @@ import { useState } from "react";
 import { LoadingPage } from "~/components/Loading";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { Button } from "@nextui-org/react";
-import { LatLng } from "leaflet";
+// import { LatLng } from "leaflet";
 
 export default function GeoPoints() {
   const {
@@ -14,7 +15,7 @@ export default function GeoPoints() {
     refetch: refetchPoints,
   } = api.city.getAllGeoPoints.useQuery();
   const { mutate: deleteGeoPoint } = api.city.deleteGeoPoint.useMutation();
-  const [position, setPosition] = useState<LatLng>(new LatLng(58.0075, 56.23));
+  // const [position, setPosition] = useState<LatLng>(new LatLng(58.0075, 56.23));
 
   const handleDelete = async (id: string) => {
     const confirm = window.confirm(
@@ -25,20 +26,20 @@ export default function GeoPoints() {
     void refetchPoints();
   };
 
-  const handleCopyPosition = (p: LatLng) => {
-    setPosition(p);
-  };
+  // const handleCopyPosition = (p: LatLng) => {
+  //   setPosition(p);
+  // };
 
   if (isItemsLoading) return <LoadingPage />;
   return (
     <div className="flex flex-col gap-2 pt-2">
-      <GeoPointForm onRefetch={refetchPoints} position={position} />
-      {!!geoPoints && (
+      {/* <GeoPointForm onRefetch={refetchPoints} position={position} /> */}
+      {/* {!!geoPoints && (
         <DynamicGeoPointsMap
           geoPoints={geoPoints}
           handleCopyPosition={handleCopyPosition}
         />
-      )}
+      )} */}
       {geoPoints?.map((geoPoint) => (
         <div
           key={geoPoint.id}
