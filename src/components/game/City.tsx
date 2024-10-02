@@ -11,6 +11,7 @@ import {
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { useState } from "react";
+import { PiMapPinFill } from "react-icons/pi";
 import {
   GiFactory,
   GiHumanTarget,
@@ -20,15 +21,22 @@ import {
 import { FcFactoryBreakdown } from "react-icons/fc";
 import type { Item } from "~/server/api/routers/item";
 import type { Company } from "~/server/api/routers/econ";
+import type {
+  GeoPoint,
+  GeoPointEffects,
+  GeoPointContainers,
+} from "~/server/api/routers/city";
+import type { Character } from "~/server/api/routers/char";
 import type { HuntingInstance } from "~/server/api/routers/hunt";
 import { LoadingSpinner } from "~/components/Loading";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function City({
-  characterId,
+  char,
   refetch,
 }: {
-  characterId: number;
+  char: Character;
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -51,6 +59,10 @@ export default function City({
     api.hunt.investigate.useMutation();
   const { mutate: coverUp, isPending: isCoverUpPending } =
     api.hunt.coverUp.useMutation();
+  const { mutate: lookUpGeoPoint, isPending: isLookUpGeoPointPending } =
+    api.city.lookUpGeoPoint.useMutation();
+  const { mutate: applyGeoPoint, isPending: isUseGeoPointPending } =
+    api.city.applyGeoPoint.useMutation();
 
   const [items, setItems] = useState<Item[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -58,6 +70,7 @@ export default function City({
     [],
   );
   const [violations, setViolations] = useState<HuntingInstance[]>([]);
+  const [geoPoints, setGeoPoints] = useState<GeoPoint[]>([]);
 
   const [auspexData, setAuspexData] = useState("");
   const [animalismData, setAnimalismData] = useState("");
@@ -65,6 +78,12 @@ export default function City({
   const [hackerImage, setHackerImage] = useState("");
   const [dateTime, setDateTime] = useState("");
   const [violationId, setViolationId] = useState<number>(0);
+  const [geoPoint, setGeoPoint] = useState<GeoPoint>();
+  const [geoContent, setGeoContent] = useState("");
+  const [geoEffects, setGeoEffects] = useState<GeoPointEffects[]>([]);
+  const [geoContainers, setGeoContainers] = useState<GeoPointContainers[]>([]);
+
+  const isExperienced = char?.features?.some((f) => f.featureId === 9) ?? false;
 
   const handleLookAround = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -72,7 +91,7 @@ export default function City({
         {
           x: pos.coords.longitude,
           y: pos.coords.latitude,
-          charId: characterId,
+          charId: char.id,
         },
         {
           onSuccess: (e) => {
@@ -83,6 +102,7 @@ export default function City({
             if (!!e.availableHuntingInstances)
               setHuntingInstances(e.availableHuntingInstances);
             if (!!e.availableViolations) setViolations(e.availableViolations);
+            if (!!e.availableGeoPoints) setGeoPoints(e.availableGeoPoints);
           },
         },
       );
@@ -95,7 +115,7 @@ export default function City({
     );
     if (!confirmed) return;
     newHunt(
-      { characterId, instanceId: instance.id! },
+      { characterId: char.id, instanceId: instance.id! },
       {
         onSuccess(e) {
           if (e?.message) alert(e.message);
@@ -117,7 +137,7 @@ export default function City({
     collectItem(
       {
         id: item.id!,
-        charId: characterId,
+        charId: char.id,
       },
       {
         onSuccess(e) {
@@ -144,7 +164,7 @@ export default function City({
     toggleActive(
       {
         id: company.id,
-        charId: characterId,
+        charId: char.id,
       },
       {
         onSuccess(e) {
@@ -165,7 +185,7 @@ export default function City({
     racket(
       {
         id: company.id,
-        charId: characterId,
+        charId: char.id,
       },
       {
         onSuccess(e) {
@@ -187,7 +207,7 @@ export default function City({
     investigate(
       {
         id: violation.id,
-        charId: characterId,
+        charId: char.id,
       },
       {
         onSuccess: (e) => {
@@ -204,8 +224,48 @@ export default function City({
     );
   };
 
+  const handleLookUpGeoPoint = (geoPoint: GeoPoint) => {
+    lookUpGeoPoint(
+      {
+        id: geoPoint.id,
+        charId: char.id,
+      },
+      {
+        onSuccess(e) {
+          setGeoPoint(geoPoint);
+          if (e?.message) alert(e.message);
+          if (e?.content) setGeoContent(e.content);
+          if (e?.effects) setGeoEffects(e.effects);
+          if (e?.containers) setGeoContainers(e.containers);
+          if (e?.auspexData) setAuspexData(e.auspexData);
+          if (e?.hackerData) setHackerData(e.hackerData);
+          if (e?.animalismData) setAnimalismData(e.animalismData);
+          geoOnOpen();
+        },
+      },
+    );
+  };
+
+  const handleUseGeoPoint = () => {
+    if (!geoPoint) return;
+    applyGeoPoint(
+      {
+        id: geoPoint.id,
+        charId: char.id,
+      },
+      {
+        onSuccess(e) {
+          if (e?.message) alert(e.message);
+          geoOnClose();
+          refetch();
+        },
+      },
+    );
+  };
+
   const handleGeoClear = () => {
     geoOnClose();
+    setGeoPoint(undefined);
     setDateTime("");
     setAuspexData("");
     setHackerData("");
@@ -226,7 +286,7 @@ export default function City({
     coverUp(
       {
         id: violation.id,
-        charId: characterId,
+        charId: char.id,
       },
       {
         onSuccess(e) {
@@ -254,9 +314,16 @@ export default function City({
         }}
       >
         <ModalContent>
-          <ModalHeader>Расследование</ModalHeader>
+          <ModalHeader>Результаты осмотра</ModalHeader>
           <ModalBody className="flex max-h-[80vh] flex-col gap-2 overflow-y-auto">
-            <p>Вам удалось узнать следующее:</p>
+            {!!geoContent ? (
+              <div
+                className="text-justify text-sm"
+                dangerouslySetInnerHTML={{ __html: geoContent }}
+              />
+            ) : (
+              <p>Вам удалось узнать следующее:</p>
+            )}
             {!!auspexData && (
               <p className="text-justify text-sm">{auspexData}</p>
             )}
@@ -283,10 +350,38 @@ export default function City({
               </div>
             )}
           </ModalBody>
-          <ModalFooter className="flex flex-col justify-between">
-            <Button onClick={geoOnClose} variant="faded" size="sm">
-              Закрыть
-            </Button>
+          <ModalFooter className="flex flex-col">
+            <div className="flex w-full flex-row justify-between gap-1">
+              <Button
+                onClick={geoOnClose}
+                variant="faded"
+                size="sm"
+                className="w-full"
+              >
+                Закрыть
+              </Button>
+              {!!geoEffects.length && (
+                <Button
+                  onClick={handleUseGeoPoint}
+                  variant="faded"
+                  color="success"
+                  size="sm"
+                  className="w-full"
+                  isDisabled={isUseGeoPointPending}
+                >
+                  Использовать
+                </Button>
+              )}
+            </div>
+            {geoContainers?.map((gc) => (
+              <Link
+                key={gc.id}
+                href={`/container/${gc.container?.id}`}
+                target="_blank"
+              >
+                Открыть {gc.container?.name}
+              </Link>
+            ))}
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -349,13 +444,48 @@ export default function City({
               </div>
             ))}
             {!!violations.length && <Divider />}
+            {geoPoints.map((geoPoint) => (
+              <div
+                key={geoPoint.id + "_geoPoint"}
+                className="flex flex-col gap-1"
+              >
+                <div className="flex flex-row items-center gap-1 text-lg">
+                  <PiMapPinFill size={32} className="min-w-8" />
+                  <div className="flex flex-col gap-0">
+                    {geoPoint.name}
+                    <div
+                      className="text-justify text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: geoPoint.content ?? "",
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className={"flex flex-row justify-between gap-1"}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="w-full"
+                    isDisabled={isLookUpGeoPointPending}
+                    onClick={() => handleLookUpGeoPoint(geoPoint)}
+                  >
+                    Посмотреть
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {!!geoPoints.length && <Divider />}
             {huntingInstances.map((instance) => (
               <div
                 key={instance.id + "_instance"}
                 className="flex flex-col gap-1"
               >
                 <div className="flex flex-row items-center gap-1 text-lg">
-                  <GiHumanTarget size={32} className="min-w-8" />
+                  <GiHumanTarget
+                    size={32}
+                    className="min-w-8"
+                    color={isExperienced ? "warning" : undefined}
+                  />
                   <div className="flex flex-col gap-0">
                     {instance.target?.name ?? "Цель для охоты"}
                     <div className="text-justify text-sm">
@@ -419,7 +549,7 @@ export default function City({
                     </div>
                   </div>
                 </div>
-                {company.character?.id !== characterId && (
+                {company.character?.id !== char.id && (
                   <div className={"flex flex-row justify-between gap-1"}>
                     {company.isActive && (
                       <Button
@@ -443,7 +573,7 @@ export default function City({
                     </Button>
                   </div>
                 )}
-                {company.character?.id === characterId && !company.isActive && (
+                {company.character?.id === char.id && !company.isActive && (
                   <div className={"flex flex-col"}>
                     <Button
                       size="sm"

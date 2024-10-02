@@ -15,6 +15,8 @@ import type { HuntingInstance } from "~/server/api/routers/hunt";
 import { LoadingPage } from "~/components/Loading";
 import { GiVampireCape } from "react-icons/gi";
 
+const marker_icon = L.icon({ iconUrl: "/map-marker.png" });
+const factory_icon = L.icon({ iconUrl: "/factory.png" });
 const skull_icon = L.icon({ iconUrl: "/skull.png" });
 const cape_icon = L.icon({ iconUrl: "/cape.png" });
 const cityBorders = [
@@ -48,6 +50,10 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
     api.hunt.getAllHuntingInstances.useQuery(undefined, {
       refetchInterval: 10000,
     });
+  const { data: companies, isLoading: companiesPointsLoading } =
+    api.city.getVisibleCompanies.useQuery();
+  const { data: geoPoints, isLoading: geoPointsLoading } =
+    api.city.getVisibleGeoPoints.useQuery();
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -75,7 +81,8 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
     }, 250);
   }, []);
 
-  if (isHuntingInstancesLoading) return <LoadingPage />;
+  if (isHuntingInstancesLoading || geoPointsLoading || companiesPointsLoading)
+    return <LoadingPage />;
 
   return (
     <div style={{ height: "100%", width: "100%", borderRadius: "0.25rem" }}>
@@ -147,6 +154,37 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
               </Popup>
             </Marker>
           ))}
+        {companies?.map((company) => (
+          <Marker
+            key={company.id}
+            position={[company.coordY, company.coordX]}
+            icon={factory_icon}
+          >
+            <Popup>
+              <div className="flex flex-col items-center gap-0">
+                <span>{company.name}</span>
+                <span className="text-justify text-xs">{company.content}</span>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+        {geoPoints?.map((geoPoint) => (
+          <Marker
+            key={geoPoint.id}
+            position={[geoPoint.lat, geoPoint.lng]}
+            icon={marker_icon}
+          >
+            <Popup>
+              <div className="flex flex-col items-center gap-0">
+                <span>{geoPoint.name}</span>
+                <span
+                  className="text-justify text-xs"
+                  dangerouslySetInnerHTML={{ __html: geoPoint.content ?? "" }}
+                />
+              </div>
+            </Popup>
+          </Marker>
+        ))}
         {!!position && (
           <Marker position={position} icon={cape_icon}>
             <GiVampireCape />

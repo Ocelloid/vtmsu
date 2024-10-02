@@ -16,6 +16,7 @@ import Controls from "~/components/admin/Controls";
 import Tickets from "~/components/admin/Tickets";
 import ForceEffects from "~/components/admin/ForceEffects";
 import Containers from "~/components/admin/Containers";
+import GeoPoints from "~/components/admin/items/GeoPoints";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -182,6 +183,17 @@ export default function Admin() {
                   }
                 >
                   <Containers />
+                </Tab>
+                <Tab
+                  key={"containers"}
+                  className="flex flex-col gap-8 md:gap-2"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Геоточки</span>
+                    </div>
+                  }
+                >
+                  <GeoPoints />
                 </Tab>
               </Tabs>
             </Tab>

@@ -159,6 +159,7 @@ model GeoPoint {
   lat                Float
   lng                Float
   name               String
+  isVisible          Boolean              @default(false)
   icon               String?
   content            String?              @db.LongText
   auspexData         String?              @db.LongText

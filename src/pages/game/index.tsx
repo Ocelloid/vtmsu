@@ -206,7 +206,7 @@ export default function Game() {
                   }
                   className="flex flex-col gap-2"
                 >
-                  <City characterId={char.id} refetch={refetch} />
+                  <City char={char} refetch={refetch} />
                 </Tab>
                 <Tab
                   key="items"
