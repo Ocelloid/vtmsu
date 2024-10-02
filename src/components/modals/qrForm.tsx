@@ -6,6 +6,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Textarea,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FaQrcode } from "react-icons/fa";
@@ -24,6 +25,9 @@ const QRForm = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
+  const [hackerData, setHackerData] = useState("");
+  const [auspexData, setAuspexData] = useState("");
+  const [animalismData, setAnimalismData] = useState("");
   const [address, setAddress] = useState("");
   const [title, setTitle] = useState("");
 
@@ -46,13 +50,24 @@ const QRForm = ({
     if (!!item) {
       setTitle(item?.name ?? "");
       setDescription(item?.content ?? "");
+      setAddress(item?.address ?? "");
+      setHackerData(item?.hackerData ?? "");
+      setAuspexData(item?.auspexData ?? "");
+      setAnimalismData(item?.animalismData ?? "");
     }
   }, [item]);
 
   const handleFormSubmit = () => {
     if (!editId)
       createMutation(
-        { name: title, content: description, address },
+        {
+          name: title,
+          content: description,
+          address,
+          hackerData,
+          auspexData,
+          animalismData,
+        },
         {
           onSuccess() {
             resetForm();
@@ -63,7 +78,15 @@ const QRForm = ({
       );
     else
       updateMutation(
-        { id: editId, name: title, content: description, address },
+        {
+          id: editId,
+          name: title,
+          content: description,
+          address,
+          hackerData,
+          auspexData,
+          animalismData,
+        },
         {
           onSuccess(e) {
             if (e?.message) alert(e.message);
@@ -111,6 +134,24 @@ const QRForm = ({
               placeholder="Введите адрес"
               value={address}
               onValueChange={setAddress}
+            />
+            <Textarea
+              label="Данные при прорицании"
+              placeholder="Введите данные при прорицании"
+              value={auspexData}
+              onValueChange={setAuspexData}
+            />
+            <Textarea
+              label="Данные при анимализме"
+              placeholder="Введите данные при анимализме"
+              value={animalismData}
+              onValueChange={setAnimalismData}
+            />
+            <Textarea
+              label="Данные при хакерстве"
+              placeholder="Введите данные при хакерстве"
+              value={hackerData}
+              onValueChange={setHackerData}
             />
             <DefaultEditor
               label="Контент"
