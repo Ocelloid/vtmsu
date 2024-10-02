@@ -112,11 +112,11 @@ export const huntRouter = createTRPCRouter({
       const hasConcentratedBlood = character.features.some(
         (f) => f.feature.name === "Концентрированнная кровь",
       );
-      const hasThaudron = character.effects.some(
-        (e) => e.effect.name === "Таудрон",
+      const hasThaudron = character.effects.some((e) =>
+        e.effect.name.includes("Таудрон"),
       );
-      const hasHangover = character.effects.some(
-        (e) => e.effect.name === "Похмелье",
+      const hasHangover = character.effects.some((e) =>
+        e.effect.name.includes("Похмелье"),
       );
 
       const lastHunt = await ctx.db.hunt.findFirst({
@@ -263,6 +263,119 @@ export const huntRouter = createTRPCRouter({
         },
       });
       return newInstance;
+    }),
+
+  investigate: protectedProcedure
+    .input(z.object({ id: z.number(), charId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const lastHunt = await ctx.db.hunt.findFirst({
+        where: {
+          instanceId: input.id,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          instance: { include: { target: { include: { descs: true } } } },
+          character: {
+            select: {
+              auspexData: true,
+              animalismData: true,
+              hackerData: true,
+              image: true,
+            },
+          },
+        },
+      });
+      if (!lastHunt || !lastHunt.instance?.isVisible)
+        return { message: "Нарушение не найдено" };
+
+      const investigator = await ctx.db.char.findUnique({
+        where: { id: input.charId },
+        include: {
+          features: { include: { feature: true } },
+          effects: { include: { effect: true } },
+          bankAccount: true,
+        },
+      });
+
+      if (!investigator) return { message: "Персонаж не найден" };
+
+      const accountToUse = investigator.bankAccount.sort(
+        (a, b) => b.balance - a.balance,
+      )[0];
+      if (!accountToUse) return { message: "Не найден счёт" };
+      if (
+        accountToUse.balance <
+        (lastHunt.instance.target?.descs?.length ?? 0) * 10
+      )
+        return {
+          message: `Недостаточно средств на счёте ${accountToUse.address}`,
+          item: undefined,
+        };
+
+      const hasAuspexActive = investigator.effects.some(
+        (e) =>
+          e.effect.name.includes("Прорицание") &&
+          (e.expires ?? new Date()) > new Date(),
+      );
+      const hasAnimalismActive = investigator.effects.some(
+        (e) =>
+          e.effect.name.includes("Анимализм") &&
+          (e.expires ?? new Date()) > new Date(),
+      );
+      const isHacker = investigator.features.some((f) =>
+        f.feature.name.includes("Хакер"),
+      );
+
+      return {
+        message: "Вы проводите расследование и узнаёте:",
+        hackerData: isHacker ? lastHunt.character.hackerData : null,
+        hackerImage: isHacker ? lastHunt.character.image : null,
+        animalismData: hasAnimalismActive
+          ? lastHunt.character.animalismData
+          : null,
+        auspexData: hasAuspexActive ? lastHunt.character.auspexData : null,
+      };
+    }),
+
+  coverUp: protectedProcedure
+    .input(z.object({ id: z.number(), charId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const instance = await ctx.db.huntingInstance.findUnique({
+        where: { id: input.id },
+        include: { target: { include: { descs: true } } },
+      });
+      if (!instance?.isVisible || !instance)
+        return { message: "Нарушение не найдено" };
+
+      const character = await ctx.db.char.findUnique({
+        where: { id: input.charId },
+        include: {
+          bankAccount: true,
+        },
+      });
+
+      if (!character) return { message: "Персонаж не найден" };
+
+      const accountToUse = character.bankAccount.sort(
+        (a, b) => b.balance - a.balance,
+      )[0];
+      if (!accountToUse) return { message: "Не найден счёт" };
+      if (accountToUse.balance < (instance.target?.descs?.length ?? 0) * 50)
+        return {
+          message: `Недостаточно средств на счёте ${accountToUse.address}`,
+          item: undefined,
+        };
+
+      await ctx.db.huntingInstance.update({
+        where: { id: input.id },
+        data: {
+          isVisible: false,
+        },
+      });
+
+      return { message: "Нарушение маскарада успешно прикрыто" };
     }),
 
   getAllHuntingTargets: protectedProcedure.query(async ({ ctx }) => {

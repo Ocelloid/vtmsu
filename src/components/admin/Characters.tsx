@@ -1,17 +1,24 @@
 import { Input, Button, Select, SelectItem, Checkbox } from "@nextui-org/react";
 import { FaPlus } from "react-icons/fa";
 import { useRouter } from "next/router";
-import type { Character, Faction, Clan } from "~/server/api/routers/char";
+import type {
+  Character,
+  Faction,
+  Clan,
+  Feature,
+} from "~/server/api/routers/char";
 import { LoadingPage } from "~/components/Loading";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
-import CharacterCard from "../CharacterCard";
+import CharacterCard from "~/components/CharacterCard";
 
 export default function Characters() {
   const router = useRouter();
   const { data: sessionData } = useSession();
   const [chars, setChars] = useState<Character[]>([]);
+  const [featureIds, setFeatureIds] = useState<number[]>([]);
+  const [features, setFeatures] = useState<Feature[]>([]);
   const [factionIds, setFactionIds] = useState<number[]>([]);
   const [factions, setFactions] = useState<Faction[]>([]);
   const [clanIds, setClanIds] = useState<number[]>([]);
@@ -28,6 +35,7 @@ export default function Characters() {
 
   useEffect(() => {
     if (!!traitsData) {
+      setFeatures(traitsData.features);
       setFactions(traitsData.factions);
       setClans(traitsData.clans);
     }
@@ -44,6 +52,13 @@ export default function Characters() {
     .sort((a, b) => a.id - b.id)
     .filter((c) =>
       !!factionIds.length ? factionIds.includes(c.factionId) : true,
+    )
+    .filter((c) =>
+      !!featureIds.length
+        ? featureIds.every((fId) =>
+            c.features?.map((f) => f.featureId).includes(fId),
+          )
+        : true,
     )
     .filter((c) => (!!clanIds.length ? clanIds.includes(c.clanId) : true))
     .filter((c) =>
@@ -85,13 +100,13 @@ export default function Characters() {
         <Input
           size="sm"
           variant="bordered"
-          className="min-w-28 max-w-96"
+          className="min-w-24 max-w-80"
           aria-label="Имя"
           placeholder="Имя"
           value={name}
           onValueChange={setName}
         />
-        <div className="flex w-full min-w-56 flex-row gap-2">
+        <div className="flex w-full min-w-64 flex-row gap-2">
           <Select
             size="sm"
             variant="bordered"
@@ -139,6 +154,31 @@ export default function Characters() {
             ))}
           </Select>
         </div>
+        <Select
+          size="sm"
+          variant="bordered"
+          placeholder="Дополнения"
+          aria-label="Дополнения"
+          selectionMode="multiple"
+          selectedKeys={featureIds.map((f) => f.toString())}
+          onChange={(e) => {
+            setFeatureIds(
+              !!e.target.value
+                ? e.target.value.split(",").map((s) => Number(s))
+                : [],
+            );
+          }}
+        >
+          {features.map((feature) => (
+            <SelectItem
+              key={feature.id}
+              value={feature.id}
+              textValue={feature.name}
+            >
+              {feature.name}
+            </SelectItem>
+          ))}
+        </Select>
       </div>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {filteredSorted

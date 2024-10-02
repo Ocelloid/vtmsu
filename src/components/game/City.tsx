@@ -31,6 +31,11 @@ export default function City({
   refetch: () => void;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: geoOpen,
+    onOpen: geoOnOpen,
+    onClose: geoOnClose,
+  } = useDisclosure();
   const { mutate: lookAround, isPending: lookAroundPending } =
     api.util.getLookAround.useMutation();
   const { mutate: collectItem, isPending: collectItemPending } =
@@ -41,6 +46,10 @@ export default function City({
     api.econ.toggleActive.useMutation();
   const { mutate: racket, isPending: isRacketPending } =
     api.econ.racket.useMutation();
+  const { mutate: investigate, isPending: isInvestigatePending } =
+    api.hunt.investigate.useMutation();
+  const { mutate: coverUp, isPending: isCoverUpPending } =
+    api.hunt.coverUp.useMutation();
 
   const [items, setItems] = useState<Item[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -166,6 +175,18 @@ export default function City({
       } ОВ.`,
     );
     if (!confirmed) return;
+    if (!violation.id) return;
+    investigate(
+      {
+        id: violation.id,
+        charId: characterId,
+      },
+      {
+        onSuccess: (e) => {
+          if (e?.message) alert(e.message);
+        },
+      },
+    );
   };
 
   const handleCoverUp = (violation: HuntingInstance) => {
@@ -175,6 +196,7 @@ export default function City({
       } ОВ.`,
     );
     if (!confirmed) return;
+    if (!violation.id) return;
   };
 
   return (
@@ -220,7 +242,7 @@ export default function City({
                     size="sm"
                     variant="ghost"
                     className="w-full"
-                    isDisabled={collectItemPending || lookAroundPending}
+                    isDisabled={isInvestigatePending || lookAroundPending}
                     onClick={() => handleInvestigate(violation)}
                   >
                     Расследовать
@@ -229,7 +251,7 @@ export default function City({
                     size="sm"
                     variant="ghost"
                     className="w-full"
-                    isDisabled={collectItemPending || lookAroundPending}
+                    isDisabled={isCoverUpPending || lookAroundPending}
                     onClick={() => handleCoverUp(violation)}
                   >
                     Прикрыть

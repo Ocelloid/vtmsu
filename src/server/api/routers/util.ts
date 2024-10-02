@@ -97,7 +97,7 @@ export const utilRouter = createTRPCRouter({
 
       const isWarrens = char.effects.some(
         (e) =>
-          e.effect.name === "Канализация" &&
+          e.effect.name.includes("Канализация") &&
           (e.expires ?? new Date()) > new Date(),
       );
 
