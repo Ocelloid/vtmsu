@@ -466,6 +466,10 @@ export default function CharacterEditor() {
         watchedFWC.reduce((a, b) => a || (!b.comment && b.checked), false)) &&
       !infiniteFeatures);
 
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
   return (
     <>
       <Head>
@@ -503,29 +507,41 @@ export default function CharacterEditor() {
                   width="440"
                 />
               )}
-              <UploadButton
-                disabled={uploading}
-                content={{
-                  button: (
-                    <div className="flex flex-row items-center gap-2">
-                      <FaImage size={16} className="ml-2" />
-                      <p className="text-sm">Загрузить</p>
-                    </div>
-                  ),
-                  allowedContent: "до 4 Мб",
-                }}
-                appearance={{ button: { height: 30, width: 120 } }}
-                className="h-14"
-                endpoint="imageUploader"
-                onBeforeUploadBegin={(files) => {
-                  setUploading(true);
-                  return files;
-                }}
-                onClientUploadComplete={(res) => {
-                  setValue("image", res[0]?.url ?? "");
-                  setUploading(false);
-                }}
-              />
+              {isLocalhost ? (
+                <UploadButton
+                  disabled={uploading}
+                  content={{
+                    button: (
+                      <div className="flex flex-row items-center gap-2">
+                        <FaImage size={16} className="ml-2" />
+                        <p className="text-sm">Загрузить</p>
+                      </div>
+                    ),
+                    allowedContent: "до 4 Мб",
+                  }}
+                  appearance={{ button: { height: 30, width: 120 } }}
+                  className="h-14"
+                  endpoint="imageUploader"
+                  onBeforeUploadBegin={(files) => {
+                    setUploading(true);
+                    return files;
+                  }}
+                  onClientUploadComplete={(res) => {
+                    setValue("image", res[0]?.url ?? "");
+                    setUploading(false);
+                  }}
+                />
+              ) : (
+                <div className="flex flex-col gap-1">
+                  <Input
+                    placeholder="Вставьте ссылку на фото"
+                    {...register("image", {
+                      required:
+                        "Скопируйте ссылку на изображение и вставьте её здесь",
+                    })}
+                  />
+                </div>
+              )}
             </div>
             <div className="-mt-16 flex flex-1 flex-col sm:mt-0">
               <div className="mb-4 flex flex-row items-center justify-between sm:mb-1">
