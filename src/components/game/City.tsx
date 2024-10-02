@@ -269,7 +269,7 @@ export default function City({
             {!!hackerImage && (
               <Image
                 src={hackerImage}
-                className="h-full w-full max-w-80 border-2 border-success sm:max-w-96"
+                className="aspect-square h-full w-full max-w-80 border-2 border-success object-cover sm:max-w-96"
                 height={8}
                 width={8}
                 quality={(violationId % 25) + 25}
