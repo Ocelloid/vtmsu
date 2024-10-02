@@ -63,6 +63,8 @@ export default function City({
   const [animalismData, setAnimalismData] = useState("");
   const [hackerData, setHackerData] = useState("");
   const [hackerImage, setHackerImage] = useState("");
+  const [dateTime, setDateTime] = useState("");
+  const [violationId, setViolationId] = useState<number>(0);
 
   const handleLookAround = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -189,7 +191,9 @@ export default function City({
       },
       {
         onSuccess: (e) => {
+          setViolationId(violation.id!);
           if (e?.message) alert(e.message);
+          if (e?.dateTime) setDateTime(e.dateTime);
           if (e?.auspexData) setAuspexData(e.auspexData);
           if (e?.hackerData) setHackerData(e.hackerData);
           if (e?.hackerImage) setHackerImage(e.hackerImage);
@@ -202,9 +206,11 @@ export default function City({
 
   const handleGeoClear = () => {
     geoOnClose();
+    setDateTime("");
     setAuspexData("");
     setHackerData("");
     setHackerImage("");
+    setViolationId(0);
     setAnimalismData("");
     handleLookAround();
   };
@@ -263,13 +269,25 @@ export default function City({
             {!!hackerImage && (
               <Image
                 src={hackerImage}
-                className="mx-auto my-auto mt-32 max-w-80 sm:max-w-96"
-                height={16}
+                className="h-full w-full max-w-80 border-2 border-success sm:max-w-96"
+                height={8}
+                width={8}
+                quality={(violationId % 25) + 25}
                 priority
                 alt="hacker-image"
               />
             )}
+            {!!dateTime && (
+              <div className="-ml-3 -mt-8 w-full text-right text-success">
+                CAM1: {dateTime}
+              </div>
+            )}
           </ModalBody>
+          <ModalFooter className="flex flex-col justify-between">
+            <Button onClick={geoOnClose} variant="faded" size="sm">
+              Закрыть
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
       <Modal

@@ -176,10 +176,12 @@ const CharacterSheet = ({
   }, [publicData, sessionData, isAdmin, setPrivateVer]);
 
   const handleFix = () => {
-    const fix = confirm("Фиксировать персонажа?");
+    const fix = confirm(
+      `${isFixed ? "Разрешить" : "Запретить"} редактирование персонажа?`,
+    );
     if (!fix) return;
     void fixMutation(
-      { id: Number(characterId) },
+      { id: Number(characterId), isFixed: !isFixed },
       {
         onSuccess: () => {
           if (!!onChange) onChange();
@@ -333,7 +335,7 @@ const CharacterSheet = ({
                 isDisabled={isFixPending}
                 className="w-full"
               >
-                Фиксировать персонажа
+                {isFixed ? "Разрешить" : "Запретить"} редактирование персонажа
               </Checkbox>
               <Select
                 label="Игрок"

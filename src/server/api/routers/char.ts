@@ -1413,11 +1413,11 @@ export const charRouter = createTRPCRouter({
     }),
 
   fix: protectedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.number(), isFixed: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.char.update({
         where: { id: input.id },
-        data: { isFixed: true },
+        data: { isFixed: input.isFixed },
       });
     }),
 

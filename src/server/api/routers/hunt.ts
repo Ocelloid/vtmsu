@@ -328,10 +328,9 @@ export const huntRouter = createTRPCRouter({
         f.feature.name.includes("Хакер"),
       );
 
-      console.log(lastHunt.character);
-
       return {
         message: "",
+        dateTime: isHacker ? lastHunt.createdAt.toLocaleString() : null,
         hackerData: isHacker ? lastHunt.character.hackerData : null,
         hackerImage: isHacker ? lastHunt.character.image : null,
         animalismData: hasAnimalismActive
