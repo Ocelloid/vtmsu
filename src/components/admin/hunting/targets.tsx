@@ -31,6 +31,7 @@ const Targets = () => {
   const [search, setSearch] = useState<string>("");
   const [image, setImage] = useState<string>("");
   const [req, setReq] = useState<string>("");
+  const [flag, setFlag] = useState<string>("");
   const [descs, setDescs] = useState<string[]>(["", ""]);
   const [uploading, setUploading] = useState<boolean>(false);
 
@@ -285,7 +286,10 @@ const Targets = () => {
       </Modal>
       <div className="-mb-4 grid w-full grid-cols-1 gap-2 md:-mb-0 md:-mt-2 md:grid-cols-4">
         <Button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            if (!!flag) setReq(flag);
+          }}
           variant="bordered"
           className="my-auto flex min-w-44 flex-row gap-0 border-black bg-transparent text-black dark:border-white dark:text-white"
         >
@@ -296,14 +300,27 @@ const Targets = () => {
           variant="underlined"
           label="Поиск"
           placeholder="Введите название"
-          className="md:col-span-3"
+          className="md:col-span-2"
           value={search}
           onValueChange={setSearch}
+        />
+        <Input
+          variant="underlined"
+          label="Поиск"
+          placeholder="Введите предпочтение"
+          className="md:col-span-1"
+          value={flag}
+          onValueChange={setFlag}
         />
       </div>
       {targets
         .filter((t) =>
-          !!search ? t.name.toLowerCase().includes(search) : true,
+          !!search ? t.name.toLowerCase().includes(search.toLowerCase()) : true,
+        )
+        .filter((t) =>
+          !!flag
+            ? t.hunt_req?.toLowerCase().includes(flag.toLowerCase())
+            : true,
         )
         .map((target) => (
           <div
