@@ -176,7 +176,7 @@ function Inventory({
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 300,
+        delay: 150,
         tolerance: 8,
       },
     }),

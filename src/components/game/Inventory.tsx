@@ -107,7 +107,7 @@ export default function Inventory({
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 300,
+        delay: 150,
         tolerance: 8,
       },
     }),
@@ -700,13 +700,13 @@ const Content = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <div className="flex h-full w-full flex-row gap-2">
+      <div className="flex h-full w-full touch-none flex-row gap-2">
         <Image
           src={item.image ?? ""}
           alt=""
           width="128"
           height="128"
-          objectFit="contain"
+          className="aspect-square object-contain"
         />
         <div className="flex h-full w-full flex-col gap-1">
           <p className="text-sm">{item.name}</p>
@@ -718,7 +718,7 @@ const Content = ({
             {item.usage > 0 && (
               <p className="text-xs">Использований:&nbsp;{item.usage}</p>
             )}
-            {item.usage !== 0 && (
+            {!!item.usage && (
               <Button
                 variant="light"
                 color="warning"
