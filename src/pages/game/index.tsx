@@ -66,11 +66,13 @@ export default function Game() {
       id: selectedCharacter!,
     },
     {
+      refetchInterval: 60000,
       enabled: !!selectedCharacter,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     },
   );
+  const { mutate: updateBloodPool } = api.char.updateBloodPool.useMutation();
 
   const { data: appData } = api.util.getAppData.useQuery();
   useEffect(() => {
@@ -81,8 +83,45 @@ export default function Game() {
   }, [appData, isAdmin, isUserAdminLoading, router]);
 
   useEffect(() => {
-    if (!!myCharacterData)
+    if (!!char && !!selectedCharacter) {
+      const activeEffects = char.effects.filter(
+        (e) => (e.expires ?? new Date()) > new Date(),
+      );
+      console.log(activeEffects);
+      if (
+        activeEffects.some((e) => e.effect.name === "Таудроновое похмелье") &&
+        !activeEffects.some((e) => e.effect.name === "Таудрон") &&
+        char.bloodPool !== 5
+      ) {
+        updateBloodPool(
+          { id: selectedCharacter, bloodPool: 5 },
+          {
+            onSuccess() {
+              void refetch();
+            },
+          },
+        );
+      }
+      if (
+        !activeEffects.some((e) => e.effect.name === "Таудроновое похмелье") &&
+        !activeEffects.some((e) => e.effect.name === "Таудрон") &&
+        char.bloodPool !== 10
+      )
+        updateBloodPool(
+          { id: selectedCharacter, bloodPool: 10 },
+          {
+            onSuccess() {
+              void refetch();
+            },
+          },
+        );
+    }
+  }, [char, selectedCharacter, updateBloodPool, refetch]);
+
+  useEffect(() => {
+    if (!!myCharacterData) {
       setSelectedCharacter(myCharacterData.filter((c) => c.verified)[0]?.id);
+    }
   }, [myCharacterData]);
 
   useEffect(() => {

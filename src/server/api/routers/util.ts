@@ -171,12 +171,16 @@ export const utilRouter = createTRPCRouter({
   getAllTickets: protectedProcedure.query(async ({ ctx }) => {
     const tickets = await ctx.db.ticket.findMany({
       orderBy: { createdAt: "desc" },
-      include: { character: { include: { faction: true, clan: true } } },
+      include: {
+        character: { include: { faction: true, clan: true } },
+        Message: true,
+      },
     });
     const players = await ctx.db.user.findMany();
     return tickets.map((t) => ({
       ...t,
       player: players.find((p) => p.id === t.character.playerId),
+      isAnswered: t.Message[t.Message.length - 1]?.isAdmin ?? false,
     }));
   }),
   getMessagesByTicketId: protectedProcedure

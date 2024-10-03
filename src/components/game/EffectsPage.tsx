@@ -3,6 +3,7 @@ import type { CharacterEffects } from "~/server/api/routers/char";
 import { CircularProgress } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import type { Character } from "~/server/api/routers/char";
+import { formatTime } from "~/utils/text";
 
 export default function EffectsPage({
   char,
@@ -13,18 +14,23 @@ export default function EffectsPage({
 }) {
   if (!char) return <LoadingPage />;
 
+  const activeEffects =
+    char.effects?.filter((e) => (e.expires ?? new Date()) > new Date()) ?? [];
+
   return (
     <div className="flex w-full flex-col gap-2">
-      {char.effects
+      {activeEffects
         ?.filter(
           (e) =>
             (auspex ? !!e.effect?.auspexData : true) &&
-            e.effect?.visibleToPlayer &&
-            (e.expires ? e.expires > new Date() : true),
+            e.effect?.visibleToPlayer,
         )
-        .map((e) => (
-          <Effect key={e.id + "_char_effect"} e={e} auspex={auspex} />
-        ))}
+        .map((e, i) =>
+          e.effect?.name === "Таудроновое похмелье" &&
+          activeEffects?.some((e) => e.effect?.name === "Таудрон") ? null : (
+            <Effect key={e.id + "_char_effect" + i} e={e} auspex={auspex} />
+          ),
+        )}
       {char.abilities
         ?.map((a) => a.abilitiy?.AbilityEffects)
         .flat()
@@ -34,9 +40,9 @@ export default function EffectsPage({
             e?.effect?.visibleToPlayer &&
             (e.expires ? e.expires > new Date() : true),
         )
-        .map((e) => (
+        .map((e, i) => (
           <Effect
-            key={e?.effect?.id + "_ability_effect"}
+            key={e?.effect?.id + "_ability_effect" + i}
             auspex={auspex}
             e={{
               characterId: char.id,
@@ -53,9 +59,9 @@ export default function EffectsPage({
             e?.effect?.visibleToPlayer &&
             (e.expires ? e.expires > new Date() : true),
         )
-        .map((e) => (
+        .map((e, i) => (
           <Effect
-            key={e?.id + "_feature_effect"}
+            key={e?.id + "_item_effect" + i}
             auspex={auspex}
             e={{
               characterId: char.id,
@@ -73,9 +79,9 @@ export default function EffectsPage({
             e?.effect?.visibleToPlayer &&
             (e.expires ? e.expires > new Date() : true),
         )
-        .map((e) => (
+        .map((e, i) => (
           <Effect
-            key={e?.id + "_feature_effect"}
+            key={e?.id + "_feature_effect" + i}
             auspex={auspex}
             e={{
               characterId: char.id,
@@ -105,9 +111,6 @@ const Effect = ({ auspex, e }: { auspex: boolean; e: CharacterEffects }) => {
     return () => clearInterval(intervalId);
   }, [e.expires]);
 
-  const minutes = Math.floor(timeRemaining / 60);
-  const seconds = timeRemaining % 60;
-
   return (
     <div
       className={`flex-row items-center gap-1 ${!!e.effect?.expiration && timeRemaining <= 0 ? "hidden" : "flex"}`}
@@ -122,11 +125,7 @@ const Effect = ({ auspex, e }: { auspex: boolean; e: CharacterEffects }) => {
         classNames={{
           value: !!timeRemaining ? "" : "text-3xl",
         }}
-        valueLabel={
-          !!timeRemaining
-            ? `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`
-            : "∞"
-        }
+        valueLabel={!!timeRemaining ? formatTime(timeRemaining) : "∞"}
         color={
           e.effect?.color as
             | "default"

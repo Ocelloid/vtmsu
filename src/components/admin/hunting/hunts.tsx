@@ -161,18 +161,20 @@ const Hunts = () => {
               selectedKeys={characterId ? [characterId] : []}
               onChange={(e) => setCharacterId(Number(e.target.value))}
             >
-              {characters.map((character) => (
-                <SelectItem
-                  key={character.id ?? ""}
-                  value={character.id}
-                  textValue={character.name}
-                >
-                  <p>{character.name}</p>
-                  <p className="text-xs">
-                    {character.faction?.name} - {character.clan?.name}
-                  </p>
-                </SelectItem>
-              ))}
+              {characters
+                .sort((a, b) => a.id - b.id)
+                .map((character) => (
+                  <SelectItem
+                    key={character.id ?? ""}
+                    value={character.id}
+                    textValue={character.name}
+                  >
+                    <p>{character.name}</p>
+                    <p className="text-xs">
+                      {character.faction?.name} - {character.clan?.name}
+                    </p>
+                  </SelectItem>
+                ))}
             </Select>
             <Select
               size="sm"

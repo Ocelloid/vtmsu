@@ -17,6 +17,7 @@ import type {
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { LoadingPage } from "~/components/Loading";
+import { formatTime } from "~/utils/text";
 
 type characterTraitsType = {
   label: string;
@@ -184,7 +185,7 @@ const CharacterTraits = () => {
                       showValueLabel={true}
                       value={(trait as Effect).expiration ?? 1}
                       maxValue={(trait as Effect).expiration ?? 1}
-                      valueLabel={`${(trait as Effect).expiration ?? 1} мин`}
+                      valueLabel={`${!!(trait as Effect).expiration ? formatTime((trait as Effect).expiration * 60) : "∞"}`}
                       color={
                         (trait as Effect).color as
                           | "default"

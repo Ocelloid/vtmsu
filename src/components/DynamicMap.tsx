@@ -123,7 +123,7 @@ function Map({ center }: { center: { lat: number; lng: number } }) {
                 className: "animate-pulse",
               }}
               fillOpacity={0.05}
-              radius={100 * instance.remains!}
+              radius={50 * instance.remains!}
             />
           ))}
         {instances

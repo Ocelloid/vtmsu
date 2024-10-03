@@ -96,3 +96,17 @@ export function containsAllValuesCaseInsensitive(
 
   return valuesB.every((val) => valuesA.includes(val));
 }
+
+export function formatTime(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds} сек`;
+  } else if (seconds < 3600) {
+    const wholeMinutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${wholeMinutes}:${remainingSeconds > 9 ? remainingSeconds : "0" + remainingSeconds}`;
+  } else {
+    const hours = Math.floor(seconds / 3600);
+    const remainingMinutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}ч ${remainingMinutes}м`;
+  }
+}

@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
-import { FaCheck, FaStopwatch, FaBan, FaPencilAlt } from "react-icons/fa";
+import {
+  FaCheck,
+  FaStopwatch,
+  FaBan,
+  FaTimes,
+  FaPencilAlt,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import { MdSend } from "react-icons/md";
 import type { Ticket } from "~/server/api/routers/util";
 import type { Character } from "~/server/api/routers/char";
@@ -19,6 +26,8 @@ import {
 } from "@nextui-org/react";
 import { LoadingSpinner, LoadingPage } from "../Loading";
 import CharacterCard from "../CharacterCard";
+
+type filteredTicket = Ticket & { isAnswered: boolean };
 
 export default function Tickets() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -44,11 +53,12 @@ export default function Tickets() {
   const [newName, setNewName] = useState<string>("");
   const [char, setChar] = useState<Character>();
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [tickets, setTickets] = useState<filteredTicket[]>([]);
   const [editId, setEditId] = useState<number>();
 
   const { data: appData } = api.util.getAppData.useQuery();
-  const { data: tickets, refetch: refetchTickets } =
-    api.util.getAllTickets.useQuery();
+  const { data: ticketsData, refetch: refetchTickets } =
+    api.util.getAllTickets.useQuery(undefined, { refetchInterval: 60000 });
   const { data: messages, refetch: refetchMessages } =
     api.util.getMessagesByTicketId.useQuery(
       { ticketId: selectedTicket?.id ?? 0 },
@@ -56,6 +66,10 @@ export default function Tickets() {
     );
   const { data: charactersData, isLoading: isCharactersLoading } =
     api.char.getAll.useQuery();
+
+  useEffect(() => {
+    if (!!ticketsData) setTickets(ticketsData);
+  }, [ticketsData]);
 
   useEffect(() => {
     if (!!charactersData) setCharacters(charactersData);
@@ -546,6 +560,17 @@ export default function Tickets() {
           </Autocomplete>
           <Button
             className="w-10 min-w-10 p-1"
+            variant="light"
+            color="warning"
+            onClick={() => {
+              setChar(undefined);
+            }}
+            isDisabled={!char}
+          >
+            <FaTimes size={24} />
+          </Button>
+          <Button
+            className="w-10 min-w-10 p-1"
             variant="solid"
             color="warning"
             onClick={() => {
@@ -588,7 +613,36 @@ export default function Tickets() {
             {tickets
               ?.filter(
                 (t) =>
-                  (!!char ? t.characterId === char?.id : true) && !t.isResolved,
+                  (!!char ? t.characterId === char?.id : true) &&
+                  !t.isResolved &&
+                  !t.isAnswered,
+              )
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
+                    setChar(t?.character);
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  <FaExclamationCircle size={16} />
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
+            {tickets
+              ?.filter(
+                (t) =>
+                  (!!char ? t.characterId === char?.id : true) &&
+                  !t.isResolved &&
+                  t.isAnswered,
               )
               .map((t) => (
                 <Button
@@ -605,7 +659,6 @@ export default function Tickets() {
                   }}
                 >
                   <p className="w-full truncate text-start text-sm">{t.name}</p>
-                  {t.isResolved && <FaCheck size={16} />}
                   <p className="h-8 w-8 text-wrap text-xs opacity-50">
                     {formatDate(t.createdAt)}
                   </p>
@@ -631,7 +684,7 @@ export default function Tickets() {
                   }}
                 >
                   <p className="w-full truncate text-start text-sm">{t.name}</p>
-                  {t.isResolved && <FaCheck size={16} />}
+                  <FaCheck size={16} />
                   <p className="h-8 w-8 text-wrap text-xs opacity-50">
                     {formatDate(t.createdAt)}
                   </p>
@@ -651,7 +704,63 @@ export default function Tickets() {
               <p className="text-sm font-semibold">Новая заявка</p>
             </Button>
             {tickets
-              ?.filter((t) => (!!char ? t.characterId === char?.id : true))
+              ?.filter(
+                (t) =>
+                  (!!char ? t.characterId === char?.id : true) &&
+                  !t.isResolved &&
+                  !t.isAnswered,
+              )
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
+                    setChar(t?.character);
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  <FaExclamationCircle size={16} />
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
+            {tickets
+              ?.filter(
+                (t) =>
+                  (!!char ? t.characterId === char?.id : true) &&
+                  !t.isResolved &&
+                  t.isAnswered,
+              )
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
+                    setChar(t?.character);
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
+            {tickets
+              ?.filter(
+                (t) =>
+                  (!!char ? t.characterId === char?.id : true) && t.isResolved,
+              )
               .map((t) => (
                 <Button
                   key={t.id}

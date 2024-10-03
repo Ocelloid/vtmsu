@@ -1382,6 +1382,26 @@ export const charRouter = createTRPCRouter({
       return ctx.db.char.delete({ where: { id: input.id } });
     }),
 
+  updateBloodPool: protectedProcedure
+    .input(z.object({ id: z.number(), bloodPool: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+      if (!char) return { message: "Персонаж не найден" };
+      if (char.bloodPool === input.bloodPool) return;
+      return ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          bloodPool: input.bloodPool,
+          bloodAmount:
+            char.bloodAmount > input.bloodPool
+              ? input.bloodPool
+              : char.bloodAmount,
+        },
+      });
+    }),
+
   getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -1569,6 +1589,7 @@ export const charRouter = createTRPCRouter({
         clan: true,
         abilities: { include: { abilitiy: true } },
         features: { include: { feature: true } },
+        effects: { include: { effect: true } },
       },
       orderBy: { createdAt: "desc" },
       where: { playerId: ctx.session.user.id },

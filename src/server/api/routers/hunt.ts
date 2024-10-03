@@ -92,6 +92,11 @@ export const huntRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const appData = await ctx.db.appData.findFirst({
+        orderBy: { id: "desc" },
+      });
+      const radius = appData?.radius ?? 200;
+
       const instance = await ctx.db.huntingInstance.findUnique({
         where: { id: input.instanceId },
         include: { target: true },
@@ -197,6 +202,19 @@ export const huntRouter = createTRPCRouter({
               (hasConcentratedBlood ? 2 : 0) +
               (hasThaudron ? 5 : 0) +
               (hasHangover ? -5 : 0),
+          },
+        });
+
+      if (status === "masq_failure")
+        await ctx.db.huntingInstance.deleteMany({
+          where: {
+            AND: [
+              { coordX: { lte: instance.coordX + radius * 0.00000392 } },
+              { coordX: { gte: instance.coordX - radius * 0.00000392 } },
+              { coordY: { lte: instance.coordY + radius * 0.00000899 } },
+              { coordY: { gte: instance.coordY - radius * 0.00000899 } },
+              { id: { not: instance.id } },
+            ],
           },
         });
 

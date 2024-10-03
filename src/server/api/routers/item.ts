@@ -746,6 +746,7 @@ export const itemRouter = createTRPCRouter({
           AddingAbility: true,
           RemovingAbility: true,
           UsingAbility: true,
+          ItemEffects: true,
         },
       });
     }),
@@ -776,6 +777,7 @@ export const itemRouter = createTRPCRouter({
         addingAbilities: z.array(z.number()).optional(),
         removingAbilities: z.array(z.number()).optional(),
         usingAbilities: z.array(z.number()).optional(),
+        addingEffects: z.array(z.number()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -844,12 +846,28 @@ export const itemRouter = createTRPCRouter({
           },
         });
       }
+      if (!!input.addingEffects?.length) {
+        await ctx.db.itemType.update({
+          where: { id: itemType.id },
+          data: {
+            ItemEffects: {
+              create: input.addingEffects.map((effectId) => ({
+                effectId,
+              })),
+            },
+          },
+          include: {
+            ItemEffects: true,
+          },
+        });
+      }
       return ctx.db.itemType.findFirst({
         where: { id: itemType.id },
         include: {
           AddingAbility: true,
           RemovingAbility: true,
           UsingAbility: true,
+          ItemEffects: true,
         },
       });
     }),
@@ -877,6 +895,7 @@ export const itemRouter = createTRPCRouter({
         addingAbilities: z.array(z.number()).optional(),
         removingAbilities: z.array(z.number()).optional(),
         usingAbilities: z.array(z.number()).optional(),
+        addingEffects: z.array(z.number()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -937,6 +956,14 @@ export const itemRouter = createTRPCRouter({
           data: input.usingAbilities.map((abilityId) => ({
             abilityId,
             itemTypeId: input.id,
+          })),
+        });
+      }
+      if (!!input.addingEffects?.length) {
+        await ctx.db.itemEffects.createMany({
+          data: input.addingEffects.map((effectId) => ({
+            effectId,
+            typeId: input.id,
           })),
         });
       }

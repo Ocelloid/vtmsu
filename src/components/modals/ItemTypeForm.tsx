@@ -102,6 +102,7 @@ const ItemTypeForm = ({
         itemType?.RemovingAbility?.map((a) => a.abilityId) ?? [],
       );
       setUsingAbilities(itemType?.UsingAbility?.map((a) => a.abilityId) ?? []);
+      setAddingEffects(itemType?.ItemEffects?.map((a) => a.effectId) ?? []);
     }
   }, [itemType]);
 
@@ -138,6 +139,7 @@ const ItemTypeForm = ({
           addingAbilities,
           removingAbilities,
           usingAbilities,
+          addingEffects,
         },
         {
           onSuccess() {
@@ -168,6 +170,7 @@ const ItemTypeForm = ({
           addingAbilities,
           removingAbilities,
           usingAbilities,
+          addingEffects,
         },
         {
           onSuccess() {
