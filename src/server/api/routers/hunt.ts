@@ -160,6 +160,7 @@ export const huntRouter = createTRPCRouter({
         !!instance.target.hunt_req &&
         containsAllValuesCaseInsensitive(
           instance.target.hunt_req,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           character.taboo,
         )
       )
