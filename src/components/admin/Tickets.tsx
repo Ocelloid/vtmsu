@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
-import { FaCheck, FaStopwatch, FaBan } from "react-icons/fa";
+import { FaCheck, FaStopwatch, FaBan, FaPencilAlt } from "react-icons/fa";
 import { MdSend } from "react-icons/md";
 import type { Ticket } from "~/server/api/routers/util";
 import type { Character } from "~/server/api/routers/char";
@@ -23,6 +23,11 @@ import CharacterCard from "../CharacterCard";
 export default function Tickets() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+  const {
     isOpen: isBanOpen,
     onOpen: onBanOpen,
     onClose: onBanClose,
@@ -39,6 +44,7 @@ export default function Tickets() {
   const [newName, setNewName] = useState<string>("");
   const [char, setChar] = useState<Character>();
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [editId, setEditId] = useState<number>();
 
   const { data: appData } = api.util.getAppData.useQuery();
   const { data: tickets, refetch: refetchTickets } =
@@ -64,6 +70,8 @@ export default function Tickets() {
     api.util.banCharacter.useMutation();
   const { mutate: timeoutCharacter, isPending: isTimeoutPending } =
     api.util.timeoutCharacter.useMutation();
+  const { mutate: editMessage, isPending: isEditPending } =
+    api.util.editMessage.useMutation();
 
   const handleAddTicket = () => {
     newTicket(
@@ -159,6 +167,24 @@ export default function Tickets() {
     );
   };
 
+  const handleEditMessage = () => {
+    if (!editId) return;
+    editMessage(
+      {
+        id: editId,
+        content: newMessage,
+      },
+      {
+        onSuccess: () => {
+          onEditClose();
+          setEditId(undefined);
+          setNewMessage("");
+          void refetchTickets();
+        },
+      },
+    );
+  };
+
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -176,6 +202,66 @@ export default function Tickets() {
 
   return (
     <>
+      <Modal
+        isOpen={isEditOpen}
+        onClose={onEditClose}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+        size="2xl"
+        backdrop="blur"
+        classNames={{
+          body: "py-6 z-[1001]",
+          wrapper: "z-[1001]",
+          backdrop: "z-[1000]",
+          base: "bg-red-200 dark:bg-red-950 bg-opacity-95 text-black dark:text-neutral-100",
+          closeButton: "hover:bg-white/5 active:bg-white/10 w-12 h-12 p-4",
+        }}
+      >
+        <ModalContent>
+          <ModalHeader>Редактирование сообщения</ModalHeader>
+          <ModalBody>
+            <Textarea
+              maxRows={9}
+              color="warning"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.ctrlKey && event.key === "Enter") {
+                  event.preventDefault(); // Prevent default newline behavior
+                  if (!!newMessage && !isEditPending) {
+                    handleEditMessage();
+                  }
+                }
+              }}
+              variant="underlined"
+              label="Сообщение"
+              placeholder="Введите сообщение"
+            />
+          </ModalBody>
+          <ModalFooter className="flex flex-row justify-between gap-2">
+            <Button
+              color="danger"
+              onClick={() => {
+                onEditClose();
+                setEditId(undefined);
+                setNewMessage("");
+                void refetchTickets();
+              }}
+            >
+              Отменить
+            </Button>
+            <Button
+              color="success"
+              isDisabled={isEditPending}
+              onClick={() => {
+                handleEditMessage();
+              }}
+            >
+              Подтвердить
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Modal
         isOpen={isOpen}
         onClose={onClose}
@@ -220,6 +306,18 @@ export default function Tickets() {
                       <div className="flex w-8 flex-col text-xs opacity-50">
                         {formatDate(m.createdAt)}
                       </div>
+                      <Button
+                        color="warning"
+                        variant="ghost"
+                        className="h-8 min-h-8 w-8 min-w-8 p-0"
+                        onClick={() => {
+                          setEditId(m.id);
+                          setNewMessage(m.content ?? "");
+                          onEditOpen();
+                        }}
+                      >
+                        <FaPencilAlt size={16} />
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -588,7 +686,7 @@ export default function Tickets() {
                   key={m.id}
                   className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
                 >
-                  <div className="flex w-full flex-row">
+                  <div className="flex w-full flex-row gap-1">
                     <div className="flex w-full flex-col text-sm">
                       <p className="flex w-full flex-col text-lg">
                         {m.isAdmin ? "Расссказчик:" : char?.name + ":"}
@@ -598,6 +696,18 @@ export default function Tickets() {
                     <div className="flex w-8 flex-col text-xs opacity-50">
                       {formatDate(m.createdAt)}
                     </div>
+                    <Button
+                      color="warning"
+                      variant="light"
+                      className="h-8 min-h-8 w-8 min-w-8 p-0"
+                      onClick={() => {
+                        setEditId(m.id);
+                        setNewMessage(m.content ?? "");
+                        onEditOpen();
+                      }}
+                    >
+                      <FaPencilAlt size={16} />
+                    </Button>
                   </div>
                 </div>
               ))}

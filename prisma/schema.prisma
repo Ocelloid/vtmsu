@@ -17,6 +17,7 @@ model AppData {
   gameAllowed   Boolean  @default(false)
   timestamp     DateTime @default(now())
   ticketsLimit  Int      @default(3)
+  radius        Int      @default(100)
   changedById   String
   user          User     @relation(fields: [changedById], references: [id])
 }
@@ -630,6 +631,7 @@ model User {
   email         String?   @unique
   isAdmin       Boolean   @default(false)
   isPersonnel   Boolean   @default(false)
+  defaultCharId Int?
   emailVerified DateTime?
   image         String?
   background    String?

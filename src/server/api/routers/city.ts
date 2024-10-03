@@ -284,7 +284,10 @@ export const cityRouter = createTRPCRouter({
     .input(z.object({ x: z.number(), y: z.number(), charId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const { x, y } = input;
-      const radius = 200;
+      const appData = await ctx.db.appData.findFirst({
+        orderBy: { id: "desc" },
+      });
+      const radius = appData?.radius ?? 200;
 
       const char = await ctx.db.char.findUnique({
         where: { id: input.charId },

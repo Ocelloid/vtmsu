@@ -17,6 +17,7 @@ export default function Controls() {
     gameAllowed: false,
     ticketsLimit: 3,
     changedById: "",
+    radius: 100,
   });
   useEffect(() => {
     if (appData) setData(appData);
@@ -32,6 +33,14 @@ export default function Controls() {
           setData({ ...data, ticketsLimit: Number(e.target.value) })
         }
         label="Предел заявок в день"
+        placeholder="Введите число"
+        type="number"
+      />
+      <Input
+        variant="underlined"
+        value={data.radius.toString()}
+        onChange={(e) => setData({ ...data, radius: Number(e.target.value) })}
+        label="Радиус действия геоточек"
         placeholder="Введите число"
         type="number"
       />

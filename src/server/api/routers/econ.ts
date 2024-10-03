@@ -173,6 +173,19 @@ export const econRouter = createTRPCRouter({
         where: { id: toAccount.id },
         data: { balance: toAccount.balance + input.amount },
       });
+      await ctx.db.ticket.create({
+        data: {
+          name: "Перевод ОВ",
+          isResolved: true,
+          characterId: input.toId,
+          Message: {
+            create: {
+              content: `Вы получили ${input.amount} ОВ со счёта ${input.fromAddress}`,
+              isAdmin: true,
+            },
+          },
+        },
+      });
     }),
 
   transferByAddress: protectedProcedure
@@ -194,7 +207,7 @@ export const econRouter = createTRPCRouter({
 
       const toAccount = await ctx.db.bankAccount.findFirst({
         where: { address: input.toAddress },
-        select: { balance: true, id: true },
+        select: { balance: true, id: true, characterId: true },
       });
       if (!toAccount) return { message: "Не найден счёт получателя" };
 
@@ -205,6 +218,19 @@ export const econRouter = createTRPCRouter({
       await ctx.db.bankAccount.update({
         where: { id: toAccount.id },
         data: { balance: toAccount.balance + input.amount },
+      });
+      await ctx.db.ticket.create({
+        data: {
+          name: "Перевод ОВ",
+          isResolved: true,
+          characterId: toAccount.characterId,
+          Message: {
+            create: {
+              content: `Вы получили ${input.amount} ОВ со счёта ${input.fromAddress}`,
+              isAdmin: true,
+            },
+          },
+        },
       });
     }),
 

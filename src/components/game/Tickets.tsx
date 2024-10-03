@@ -291,26 +291,50 @@ export default function Tickets({ char }: { char: Character }) {
           >
             <p className="text-sm font-semibold">Новая заявка</p>
           </Button>
-          {tickets?.map((t) => (
-            <Button
-              key={t.id}
-              variant="faded"
-              color="warning"
-              className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
-                t.id === selectedTicket?.id ? "bg-red-900/75" : ""
-              }`}
-              onClick={() => {
-                setSelectedTicket(t);
-                onOpen();
-              }}
-            >
-              <p className="w-full truncate text-start text-sm">{t.name}</p>
-              {t.isResolved && <FaCheck size={16} />}
-              <p className="h-8 w-8 text-wrap text-xs opacity-50">
-                {formatDate(t.createdAt)}
-              </p>
-            </Button>
-          ))}
+          {tickets
+            ?.filter((t) => !t.isResolved)
+            .map((t) => (
+              <Button
+                key={t.id}
+                variant="faded"
+                color="warning"
+                className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                }`}
+                onClick={() => {
+                  setSelectedTicket(t);
+                  onOpen();
+                }}
+              >
+                <p className="w-full truncate text-start text-sm">{t.name}</p>
+                {t.isResolved && <FaCheck size={16} />}
+                <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                  {formatDate(t.createdAt)}
+                </p>
+              </Button>
+            ))}
+          {tickets
+            ?.filter((t) => t.isResolved)
+            .map((t) => (
+              <Button
+                key={t.id}
+                variant="faded"
+                color="warning"
+                className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                }`}
+                onClick={() => {
+                  setSelectedTicket(t);
+                  onOpen();
+                }}
+              >
+                <p className="w-full truncate text-start text-sm">{t.name}</p>
+                {t.isResolved && <FaCheck size={16} />}
+                <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                  {formatDate(t.createdAt)}
+                </p>
+              </Button>
+            ))}
         </div>
         <div className="hidden max-h-[calc(100vh-296px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
           <Button
@@ -323,25 +347,48 @@ export default function Tickets({ char }: { char: Character }) {
           >
             <p className="text-sm font-semibold">Новая заявка</p>
           </Button>
-          {tickets?.map((t) => (
-            <Button
-              key={t.id}
-              variant="faded"
-              color="warning"
-              className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
-                t.id === selectedTicket?.id ? "bg-red-900/75" : ""
-              }`}
-              onClick={() => {
-                setSelectedTicket(t);
-              }}
-            >
-              <p className="w-full truncate text-start text-sm">{t.name}</p>
-              {t.isResolved && <FaCheck size={16} />}
-              <p className="h-8 w-8 text-wrap text-xs opacity-50">
-                {formatDate(t.createdAt)}
-              </p>
-            </Button>
-          ))}
+          {tickets
+            ?.filter((t) => !t.isResolved)
+            .map((t) => (
+              <Button
+                key={t.id}
+                variant="faded"
+                color="warning"
+                className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                }`}
+                onClick={() => {
+                  setSelectedTicket(t);
+                }}
+              >
+                <p className="w-full truncate text-start text-sm">{t.name}</p>
+                {t.isResolved && <FaCheck size={16} />}
+                <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                  {formatDate(t.createdAt)}
+                </p>
+              </Button>
+            ))}
+          {tickets
+            ?.filter((t) => t.isResolved)
+            .map((t) => (
+              <Button
+                key={t.id}
+                variant="faded"
+                color="warning"
+                className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                }`}
+                onClick={() => {
+                  setSelectedTicket(t);
+                }}
+              >
+                <p className="w-full truncate text-start text-sm">{t.name}</p>
+                {t.isResolved && <FaCheck size={16} />}
+                <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                  {formatDate(t.createdAt)}
+                </p>
+              </Button>
+            ))}
         </div>
         <div className="hidden h-full w-full flex-col gap-2 md:flex">
           <div

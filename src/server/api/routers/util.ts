@@ -9,6 +9,7 @@ export type AppData = {
   editAllowed: boolean;
   gameAllowed: boolean;
   ticketsLimit: number;
+  radius: number;
   changedById: string;
 };
 
@@ -108,6 +109,25 @@ export const utilRouter = createTRPCRouter({
           ticketId: input.ticketId,
           content: input.content,
           isAdmin: input.isAdmin ?? false,
+        },
+      });
+    }),
+  editMessage: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        content: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const message = await ctx.db.message.findUnique({
+        where: { id: input.id },
+      });
+      if (!message) return;
+      return ctx.db.message.update({
+        where: { id: input.id },
+        data: {
+          content: input.content,
         },
       });
     }),

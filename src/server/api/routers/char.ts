@@ -240,6 +240,22 @@ export type FeatureAvailable = {
 };
 
 export const charRouter = createTRPCRouter({
+  getDefault: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session ? ctx.session.user.id : "" },
+    });
+    return user ? user.defaultCharId : 0;
+  }),
+
+  setDefault: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { defaultCharId: input.id },
+      });
+    }),
+
   spendBlood: protectedProcedure
     .input(
       z.object({

@@ -56,15 +56,30 @@ export default function Container() {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     });
+  const { data: defaultCharacter, isLoading: isDefaultCharacterLoading } =
+    api.char.getDefault.useQuery(undefined, {
+      enabled: !!sessionData,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    });
 
   useEffect(() => {
     if (containerData) setContainer(containerData);
   }, [containerData]);
 
+  useEffect(() => {
+    if (!!defaultCharacter) setSelectedCharacter(defaultCharacter);
+    else if (!!myCharacterData) {
+      if (myCharacterData?.length === 1)
+        setSelectedCharacter(myCharacterData[0]!.id);
+    }
+  }, [defaultCharacter, myCharacterData]);
+
   if (
     sessionStatus === "loading" ||
     isContainerLoading ||
-    isMyCharactersLoading
+    isMyCharactersLoading ||
+    isDefaultCharacterLoading
   )
     return <LoadingPage />;
   if (!sessionData)
@@ -101,6 +116,7 @@ export default function Container() {
             >
               {myCharacterData
                 .filter((c) => c.verified)
+                .sort((a, b) => a.id - b.id)
                 .map((c) => (
                   <SelectItem
                     key={c.id.toString()}

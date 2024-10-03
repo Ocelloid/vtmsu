@@ -12,6 +12,7 @@ export type User = {
   email: string | null;
   isAdmin: boolean;
   isPersonnel: boolean;
+  defaultCharId?: number | null;
   emailVerified: Date | null;
   image: string | null;
   characters?: Character[] | null;

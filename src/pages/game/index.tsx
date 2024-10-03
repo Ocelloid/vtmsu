@@ -2,7 +2,21 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { LoadingPage } from "~/components/Loading";
 import { api } from "~/utils/api";
-import { Select, SelectItem, Tabs, Tab, Link, Badge } from "@nextui-org/react";
+import {
+  Select,
+  SelectItem,
+  Tabs,
+  Tab,
+  Link,
+  Badge,
+  Modal,
+  Button,
+  ModalContent,
+  ModalBody,
+  ModalHeader,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { GiLightBackpack, GiMoneyStack } from "react-icons/gi";
 import { CgShapeRhombus, CgInfinity } from "react-icons/cg";
@@ -25,6 +39,7 @@ import { useRouter } from "next/router";
 
 export default function Game() {
   const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: sessionData } = useSession();
   const { data: isAdmin, isLoading: isUserAdminLoading } =
     api.user.userIsAdmin.useQuery(undefined, { enabled: !!sessionData });
@@ -34,6 +49,16 @@ export default function Game() {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     });
+  const { data: defaultCharacter, isLoading: isDefaultCharacterLoading } =
+    api.char.getDefault.useQuery(undefined, {
+      enabled: !!sessionData,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    });
+  const {
+    mutate: setDefaultCharacter,
+    isPending: isSetDefaultCharacterPending,
+  } = api.char.setDefault.useMutation();
   const [selectedCharacter, setSelectedCharacter] = useState<number>();
   const { data: char, refetch } = api.char.getById.useQuery(
     {
@@ -59,6 +84,15 @@ export default function Game() {
       setSelectedCharacter(myCharacterData.filter((c) => c.verified)[0]?.id);
   }, [myCharacterData]);
 
+  useEffect(() => {
+    if (!!defaultCharacter) setSelectedCharacter(defaultCharacter);
+    else if (!!myCharacterData) {
+      if (myCharacterData?.length === 1)
+        setSelectedCharacter(myCharacterData[0]!.id);
+      else if ((myCharacterData?.length ?? 0) > 1) onOpen();
+    }
+  }, [defaultCharacter, myCharacterData, onOpen]);
+
   if (!sessionData)
     return (
       <div className="flex h-[100vh] w-[100vw] items-center justify-center">
@@ -73,7 +107,8 @@ export default function Game() {
       </div>
     );
 
-  if (isMyCharactersLoading) return <LoadingPage />;
+  if (isMyCharactersLoading || isDefaultCharacterLoading)
+    return <LoadingPage />;
 
   return (
     <>
@@ -82,6 +117,56 @@ export default function Game() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>Выбор персонажа</ModalHeader>
+          <ModalBody>
+            <Select
+              size="sm"
+              variant="bordered"
+              placeholder="Выберите персонажа"
+              aria-label="characters"
+              className="w-full"
+              selectedKeys={
+                selectedCharacter ? [selectedCharacter.toString()] : []
+              }
+              onChange={(e) => {
+                setSelectedCharacter(
+                  !!e.target.value ? Number(e.target.value) : selectedCharacter,
+                );
+              }}
+            >
+              {myCharacterData
+                .filter((c) => c.verified)
+                .sort((a, b) => a.id - b.id)
+                .map((c) => (
+                  <SelectItem
+                    key={c.id.toString()}
+                    value={c.id.toString()}
+                    textValue={c.name}
+                  >
+                    <CharacterCard character={c} isSelect={true} />
+                  </SelectItem>
+                ))}
+            </Select>
+          </ModalBody>
+          <ModalFooter className="flex flex-col">
+            <Button
+              variant="faded"
+              color="success"
+              isDisabled={!selectedCharacter || isSetDefaultCharacterPending}
+              onClick={() =>
+                setDefaultCharacter(
+                  { id: selectedCharacter! },
+                  { onSuccess: () => onClose() },
+                )
+              }
+            >
+              Выбрать
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <main className="fixed flex h-full w-full flex-grow basis-full flex-col sm:static sm:mt-24 sm:pb-2">
         <div className="container flex h-screen flex-col gap-1 overflow-auto rounded-none bg-white/75 p-2 dark:bg-red-950/50 sm:h-full sm:rounded-b-lg">
           <Select
@@ -101,6 +186,7 @@ export default function Game() {
           >
             {myCharacterData
               .filter((c) => c.verified)
+              .sort((a, b) => a.id - b.id)
               .map((c) => (
                 <SelectItem
                   key={c.id.toString()}
