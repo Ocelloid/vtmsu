@@ -2,7 +2,7 @@
 import { Button, Input } from "@nextui-org/react";
 import { useState } from "react";
 
-const alphabet = {
+export const alphabet = {
   а: "ᚐ",
   б: "ᚁ",
   в: "ᚃ",
@@ -125,18 +125,36 @@ export default function OghamTransliteration() {
   );
 }
 
-const OghamKeyboard = ({ onPress }: { onPress: (e: string) => void }) => {
+export const OghamKeyboard = ({
+  onPress,
+  backward = false,
+  latin = true,
+}: {
+  onPress: (e: string) => void;
+  backward?: boolean;
+  latin?: boolean;
+}) => {
   return (
     <div className="flex w-full flex-row flex-wrap gap-2">
-      {Object.values(alphabet).map((val, index) => (
-        <Button
-          key={val}
-          className="h-8 w-8 min-w-14 rounded-lg bg-white/75 p-0 text-2xl dark:bg-red-950/50"
-          onClick={() => onPress(val)}
-        >
-          {Object.keys(alphabet)[index]}: {val}
-        </Button>
-      ))}
+      {Object.values(alphabet)
+        .filter((_a, i) => i < 33 || latin)
+        .map((val, index) => (
+          <Button
+            key={val}
+            className="h-8 w-8 min-w-14 rounded-lg bg-white/75 p-0 text-2xl dark:bg-red-950/50"
+            onClick={() => onPress(val)}
+          >
+            {backward ? (
+              <span>
+                {Object.keys(alphabet)[index]}: {val}
+              </span>
+            ) : (
+              <span>
+                {val}: {Object.keys(alphabet)[index]}
+              </span>
+            )}
+          </Button>
+        ))}
     </div>
   );
 };

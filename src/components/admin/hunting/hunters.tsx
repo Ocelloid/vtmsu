@@ -170,6 +170,7 @@ const HunterForm = ({
   char: Character;
   refetch: () => void;
 }) => {
+  const [taboo, setTaboo] = useState("");
   const [hackerData, setHackerData] = useState("");
   const [auspexData, setAuspexData] = useState("");
   const [requirement, setRequirement] = useState("");
@@ -186,6 +187,7 @@ const HunterForm = ({
         animalismData: animalismData,
         hackerData: hackerData,
         huntReq: requirement,
+        taboo: taboo,
       },
       {
         onSuccess() {
@@ -200,16 +202,25 @@ const HunterForm = ({
     if (!!char.animalismData) setAnimalismData(char.animalismData);
     if (!!char.hackerData) setHackerData(char.hackerData);
     if (!!char.hunt_req) setRequirement(char.hunt_req);
+    if (!!char.taboo) setTaboo(char.taboo);
   }, [char]);
 
   return (
     <div className="flex flex-col gap-2 px-2">
-      <Input
-        label="Требование к охоте"
-        placeholder="Введите требование к охоте"
-        value={requirement}
-        onValueChange={setRequirement}
-      />
+      <div className="flex flex-col gap-2 md:flex-row">
+        <Input
+          label="Требование к охоте"
+          placeholder="Введите требование к охоте"
+          value={requirement}
+          onValueChange={setRequirement}
+        />
+        <Input
+          label="Запрет на охоту"
+          placeholder="Введите запрет на охоту"
+          value={taboo}
+          onValueChange={setTaboo}
+        />
+      </div>
       <div className="flex flex-row flex-wrap text-justify text-sm">
         <Tooltip content={char.clan?.content}>
           <p>{char.clan?.name}&nbsp;-&nbsp;</p>

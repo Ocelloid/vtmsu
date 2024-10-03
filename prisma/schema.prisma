@@ -415,6 +415,7 @@ model Char {
   status              String?
   childer             String?
   hunt_req            String?
+  taboo               String?
   comment             String?               @db.LongText
   p_comment           String?               @db.LongText
   alive               Boolean               @default(true)

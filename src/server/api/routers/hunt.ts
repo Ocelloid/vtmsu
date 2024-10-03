@@ -153,6 +153,18 @@ export const huntRouter = createTRPCRouter({
       )
         status = "req_failure";
 
+      if (
+        !!character &&
+        !!instance &&
+        !!character.taboo &&
+        !!instance.target.hunt_req &&
+        containsAllValuesCaseInsensitive(
+          instance.target.hunt_req,
+          character.taboo,
+        )
+      )
+        status = "req_failure";
+
       if (!!instance && !!instance.expires && instance.expires < new Date())
         status = "exp_failure";
 

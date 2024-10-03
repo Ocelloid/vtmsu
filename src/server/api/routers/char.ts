@@ -21,6 +21,7 @@ export type Character = {
   bloodAmount?: number;
   bloodPool?: number;
   health?: number;
+  taboo?: string | null;
   hunt_req?: string | null;
   additionalAbilities?: number | null;
   playerId?: string | null;

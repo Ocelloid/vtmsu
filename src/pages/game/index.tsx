@@ -34,6 +34,7 @@ import BloodMeter from "~/components/game/BloodMeter";
 import HealthMeter from "~/components/game/HealthMeter";
 import GameStore from "~/components/game/GameStore";
 import RitualPage from "~/components/game/RitualPage";
+import OghamPage from "~/components/game/OghamPage";
 import City from "~/components/game/City";
 import { useRouter } from "next/router";
 
@@ -231,7 +232,7 @@ export default function Game() {
                     placement="bottom"
                     classNames={{
                       panel:
-                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-216px)]",
+                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-216px)] sm:max-h-[calc(100vh-316px)]",
                       tab: "p-1 w-min",
                       tabList:
                         "w-full justify-between rounded-none rounded-t-lg mx-2 ",
@@ -250,6 +251,17 @@ export default function Game() {
                       className="flex flex-col gap-2"
                     >
                       <AbilityPage char={char} refetch={refetch} />
+                    </Tab>
+                    <Tab
+                      key="ogham"
+                      title={
+                        <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                          <span className="text-lg font-semibold">Охам</span>
+                        </div>
+                      }
+                      className="flex flex-col gap-2"
+                    >
+                      <OghamPage />
                     </Tab>
                     <Tab
                       key="rituals"
