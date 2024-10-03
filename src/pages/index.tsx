@@ -2,13 +2,13 @@ import Head from "next/head";
 import DefaultCard from "~/components/DefaultCard";
 import about from "~/../public/about.png";
 import rules from "~/../public/rules.png";
-import shop from "~/../public/shop.png";
+import chars from "~/../public/chars.png";
 
 export default function Home() {
   const links = [
     {
       title: "Об игре",
-      subtitle: "Информация об игре",
+      subtitle: "Что за игра",
       to: "/about",
       image: about,
     },
@@ -19,10 +19,10 @@ export default function Home() {
       image: rules,
     },
     {
-      title: "Магазин",
-      subtitle: "Игровой мерч",
+      title: "Персонажи",
+      subtitle: "Кем играть",
       to: "/shop",
-      image: shop,
+      image: chars,
     },
   ];
 
