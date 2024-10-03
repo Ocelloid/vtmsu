@@ -138,6 +138,49 @@ export type CouponItem = {
 };
 
 export const utilRouter = createTRPCRouter({
+  pushCompanyBalances: protectedProcedure.query(async ({ ctx }) => {
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 1 } },
+      data: { balance: { increment: 2 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 2 } },
+      data: { balance: { increment: 6 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 3 } },
+      data: { balance: { increment: 10 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 4 } },
+      data: { balance: { increment: 14 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 5 } },
+      data: { balance: { increment: 18 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 6 } },
+      data: { balance: { increment: 22 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 7 } },
+      data: { balance: { increment: 26 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 8 } },
+      data: { balance: { increment: 30 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 9 } },
+      data: { balance: { increment: 34 } },
+    });
+    await ctx.db.bankAccount.updateMany({
+      where: { company: { level: 10 } },
+      data: { balance: { increment: 38 } },
+    });
+    return await ctx.db.bankAccount.findMany({ include: { company: true } });
+  }),
   getAppData: protectedProcedure.query(async ({ ctx }) => {
     const appData = await ctx.db.appData.findFirst({
       orderBy: { id: "desc" },
