@@ -17,7 +17,7 @@ import { type ReactNode, useState, useEffect } from "react";
 import DefaultEditor from "~/components/editors/DefaultEditor";
 import { UploadButton } from "~/utils/uploadthing";
 import Image from "next/image";
-import type { Ability } from "~/server/api/routers/char";
+import type { Ability, Effect } from "~/server/api/routers/char";
 
 const ItemTypeForm = ({
   editId,
@@ -46,20 +46,24 @@ const ItemTypeForm = ({
   const [addingAbilities, setAddingAbilities] = useState<number[]>([]);
   const [removingAbilities, setRemovingAbilities] = useState<number[]>([]);
   const [usingAbilities, setUsingAbilities] = useState<number[]>([]);
+  const [addingEffects, setAddingEffects] = useState<number[]>([]);
   const [abilities, setAbilities] = useState<Ability[]>([]);
+  const [effects, setEffects] = useState<Effect[]>([]);
 
   const { mutate: createMutation, isPending } =
     api.item.createType.useMutation();
   const { mutate: updateMutation, isPending: isPendingUpdate } =
     api.item.updateType.useMutation();
   const { data: abilityData, isLoading: isAbilitiesLoading } =
-    api.char.getAbilities.useQuery();
+    api.char.getAbilities.useQuery(undefined, { enabled: isModalOpen });
+  const { data: effectsData, isLoading: isEffectsLoading } =
+    api.char.getEffects.useQuery(undefined, { enabled: isModalOpen });
   const { data: itemType, isLoading: isItemTypeLoading } =
     api.item.getTypeById.useQuery(
       {
         id: editId!,
       },
-      { enabled: !!editId },
+      { enabled: !!editId && isModalOpen },
     );
 
   const resetForm = () => {
@@ -69,6 +73,7 @@ const ItemTypeForm = ({
     setAddingAbilities([]);
     setRemovingAbilities([]);
     setUsingAbilities([]);
+    setAddingEffects([]);
     setImage("");
     setCost(0);
     setUsage(-1);
@@ -105,6 +110,12 @@ const ItemTypeForm = ({
       setAbilities(abilityData);
     }
   }, [abilityData]);
+
+  useEffect(() => {
+    if (!!effectsData) {
+      setEffects(effectsData);
+    }
+  }, [effectsData]);
 
   const handleFormSubmit = () => {
     if (!editId)
@@ -168,7 +179,7 @@ const ItemTypeForm = ({
       );
   };
 
-  if (isItemTypeLoading || isAbilitiesLoading)
+  if (isItemTypeLoading || isAbilitiesLoading || isEffectsLoading)
     return <LoadingSpinner width={24} height={24} />;
 
   return (
@@ -352,6 +363,8 @@ const ItemTypeForm = ({
                   </SelectItem>
                 ))}
               </Select>
+            </div>
+            <div className="flex flex-row gap-2">
               <Select
                 size="sm"
                 label="Использование способностей"
@@ -370,6 +383,27 @@ const ItemTypeForm = ({
                 {abilities.map((ability) => (
                   <SelectItem key={ability.id} value={ability.id}>
                     {ability.name}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Select
+                size="sm"
+                label="Применение эффектов"
+                variant="underlined"
+                placeholder="Выберите эффектов"
+                selectionMode="multiple"
+                selectedKeys={addingEffects.map((a) => a.toString())}
+                onChange={(e) => {
+                  setAddingEffects(
+                    !!e.target.value
+                      ? e.target.value.split(",").map((s) => Number(s))
+                      : [],
+                  );
+                }}
+              >
+                {effects.map((effect) => (
+                  <SelectItem key={effect.id} value={effect.id}>
+                    {effect.name}
                   </SelectItem>
                 ))}
               </Select>
