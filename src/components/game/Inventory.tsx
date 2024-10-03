@@ -700,13 +700,13 @@ const Content = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <div className="flex h-full w-full touch-none flex-row gap-2">
+      <div className="flex h-full w-full flex-row gap-2">
         <Image
           src={item.image ?? ""}
           alt=""
           width="128"
           height="128"
-          className="aspect-square object-contain"
+          className="aspect-square touch-none object-contain"
         />
         <div className="flex h-full w-full flex-col gap-1">
           <p className="text-sm">{item.name}</p>
