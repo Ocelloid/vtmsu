@@ -1532,6 +1532,7 @@ export const charRouter = createTRPCRouter({
         animalismData: z.string().optional(),
         hackerData: z.string().optional(),
         huntReq: z.string().optional(),
+        taboo: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -1542,6 +1543,7 @@ export const charRouter = createTRPCRouter({
           animalismData: input.animalismData,
           hackerData: input.hackerData,
           hunt_req: input.huntReq,
+          taboo: input.taboo,
         },
       });
     }),
