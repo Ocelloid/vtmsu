@@ -372,13 +372,16 @@ export const itemRouter = createTRPCRouter({
 
       if (!!item.type.UsingAbility?.length) {
         const abilityEffects = item.type.UsingAbility.map((a) =>
-          a.ability.AbilityEffects.map((ae) => ae.effectId),
+          a.ability.AbilityEffects.map((ae) => ae),
         );
         const effects = abilityEffects.flat();
         await ctx.db.characterEffects.createMany({
-          data: effects.map((effectId) => ({
-            effectId,
+          data: effects.map((e) => ({
+            effectId: e.effectId,
             characterId: input.charId,
+            expires: new Date(
+              new Date().getTime() + e.effect.expiration * 60 * 1000,
+            ),
           })),
         });
       }

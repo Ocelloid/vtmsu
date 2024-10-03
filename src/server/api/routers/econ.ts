@@ -35,7 +35,7 @@ export type BankAccount = {
   updatedAt: Date;
   character?: Character;
   companyId?: string | null;
-  company?: Company;
+  company?: Company | null;
 };
 
 export const econRouter = createTRPCRouter({

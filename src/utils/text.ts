@@ -86,3 +86,13 @@ export function calculateDistance(
   console.log(distance);
   return distance;
 }
+
+export function containsAllValuesCaseInsensitive(
+  strA: string,
+  strB: string,
+): boolean {
+  const valuesA = strA.split(",").map((val) => val.trim().toLowerCase());
+  const valuesB = strB.split(",").map((val) => val.trim().toLowerCase());
+
+  return valuesB.every((val) => valuesA.includes(val));
+}

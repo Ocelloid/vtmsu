@@ -12,6 +12,7 @@ import {
   Select,
   SelectItem,
   Divider,
+  Tooltip,
 } from "@nextui-org/react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
@@ -110,7 +111,7 @@ export default function Hunters() {
         onSelectionChange={(e) => setSelectedKeys(e as Set<string>)}
       >
         {characters
-          .sort((a, b) => a.id - b.id)
+          .sort((a, b) => b.id - a.id)
           .filter((c) =>
             !!factionIds.length ? factionIds.includes(c.factionId) : true,
           )
@@ -132,12 +133,23 @@ export default function Hunters() {
                 />
               }
               subtitle={
-                <div className="flex flex-row items-center gap-1">
-                  Прорицание: {char.auspexData ? <FaCheck /> : <FaTimes />}
-                  <Divider orientation="vertical" />
-                  Анимализм: {char.animalismData ? <FaCheck /> : <FaTimes />}
-                  <Divider orientation="vertical" />
-                  Хакерство: {char.hackerData ? <FaCheck /> : <FaTimes />}
+                <div className="iems-center flex flex-col gap-2 md:flex-row">
+                  <div className="flex flex-row items-center gap-1">
+                    Предпочтение в охоте:
+                    {!!char.hunt_req ? <FaCheck /> : <FaTimes />}
+                  </div>
+                  <div className="flex flex-row items-center gap-1">
+                    Прорицание:
+                    {!!char.auspexData ? <FaCheck /> : <FaTimes />}
+                  </div>
+                  <div className="flex flex-row items-center gap-1">
+                    Анимализм:
+                    {!!char.animalismData ? <FaCheck /> : <FaTimes />}
+                  </div>
+                  <div className="flex flex-row items-center gap-1">
+                    Хакерство:
+                    {!!char.hackerData ? <FaCheck /> : <FaTimes />}
+                  </div>
                 </div>
               }
             >
@@ -160,6 +172,7 @@ const HunterForm = ({
 }) => {
   const [hackerData, setHackerData] = useState("");
   const [auspexData, setAuspexData] = useState("");
+  const [requirement, setRequirement] = useState("");
   const [animalismData, setAnimalismData] = useState("");
 
   const { mutate: saveChar, isPending: isSavePending } =
@@ -172,6 +185,7 @@ const HunterForm = ({
         auspexData: auspexData,
         animalismData: animalismData,
         hackerData: hackerData,
+        huntReq: requirement,
       },
       {
         onSuccess() {
@@ -185,10 +199,34 @@ const HunterForm = ({
     if (!!char.auspexData) setAuspexData(char.auspexData);
     if (!!char.animalismData) setAnimalismData(char.animalismData);
     if (!!char.hackerData) setHackerData(char.hackerData);
+    if (!!char.hunt_req) setRequirement(char.hunt_req);
   }, [char]);
 
   return (
     <div className="flex flex-col gap-2 px-2">
+      <Input
+        label="Требование к охоте"
+        placeholder="Введите требование к охоте"
+        value={requirement}
+        onValueChange={setRequirement}
+      />
+      <div className="flex flex-row flex-wrap text-justify text-sm">
+        <Tooltip content={char.clan?.content}>
+          <p>{char.clan?.name}&nbsp;-&nbsp;</p>
+        </Tooltip>
+        {char.features?.map((f, i) => (
+          <Tooltip
+            key={char.id + "_feature_" + f.id}
+            content={f.feature?.content}
+          >
+            <p>
+              {f.feature?.name}
+              {(char.features?.length ?? 0) !== i + 1 ? <>,&nbsp;</> : ""}
+            </p>
+          </Tooltip>
+        ))}
+      </div>
+      <Divider />
       <div
         className="flex flex-col text-justify text-sm"
         dangerouslySetInnerHTML={{ __html: char.publicInfo ?? "" }}

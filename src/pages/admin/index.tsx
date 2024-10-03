@@ -17,6 +17,7 @@ import Tickets from "~/components/admin/Tickets";
 import ForceEffects from "~/components/admin/ForceEffects";
 import Containers from "~/components/admin/Containers";
 import GeoPoints from "~/components/admin/items/GeoPoints";
+import Coupons from "~/components/admin/items/Coupons";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -150,6 +151,17 @@ export default function Admin() {
                   }
                 >
                   <OghamTransliteration />
+                </Tab>
+                <Tab
+                  key={"coupons"}
+                  className="flex flex-col gap-8 md:gap-2"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Купоны</span>
+                    </div>
+                  }
+                >
+                  <Coupons />
                 </Tab>
                 <Tab
                   key={"item_types"}

@@ -21,6 +21,7 @@ export type Character = {
   bloodAmount?: number;
   bloodPool?: number;
   health?: number;
+  hunt_req?: string | null;
   additionalAbilities?: number | null;
   playerId?: string | null;
   comment?: string | null;
@@ -1529,6 +1530,7 @@ export const charRouter = createTRPCRouter({
         auspexData: z.string().optional(),
         animalismData: z.string().optional(),
         hackerData: z.string().optional(),
+        huntReq: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -1538,6 +1540,7 @@ export const charRouter = createTRPCRouter({
           auspexData: input.auspexData,
           animalismData: input.animalismData,
           hackerData: input.hackerData,
+          hunt_req: input.huntReq,
         },
       });
     }),

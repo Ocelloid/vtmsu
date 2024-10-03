@@ -11,6 +11,7 @@ import {
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FaQrcode } from "react-icons/fa";
+import { RiCoupon3Fill } from "react-icons/ri";
 import type { Character } from "~/server/api/routers/char";
 import EffectsPage from "~/components/game/EffectsPage";
 import { LoadingPage } from "~/components/Loading";
@@ -20,6 +21,7 @@ export default function CharQRCode({ char }: { char: Character }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [scannedChar, setScannedChar] = useState<Character>();
   const { data: chars, isLoading: charsLoading } = api.char.getAll.useQuery();
+  const { mutate: applyCoupon } = api.util.applyCoupon.useMutation();
 
   useEffect(() => {
     if (!charsLoading)
@@ -126,11 +128,6 @@ export default function CharQRCode({ char }: { char: Character }) {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <p className="text-justify text-sm">
-        Это код вашего персонажа. Он может быть использован для передачи
-        предметов, предприятий, очков влияния, скана ауры или применения
-        эффектов. В случае гибели персонажа он используется для лута и диаблери.
-      </p>
       <canvas id="canvas" className="mx-auto"></canvas>
       <Button
         onClick={() => {
@@ -139,9 +136,30 @@ export default function CharQRCode({ char }: { char: Character }) {
         }}
         variant="ghost"
         color="warning"
-        className="mx-auto mb-auto max-w-64"
+        className="mx-auto max-w-64"
       >
         <FaQrcode size={24} /> Сканировать QR-код
+      </Button>
+      <Button
+        onClick={() => {
+          const couponAddress = prompt("Введите адрес купона");
+          applyCoupon(
+            {
+              charId: char.id,
+              address: couponAddress ?? "",
+            },
+            {
+              onSuccess(e) {
+                if (e?.message) alert(e.message);
+              },
+            },
+          );
+        }}
+        variant="ghost"
+        color="warning"
+        className="mx-auto mb-auto max-w-64"
+      >
+        <RiCoupon3Fill size={24} /> Ввести купон
       </Button>
     </>
   );

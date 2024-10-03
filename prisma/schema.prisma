@@ -45,31 +45,32 @@ model Container {
 }
 
 model Item {
-  id            Int        @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   name          String
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  content       String?    @db.LongText
-  auspexData    String?    @db.LongText
-  hackerData    String?    @db.LongText
-  animalismData String?    @db.LongText
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  content       String?      @db.LongText
+  auspexData    String?      @db.LongText
+  hackerData    String?      @db.LongText
+  animalismData String?      @db.LongText
   image         String?
   address       String?
-  usage         Int        @default(-1)
-  typeId        Int        @default(1)
+  usage         Int          @default(-1)
+  typeId        Int          @default(1)
   coordX        Float?
   coordY        Float?
-  isTrash       Boolean    @default(false)
-  isTradable    Boolean    @default(true)
-  type          ItemType   @relation(fields: [typeId], references: [id])
-  createdBy     User       @relation(fields: [createdById], references: [id])
+  isTrash       Boolean      @default(false)
+  isTradable    Boolean      @default(true)
+  type          ItemType     @relation(fields: [typeId], references: [id])
+  createdBy     User         @relation(fields: [createdById], references: [id])
   createdById   String
   ownedById     Int?
   lastOwnedById Int?
   lastUsedById  Int?
-  ownedBy       Char?      @relation(fields: [ownedById], references: [id])
+  ownedBy       Char?        @relation(fields: [ownedById], references: [id])
   containerId   String?
-  container     Container? @relation(fields: [containerId], references: [id])
+  container     Container?   @relation(fields: [containerId], references: [id])
+  CouponItem    CouponItem[]
 }
 
 model ItemType {
@@ -99,6 +100,7 @@ model ItemType {
   RemovingAbility RemovingAbility[]
   UsingAbility    UsingAbility[]
   ItemEffects     ItemEffects[]
+  CouponItemType  CouponItemType[]
 }
 
 model AddingAbility {
@@ -126,33 +128,35 @@ model UsingAbility {
 }
 
 model Company {
-  id          String        @id @default(cuid())
-  name        String
-  image       String
-  level       Int           @default(1)
-  isActive    Boolean       @default(true)
-  isVisible   Boolean       @default(true)
-  isWarrens   Boolean       @default(false)
-  coordX      Float         @default(0)
-  coordY      Float         @default(0)
-  content     String        @db.LongText
-  characterId Int
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  character   Char          @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  BankAccount BankAccount[]
+  id            String          @id @default(cuid())
+  name          String
+  image         String
+  level         Int             @default(1)
+  isActive      Boolean         @default(true)
+  isVisible     Boolean         @default(true)
+  isWarrens     Boolean         @default(false)
+  coordX        Float           @default(0)
+  coordY        Float           @default(0)
+  content       String          @db.LongText
+  characterId   Int
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  character     Char            @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  BankAccount   BankAccount[]
+  CouponCompany CouponCompany[]
 }
 
 model BankAccount {
-  id          Int      @id @default(autoincrement())
-  address     String
-  balance     Int
-  characterId Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  character   Char     @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  companyId   String?
-  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id                Int                 @id @default(autoincrement())
+  address           String
+  balance           Int
+  characterId       Int
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  character         Char                @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  companyId         String?
+  company           Company?            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  CouponBankAccount CouponBankAccount[]
 }
 
 model GeoPoint {
@@ -299,6 +303,97 @@ model Message {
   ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 }
 
+model Coupon {
+  id                String              @id @default(cuid())
+  name              String
+  content           String
+  address           String
+  usage             Int
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  CouponFeature     CouponFeature[]
+  CouponAbility     CouponAbility[]
+  CouponRitual      CouponRitual[]
+  CouponKnowledge   CouponKnowledge[]
+  CouponEffect      CouponEffect[]
+  CouponBankAccount CouponBankAccount[]
+  CouponCompany     CouponCompany[]
+  CouponItemType    CouponItemType[]
+  CouponItem        CouponItem[]
+}
+
+model CouponFeature {
+  id        Int     @id @default(autoincrement())
+  couponId  String
+  featureId Int
+  coupon    Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  feature   Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+}
+
+model CouponAbility {
+  id        Int     @id @default(autoincrement())
+  couponId  String
+  abilityId Int
+  coupon    Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  ability   Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+}
+
+model CouponRitual {
+  id       Int    @id @default(autoincrement())
+  couponId String
+  ritualId Int
+  coupon   Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  ritual   Ritual @relation(fields: [ritualId], references: [id], onDelete: Cascade)
+}
+
+model CouponKnowledge {
+  id          Int       @id @default(autoincrement())
+  couponId    String
+  knowledgeId Int
+  coupon      Coupon    @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  knowledge   Knowledge @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+}
+
+model CouponEffect {
+  id       Int    @id @default(autoincrement())
+  couponId String
+  effectId Int
+  coupon   Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  effect   Effect @relation(fields: [effectId], references: [id], onDelete: Cascade)
+}
+
+model CouponBankAccount {
+  id            Int         @id @default(autoincrement())
+  couponId      String
+  bankAccountId Int
+  coupon        Coupon      @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+}
+
+model CouponCompany {
+  id        Int     @id @default(autoincrement())
+  couponId  String
+  companyId String
+  coupon    Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model CouponItemType {
+  id         Int      @id @default(autoincrement())
+  couponId   String
+  itemTypeId Int
+  coupon     Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  itemType   ItemType @relation(fields: [itemTypeId], references: [id], onDelete: Cascade)
+}
+
+model CouponItem {
+  id       Int    @id @default(autoincrement())
+  couponId String
+  itemId   Int
+  coupon   Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  item     Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
 model Char {
   id                  Int                   @id @default(autoincrement())
   name                String
@@ -421,6 +516,7 @@ model Effect {
   AbilityEffects   AbilityEffects[]
   FeatureEffects   FeatureEffects[]
   GeoPointEffects  GeoPointEffects[]
+  CouponEffect     CouponEffect[]
 }
 
 model ClanInFaction {
@@ -484,6 +580,7 @@ model Knowledge {
   visibleToPlayer     Boolean               @default(false)
   CharacterKnowledges CharacterKnowledges[]
   RitualKnowledges    RitualKnowledges[]
+  CouponKnowledge     CouponKnowledge[]
 }
 
 model CharacterRituals {
@@ -506,6 +603,7 @@ model Ritual {
   CharacterRituals CharacterRituals[]
   ritualKnowledges RitualKnowledges[]
   RitualEffects    RitualEffects[]
+  CouponRitual     CouponRitual[]
 }
 
 model RitualKnowledges {
@@ -539,6 +637,7 @@ model Ability {
   RemovingAbility    RemovingAbility[]
   UsingAbility       UsingAbility[]
   AbilityEffects     AbilityEffects[]
+  CouponAbility      CouponAbility[]
 }
 
 model CharacterFeatures {
@@ -561,6 +660,7 @@ model Feature {
   FeatureAvailable  FeatureAvailable[]
 
   FeatureEffects FeatureEffects[]
+  CouponFeature  CouponFeature[]
 }
 
 model Rule {

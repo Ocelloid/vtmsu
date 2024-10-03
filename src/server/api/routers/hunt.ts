@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { Character } from "~/server/api/routers/char";
 import type { User } from "~/server/api/routers/user";
-
+import { containsAllValuesCaseInsensitive } from "~/utils/text";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export type HuntingData = {
@@ -146,7 +146,10 @@ export const huntRouter = createTRPCRouter({
         !!instance &&
         !!character.hunt_req &&
         !!instance.target.hunt_req &&
-        character.hunt_req !== instance.target.hunt_req
+        !containsAllValuesCaseInsensitive(
+          instance.target.hunt_req,
+          character.hunt_req,
+        )
       )
         status = "req_failure";
 
