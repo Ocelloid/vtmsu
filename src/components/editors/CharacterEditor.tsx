@@ -88,11 +88,6 @@ export default function CharacterEditor() {
   const router = useRouter();
 
   const { data: appData } = api.util.getAppData.useQuery();
-  useEffect(() => {
-    if (appData) {
-      if (!appData.createAllowed) void router.push("/characters");
-    }
-  }, [appData, router]);
 
   const discKeys = Object.keys(disciplines);
   const discIcons = Object.values(disciplines).map((disc, i) => {
@@ -208,6 +203,12 @@ export default function CharacterEditor() {
       setIsPersonnel(userData.isPersonnel);
     }
   }, [userData]);
+
+  useEffect(() => {
+    if (!!appData && !isAdmin) {
+      if (!appData.createAllowed) void router.push("/characters");
+    }
+  }, [appData, router, isAdmin]);
 
   useEffect(() => {
     const playerName = userData?.name ?? "";
