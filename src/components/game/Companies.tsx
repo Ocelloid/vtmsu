@@ -29,7 +29,7 @@ export default function Companies({ characterId }: { characterId: number }) {
     refetch: refetchCompanies,
   } = api.econ.getByCharacterId.useQuery(
     { characterId },
-    { enabled: !!sessionData },
+    { enabled: !!sessionData, refetchInterval: 180000 },
   );
 
   if (companiesLoading) return <LoadingPage />;
