@@ -205,10 +205,10 @@ export default function CharacterEditor() {
   }, [userData]);
 
   useEffect(() => {
-    if (!!appData && !isAdmin) {
+    if (!!appData && !!userData && !userData.isAdmin) {
       if (!appData.createAllowed) void router.push("/characters");
     }
-  }, [appData, router, isAdmin]);
+  }, [appData, router, userData]);
 
   useEffect(() => {
     const playerName = userData?.name ?? "";
