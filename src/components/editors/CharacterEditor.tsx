@@ -474,7 +474,7 @@ export default function CharacterEditor() {
   return (
     <>
       <Head>
-        <title>Новый персонаж</title>
+        <title>{!!watchedName ? watchedName : "Новый персонаж"}</title>
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
