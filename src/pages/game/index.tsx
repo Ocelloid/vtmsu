@@ -252,17 +252,19 @@ export default function Game() {
                     >
                       <AbilityPage char={char} refetch={refetch} />
                     </Tab>
-                    <Tab
-                      key="ogham"
-                      title={
-                        <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                          <span className="text-lg font-semibold">Охам</span>
-                        </div>
-                      }
-                      className="flex flex-col gap-2"
-                    >
-                      <OghamPage />
-                    </Tab>
+                    {char.knowledges?.some((k) => k.knowledge?.id === 4) && (
+                      <Tab
+                        key="ogham"
+                        title={
+                          <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
+                            <span className="text-lg font-semibold">Охам</span>
+                          </div>
+                        }
+                        className="flex flex-col gap-2"
+                      >
+                        <OghamPage />
+                      </Tab>
+                    )}
                     <Tab
                       key="rituals"
                       title={

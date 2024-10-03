@@ -1,5 +1,6 @@
 "use client";
 import { Button, Input } from "@nextui-org/react";
+import { FaBackspace } from "react-icons/fa";
 import { useState } from "react";
 
 export const alphabet = {
@@ -109,7 +110,10 @@ export default function OghamTransliteration() {
         {transliterationTo}
       </p>
       Перевести с Охама:
-      <OghamKeyboard onPress={(e: string) => handleChangeFrom(valueFrom + e)} />
+      <OghamKeyboard
+        onPress={(e: string) => handleChangeFrom(valueFrom + e)}
+        onRemoveLast={() => handleChangeFrom(valueFrom.slice(0, -1))}
+      />
       <Input
         value={valueFrom}
         onChange={(e) => handleChangeFrom(e.target.value)}
@@ -127,10 +131,12 @@ export default function OghamTransliteration() {
 
 export const OghamKeyboard = ({
   onPress,
+  onRemoveLast,
   backward = false,
   latin = true,
 }: {
   onPress: (e: string) => void;
+  onRemoveLast: () => void;
   backward?: boolean;
   latin?: boolean;
 }) => {
@@ -146,15 +152,22 @@ export const OghamKeyboard = ({
           >
             {backward ? (
               <span>
-                {Object.keys(alphabet)[index]}: {val}
+                {val}: {Object.keys(alphabet)[index]}
               </span>
             ) : (
               <span>
-                {val}: {Object.keys(alphabet)[index]}
+                {Object.keys(alphabet)[index]}: {val}
               </span>
             )}
           </Button>
         ))}
+
+      <Button
+        className="h-8 w-8 min-w-14 rounded-lg bg-white/75 p-0 text-2xl dark:bg-red-950/50"
+        onClick={() => onRemoveLast()}
+      >
+        <FaBackspace size={24} />
+      </Button>
     </div>
   );
 };
