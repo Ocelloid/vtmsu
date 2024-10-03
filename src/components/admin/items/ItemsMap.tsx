@@ -23,7 +23,9 @@ export default function ItemsMap({ items }: { items: Item[] }) {
         >
           <Popup>
             <div className="flex flex-col items-center gap-0">
-              <span>{item.name}</span>
+              <span>
+                {item.id}: {item.name}
+              </span>
               <div dangerouslySetInnerHTML={{ __html: item.content ?? "" }} />
             </div>
           </Popup>

@@ -35,7 +35,9 @@ export default function Items() {
           className="flex w-auto flex-row items-center justify-between rounded-lg bg-white/75 p-2 dark:bg-red-950/50"
         >
           <div className="flex flex-col gap-1">
-            <p>{item.name}</p>
+            <p>
+              {item.id}: {item.name}
+            </p>
             <p className="text-sm text-gray-500">{item.type?.name}</p>
           </div>
           <div className="flex flex-row gap-1">
