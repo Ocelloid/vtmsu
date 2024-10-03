@@ -416,6 +416,9 @@ export default function Tickets({ char }: { char: Character }) {
                 </div>
               </div>
             ))}
+            <p className="flex w-full flex-col text-lg">
+              {selectedTicket?.name}
+            </p>
           </div>
           {!selectedTicket && (
             <>
