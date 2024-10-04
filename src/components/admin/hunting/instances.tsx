@@ -168,7 +168,7 @@ const Instances = () => {
     setId(undefined);
     setExpires(undefined);
     setPosition(new LatLng(58.0075, 56.23));
-    setTargetId(0);
+    // setTargetId(0);
   };
 
   if (isInstancesLoading || isTargetsLoading) return <LoadingPage />;
