@@ -161,7 +161,7 @@ export const econRouter = createTRPCRouter({
 
       const toAccount = await ctx.db.bankAccount.findFirst({
         where: { characterId: input.toId },
-        select: { balance: true, id: true },
+        select: { balance: true, id: true, address: true },
       });
       if (!toAccount) return { message: "Не найден счёт получателя" };
 
