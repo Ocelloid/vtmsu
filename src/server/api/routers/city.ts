@@ -291,7 +291,10 @@ export const cityRouter = createTRPCRouter({
 
       const char = await ctx.db.char.findUnique({
         where: { id: input.charId },
-        include: { effects: { include: { effect: true } } },
+        include: {
+          effects: { include: { effect: true } },
+          knowledges: { include: { knowledge: true } },
+        },
       });
 
       if (!char)
@@ -342,7 +345,12 @@ export const cityRouter = createTRPCRouter({
       const geoPoints = await ctx.db.geoPoint.findMany();
 
       const availableGeoPoints = geoPoints.filter(
-        (g) => calculateDistance(g.lat, g.lng, y, x) <= radius,
+        (g) =>
+          calculateDistance(g.lat, g.lng, y, x) <= radius &&
+          (g.icon !== "sewer" ||
+            char.knowledges.some((k) =>
+              k.knowledge.name.includes("Канализация"),
+            )),
       );
 
       const availableHuntingInstances = huntingInstances.filter(
