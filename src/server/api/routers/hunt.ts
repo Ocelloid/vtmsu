@@ -354,6 +354,15 @@ export const huntRouter = createTRPCRouter({
           item: undefined,
         };
 
+      await ctx.db.bankAccount.update({
+        where: { id: accountToUse.id },
+        data: {
+          balance:
+            accountToUse.balance -
+            (lastHunt.instance.target?.descs?.length ?? 0) * 10,
+        },
+      });
+
       const hasAuspexActive = investigator.effects.some(
         (e) =>
           e.effect.name.includes("Прорицание") &&
@@ -408,6 +417,14 @@ export const huntRouter = createTRPCRouter({
           message: `Недостаточно средств на счёте ${accountToUse.address}`,
           item: undefined,
         };
+
+      await ctx.db.bankAccount.update({
+        where: { id: accountToUse.id },
+        data: {
+          balance:
+            accountToUse.balance - (instance.target?.descs?.length ?? 0) * 50,
+        },
+      });
 
       await ctx.db.huntingInstance.update({
         where: { id: input.id },
