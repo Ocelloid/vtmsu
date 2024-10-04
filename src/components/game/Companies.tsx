@@ -36,11 +36,11 @@ export default function Companies({ characterId }: { characterId: number }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <CompanyForm
+      {/* <CompanyForm
         characterId={characterId}
         onRefetch={refetchCompanies}
         className="mx-auto w-min"
-      />
+      /> */}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
         {companies?.map((company) => (
           <div
