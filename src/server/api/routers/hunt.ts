@@ -139,12 +139,13 @@ export const huntRouter = createTRPCRouter({
         },
       });
       if (
-        (lastHunt?.createdAt ?? new Date()) >
+        (lastHunt?.createdAt ?? new Date(0)) >
         new Date(new Date().getTime() - frequency * 60 * 1000)
-      )
+      ) {
         return {
           message: `Вашему персонажу нужно отдохнуть хотя бы ${frequency} минут между охотами`,
         };
+      }
 
       if (
         !!character &&

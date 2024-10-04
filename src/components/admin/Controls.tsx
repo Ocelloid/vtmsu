@@ -7,6 +7,8 @@ import { api } from "~/utils/api";
 export default function Controls() {
   const [allowPush, setAllowPush] = useState(false);
   const { mutate: setAppData, isPending } = api.util.setAppData.useMutation();
+  const { mutate: createCharacterBalances } =
+    api.util.createCharacterBalances.useMutation();
   const { mutate: sunrise, isPending: isSunrisePending } =
     api.util.sunrise.useMutation();
   const { data: appData, isLoading: isAppDataLoading } =
@@ -99,6 +101,15 @@ export default function Controls() {
       >
         Запустить продвижение предприятий костылём из этого браузера
       </Checkbox>
+      <Button
+        variant="bordered"
+        onClick={() => {
+          const confirmed = confirm("Вы уверены, что хотите создать счета?");
+          if (confirmed) createCharacterBalances();
+        }}
+      >
+        Создать пустые счета тем, у кого их нет
+      </Button>
       <Button
         variant="bordered"
         className="mt-auto"

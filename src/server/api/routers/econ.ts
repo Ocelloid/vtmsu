@@ -320,7 +320,7 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (!company) return { message: "Не найдено предприятие" };
-      const upgradeCost = company.level * 1000 - 500;
+      const upgradeCost = company.level * 960 - 480;
       console.log(upgradeCost);
       if (company.level >= 10)
         return { message: "Предприятие уже вышло на 10 уровень" };
@@ -386,7 +386,7 @@ export const econRouter = createTRPCRouter({
 
       if (
         (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
-        company.level * 1000 - 500
+        company.level * 960 - 480
       )
         return {
           message: `Недостаточно средств на счёте ${character.bankAccount.sort((a, b) => a.id - b.id)[0]?.address}`,
@@ -443,7 +443,7 @@ export const econRouter = createTRPCRouter({
 
       if (
         (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
-        (company.level - 1) * 4000 + 2000
+        (company.level - 1) * 3840 + 1920
       )
         return {
           message: `Недостаточно средств на счёте ${character.bankAccount.sort((a, b) => a.id - b.id)[0]?.address}`,

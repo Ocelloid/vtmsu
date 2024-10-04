@@ -139,6 +139,27 @@ export type CouponItem = {
 };
 
 export const utilRouter = createTRPCRouter({
+  createCharacterBalances: protectedProcedure.mutation(async ({ ctx }) => {
+    const characters = await ctx.db.char.findMany({
+      include: { bankAccount: true },
+    });
+    const charactersWithoutBankAccounts = characters.filter(
+      (c) => !c.bankAccount.length,
+    );
+    await ctx.db.bankAccount.createMany({
+      data: charactersWithoutBankAccounts.map((c) => ({
+        characterId: c.id,
+        companyId: null,
+        address: (
+          (Date.now() % 1000000) * 100 +
+          c.id.toString() +
+          Math.floor(Math.random() * 100)
+        ).toString(),
+        balance: 240,
+      })),
+    });
+  }),
+
   pushCompanyBalances: protectedProcedure.query(async ({ ctx }) => {
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 1 } },
@@ -195,6 +216,7 @@ export const utilRouter = createTRPCRouter({
         editAllowed: z.boolean().optional(),
         gameAllowed: z.boolean().optional(),
         ticketsLimit: z.number().optional(),
+        frequency: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -207,6 +229,7 @@ export const utilRouter = createTRPCRouter({
           editAllowed: input.editAllowed ?? oldData?.editAllowed,
           gameAllowed: input.gameAllowed ?? oldData?.gameAllowed,
           ticketsLimit: input.ticketsLimit ?? oldData?.ticketsLimit,
+          frequency: input.frequency ?? oldData?.frequency,
           changedById: ctx.session.user.id,
         },
       });
