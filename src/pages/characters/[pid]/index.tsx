@@ -335,7 +335,7 @@ const CharacterSheet = ({
                 isDisabled={isFixPending}
                 className="w-full"
               >
-                {isFixed ? "Разрешить" : "Запретить"} редактирование персонажа
+                {isFixed ? "Запрещено" : "Разрешено"} редактирование персонажа
               </Checkbox>
               <Select
                 label="Игрок"

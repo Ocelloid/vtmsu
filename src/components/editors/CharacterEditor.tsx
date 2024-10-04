@@ -508,7 +508,7 @@ export default function CharacterEditor() {
                   width="440"
                 />
               )}
-              {isLocalhost ? (
+              {(isLocalhost || isAdmin) && (
                 <UploadButton
                   disabled={uploading}
                   content={{
@@ -532,7 +532,8 @@ export default function CharacterEditor() {
                     setUploading(false);
                   }}
                 />
-              ) : (
+              )}
+              {(!isLocalhost || isAdmin) && (
                 <div className="flex flex-col gap-1">
                   <Input
                     placeholder="Вставьте ссылку на фото"
