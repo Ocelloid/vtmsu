@@ -143,8 +143,7 @@ export const huntRouter = createTRPCRouter({
         new Date(new Date().getTime() - frequency * 60 * 1000)
       )
         return {
-          message:
-            "Вашему персонажу нужно отдохнуть хотя бы 30 минут между охотами",
+          message: `Вашему персонажу нужно отдохнуть хотя бы ${frequency} минут между охотами`,
         };
 
       if (
