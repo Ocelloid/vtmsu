@@ -111,7 +111,6 @@ export default function Hunters() {
         onSelectionChange={(e) => setSelectedKeys(e as Set<string>)}
       >
         {characters
-          .sort((a, b) => b.id - a.id)
           .filter((c) =>
             !!factionIds.length ? factionIds.includes(c.factionId) : true,
           )
@@ -123,7 +122,11 @@ export default function Hunters() {
             <AccordionItem
               key={char.id}
               aria-label={char.name}
-              title={char.name}
+              title={`${char.name}, ${char.createdBy?.name}: ${
+                (char?.createdBy?.characters?.findIndex(
+                  (c) => c?.id === char?.id,
+                ) ?? 0) + 1
+              }`}
               startContent={
                 <Avatar
                   isBordered

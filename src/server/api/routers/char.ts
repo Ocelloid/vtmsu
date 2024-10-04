@@ -1570,10 +1570,11 @@ export const charRouter = createTRPCRouter({
 
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.db.char.findMany({
-      orderBy: { pending: "desc" },
+      orderBy: { id: "desc" },
       include: {
         faction: true,
         clan: true,
+        createdBy: { include: { characters: true } },
         features: { include: { feature: true } },
         abilities: { include: { abilitiy: true } },
         effects: { include: { effect: true } },

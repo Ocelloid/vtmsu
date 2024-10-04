@@ -21,7 +21,7 @@ export default function Home() {
     {
       title: "Персонажи",
       subtitle: "Кем играть",
-      to: "/shop",
+      to: "/characters",
       image: chars,
     },
   ];
