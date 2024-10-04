@@ -628,6 +628,7 @@ export default function Tickets() {
                   onClick={() => {
                     setSelectedTicket(t);
                     setChar(t?.character);
+                    onOpen();
                   }}
                 >
                   <p className="w-full truncate text-start text-sm">{t.name}</p>
