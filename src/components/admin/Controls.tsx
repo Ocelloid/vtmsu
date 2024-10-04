@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 
 export default function Controls() {
+  const [allowPush, setAllowPush] = useState(false);
   const { mutate: setAppData, isPending } = api.util.setAppData.useMutation();
   const { mutate: sunrise, isPending: isSunrisePending } =
     api.util.sunrise.useMutation();
@@ -13,7 +14,8 @@ export default function Controls() {
   const { data: companyBalances } = api.util.pushCompanyBalances.useQuery(
     undefined,
     {
-      refetchInterval: 180000,
+      enabled: !!allowPush,
+      refetchInterval: 90000,
     },
   );
 
@@ -80,6 +82,12 @@ export default function Controls() {
       >
         Сохранить
       </Button>
+      <Checkbox
+        isSelected={allowPush}
+        onChange={(e) => setAllowPush(e.target.checked)}
+      >
+        Запустить продвижение предприятий костылём из этого браузера
+      </Checkbox>
       <Button
         variant="bordered"
         className="mt-auto"

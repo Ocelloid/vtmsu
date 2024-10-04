@@ -141,43 +141,43 @@ export const utilRouter = createTRPCRouter({
   pushCompanyBalances: protectedProcedure.query(async ({ ctx }) => {
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 1 } },
-      data: { balance: { increment: 2 } },
+      data: { balance: { increment: 1 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 2 } },
-      data: { balance: { increment: 6 } },
+      data: { balance: { increment: 3 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 3 } },
-      data: { balance: { increment: 10 } },
+      data: { balance: { increment: 5 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 4 } },
-      data: { balance: { increment: 14 } },
+      data: { balance: { increment: 7 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 5 } },
-      data: { balance: { increment: 18 } },
+      data: { balance: { increment: 9 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 6 } },
-      data: { balance: { increment: 22 } },
+      data: { balance: { increment: 11 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 7 } },
-      data: { balance: { increment: 26 } },
+      data: { balance: { increment: 13 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 8 } },
-      data: { balance: { increment: 30 } },
+      data: { balance: { increment: 15 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 9 } },
-      data: { balance: { increment: 34 } },
+      data: { balance: { increment: 17 } },
     });
     await ctx.db.bankAccount.updateMany({
       where: { company: { level: 10 } },
-      data: { balance: { increment: 38 } },
+      data: { balance: { increment: 19 } },
     });
     return await ctx.db.bankAccount.findMany({ include: { company: true } });
   }),
