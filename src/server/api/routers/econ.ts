@@ -250,9 +250,22 @@ export const econRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const character = await ctx.db.char.findUnique({
         where: { id: input.characterId },
-        include: { effects: { include: { effect: true } } },
+        include: { effects: { include: { effect: true } }, bankAccount: true },
       });
       if (!character) return { message: "Не найден персонаж" };
+      const accountToUse = character.bankAccount.sort(
+        (a, b) => b.balance - a.balance,
+      )[0];
+      if (!accountToUse)
+        return { message: "Не найден счет для покупки", item: undefined };
+      if (accountToUse.balance < 960)
+        return { message: "Недостаточно средств для создания предприятия" };
+      await ctx.db.bankAccount.update({
+        where: { id: accountToUse.id },
+        data: {
+          balance: accountToUse.balance - 960,
+        },
+      });
       const characterIsWarrens = !!character.effects?.find((e) =>
         e.effect.name.includes("Канализация"),
       );
@@ -340,7 +353,7 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
         data: { level: company.level + 1 },
       });
-      return { message: "Уровень предрпиятия успешно повышен" };
+      return { message: "Уровень предприятия успешно повышен" };
     }),
   setLevel: protectedProcedure
     .input(

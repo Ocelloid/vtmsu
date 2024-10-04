@@ -36,11 +36,11 @@ export default function Companies({ characterId }: { characterId: number }) {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* <CompanyForm
+      <CompanyForm
         characterId={characterId}
         onRefetch={refetchCompanies}
         className="mx-auto w-min"
-      /> */}
+      />
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
         {companies?.map((company) => (
           <div
@@ -372,7 +372,7 @@ function CompanyForm({
             {!editId ? (
               <>
                 <p>Ваш баланс: {balance ?? 0} ОВ</p>
-                <p>Стоимость предприятия: 500 ОВ</p>
+                <p>Стоимость предприятия: 960 ОВ</p>
               </>
             ) : (
               <>
@@ -382,7 +382,7 @@ function CompanyForm({
                 </p>
                 <p>
                   Стоимость повышения уровня предприятия:{" "}
-                  {(companyData?.level ?? 0) * 1000 - 500} ОВ
+                  {(companyData?.level ?? 0) * 960 - 480} ОВ
                 </p>
                 <Button
                   onClick={handleUpgrade}
