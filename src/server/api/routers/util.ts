@@ -23,6 +23,7 @@ export type AppData = {
   gameAllowed: boolean;
   ticketsLimit: number;
   radius: number;
+  frequency: number;
   changedById: string;
 };
 

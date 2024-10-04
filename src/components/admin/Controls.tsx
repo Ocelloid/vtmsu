@@ -31,6 +31,7 @@ export default function Controls() {
     ticketsLimit: 3,
     changedById: "",
     radius: 100,
+    frequency: 30,
   });
   useEffect(() => {
     if (appData) setData(appData);
@@ -54,6 +55,16 @@ export default function Controls() {
         value={data.radius.toString()}
         onChange={(e) => setData({ ...data, radius: Number(e.target.value) })}
         label="Радиус действия геоточек"
+        placeholder="Введите число"
+        type="number"
+      />
+      <Input
+        variant="underlined"
+        value={data.frequency.toString()}
+        onChange={(e) =>
+          setData({ ...data, frequency: Number(e.target.value) })
+        }
+        label="Частота охоты в минутах"
         placeholder="Введите число"
         type="number"
       />

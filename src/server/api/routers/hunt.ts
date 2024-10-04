@@ -96,6 +96,7 @@ export const huntRouter = createTRPCRouter({
         orderBy: { id: "desc" },
       });
       const radius = appData?.radius ?? 200;
+      const frequency = appData?.frequency ?? 30;
 
       const instance = await ctx.db.huntingInstance.findUnique({
         where: { id: input.instanceId },
@@ -139,7 +140,7 @@ export const huntRouter = createTRPCRouter({
       });
       if (
         (lastHunt?.createdAt ?? new Date()) >
-        new Date(new Date().getTime() - 30 * 60 * 1000)
+        new Date(new Date().getTime() - frequency * 60 * 1000)
       )
         return {
           message:

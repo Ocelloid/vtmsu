@@ -18,6 +18,7 @@ model AppData {
   timestamp     DateTime @default(now())
   ticketsLimit  Int      @default(3)
   radius        Int      @default(100)
+  frequency     Int      @default(30)
   changedById   String
   user          User     @relation(fields: [changedById], references: [id])
 }
