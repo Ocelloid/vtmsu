@@ -180,7 +180,7 @@ export const econRouter = createTRPCRouter({
           characterId: input.toId,
           Message: {
             create: {
-              content: `Вы получили ${input.amount} ОВ со счёта ${input.fromAddress}`,
+              content: `Вы получили ${input.amount} ОВ на счёт ${toAccount.address} со счёта ${input.fromAddress}`,
               isAdmin: true,
             },
           },
@@ -226,7 +226,7 @@ export const econRouter = createTRPCRouter({
           characterId: toAccount.characterId,
           Message: {
             create: {
-              content: `Вы получили ${input.amount} ОВ со счёта ${input.fromAddress}`,
+              content: `Вы получили ${input.amount} ОВ на счёт #${input.toAddress} со счёта ${input.fromAddress}`,
               isAdmin: true,
             },
           },
