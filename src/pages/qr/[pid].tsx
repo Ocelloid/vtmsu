@@ -62,12 +62,13 @@ export default function QRPage() {
   )
     return <LoadingPage />;
 
-  const hasAuspex = char?.effects.some((e) =>
-    e.effect?.name.includes("Прорицание"),
-  );
-  const hasAnimalism = char?.effects.some((e) =>
-    e.effect?.name.includes("Анимализм"),
-  );
+  const now = new Date();
+  const hasAuspex = char?.effects
+    ?.filter((e) => (e.expires?.getTime() ?? now.getTime()) - now.getTime() > 0)
+    .find((e) => e.effect?.name.includes("Прорицание"));
+  const hasAnimalism = char?.effects
+    ?.filter((e) => (e.expires?.getTime() ?? now.getTime()) - now.getTime() > 0)
+    .find((e) => e.effect?.name.includes("Анимализм"));
   const isHacker = char?.features.some((e) =>
     e.feature?.name.includes("Хакер"),
   );

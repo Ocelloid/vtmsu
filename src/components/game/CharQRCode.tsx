@@ -39,6 +39,10 @@ export default function CharQRCode({ char }: { char: Character }) {
   }, [char, charsLoading]);
 
   const handleScanSuccess = (decodedText: string) => {
+    if (decodedText.includes("http")) {
+      window.location.href = decodedText;
+      return;
+    }
     if (!chars) {
       alert("Отсутствует список персонажей");
       return;
@@ -76,6 +80,12 @@ export default function CharQRCode({ char }: { char: Character }) {
   const hasAuspex = char?.effects
     ?.filter((e) => (e.expires?.getTime() ?? now.getTime()) - now.getTime() > 0)
     .find((e) => e.effect?.name.includes("Прорицание"));
+  const hasAnimalism = char?.effects
+    ?.filter((e) => (e.expires?.getTime() ?? now.getTime()) - now.getTime() > 0)
+    .find((e) => e.effect?.name.includes("Анимализм"));
+  const isHacker = char?.features?.filter((f) =>
+    f.feature?.name.includes("Хакер"),
+  );
 
   return (
     <>
@@ -112,9 +122,12 @@ export default function CharQRCode({ char }: { char: Character }) {
                       : "Персонаж нежив"
                     : "Финальная смерть"}
                 </p>
+                {!!isHacker && <p>{scannedChar.hackerData}</p>}
+                {!!hasAnimalism && <p>{scannedChar.animalismData}</p>}
                 {!!hasAuspex && (
                   <div className="flex w-full flex-col">
                     Эффекты персонажа в ауре:
+                    {scannedChar.auspexData}
                     <EffectsPage char={scannedChar} auspex={true} />
                   </div>
                 )}
