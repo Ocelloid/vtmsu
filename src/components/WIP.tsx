@@ -14,9 +14,11 @@ export default function WIP() {
       <Image
         src="/wip.png"
         alt="wip"
+        title="Двойной щелчок чтобы убрать"
         layout="fill"
         objectFit="none"
         className="z-[10000]"
+        onDoubleClick={() => setOpenWIP(false)}
       />
     );
   }

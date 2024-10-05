@@ -244,6 +244,7 @@ export const utilRouter = createTRPCRouter({
           ticketsLimit: input.ticketsLimit ?? oldData?.ticketsLimit,
           frequency: input.frequency ?? oldData?.frequency,
           changedById: ctx.session.user.id,
+          wip: input.wip ?? oldData?.wip,
         },
       });
     }),
