@@ -31,7 +31,7 @@ export default function Donate() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="mx-auto flex h-full w-full flex-col items-center justify-center">
+      <main className="mx-auto flex h-full w-full max-w-3xl flex-col items-center justify-center">
         <div className="container flex h-full flex-col pt-24">
           <h1 className="flex flex-col items-center text-5xl font-extrabold tracking-tight sm:text-[5rem]">
             Фонд
