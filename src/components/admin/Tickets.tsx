@@ -313,7 +313,7 @@ export default function Tickets() {
                     <div className="flex w-full flex-row">
                       <div className="flex w-full flex-col text-sm">
                         <p className="flex w-full flex-col text-lg">
-                          {m.isAdmin ? "Расссказчик:" : char?.name + ":"}
+                          {m.isAdmin ? "Рассказчик:" : char?.name + ":"}
                         </p>
                         {m.content}
                       </div>
@@ -799,7 +799,7 @@ export default function Tickets() {
                   <div className="flex w-full flex-row gap-1">
                     <div className="flex w-full flex-col text-sm">
                       <p className="flex w-full flex-col text-lg">
-                        {m.isAdmin ? "Расссказчик:" : char?.name + ":"}
+                        {m.isAdmin ? "Рассказчик:" : char?.name + ":"}
                       </p>
                       {m.content}
                     </div>
