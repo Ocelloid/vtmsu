@@ -145,11 +145,35 @@ export type CouponItem = {
 
 export const utilRouter = createTRPCRouter({
   getTopDonate: publicProcedure.query(async ({ ctx }) => {
-    const topDonate = await ctx.db.char.findFirst({
-      orderBy: { bloodAmount: "desc" },
-      include: { bankAccount: true },
+    const transactions = await ctx.db.transaction.findMany({
+      where: { accountToAddress: "58400810" },
     });
-    return topDonate;
+    const bankAccounts = await ctx.db.bankAccount.findMany({
+      where: {
+        address: {
+          in: transactions.map((t) => t.accountFromAddress),
+        },
+      },
+      include: { character: true },
+    });
+    const accounts = transactions.map((t) => ({
+      address: t.accountFromAddress,
+      name: "",
+      amount: 0,
+    }));
+    return accounts
+      .map((a) => {
+        const bankAccount = bankAccounts.find((b) => b.address === a.address);
+        const total = transactions
+          .filter((t) => t.accountFromAddress === a.address)
+          .reduce((acc, t) => acc + t.amount, 0);
+        return {
+          address: a.address,
+          name: bankAccount?.character?.name ?? "",
+          amount: total,
+        };
+      })
+      .sort((a, b) => b.amount - a.amount);
   }),
   createCharacterBalances: protectedProcedure.mutation(async ({ ctx }) => {
     const characters = await ctx.db.char.findMany({

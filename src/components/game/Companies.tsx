@@ -227,7 +227,6 @@ function CompanyForm({
   const [content, setContent] = useState("");
   const [image, setImage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
-  const [isWarrens, setIsWarrens] = useState(false);
 
   const {
     data: balance,
@@ -256,7 +255,6 @@ function CompanyForm({
     setContent("");
     setImage("");
     setIsVisible(false);
-    setIsWarrens(false);
   };
 
   useEffect(() => {
@@ -265,7 +263,6 @@ function CompanyForm({
       setContent(companyData?.content ?? "");
       setImage(companyData?.image ?? "");
       setIsVisible(companyData?.isVisible ?? false);
-      setIsWarrens(companyData?.isWarrens ?? false);
     }
   }, [companyData]);
 
@@ -278,7 +275,6 @@ function CompanyForm({
           content: content,
           image,
           isVisible,
-          isWarrens,
           characterId,
           coordX: location.longitude,
           coordY: location.latitude,
@@ -301,7 +297,6 @@ function CompanyForm({
           content: content,
           image,
           isVisible,
-          isWarrens,
         },
         {
           onSuccess() {

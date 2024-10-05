@@ -154,22 +154,20 @@ export default function BankAccounts() {
               перевести средства из предприятия в счёт персонажа или наоборот.
             </p>
             {!!bankAccounts && (
-              <Select
-                size="sm"
+              <Autocomplete
+                size="md"
                 variant="bordered"
                 placeholder="Выберите счёт"
-                aria-label="accounts"
-                className="w-full"
-                selectedKeys={accountId ? [accountId.toString()] : []}
-                onChange={(e) => {
-                  setAccountId(
-                    !!e.target.value ? Number(e.target.value) : accountId,
-                  );
+                aria-label="bankAccounts"
+                className="w-full rounded-sm"
+                selectedKey={accountId ? accountId.toString() : undefined}
+                onSelectionChange={(e) => {
+                  setAccountId(!!e ? Number(e) : accountId);
                 }}
               >
                 {bankAccounts.map((account) => (
-                  <SelectItem
-                    key={account.id}
+                  <AutocompleteItem
+                    key={account.id.toString()}
                     value={account.id.toString()}
                     textValue={
                       !!account.company
@@ -190,9 +188,9 @@ export default function BankAccounts() {
                         Баланс: {account.balance} ОВ
                       </div>
                     </div>
-                  </SelectItem>
+                  </AutocompleteItem>
                 ))}
-              </Select>
+              </Autocomplete>
             )}
             {!!accountId && (
               <Input

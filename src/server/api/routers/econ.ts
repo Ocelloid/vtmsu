@@ -38,6 +38,14 @@ export type BankAccount = {
   company?: Company | null;
 };
 
+export type Transaction = {
+  id: number;
+  accountFromId: number;
+  accountToId: number;
+  amount: number;
+  createdAt: Date;
+};
+
 export const econRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.db.company.findMany({
@@ -56,7 +64,7 @@ export const econRouter = createTRPCRouter({
     .input(z.object({ characterId: z.number() }))
     .query(({ ctx, input }) => {
       return ctx.db.company.findMany({
-        where: { characterId: input.characterId },
+        where: { characterId: input.characterId, isWarrens: false },
         include: { BankAccount: true },
       });
     }),
@@ -173,6 +181,15 @@ export const econRouter = createTRPCRouter({
         where: { id: toAccount.id },
         data: { balance: toAccount.balance + input.amount },
       });
+      await ctx.db.transaction.create({
+        data: {
+          accountFromId: fromAccount.id,
+          accountFromAddress: input.fromAddress,
+          accountToId: toAccount.id,
+          accountToAddress: toAccount.address,
+          amount: input.amount,
+        },
+      });
       await ctx.db.ticket.create({
         data: {
           name: "Перевод ОВ",
@@ -207,7 +224,7 @@ export const econRouter = createTRPCRouter({
 
       const toAccount = await ctx.db.bankAccount.findFirst({
         where: { address: input.toAddress },
-        select: { balance: true, id: true, characterId: true },
+        select: { balance: true, id: true, characterId: true, address: true },
       });
       if (!toAccount) return { message: "Не найден счёт получателя" };
 
@@ -218,6 +235,15 @@ export const econRouter = createTRPCRouter({
       await ctx.db.bankAccount.update({
         where: { id: toAccount.id },
         data: { balance: toAccount.balance + input.amount },
+      });
+      await ctx.db.transaction.create({
+        data: {
+          accountFromId: fromAccount.id,
+          accountFromAddress: input.fromAddress,
+          accountToId: toAccount.id,
+          accountToAddress: toAccount.address,
+          amount: input.amount,
+        },
       });
       await ctx.db.ticket.create({
         data: {

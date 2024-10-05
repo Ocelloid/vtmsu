@@ -164,7 +164,9 @@ model BankAccount {
 model Transaction {
   id            Int      @id @default(autoincrement())
   accountFromId Int
+  accountFromAddress String @default("")
   accountToId   Int
+  accountToAddress String @default("")
   amount        Int
   createdAt     DateTime @default(now())
 }

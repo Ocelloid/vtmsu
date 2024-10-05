@@ -5,6 +5,23 @@ import { useEffect, useState } from "react";
 import type { Character } from "~/server/api/routers/char";
 import { formatTime } from "~/utils/text";
 
+function filterUniqueEffects(effects: CharacterEffects[]): CharacterEffects[] {
+  const effectMap = new Map<number, CharacterEffects>();
+
+  effects.forEach((effect) => {
+    const existingEffect = effectMap.get(effect.effectId);
+    if (
+      !existingEffect ||
+      (effect.expires &&
+        (!existingEffect.expires || effect.expires > existingEffect.expires))
+    ) {
+      effectMap.set(effect.effectId, effect);
+    }
+  });
+
+  return Array.from(effectMap.values());
+}
+
 export default function EffectsPage({
   char,
   auspex,
@@ -14,8 +31,9 @@ export default function EffectsPage({
 }) {
   if (!char) return <LoadingPage />;
 
-  const activeEffects =
-    char.effects?.filter((e) => (e.expires ?? new Date()) > new Date()) ?? [];
+  const activeEffects = filterUniqueEffects(
+    char.effects?.filter((e) => (e.expires ?? new Date()) > new Date()) ?? [],
+  );
 
   return (
     <div className="flex w-full flex-col gap-2">

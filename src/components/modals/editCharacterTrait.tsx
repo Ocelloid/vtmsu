@@ -240,6 +240,7 @@ const EditCharacterTrait = ({
             | "danger",
         );
         setExpiration((trait as Effect).expiration ?? 1);
+        setAuspexData((trait as Effect).auspexData ?? "");
       }
     }
   }, [trait, traitType]);
