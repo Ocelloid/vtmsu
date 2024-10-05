@@ -159,6 +159,11 @@ export const econRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const allAccounts = await ctx.db.bankAccount.findMany({
+        where: { address: input.fromAddress },
+        select: { balance: true, id: true },
+      });
+      if (allAccounts.length > 1) return { message: "Счёт-дубликат" };
       const fromAccount = await ctx.db.bankAccount.findFirst({
         where: { address: input.fromAddress },
         select: { balance: true, id: true },
@@ -172,6 +177,8 @@ export const econRouter = createTRPCRouter({
         select: { balance: true, id: true, address: true },
       });
       if (!toAccount) return { message: "Не найден счёт получателя" };
+      if (toAccount.address === input.fromAddress)
+        return { message: "Счёт получателя и отправителя совпадают" };
 
       await ctx.db.bankAccount.update({
         where: { id: fromAccount.id },
@@ -214,6 +221,11 @@ export const econRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const allAccounts = await ctx.db.bankAccount.findMany({
+        where: { address: input.fromAddress },
+        select: { balance: true, id: true },
+      });
+      if (allAccounts.length > 1) return { message: "Счёт-дубликат" };
       const fromAccount = await ctx.db.bankAccount.findFirst({
         where: { address: input.fromAddress },
         select: { balance: true, id: true },
@@ -227,6 +239,9 @@ export const econRouter = createTRPCRouter({
         select: { balance: true, id: true, characterId: true, address: true },
       });
       if (!toAccount) return { message: "Не найден счёт получателя" };
+
+      if (toAccount.address === input.fromAddress)
+        return { message: "Счёт получателя и отправителя совпадают" };
 
       await ctx.db.bankAccount.update({
         where: { id: fromAccount.id },
