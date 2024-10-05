@@ -19,6 +19,7 @@ model AppData {
   ticketsLimit  Int      @default(3)
   radius        Int      @default(100)
   frequency     Int      @default(30)
+  wip           Boolean  @default(false)
   changedById   String
   user          User     @relation(fields: [changedById], references: [id])
 }
@@ -158,6 +159,14 @@ model BankAccount {
   companyId         String?
   company           Company?            @relation(fields: [companyId], references: [id], onDelete: Cascade)
   CouponBankAccount CouponBankAccount[]
+}
+
+model Transaction {
+  id            Int      @id @default(autoincrement())
+  accountFromId Int
+  accountToId   Int
+  amount        Int
+  createdAt     DateTime @default(now())
 }
 
 model GeoPoint {

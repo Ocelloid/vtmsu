@@ -9,6 +9,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import Navigation from "~/components/Navigation";
 import BGImage from "~/components/BGImage";
 import Footer from "~/components/Footer";
+import WIP from "~/components/WIP";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,6 +24,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <NextUIProvider>
       <NextThemesProvider attribute="class" defaultTheme="dark">
         <SessionProvider session={session}>
+          <WIP />
           <main
             className={`font-sans ${inter.variable} flex flex-1 flex-grow flex-col`}
           >

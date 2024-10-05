@@ -34,6 +34,7 @@ export default function Controls() {
     changedById: "",
     radius: 100,
     frequency: 30,
+    wip: false,
   });
   useEffect(() => {
     if (appData) setData(appData);
@@ -87,6 +88,12 @@ export default function Controls() {
         onChange={(e) => setData({ ...data, gameAllowed: e.target.checked })}
       >
         Разрешить игровой режим
+      </Checkbox>
+      <Checkbox
+        isSelected={data.wip}
+        onChange={(e) => setData({ ...data, wip: e.target.checked })}
+      >
+        Технические работы
       </Checkbox>
       <Button
         variant="bordered"

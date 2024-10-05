@@ -2,7 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import type { User } from "~/server/api/routers/user";
 import type {
   Character,
@@ -25,6 +29,7 @@ export type AppData = {
   radius: number;
   frequency: number;
   changedById: string;
+  wip: boolean;
 };
 
 export type Ticket = {
@@ -139,6 +144,13 @@ export type CouponItem = {
 };
 
 export const utilRouter = createTRPCRouter({
+  getTopDonate: publicProcedure.query(async ({ ctx }) => {
+    const topDonate = await ctx.db.char.findFirst({
+      orderBy: { bloodAmount: "desc" },
+      include: { bankAccount: true },
+    });
+    return topDonate;
+  }),
   createCharacterBalances: protectedProcedure.mutation(async ({ ctx }) => {
     const characters = await ctx.db.char.findMany({
       include: { bankAccount: true },
@@ -217,6 +229,7 @@ export const utilRouter = createTRPCRouter({
         gameAllowed: z.boolean().optional(),
         ticketsLimit: z.number().optional(),
         frequency: z.number().optional(),
+        wip: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
