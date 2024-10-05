@@ -155,7 +155,7 @@ const CharacterSheet = ({
       } else {
         setPublicChar(publicData);
         setSelectedPlayer(publicData.playerId);
-        setCompanies(publicData.Company ?? []);
+        setCompanies(publicData.Company.filter((c) => !c.isWarrens) ?? []);
       }
     }
   }, [isAdmin, publicData, sessionData, router, setPublicChar]);

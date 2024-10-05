@@ -1537,6 +1537,7 @@ export const charRouter = createTRPCRouter({
               name: true,
               image: true,
               content: true,
+              isWarrens: true,
               BankAccount: true,
             },
           },

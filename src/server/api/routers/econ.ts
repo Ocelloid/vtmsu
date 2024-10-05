@@ -64,7 +64,7 @@ export const econRouter = createTRPCRouter({
     .input(z.object({ characterId: z.number() }))
     .query(({ ctx, input }) => {
       return ctx.db.company.findMany({
-        where: { characterId: input.characterId, isWarrens: false },
+        where: { characterId: input.characterId },
         include: { BankAccount: true },
       });
     }),
