@@ -341,7 +341,10 @@ export const itemRouter = createTRPCRouter({
 
       const char = await ctx.db.char.findUnique({
         where: { id: input.charId },
-        include: { features: { include: { feature: true } } },
+        include: {
+          features: { include: { feature: true } },
+          effects: { include: { effect: true } },
+        },
       });
       if (!char) return { message: "Персонаж не найден" };
 
@@ -449,11 +452,14 @@ export const itemRouter = createTRPCRouter({
         )
           return { message: "Вас не насыщает кровь из пакетов" };
         const newBloodAmount = char.bloodAmount + item.type.bloodAmount;
+        const hasConcentratedBlood = char.features.some(
+          (f) => f.feature.name === "Концентрированнная кровь",
+        );
+        const maxPool = char.bloodPool + (hasConcentratedBlood ? 2 : 0);
         await ctx.db.char.update({
           where: { id: input.charId },
           data: {
-            bloodAmount:
-              newBloodAmount > char.bloodPool ? char.bloodPool : newBloodAmount,
+            bloodAmount: newBloodAmount > maxPool ? maxPool : newBloodAmount,
           },
         });
       }
