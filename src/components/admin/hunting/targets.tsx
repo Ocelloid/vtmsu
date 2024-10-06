@@ -159,14 +159,14 @@ const Targets = () => {
                 <LoadingSpinner width={80} height={80} />
               ) : (
                 <Image
-                  className="aspect-square h-[196px] w-full rounded-md object-cover"
+                  className="aspect-square h-[196px] w-full rounded-md object-scale-down"
                   alt="char_photo"
                   src={!!image ? image : default_char}
                   height="440"
                   width="440"
                 />
               )}
-              {isLocalhost ? (
+              {!isLocalhost ? (
                 <UploadButton
                   content={{
                     button: (
