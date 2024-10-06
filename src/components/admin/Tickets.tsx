@@ -299,11 +299,94 @@ export default function Tickets() {
           </ModalHeader>
           <ModalBody>
             <div className="flex h-full w-full flex-col gap-2">
+              {!selectedTicket && (
+                <>
+                  <Input
+                    value={newName}
+                    color="warning"
+                    onChange={(e) => setNewName(e.target.value)}
+                    variant="underlined"
+                    label="Название заявки"
+                    placeholder="Введите название заявки"
+                  />
+                </>
+              )}
+              {selectedTicket?.isResolved && (
+                <p className="text-sm text-warning">Заявка закрыта</p>
+              )}
+              {!selectedTicket?.isResolved && (
+                <div className="flex flex-row items-center gap-2">
+                  <Textarea
+                    maxRows={3}
+                    color="warning"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.ctrlKey && event.key === "Enter") {
+                        event.preventDefault(); // Prevent default newline behavior
+                        if (
+                          !(
+                            (tooManyTickets && !selectedTicket) ||
+                            isNewTicketPending ||
+                            isPending ||
+                            !newMessage ||
+                            (!newName && !selectedTicket)
+                          )
+                        ) {
+                          if (!selectedTicket) handleAddTicket();
+                          else handleSendMessage();
+                        }
+                      }
+                    }}
+                    variant="underlined"
+                    label="Сообщение"
+                    placeholder="Введите сообщение"
+                  />
+                  <div className="flex h-full flex-col gap-2">
+                    {!!selectedTicket && (
+                      <Button
+                        variant="light"
+                        color="warning"
+                        className="text-md h-full min-w-10 text-black dark:text-warning"
+                        onClick={() => handleCloseTicket()}
+                      >
+                        {isCloseTicketPending ? (
+                          <LoadingSpinner width={24} height={24} />
+                        ) : (
+                          <FaCheck size={24} />
+                        )}
+                      </Button>
+                    )}
+                    <Button
+                      variant="light"
+                      color="warning"
+                      className="text-md h-full min-w-10 text-black dark:text-warning"
+                      isDisabled={
+                        isNewTicketPending ||
+                        isPending ||
+                        !newMessage ||
+                        (!newName && !selectedTicket)
+                      }
+                      onClick={() =>
+                        !!selectedTicket
+                          ? handleSendMessage()
+                          : handleAddTicket()
+                      }
+                    >
+                      {isNewTicketPending || isPending ? (
+                        <LoadingSpinner width={24} height={24} />
+                      ) : (
+                        <MdSend size={24} />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
               <div
                 className={`${
                   selectedTicket?.isResolved
-                    ? "max-h-[calc(100vh-140px)]"
-                    : "max-h-[calc(100vh-240px)]"
+                    ? "max-h-[calc(100svh-180px)]"
+                    : "max-h-[calc(100svh-280px)]"
                 } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
               >
                 {messages?.map((m) => (
@@ -337,89 +420,8 @@ export default function Tickets() {
                   </div>
                 ))}
               </div>
-              {!selectedTicket && (
-                <>
-                  <Input
-                    value={newName}
-                    color="warning"
-                    onChange={(e) => setNewName(e.target.value)}
-                    variant="underlined"
-                    label="Название заявки"
-                    placeholder="Введите название заявки"
-                  />
-                </>
-              )}
-              {selectedTicket?.isResolved && (
-                <p className="text-sm text-warning">Заявка закрыта</p>
-              )}
             </div>
           </ModalBody>
-          {!selectedTicket?.isResolved && (
-            <ModalFooter className="flex flex-row items-center gap-2">
-              <Textarea
-                maxRows={3}
-                color="warning"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(event) => {
-                  if (event.ctrlKey && event.key === "Enter") {
-                    event.preventDefault(); // Prevent default newline behavior
-                    if (
-                      !(
-                        (tooManyTickets && !selectedTicket) ||
-                        isNewTicketPending ||
-                        isPending ||
-                        !newMessage ||
-                        (!newName && !selectedTicket)
-                      )
-                    ) {
-                      if (!selectedTicket) handleAddTicket();
-                      else handleSendMessage();
-                    }
-                  }
-                }}
-                variant="underlined"
-                label="Сообщение"
-                placeholder="Введите сообщение"
-              />
-              <div className="flex h-full flex-col gap-2">
-                {!!selectedTicket && (
-                  <Button
-                    variant="light"
-                    color="warning"
-                    className="text-md h-full min-w-10 text-black dark:text-warning"
-                    onClick={() => handleCloseTicket()}
-                  >
-                    {isCloseTicketPending ? (
-                      <LoadingSpinner width={24} height={24} />
-                    ) : (
-                      <FaCheck size={24} />
-                    )}
-                  </Button>
-                )}
-                <Button
-                  variant="light"
-                  color="warning"
-                  className="text-md h-full min-w-10 text-black dark:text-warning"
-                  isDisabled={
-                    isNewTicketPending ||
-                    isPending ||
-                    !newMessage ||
-                    (!newName && !selectedTicket)
-                  }
-                  onClick={() =>
-                    !!selectedTicket ? handleSendMessage() : handleAddTicket()
-                  }
-                >
-                  {isNewTicketPending || isPending ? (
-                    <LoadingSpinner width={24} height={24} />
-                  ) : (
-                    <MdSend size={24} />
-                  )}
-                </Button>
-              </div>
-            </ModalFooter>
-          )}
         </ModalContent>
       </Modal>
       <Modal
@@ -609,7 +611,7 @@ export default function Tickets() {
         >
           <p className="text-sm font-semibold">Новая заявка</p>
         </Button>
-        <div className="flex h-full max-h-[calc(100vh-372px)] flex-row gap-2 pt-2 md:max-h-[calc(100vh-300px)]">
+        <div className="flex h-full max-h-[calc(100svh-372px)] flex-row gap-2 pt-2 md:max-h-[calc(100svh-300px)]">
           <div className="flex w-full flex-col gap-2 overflow-y-auto md:hidden">
             {tickets
               ?.filter(
@@ -693,7 +695,7 @@ export default function Tickets() {
                 </Button>
               ))}
           </div>
-          <div className="hidden max-h-[calc(100vh-206px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
+          <div className="hidden max-h-[calc(100svh-206px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
             <Button
               variant="bordered"
               color="warning"
@@ -788,8 +790,8 @@ export default function Tickets() {
             <div
               className={`${
                 selectedTicket?.isResolved
-                  ? "max-h-[calc(100vh-112px) sm:max-h-[calc(100vh-320px)]"
-                  : "max-h-[calc(100vh-176px)] sm:max-h-[calc(100vh-400px)]"
+                  ? "max-h-[calc(100svh-112px) sm:max-h-[calc(100svh-320px)]"
+                  : "max-h-[calc(100svh-176px)] sm:max-h-[calc(100svh-400px)]"
               } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
             >
               {messages?.map((m) => (
