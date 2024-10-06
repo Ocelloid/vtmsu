@@ -138,8 +138,12 @@ export default function Hunters() {
               subtitle={
                 <div className="iems-center flex flex-col gap-2 md:flex-row">
                   <div className="flex flex-row items-center gap-1">
-                    Предпочтение в охоте:
+                    Предпочтение:
                     {!!char.hunt_req ? <FaCheck /> : <FaTimes />}
+                  </div>
+                  <div className="flex flex-row items-center gap-1">
+                    Табу:
+                    {!!char.taboo ? <FaCheck /> : <FaTimes />}
                   </div>
                   <div className="flex flex-row items-center gap-1">
                     Прорицание:

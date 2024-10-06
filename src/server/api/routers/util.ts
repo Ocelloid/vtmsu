@@ -143,6 +143,12 @@ export type CouponItem = {
   item?: Item;
 };
 
+export type Donator = {
+  address: string;
+  name: string;
+  amount: number;
+};
+
 export const utilRouter = createTRPCRouter({
   getTopDonate: publicProcedure.query(async ({ ctx }) => {
     const transactions = await ctx.db.transaction.findMany({
@@ -173,7 +179,13 @@ export const utilRouter = createTRPCRouter({
           amount: total,
         };
       })
-      .sort((a, b) => b.amount - a.amount);
+      .sort((a, b) => b.amount - a.amount)
+      .reduce((acc, curr) => {
+        if (!acc.find((a) => a.address === curr.address)) {
+          acc.push(curr);
+        }
+        return acc;
+      }, [] as Donator[]);
   }),
   createCharacterBalances: protectedProcedure.mutation(async ({ ctx }) => {
     const characters = await ctx.db.char.findMany({

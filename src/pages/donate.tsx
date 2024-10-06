@@ -1,16 +1,11 @@
 "use client";
 import Head from "next/head";
+import type { Donator } from "~/server/api/routers/util";
 import { LoadingPage } from "~/components/Loading";
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/react";
 import { FaCopy } from "react-icons/fa";
 import { api } from "~/utils/api";
-
-type Donator = {
-  address: string;
-  name: string;
-  amount: number;
-};
 
 export default function Donate() {
   const [donators, setDonators] = useState<Donator[]>([]);

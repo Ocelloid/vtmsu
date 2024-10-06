@@ -139,7 +139,7 @@ export default function Tickets({ char }: { char: Character }) {
                   selectedTicket?.isResolved
                     ? "max-h-[calc(100vh-140px)]"
                     : "max-h-[calc(100vh-240px)]"
-                } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
+                } flex flex-col-reverse gap-2 overflow-y-auto`}
               >
                 {messages?.map((m) => (
                   <div
