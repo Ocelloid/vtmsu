@@ -133,50 +133,6 @@ export default function Tickets({ char }: { char: Character }) {
           </ModalHeader>
           <ModalBody>
             <div className={`flex h-full w-full flex-col gap-2`}>
-              <div
-                className={`flex flex-col-reverse gap-2 ${
-                  selectedTicket?.isResolved
-                    ? "max-h-[calc(100svh-140px)]"
-                    : "max-h-[calc(100svh-240px)]"
-                } overflow-y-auto`}
-              >
-                {messages?.map((m) => (
-                  <div
-                    key={m.id}
-                    className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
-                  >
-                    <div className="flex w-full flex-row">
-                      <div className="flex w-full flex-col text-sm">
-                        <p className="flex w-full flex-col text-lg">
-                          {m.isAdmin ? "Рассказчик:" : char?.name + ":"}
-                        </p>
-                        {m.content}
-                      </div>
-                      <div className="flex w-8 flex-col text-xs opacity-50">
-                        {formatDate(m.createdAt)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {!selectedTicket && (
-                <>
-                  <Input
-                    value={newName}
-                    color="warning"
-                    onChange={(e) => setNewName(e.target.value)}
-                    variant="underlined"
-                    label="Название заявки"
-                    placeholder="Введите название заявки"
-                  />
-                  {tooManyTickets && (
-                    <p className="text-sm text-danger dark:text-warning">
-                      У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
-                      открытых заявок
-                    </p>
-                  )}
-                </>
-              )}
               {timeoutUntil && (
                 <p className="text-sm text-danger dark:text-warning">
                   Вы не можете отправлять сообщения и создавать новые заявки до{" "}
@@ -274,6 +230,50 @@ export default function Tickets({ char }: { char: Character }) {
                     </Button>
                   </div>
                 </div>
+              )}
+              <div
+                className={`flex flex-col-reverse gap-2 ${
+                  selectedTicket?.isResolved
+                    ? "max-h-[calc(100svh-180px)]"
+                    : "max-h-[calc(100svh-280px)]"
+                } overflow-y-auto`}
+              >
+                {messages?.map((m) => (
+                  <div
+                    key={m.id}
+                    className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
+                  >
+                    <div className="flex w-full flex-row">
+                      <div className="flex w-full flex-col text-sm">
+                        <p className="flex w-full flex-col text-lg">
+                          {m.isAdmin ? "Рассказчик:" : char?.name + ":"}
+                        </p>
+                        {m.content}
+                      </div>
+                      <div className="flex w-8 flex-col text-xs opacity-50">
+                        {formatDate(m.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {!selectedTicket && (
+                <>
+                  <Input
+                    value={newName}
+                    color="warning"
+                    onChange={(e) => setNewName(e.target.value)}
+                    variant="underlined"
+                    label="Название заявки"
+                    placeholder="Введите название заявки"
+                  />
+                  {tooManyTickets && (
+                    <p className="text-sm text-danger dark:text-warning">
+                      У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
+                      открытых заявок
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </ModalBody>
