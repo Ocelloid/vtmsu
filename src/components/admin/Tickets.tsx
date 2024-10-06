@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import {
   FaCheck,
+  FaRedoAlt,
   FaStopwatch,
   FaBan,
   FaTimes,
@@ -348,14 +349,16 @@ export default function Tickets() {
                   {!!selectedTicket && (
                     <Button
                       variant="light"
-                      color="warning"
-                      className="text-md h-full min-w-10 text-black dark:text-warning"
+                      color={selectedTicket.isResolved ? "danger" : "success"}
+                      className="text-md h-full min-w-10"
                       onClick={() =>
                         handleCloseTicket(selectedTicket.isResolved)
                       }
                     >
                       {isCloseTicketPending ? (
                         <LoadingSpinner width={24} height={24} />
+                      ) : selectedTicket.isResolved ? (
+                        <FaRedoAlt size={24} />
                       ) : (
                         <FaCheck size={24} />
                       )}
@@ -888,17 +891,16 @@ export default function Tickets() {
                 {!!selectedTicket && (
                   <Button
                     variant="light"
-                    color="warning"
-                    className="text-md h-full min-w-10 text-black dark:text-warning"
+                    color={selectedTicket.isResolved ? "danger" : "success"}
+                    className="text-md h-full min-w-10"
                     onClick={() => handleCloseTicket(selectedTicket.isResolved)}
                   >
                     {isCloseTicketPending ? (
                       <LoadingSpinner width={24} height={24} />
+                    ) : selectedTicket.isResolved ? (
+                      <FaRedoAlt size={24} />
                     ) : (
-                      <FaCheck
-                        size={24}
-                        color={selectedTicket.isResolved ? "danger" : "success"}
-                      />
+                      <FaCheck size={24} />
                     )}
                   </Button>
                 )}
