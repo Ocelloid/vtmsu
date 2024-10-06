@@ -445,7 +445,7 @@ export default function CharacterEditor() {
   const abilitiesRemain: number = watchedFWC
     .filter((fwc) => fwc.checked)
     .map((fwc) => fwc.id)
-    .includes(features.find((f) => f.name === "Способный ученик")!.id)
+    .includes(features.find((f) => f.name.includes("Способный ученик"))!.id)
     ? Number(watchedAdditionalAbilities ?? 0) + 4
     : Number(watchedAdditionalAbilities ?? 0) + 3;
 

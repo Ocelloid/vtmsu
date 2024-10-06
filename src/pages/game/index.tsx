@@ -20,7 +20,7 @@ import {
 import { useState, useEffect } from "react";
 import { GiLightBackpack, GiMoneyStack } from "react-icons/gi";
 import { CgShapeRhombus, CgInfinity } from "react-icons/cg";
-import { FaQrcode, FaMap, FaShoppingBasket } from "react-icons/fa";
+import { FaQrcode, FaMap, FaShoppingBasket, FaArrowLeft } from "react-icons/fa";
 import { IoMdChatboxes } from "react-icons/io";
 import BankAccounts from "~/components/game/BankAccounts";
 import Companies from "~/components/game/Companies";
@@ -244,6 +244,7 @@ export default function Game() {
               <Tabs
                 aria-label="Игровое меню"
                 placement="bottom"
+                defaultSelectedKey={"vamp"}
                 classNames={{
                   panel:
                     "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
@@ -254,6 +255,21 @@ export default function Game() {
                     "overflow-hidden overflow-y-hidden w-full h-8 items-center justify-center flex flex-col",
                 }}
               >
+                <Tab
+                  key="back"
+                  title={
+                    <Link
+                      className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700"
+                      href="/characters"
+                    >
+                      <FaArrowLeft size={24} />
+                      <span className="hidden text-lg font-bold lg:flex">
+                        Назад
+                      </span>
+                    </Link>
+                  }
+                  className="flex flex-col gap-2"
+                />
                 <Tab
                   key="vamp"
                   title={

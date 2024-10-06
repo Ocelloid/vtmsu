@@ -348,15 +348,6 @@ export const itemRouter = createTRPCRouter({
       });
       if (!char) return { message: "Персонаж не найден" };
 
-      await ctx.db.item.update({
-        where: { id: input.id },
-        data: {
-          usage: item.usage > 0 ? item.usage - 1 : -1,
-          isTrash: item.usage - 1 === 0,
-          lastUsedById: input.charId,
-        },
-      });
-
       if (!!item.type.ItemEffects?.length) {
         const effects = item.type.ItemEffects.map((a) => ({
           id: a.effectId,
@@ -452,8 +443,8 @@ export const itemRouter = createTRPCRouter({
         )
           return { message: "Вас не насыщает кровь из пакетов" };
         const newBloodAmount = char.bloodAmount + item.type.bloodAmount;
-        const hasConcentratedBlood = char.features.some(
-          (f) => f.feature.name === "Концентрированнная кровь",
+        const hasConcentratedBlood = char.features.some((f) =>
+          f.feature.name.includes("Концентрированная кровь"),
         );
         const maxPool = char.bloodPool + (hasConcentratedBlood ? 2 : 0);
         await ctx.db.char.update({
@@ -504,6 +495,15 @@ export const itemRouter = createTRPCRouter({
           },
         });
       }
+
+      await ctx.db.item.update({
+        where: { id: input.id },
+        data: {
+          usage: item.usage > 0 ? item.usage - 1 : -1,
+          isTrash: item.usage - 1 === 0,
+          lastUsedById: input.charId,
+        },
+      });
 
       return { message: "" };
     }),

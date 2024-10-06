@@ -13,8 +13,8 @@ export default function BloodMeter({ char }: { char: Character }) {
   const featureEffects = char?.features
     ?.map((f) => f.feature?.FeatureEffects)
     .flat();
-  const hasConcentratedBlood = !!featureEffects?.find(
-    (e) => e?.effect?.name === "Концентрированная кровь",
+  const hasConcentratedBlood = !!featureEffects?.find((e) =>
+    e?.effect?.name.includes("Концентрированная кровь"),
   );
 
   return (

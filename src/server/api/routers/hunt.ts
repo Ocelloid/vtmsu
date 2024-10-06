@@ -121,7 +121,7 @@ export const huntRouter = createTRPCRouter({
       let status = "success";
 
       const hasConcentratedBlood = character.features.some(
-        (f) => f.feature.name === "Концентрированнная кровь",
+        (f) => f.feature.name === "Концентрированная кровь",
       );
       const hasThaudron = character.effects.some((e) =>
         e.effect.name.includes("Таудрон"),
