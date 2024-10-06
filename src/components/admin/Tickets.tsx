@@ -46,6 +46,7 @@ export default function Tickets() {
     onOpen: onTimeoutOpen,
     onClose: onTimeoutClose,
   } = useDisclosure();
+  const [search, setSearch] = useState<string>("");
   const [reason, setReason] = useState<string>("");
   const [duration, setDuration] = useState<number>(1);
   const [selectedTicket, setSelectedTicket] = useState<Ticket>();
@@ -199,6 +200,14 @@ export default function Tickets() {
       },
     );
   };
+
+  const filteredTickets = tickets?.filter(
+    (t) =>
+      t.name.includes(search) ||
+      t.messages?.some(
+        (m) => m.content.includes(search) || m.name.includes(search),
+      ),
+  );
 
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, "0");
@@ -536,10 +545,17 @@ export default function Tickets() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <div className="container flex flex-col gap-1 rounded-b-lg bg-white/75 p-2 dark:bg-red-950/50 sm:h-full">
-        <div className="flex flex-row items-center justify-between gap-1 py-2">
+      <div className="container flex flex-col gap-0 rounded-b-lg bg-white/75 p-2 dark:bg-red-950/50 sm:h-full">
+        <Input
+          size="sm"
+          className="w-full"
+          placeholder="Поиск"
+          value={search}
+          onValueChange={setSearch}
+        />
+        <div className="flex flex-row items-center justify-between gap-1 py-1">
           <Autocomplete
-            size="md"
+            size="sm"
             variant="bordered"
             placeholder="Выберите персонажа"
             aria-label="characters"
@@ -562,6 +578,7 @@ export default function Tickets() {
             ))}
           </Autocomplete>
           <Button
+            size="sm"
             className="w-10 min-w-10 p-1"
             variant="light"
             color="warning"
@@ -573,6 +590,7 @@ export default function Tickets() {
             <FaTimes size={24} />
           </Button>
           <Button
+            size="sm"
             className="w-10 min-w-10 p-1"
             variant="solid"
             color="warning"
@@ -586,6 +604,7 @@ export default function Tickets() {
             <FaStopwatch size={24} />
           </Button>
           <Button
+            size="sm"
             className="w-10 min-w-10 p-1"
             variant="solid"
             color="danger"
@@ -601,6 +620,7 @@ export default function Tickets() {
         </div>
         <Button
           variant="bordered"
+          size="sm"
           color="warning"
           isDisabled={!char}
           className={`h-10 min-h-10 w-full items-center gap-2 rounded-lg bg-red-950 p-2 md:hidden`}
@@ -611,9 +631,9 @@ export default function Tickets() {
         >
           <p className="text-sm font-semibold">Новая заявка</p>
         </Button>
-        <div className="flex h-full max-h-[calc(100svh-372px)] flex-row gap-2 pt-2 md:max-h-[calc(100svh-300px)]">
+        <div className="flex h-full max-h-[calc(100svh-375px)] flex-row gap-1 pt-2 md:max-h-[calc(100svh-300px)]">
           <div className="flex w-full flex-col gap-2 overflow-y-auto md:hidden">
-            {tickets
+            {filteredTickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -641,7 +661,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {tickets
+            {filteredTickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -668,7 +688,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {tickets
+            {filteredTickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) && t.isResolved,
@@ -707,7 +727,7 @@ export default function Tickets() {
             >
               <p className="text-sm font-semibold">Новая заявка</p>
             </Button>
-            {tickets
+            {filteredTickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -734,7 +754,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {tickets
+            {filteredTickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -760,7 +780,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {tickets
+            {filteredTickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) && t.isResolved,
