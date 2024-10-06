@@ -2,6 +2,7 @@ import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import {
   Modal,
+  Input,
   ModalContent,
   ModalBody,
   Button,
@@ -19,15 +20,18 @@ import QRScanner from "~/components/QRScanner";
 
 export default function CharQRCode({ char }: { char: Character }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [manualCode, setManualCode] = useState("");
   const [scannedChar, setScannedChar] = useState<Character>();
   const { data: chars, isLoading: charsLoading } = api.char.getAll.useQuery();
   const { mutate: applyCoupon } = api.util.applyCoupon.useMutation();
 
   useEffect(() => {
-    if (!charsLoading)
+    if (!charsLoading) {
+      const code = char.id + "-" + Date.now();
+      // setCurrentCode(code);
       QRCode.toCanvas(
         document.getElementById("canvas"),
-        char.id + "-" + Date.now(),
+        code,
         {
           width: 256,
           margin: 1,
@@ -36,9 +40,12 @@ export default function CharQRCode({ char }: { char: Character }) {
           if (error) console.error(error);
         },
       );
+    }
   }, [char, charsLoading]);
 
   const handleScanSuccess = (decodedText: string) => {
+    const charId = decodedText.split("-")[0];
+    const timecode = decodedText.split("-")[1];
     if (decodedText.includes("http")) {
       window.location.href = decodedText;
       return;
@@ -51,14 +58,9 @@ export default function CharQRCode({ char }: { char: Character }) {
       alert("QR-код пуст");
       return;
     }
-    const charId = decodedText.split("-")[0];
-    const timecode = decodedText.split("-")[1];
-    if (!charId) {
-      alert("Отсутствует ID персонажа");
-      return;
-    }
     if (!timecode) {
-      alert("Отсутствует таймкод");
+      alert("Отсутствует таймкод. Перевожу на страницу предметов.");
+      window.location.href = `https://vtm.su/qr/${decodedText}`;
       return;
     }
     const diffMs = Date.now() - Number(timecode);
@@ -112,6 +114,25 @@ export default function CharQRCode({ char }: { char: Character }) {
               onScanSuccess={handleScanSuccess}
               onScanError={(e) => console.error(e)}
             />
+            <div className="mx-auto flex w-1/2 flex-row items-center justify-between gap-2">
+              <Input
+                size="sm"
+                variant="underlined"
+                label="Ввести вручную"
+                value={manualCode}
+                onValueChange={setManualCode}
+              />
+              <Button
+                size="sm"
+                variant="light"
+                onClick={() => {
+                  if (!manualCode) return;
+                  handleScanSuccess(manualCode);
+                }}
+              >
+                <FaQrcode size={24} /> Проверить
+              </Button>
+            </div>
             {!!scannedChar && (
               <div className="flex w-full flex-col">
                 <p>Информация о персонаже {scannedChar.name}:</p>
@@ -119,11 +140,13 @@ export default function CharQRCode({ char }: { char: Character }) {
                   {char.alive
                     ? char.bloodAmount === 0 || char.health === 0
                       ? "Торпор"
-                      : "Персонаж нежив"
-                    : "Финальная смерть"}
+                      : ""
+                    : "Погиб"}
                 </p>
-                {!!isHacker && <p>{scannedChar.hackerData}</p>}
-                {!!hasAnimalism && <p>{scannedChar.animalismData}</p>}
+                {!!isHacker && <p>{`Хакер: "${scannedChar.hackerData}"`}</p>}
+                {!!hasAnimalism && (
+                  <p>{`Анимализм: "${scannedChar.animalismData}"`}</p>
+                )}
                 {!!hasAuspex && (
                   <div className="flex w-full flex-col">
                     Эффекты персонажа в ауре:
@@ -142,6 +165,7 @@ export default function CharQRCode({ char }: { char: Character }) {
         </ModalContent>
       </Modal>
       <canvas id="canvas" className="mx-auto"></canvas>
+      {/* <p className="mx-auto max-w-64 text-center text-sm">{currentCode}</p> */}
       <Button
         onClick={() => {
           setScannedChar(undefined);

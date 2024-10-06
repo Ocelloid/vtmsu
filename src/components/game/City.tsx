@@ -10,7 +10,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PiMapPinFill } from "react-icons/pi";
 import {
   GiFactory,
@@ -63,6 +63,7 @@ export default function City({
     api.city.lookUpGeoPoint.useMutation();
   const { mutate: applyGeoPoint, isPending: isUseGeoPointPending } =
     api.city.applyGeoPoint.useMutation();
+  // const { mutate: updateLocation } = api.util.updateLocation.useMutation();
 
   const [items, setItems] = useState<Item[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -84,6 +85,54 @@ export default function City({
   const [geoContainers, setGeoContainers] = useState<GeoPointContainers[]>([]);
 
   const isExperienced = char?.features?.some((f) => f.featureId === 9) ?? false;
+
+  const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Initial location update
+    const sendLocationUpdate = () => {
+      try {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          console.log(pos.coords);
+          // updateLocation(
+          //   {
+          //     x: pos.coords.longitude,
+          //     y: pos.coords.latitude,
+          //     charId: char.id,
+          //   },
+          //   {
+          //     onSuccess: (e) => {
+          //       if (e?.message) alert(e.message);
+          //     },
+          //   },
+          // );
+        });
+      } catch (error) {
+        console.error("Error sending location update:", error);
+      }
+    };
+
+    navigator.geolocation.getCurrentPosition((pos) => {
+      console.log(pos.coords);
+      // updateLocation({
+      //   x: pos.coords.longitude,
+      //   y: pos.coords.latitude,
+      //   charId: char.id,
+      // }, {
+      //   onSuccess: (e) => {
+      //     if (e?.message) alert(e.message);
+      //   },
+      // });
+    });
+
+    // Send location updates every minute
+    intervalIdRef.current = setInterval(sendLocationUpdate, 60000);
+
+    // Cleanup function to clear the interval when the component unmounts
+    return () => {
+      if (intervalIdRef.current !== null) clearInterval(intervalIdRef.current);
+    };
+  }, [char.id]);
 
   const handleLookAround = () => {
     navigator.geolocation.getCurrentPosition((pos) => {

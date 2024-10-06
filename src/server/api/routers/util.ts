@@ -150,6 +150,28 @@ export type Donator = {
 };
 
 export const utilRouter = createTRPCRouter({
+  // updateLocation: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       x: z.number(),
+  //       y: z.number(),
+  //       charId: z.number(),
+  //     }),
+  //   )
+  //   .mutation(async ({ ctx, input }) => {
+  //     const char = await ctx.db.char.findUnique({
+  //       where: { id: input.charId },
+  //       include: { features: { include: { feature: true } } },
+  //     });
+  //     if (!char) return { message: "Персонаж не найден" };
+  //     await ctx.db.char.update({
+  //       where: { charId: input.charId },
+  //       data: {
+  //         coordX: input.x,
+  //         coordY: input.y,
+  //       },
+  //     });
+  //   }),
   getTopDonate: publicProcedure.query(async ({ ctx }) => {
     const transactions = await ctx.db.transaction.findMany({
       where: { accountToAddress: "58400810" },

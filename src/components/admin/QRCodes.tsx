@@ -12,16 +12,20 @@ export default function QRCodes() {
     isLoading: isItemListLoading,
     refetch: refetchItemList,
   } = api.item.getAll.useQuery();
-  const generateQRCode = (url: string) => {
-    QRCode.toDataURL(url, { width: 1024, margin: 2 }, (err, url) => {
-      if (err) throw err;
-      const aEl = document.createElement("a");
-      aEl.href = url;
-      aEl.download = "QR_Code.png";
-      document.body.appendChild(aEl);
-      aEl.click();
-      document.body.removeChild(aEl);
-    });
+  const generateQRCode = (address: string) => {
+    QRCode.toDataURL(
+      `https://vtm.su/qr/${address}`,
+      { width: 1024, margin: 2 },
+      (err) => {
+        if (err) throw err;
+        const aEl = document.createElement("a");
+        aEl.href = `https://vtm.su/qr/${address}`;
+        aEl.download = `${address}.png`;
+        document.body.appendChild(aEl);
+        aEl.click();
+        document.body.removeChild(aEl);
+      },
+    );
   };
   if (isItemListLoading) return <LoadingPage />;
 
@@ -46,9 +50,7 @@ export default function QRCodes() {
                 size="sm"
                 variant="light"
                 className="w-10 min-w-10"
-                onClick={() =>
-                  generateQRCode(`https://vtm.su/qr/${item.address}`)
-                }
+                onClick={() => generateQRCode(item.address ?? "no-address")}
               >
                 <FaDownload />
               </Button>
