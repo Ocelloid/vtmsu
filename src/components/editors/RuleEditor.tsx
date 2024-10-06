@@ -74,7 +74,7 @@ const RuleEditor = ({ onSubmit }: { onSubmit: (rule?: Rule) => void }) => {
       content: content,
       editorProps: {
         attributes: {
-          class: "min-h-[calc(100vh-18rem)]",
+          class: "min-h-[calc(100svh-18rem)]",
         },
       },
     },

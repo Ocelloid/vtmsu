@@ -84,7 +84,7 @@ export default function Container() {
     return <LoadingPage />;
   if (!sessionData)
     return (
-      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
+      <div className="flex h-[100svh] w-[100vw] items-center justify-center">
         Войдите, чтобы увидеть эту страницу
       </div>
     );
@@ -96,7 +96,7 @@ export default function Container() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-[calc(100vh-1.5rem)] flex-col pt-24">
+      <main className=" flex min-h-[calc(100svh-1.5rem)] flex-col pt-24">
         <div className="container flex flex-col gap-2 px-4">
           {!!myCharacterData && (
             <Select

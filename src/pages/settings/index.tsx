@@ -179,13 +179,13 @@ export default function Settings() {
   if (isUserLoading) return <LoadingPage />;
   if (!sessionData)
     return (
-      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
+      <div className="flex h-[100svh] w-[100vw] items-center justify-center">
         Войдите, чтобы увидеть эту страницу
       </div>
     );
   if (!userData)
     return (
-      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
+      <div className="flex h-[100svh] w-[100vw] items-center justify-center">
         Что-то пошло не так
       </div>
     );
@@ -206,7 +206,7 @@ export default function Settings() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className={`${isChanged ? "mb-36 min-h-[calc(100vh-9rem)]" : "min-h-[calc(100vh-1.5rem)]"} flex  flex-1 flex-col sm:pb-4`}
+        className={`${isChanged ? "mb-36 min-h-[calc(100svh-9rem)]" : "min-h-[calc(100svh-1.5rem)]"} flex  flex-1 flex-col sm:pb-4`}
       >
         <div
           className={`${isChanged ? "bottom-0 z-20" : "-bottom-36 opacity-0"} fixed inset-x-0 h-36 w-full bg-black/75`}

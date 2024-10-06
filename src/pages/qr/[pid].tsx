@@ -80,7 +80,7 @@ export default function QRPage() {
         <meta name="description" content="Маскарад Вампиров" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className=" flex min-h-[calc(100vh-1.5rem)] flex-col pt-24">
+      <main className=" flex min-h-[calc(100svh-1.5rem)] flex-col pt-24">
         <div className="container flex flex-col gap-2 px-4">
           {!!myCharacterData && (
             <Select

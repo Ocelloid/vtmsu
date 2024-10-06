@@ -32,7 +32,7 @@ export default function Shop() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
-      <main className="flex min-h-[calc(100vh-1.5rem)] flex-1 flex-col pt-24">
+      <main className="flex min-h-[calc(100svh-1.5rem)] flex-1 flex-col pt-24">
         <p className="mx-auto px-4">
           Раздел находится в разработке - товары ненастоящие, это только пример
           того, как они могут выглядеть.

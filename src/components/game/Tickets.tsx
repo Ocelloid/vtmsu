@@ -136,8 +136,8 @@ export default function Tickets({ char }: { char: Character }) {
               <div
                 className={`flex flex-col-reverse gap-2 ${
                   selectedTicket?.isResolved
-                    ? "max-h-[calc(100vh-140px)]"
-                    : "max-h-[calc(100vh-240px)]"
+                    ? "max-h-[calc(100svh-140px)]"
+                    : "max-h-[calc(100svh-240px)]"
                 } overflow-y-auto`}
               >
                 {messages?.map((m) => (
@@ -279,7 +279,7 @@ export default function Tickets({ char }: { char: Character }) {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <div className="flex h-full max-h-[calc(100vh-176px)] flex-row gap-2 py-2">
+      <div className="flex h-full max-h-[calc(100svh-176px)] flex-row gap-2 py-2">
         <div className="flex w-full flex-col-reverse gap-2 overflow-y-auto md:hidden">
           <Button
             variant="bordered"
@@ -337,7 +337,7 @@ export default function Tickets({ char }: { char: Character }) {
               </Button>
             ))}
         </div>
-        <div className="hidden max-h-[calc(100vh-296px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
+        <div className="hidden max-h-[calc(100svh-296px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
           <Button
             variant="bordered"
             color="warning"
@@ -395,8 +395,8 @@ export default function Tickets({ char }: { char: Character }) {
           <div
             className={`${
               selectedTicket?.isResolved
-                ? "max-h-[calc(100vh-112px) sm:max-h-[calc(100vh-320px)]"
-                : "max-h-[calc(100vh-176px)] sm:max-h-[calc(100vh-400px)]"
+                ? "max-h-[calc(100svh-112px) sm:max-h-[calc(100svh-320px)]"
+                : "max-h-[calc(100svh-176px)] sm:max-h-[calc(100svh-400px)]"
             } flex h-full w-full flex-col-reverse gap-2 overflow-y-auto`}
           >
             {messages?.map((m) => (

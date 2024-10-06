@@ -34,7 +34,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <meta name="mailru-domain" content="IIqVAA964y7KF7LL" />
       </Head>
-      <main className=" mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-4xl flex-col items-center justify-center">
+      <main className=" mx-auto flex min-h-[calc(100svh-1.5rem)] max-w-4xl flex-col items-center justify-center">
         <div className="container flex flex-col items-center justify-center gap-4 px-4 pt-24 text-justify">
           <h1 className="flex flex-col items-center justify-center text-5xl font-extrabold tracking-tight sm:text-[5rem]">
             Маскарад

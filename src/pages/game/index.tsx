@@ -135,13 +135,13 @@ export default function Game() {
 
   if (!sessionData)
     return (
-      <div className="flex h-[100vh] w-[100vw] items-center justify-center">
+      <div className="flex h-[100svh] w-[100vw] items-center justify-center">
         Войдите, чтобы увидеть эту страницу
       </div>
     );
   if (!myCharacterData?.filter((c) => c.verified).length)
     return (
-      <div className="flex h-[100vh] w-[100vw] flex-col items-center justify-center">
+      <div className="flex h-[100svh] w-[100vw] flex-col items-center justify-center">
         <Link href="/characters/new">Сначала&nbsp;создайте&nbsp;персонажа</Link>
         и дождитесь верификации
       </div>
@@ -287,7 +287,7 @@ export default function Game() {
                     placement="bottom"
                     classNames={{
                       panel:
-                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-216px)] sm:max-h-[calc(100vh-316px)]",
+                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100svh-216px)] sm:max-h-[calc(100svh-316px)]",
                       tab: "p-1 w-min",
                       tabList:
                         "w-full justify-between rounded-none rounded-t-lg mx-2 ",
@@ -408,7 +408,7 @@ export default function Game() {
                     placement="bottom"
                     classNames={{
                       panel:
-                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-216px)]",
+                        "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100svh-216px)]",
                       tab: "p-1 w-min",
                       tabList:
                         "w-full justify-between rounded-none rounded-t-lg mx-2 ",

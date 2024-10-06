@@ -18,7 +18,7 @@ export default function ProductPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CartDrawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick} />
-      <main className="flex min-h-[calc(100vh-1.5rem)] flex-1 flex-col py-24">
+      <main className="flex min-h-[calc(100svh-1.5rem)] flex-1 flex-col py-24">
         <div className="container flex flex-col gap-12">
           <p className="mx-auto px-4">
             Раздел находится в разработке - товары ненастоящие, это только
