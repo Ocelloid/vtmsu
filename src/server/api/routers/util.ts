@@ -430,7 +430,7 @@ export const utilRouter = createTRPCRouter({
       if (!ticket) return;
       return ctx.db.ticket.update({
         where: { id: input.ticketId },
-        data: { isResolved: true },
+        data: { isResolved: !ticket.isResolved },
         include: { character: { include: { faction: true, clan: true } } },
       });
     }),

@@ -1,8 +1,6 @@
 "use client";
 import {
   Button,
-  Select,
-  SelectItem,
   Autocomplete,
   AutocompleteItem,
   Input,
