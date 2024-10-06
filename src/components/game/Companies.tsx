@@ -375,18 +375,22 @@ function CompanyForm({
                   Баланс предприятия:{" "}
                   {companyData?.BankAccount[0]?.balance ?? 0} ОВ
                 </p>
-                <p>
-                  Стоимость повышения уровня предприятия:{" "}
-                  {(companyData?.level ?? 0) * 960 - 480} ОВ
-                </p>
-                <Button
-                  onClick={handleUpgrade}
-                  variant="light"
-                  color="warning"
-                  isDisabled={isUpgradePending}
-                >
-                  <FaArrowUp size={16} /> Улучшить предприятие
-                </Button>
+                {!!companyData?.isActive && (
+                  <p>
+                    Стоимость повышения уровня предприятия:{" "}
+                    {(companyData?.level ?? 0) * 960 - 480} ОВ
+                  </p>
+                )}
+                {!!companyData?.isActive && (
+                  <Button
+                    onClick={handleUpgrade}
+                    variant="light"
+                    color="warning"
+                    isDisabled={isUpgradePending}
+                  >
+                    <FaArrowUp size={16} /> Улучшить предприятие
+                  </Button>
+                )}
               </>
             )}
             <Input
