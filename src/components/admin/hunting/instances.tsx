@@ -199,7 +199,7 @@ const Instances = () => {
           </ModalHeader>
           <ModalBody className="flex flex-col">
             <Image
-              className="mx-auto mt-1 aspect-square h-[196px] w-full rounded-md object-cover"
+              className="mx-auto mt-1 aspect-square h-[196px] w-full rounded-md object-scale-down"
               alt="char_photo"
               src={
                 !!targets.find((t) => t.id === targetId)?.image
