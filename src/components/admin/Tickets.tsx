@@ -203,8 +203,10 @@ export default function Tickets() {
 
   const filteredTickets = tickets?.filter(
     (t) =>
-      t.name.includes(search) ||
-      t.messages?.some((m) => m.content.includes(search)),
+      t.name.toLowerCase().includes(search.toLowerCase()) ||
+      t.Message?.some((m) =>
+        m.content?.toLowerCase().includes(search.toLowerCase()),
+      ),
   );
 
   const formatDate = (date: Date) => {

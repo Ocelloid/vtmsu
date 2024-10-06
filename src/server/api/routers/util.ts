@@ -41,13 +41,13 @@ export type Ticket = {
   player?: User;
   createdAt: Date;
   updatedAt: Date;
-  messages?: Message[];
+  Message?: Message[];
 };
 
 export type Message = {
   id: number;
   ticketId: number;
-  content: string;
+  content: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
