@@ -121,6 +121,7 @@ export default function Tickets() {
           onClose();
           setNewMessage("");
           void refetchMessages();
+          void refetchTickets();
         },
       },
     );

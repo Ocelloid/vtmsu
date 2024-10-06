@@ -133,14 +133,14 @@ export default function Tickets({ char }: { char: Character }) {
             {!selectedTicket ? "Новая заявка" : selectedTicket.name}
           </ModalHeader>
           <ModalBody>
-            <div className="flex h-full w-full flex-col gap-2">
-              <div
-                className={`${
-                  selectedTicket?.isResolved
-                    ? "max-h-[calc(100vh-140px)]"
-                    : "max-h-[calc(100vh-240px)]"
-                } flex flex-col-reverse gap-2 overflow-y-auto`}
-              >
+            <div
+              className={`${
+                selectedTicket?.isResolved
+                  ? "max-h-[calc(100vh-140px)]"
+                  : "max-h-[calc(100vh-240px)]"
+              } flex h-full w-full flex-col gap-2`}
+            >
+              <div className={` flex flex-col-reverse gap-2 overflow-y-auto`}>
                 {messages?.map((m) => (
                   <div
                     key={m.id}
