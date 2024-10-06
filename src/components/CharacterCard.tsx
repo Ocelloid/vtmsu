@@ -42,6 +42,8 @@ const CharacterCard = ({
     else return undefined;
   });
 
+  const defaultIcon = theme === "light" ? factions._ankh : factions._ankh_white;
+
   const iconSelection = [...factionSelection, ...clanSelection].filter(
     (x) => x !== undefined,
   );
@@ -113,7 +115,7 @@ const CharacterCard = ({
                   src={
                     iconSelection.find(
                       (is) => is!.value === character.faction?.icon,
-                    )?.image ?? ""
+                    )?.image ?? defaultIcon
                   }
                   width={32}
                   height={32}
@@ -130,7 +132,7 @@ const CharacterCard = ({
                   src={
                     iconSelection.find(
                       (is) => is!.value === character.clan?.icon,
-                    )?.image ?? ""
+                    )?.image ?? defaultIcon
                   }
                   width={32}
                   height={32}

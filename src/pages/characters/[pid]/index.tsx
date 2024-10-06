@@ -12,8 +12,8 @@ import {
   Button,
   useDisclosure,
   Divider,
-  Select,
-  SelectItem,
+  Autocomplete,
+  AutocompleteItem,
   Checkbox,
 } from "@nextui-org/react";
 import {
@@ -337,18 +337,22 @@ const CharacterSheet = ({
               >
                 {isFixed ? "Запрещено" : "Разрешено"} редактирование персонажа
               </Checkbox>
-              <Select
+              <Autocomplete
                 label="Игрок"
                 variant="underlined"
                 placeholder="Выберите игрока"
                 className="w-full"
-                selectedKeys={selectedPlayer ? [selectedPlayer.toString()] : []}
-                onChange={(e) => {
-                  handlePlayerChange(e.target.value);
+                selectedKey={selectedPlayer}
+                onSelectionChange={(e) => {
+                  if (!!e) handlePlayerChange(e.toString());
                 }}
               >
                 {playersData.map((p) => (
-                  <SelectItem key={p.id} value={p.id} textValue={p.name ?? ""}>
+                  <AutocompleteItem
+                    key={p.id}
+                    value={p.id}
+                    textValue={p.name ?? ""}
+                  >
                     <div className="flex flex-col gap-1">
                       <div className="text-small dark:text-red-100">
                         {p.name}
@@ -361,14 +365,14 @@ const CharacterSheet = ({
                           height={128}
                           width={128}
                         />
-                        <div className="whitespace-normal text-tiny dark:text-red-100">
+                        <span className="whitespace-normal text-tiny dark:text-red-100">
                           {p.email}
-                        </div>
+                        </span>
                       </div>
                     </div>
-                  </SelectItem>
+                  </AutocompleteItem>
                 ))}
-              </Select>
+              </Autocomplete>
             </div>
           )}
           {!!isAdmin && receivedComment && (
