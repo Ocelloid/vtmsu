@@ -332,7 +332,7 @@ export default function Inventory({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <div className="grid max-h-[calc(100vh-256px)] grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((item) => (
           <div
             key={item.id}
@@ -359,35 +359,35 @@ export default function Inventory({
             />
           </div>
         ))}
-      </div>
-      <div className="flex flex-row justify-between gap-2">
-        <Button
-          variant="faded"
-          color="primary"
-          className="w-full sm:w-auto"
-          onClick={onDropOpen}
-          isDisabled={!inHand.length}
-        >
-          Сбросить
-        </Button>
-        <Button
-          variant="faded"
-          color="danger"
-          className="w-full sm:w-auto"
-          onClick={onBleedOpen}
-          isDisabled={(char.bloodAmount ?? 0) < 2}
-        >
-          Слить
-        </Button>
-        <Button
-          variant="faded"
-          color="warning"
-          className="w-full sm:w-auto"
-          onClick={onTradeOpen}
-          isDisabled={!inHand.length}
-        >
-          Передать
-        </Button>
+        <div className="flex flex-row justify-between gap-2">
+          <Button
+            variant="faded"
+            color="primary"
+            className="w-full sm:w-auto"
+            onClick={onDropOpen}
+            isDisabled={!inHand.length}
+          >
+            Сбросить
+          </Button>
+          <Button
+            variant="faded"
+            color="danger"
+            className="w-full sm:w-auto"
+            onClick={onBleedOpen}
+            isDisabled={(char.bloodAmount ?? 0) < 2}
+          >
+            Слить
+          </Button>
+          <Button
+            variant="faded"
+            color="warning"
+            className="w-full sm:w-auto"
+            onClick={onTradeOpen}
+            isDisabled={!inHand.length}
+          >
+            Передать
+          </Button>
+        </div>
       </div>
     </div>
   );
