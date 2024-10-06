@@ -136,27 +136,29 @@ export default function City({
   // }, [char.id]);
 
   const handleLookAround = () => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      lookAround(
-        {
-          x: pos.coords.longitude,
-          y: pos.coords.latitude,
-          charId: char.id,
-        },
-        {
-          onSuccess: (e) => {
-            onOpen();
-            if (!!e.message) alert(e.message);
-            if (!!e.availableItems) setItems(e.availableItems);
-            if (!!e.availableCompanies) setCompanies(e.availableCompanies);
-            if (!!e.availableHuntingInstances)
-              setHuntingInstances(e.availableHuntingInstances);
-            if (!!e.availableViolations) setViolations(e.availableViolations);
-            if (!!e.availableGeoPoints) setGeoPoints(e.availableGeoPoints);
+    if (!!window && !!window.navigator && !!window.navigator.geolocation)
+      window.navigator.geolocation.getCurrentPosition((pos) => {
+        lookAround(
+          {
+            x: pos.coords.longitude,
+            y: pos.coords.latitude,
+            charId: char.id,
           },
-        },
-      );
-    });
+          {
+            onSuccess: (e) => {
+              onOpen();
+              if (!!e.message) alert(e.message);
+              if (!!e.availableItems) setItems(e.availableItems);
+              if (!!e.availableCompanies) setCompanies(e.availableCompanies);
+              if (!!e.availableHuntingInstances)
+                setHuntingInstances(e.availableHuntingInstances);
+              if (!!e.availableViolations) setViolations(e.availableViolations);
+              if (!!e.availableGeoPoints) setGeoPoints(e.availableGeoPoints);
+            },
+          },
+        );
+      });
+    else alert("Геолокация не активна в вашем браузере");
   };
 
   const handleAttack = (instance: HuntingInstance) => {
@@ -455,191 +457,206 @@ export default function City({
           <ModalHeader>Осмотреться</ModalHeader>
           <ModalBody className="flex max-h-[80vh] flex-col gap-2 overflow-y-auto">
             Вы видите рядом с собой...
-            {violations.map((violation) => (
-              <div
-                key={violation.id + "_violation"}
-                className="flex flex-col gap-1"
-              >
-                <div className="flex flex-row items-center gap-1 text-lg">
-                  <GiChalkOutlineMurder size={32} className="min-w-8" />
-                  <div className="flex flex-col gap-0">
-                    {violation.target?.name ?? "Нарушение маскарада"}
-                    <div className="text-justify text-sm">
-                      {
-                        violation.target?.descs![
-                          violation.target?.descs!.length - violation.remains!
-                        ]!.content
-                      }
-                    </div>
-                  </div>
-                </div>
-                <div className={"flex flex-row justify-between gap-1"}>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="w-full"
-                    isDisabled={isInvestigatePending || lookAroundPending}
-                    onClick={() => handleInvestigate(violation)}
-                  >
-                    Расследовать
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="w-full"
-                    isDisabled={isCoverUpPending || lookAroundPending}
-                    onClick={() => handleCoverUp(violation)}
-                  >
-                    Прикрыть
-                  </Button>
-                </div>
-              </div>
-            ))}
-            {!!violations.length && <Divider />}
-            {geoPoints.map((geoPoint) => (
-              <div
-                key={geoPoint.id + "_geoPoint"}
-                className="flex flex-col gap-1"
-              >
-                <div className="flex flex-row items-center gap-1 text-lg">
-                  <PiMapPinFill size={32} className="min-w-8" />
-                  <div className="flex flex-col gap-0">
-                    {geoPoint.name}
-                    <div
-                      className="text-justify text-sm"
-                      dangerouslySetInnerHTML={{
-                        __html: geoPoint.content ?? "",
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className={"flex flex-row justify-between gap-1"}>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="w-full"
-                    isDisabled={isLookUpGeoPointPending}
-                    onClick={() => handleLookUpGeoPoint(geoPoint)}
-                  >
-                    Посмотреть
-                  </Button>
-                </div>
-              </div>
-            ))}
-            {!!geoPoints.length && <Divider />}
-            {huntingInstances.map((instance) => (
-              <div
-                key={instance.id + "_instance"}
-                className="flex flex-col gap-1"
-              >
-                <div className="flex flex-row items-center gap-1 text-lg">
-                  <GiHumanTarget
-                    size={32}
-                    className="min-w-8"
-                    color={isExperienced ? "warning" : undefined}
-                  />
-                  <div className="flex flex-col gap-0">
-                    {instance.target?.name ?? "Цель для охоты"}
-                    <div className="text-justify text-sm">
-                      {
-                        instance.target?.descs![
-                          instance.target?.descs!.length - instance.remains!
-                        ]!.content
-                      }
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  isDisabled={isHuntPending || lookAroundPending}
-                  onClick={() => handleAttack(instance)}
+            {!!violations &&
+              violations.map((violation) => (
+                <div
+                  key={(violation?.id ?? "") + "_violation"}
+                  className="flex flex-col gap-1"
                 >
-                  Охота
-                </Button>
-              </div>
-            ))}
-            {!!huntingInstances.length && <Divider />}
-            {items.map((item) => (
-              <div key={item.id + "_item"} className="flex flex-col gap-1">
-                <div className="flex flex-row items-center gap-1 text-lg">
-                  <GiCardboardBoxClosed size={32} className="min-w-8" />
-                  <div className="flex flex-col gap-0">
-                    {item.name}
-                    <div
-                      className="text-justify text-sm"
-                      dangerouslySetInnerHTML={{ __html: item.content ?? "" }}
-                    />
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  isDisabled={collectItemPending || lookAroundPending}
-                  onClick={() => handleCollectItem(item)}
-                >
-                  Подобрать
-                </Button>
-              </div>
-            ))}
-            {!!items.length && <Divider />}
-            {companies.map((company) => (
-              <div
-                key={company.id + "_company"}
-                className="flex flex-col gap-1"
-              >
-                <div className="flex flex-row items-center gap-1 text-lg">
-                  {company.isActive ? (
-                    <GiFactory size={32} className="min-w-8" />
-                  ) : (
-                    <FcFactoryBreakdown size={32} className="min-w-8" />
-                  )}
-                  <div className="flex flex-col gap-0">
-                    {company.name}
-                    <div className="text-justify text-sm">
-                      Владелец: {company.character?.name}
+                  <div className="flex flex-row items-center gap-1 text-lg">
+                    <GiChalkOutlineMurder size={32} className="min-w-8" />
+                    <div className="flex flex-col gap-0">
+                      {violation?.target?.name ?? "Нарушение маскарада"}
+                      <div className="text-justify text-sm">
+                        {violation?.target?.descs?.[
+                          (violation.target?.descs?.length ?? 0) -
+                            (violation?.remains ?? 0)
+                        ]?.content ?? ""}
+                      </div>
                     </div>
                   </div>
-                </div>
-                {company.character?.id !== char.id && (
                   <div className={"flex flex-row justify-between gap-1"}>
-                    {company.isActive && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="w-full"
-                        isDisabled={isToggleActivePending || lookAroundPending}
-                        onClick={() => handleSabotage(company)}
-                      >
-                        Саботаж
-                      </Button>
-                    )}
                     <Button
                       size="sm"
                       variant="ghost"
                       className="w-full"
-                      isDisabled={isRacketPending || lookAroundPending}
-                      onClick={() => handleRacket(company)}
+                      isDisabled={isInvestigatePending || lookAroundPending}
+                      onClick={() => handleInvestigate(violation)}
                     >
-                      Рэкет
+                      Расследовать
                     </Button>
-                  </div>
-                )}
-                {company.character?.id === char.id && !company.isActive && (
-                  <div className={"flex flex-col"}>
                     <Button
                       size="sm"
-                      color="primary"
                       variant="ghost"
-                      isDisabled={isToggleActivePending || lookAroundPending}
-                      onClick={() => handleSabotage(company)}
+                      className="w-full"
+                      isDisabled={isCoverUpPending || lookAroundPending}
+                      onClick={() => handleCoverUp(violation)}
                     >
-                      Восстановить
+                      Прикрыть
                     </Button>
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              ))}
+            {!!violations?.length && <Divider />}
+            {!!geoPoints &&
+              geoPoints.map((geoPoint) => (
+                <div
+                  key={(geoPoint?.id ?? "") + "_geoPoint"}
+                  className="flex flex-col gap-1"
+                >
+                  <div className="flex flex-row items-center gap-1 text-lg">
+                    <PiMapPinFill size={32} className="min-w-8" />
+                    <div className="flex flex-col gap-0">
+                      {geoPoint?.name}
+                      <div
+                        className="text-justify text-sm"
+                        dangerouslySetInnerHTML={{
+                          __html: geoPoint?.content ?? "",
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className={"flex flex-row justify-between gap-1"}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="w-full"
+                      isDisabled={isLookUpGeoPointPending}
+                      onClick={() => handleLookUpGeoPoint(geoPoint)}
+                    >
+                      Посмотреть
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            {!!geoPoints?.length && <Divider />}
+            {!!huntingInstances &&
+              huntingInstances?.map((instance) => (
+                <div
+                  key={(instance?.id ?? "") + "_instance"}
+                  className="flex flex-col gap-1"
+                >
+                  <div className="flex flex-row items-center gap-1 text-lg">
+                    <GiHumanTarget
+                      size={32}
+                      className="min-w-8"
+                      color={isExperienced ? "warning" : undefined}
+                    />
+                    <div className="flex flex-col gap-0">
+                      {instance?.target?.name ?? "Цель для охоты"}
+                      <div className="text-justify text-sm">
+                        {
+                          instance?.target?.descs?.[
+                            (instance.target?.descs?.length ?? 0) -
+                              (instance?.remains ?? 0)
+                          ]?.content
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    isDisabled={isHuntPending || lookAroundPending}
+                    onClick={() => handleAttack(instance)}
+                  >
+                    Охота
+                  </Button>
+                </div>
+              ))}
+            {!!huntingInstances?.length && <Divider />}
+            {!!items &&
+              items.map((item) => (
+                <div
+                  key={(item?.id ?? "") + "_item"}
+                  className="flex flex-col gap-1"
+                >
+                  <div className="flex flex-row items-center gap-1 text-lg">
+                    <GiCardboardBoxClosed size={32} className="min-w-8" />
+                    <div className="flex flex-col gap-0">
+                      {item?.name}
+                      <div
+                        className="text-justify text-sm"
+                        dangerouslySetInnerHTML={{
+                          __html: item?.content ?? "",
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    isDisabled={collectItemPending || lookAroundPending}
+                    onClick={() => handleCollectItem(item)}
+                  >
+                    Подобрать
+                  </Button>
+                </div>
+              ))}
+            {!!items?.length && <Divider />}
+            {!!companies &&
+              companies.map((company) => (
+                <div
+                  key={(company?.id ?? "") + "_company"}
+                  className="flex flex-col gap-1"
+                >
+                  <div className="flex flex-row items-center gap-1 text-lg">
+                    {company?.isActive ? (
+                      <GiFactory size={32} className="min-w-8" />
+                    ) : (
+                      <FcFactoryBreakdown size={32} className="min-w-8" />
+                    )}
+                    <div className="flex flex-col gap-0">
+                      {company?.name}
+                      <div className="text-justify text-sm">
+                        Владелец: {company?.character?.name}
+                      </div>
+                    </div>
+                  </div>
+                  {company?.character?.id !== char.id && (
+                    <div className={"flex flex-row justify-between gap-1"}>
+                      {company?.isActive && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="w-full"
+                          isDisabled={
+                            isToggleActivePending || lookAroundPending
+                          }
+                          onClick={() => handleSabotage(company)}
+                        >
+                          Саботаж
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-full"
+                        isDisabled={isRacketPending || lookAroundPending}
+                        onClick={() => handleRacket(company)}
+                      >
+                        Рэкет
+                      </Button>
+                    </div>
+                  )}
+                  {company?.character?.id === char?.id &&
+                    !company?.isActive && (
+                      <div className={"flex flex-col"}>
+                        <Button
+                          size="sm"
+                          color="primary"
+                          variant="ghost"
+                          isDisabled={
+                            isToggleActivePending || lookAroundPending
+                          }
+                          onClick={() => handleSabotage(company)}
+                        >
+                          Восстановить
+                        </Button>
+                      </div>
+                    )}
+                </div>
+              ))}
           </ModalBody>
           <ModalFooter className="flex flex-col justify-between">
             <Button onClick={onClose} variant="faded" size="sm">
