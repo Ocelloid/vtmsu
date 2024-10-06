@@ -395,7 +395,7 @@ export default function Tickets() {
                     className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
                   >
                     <div className="flex w-full flex-row">
-                      <div className="flex w-full flex-col text-sm">
+                      <div className="flex w-full flex-col whitespace-pre-wrap text-sm">
                         <p className="flex w-full flex-col text-lg">
                           {m.isAdmin ? "Рассказчик:" : char?.name + ":"}
                         </p>

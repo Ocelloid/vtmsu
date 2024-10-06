@@ -154,6 +154,24 @@ export default function Tickets({ char }: { char: Character }) {
                   Заявка закрыта
                 </p>
               )}
+              {!selectedTicket && (
+                <>
+                  <Input
+                    value={newName}
+                    color="warning"
+                    onChange={(e) => setNewName(e.target.value)}
+                    variant="underlined"
+                    label="Название заявки"
+                    placeholder="Введите название заявки"
+                  />
+                  {tooManyTickets && (
+                    <p className="text-sm text-danger dark:text-warning">
+                      У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
+                      открытых заявок
+                    </p>
+                  )}
+                </>
+              )}
               {!selectedTicket?.isResolved && (
                 <div className="flex flex-row items-center gap-2">
                   <Textarea
@@ -244,7 +262,7 @@ export default function Tickets({ char }: { char: Character }) {
                     className="flex flex-col rounded-lg border-2 border-red-700/50 p-2"
                   >
                     <div className="flex w-full flex-row">
-                      <div className="flex w-full flex-col text-sm">
+                      <div className="flex w-full flex-col whitespace-pre-wrap text-sm">
                         <p className="flex w-full flex-col text-lg">
                           {m.isAdmin ? "Рассказчик:" : char?.name + ":"}
                         </p>
@@ -257,24 +275,6 @@ export default function Tickets({ char }: { char: Character }) {
                   </div>
                 ))}
               </div>
-              {!selectedTicket && (
-                <>
-                  <Input
-                    value={newName}
-                    color="warning"
-                    onChange={(e) => setNewName(e.target.value)}
-                    variant="underlined"
-                    label="Название заявки"
-                    placeholder="Введите название заявки"
-                  />
-                  {tooManyTickets && (
-                    <p className="text-sm text-danger dark:text-warning">
-                      У вас не может быть больше {appData?.ticketsLimit ?? 0}{" "}
-                      открытых заявок
-                    </p>
-                  )}
-                </>
-              )}
             </div>
           </ModalBody>
         </ModalContent>
