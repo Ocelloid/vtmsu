@@ -539,7 +539,7 @@ export default function City({
                   {!!instance?.target?.image && (
                     <Image
                       src={instance?.target?.image}
-                      className="ml-auto aspect-square h-full w-full border-2 border-success object-cover sm:max-w-96"
+                      className={`mx-auto aspect-square h-full w-full rounded-t-xl object-cover sm:max-w-96`}
                       height={256}
                       width={256}
                       alt="hunting-image"
