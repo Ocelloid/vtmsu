@@ -247,7 +247,7 @@ export default function Game() {
                 defaultSelectedKey={"vamp"}
                 classNames={{
                   panel:
-                    "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100vh-176px)]",
+                    "py-0 mb-auto overflow-y-auto h-full max-h-[calc(100svh-176px)]",
                   tab: "h-8 p-0 w-full overflow-hidden overflow-y-hidden",
                   tabList: "w-full justify-between",
                   wrapper: "flex-grow",
