@@ -536,7 +536,7 @@ export default function CharacterEditor() {
               {(!isLocalhost || isAdmin) && (
                 <div className="flex flex-col gap-1">
                   <Input
-                    placeholder="Вставьте ссылку на фото"
+                    placeholder="Введите ссылку на фото - воспользуйтесь imgBB например"
                     {...register("image", {
                       required:
                         "Скопируйте ссылку на изображение и вставьте её здесь",

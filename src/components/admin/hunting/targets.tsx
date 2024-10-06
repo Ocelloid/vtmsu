@@ -192,7 +192,7 @@ const Targets = () => {
                   value={image}
                   onValueChange={setImage}
                   label="Фото добычи"
-                  placeholder="Введите ссылку на фото"
+                  placeholder="Введите ссылку на фото - воспользуйтесь imgBB например"
                 />
               )}
             </div>
