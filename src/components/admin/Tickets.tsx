@@ -895,7 +895,10 @@ export default function Tickets() {
                     {isCloseTicketPending ? (
                       <LoadingSpinner width={24} height={24} />
                     ) : (
-                      <FaCheck size={24} />
+                      <FaCheck
+                        size={24}
+                        color={selectedTicket.isResolved ? "danger" : "success"}
+                      />
                     )}
                   </Button>
                 )}
