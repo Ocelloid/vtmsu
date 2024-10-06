@@ -93,6 +93,28 @@ const CouponForm = ({
       { enabled: !!editId && isOpen },
     );
 
+  useEffect(() => {
+    if (!!couponData) {
+      setName(couponData?.name ?? "");
+      setContent(couponData?.content ?? "");
+      setAddress(couponData?.address ?? "");
+      setUsage(couponData?.usage ?? 0);
+      setFeatureIds(couponData?.CouponFeature.map((a) => a.featureId) ?? []);
+      setAbilityIds(couponData?.CouponAbility.map((a) => a.abilityId) ?? []);
+      setRitualIds(couponData?.CouponRitual.map((a) => a.ritualId) ?? []);
+      setKnowledgeIds(
+        couponData?.CouponKnowledge.map((a) => a.knowledgeId) ?? [],
+      );
+      setEffectIds(couponData?.CouponEffect.map((a) => a.effectId) ?? []);
+      setBankAccountIds(
+        couponData?.CouponBankAccount.map((a) => a.bankAccountId) ?? [],
+      );
+      setCompanyIds(couponData?.CouponCompany.map((a) => a.companyId) ?? []);
+      setItemTypeIds(couponData?.CouponItemType.map((a) => a.itemTypeId) ?? []);
+      setItemIds(couponData?.CouponItem.map((a) => a.itemId) ?? []);
+    }
+  }, [couponData]);
+
   const resetForm = () => {
     setName("");
     setContent("");
