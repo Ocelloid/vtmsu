@@ -126,6 +126,10 @@ const Targets = () => {
 
   if (isTargetsLoading) return <LoadingPage />;
 
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
   return (
     <>
       <Modal
@@ -162,26 +166,35 @@ const Targets = () => {
                   width="440"
                 />
               )}
-              <UploadButton
-                content={{
-                  button: (
-                    <>
-                      <FaImage size={16} className="ml-2" />
-                      <p className="hidden text-sm sm:flex">{`Фото (до 4 Мб)`}</p>
-                    </>
-                  ),
-                  allowedContent: "Изображение (1 Мб)",
-                }}
-                className="absolute bottom-2 left-1/2 z-20 mx-auto mt-2 h-8 w-full max-w-[160px] -translate-x-1/2 cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
-                endpoint="imageUploader"
-                onUploadBegin={() => {
-                  setUploading(true);
-                }}
-                onClientUploadComplete={(res) => {
-                  setImage(res[0]?.url ?? "");
-                  setUploading(false);
-                }}
-              />
+              {isLocalhost ? (
+                <UploadButton
+                  content={{
+                    button: (
+                      <>
+                        <FaImage size={16} className="ml-2" />
+                        <p className="hidden text-sm sm:flex">{`Фото (до 4 Мб)`}</p>
+                      </>
+                    ),
+                    allowedContent: "Изображение (1 Мб)",
+                  }}
+                  className="absolute bottom-2 left-1/2 z-20 mx-auto mt-2 h-8 w-full max-w-[160px] -translate-x-1/2 cursor-pointer text-white [&>div]:hidden [&>div]:text-sm [&>label>svg]:mr-1 [&>label]:w-full [&>label]:min-w-[84px] [&>label]:flex-1 [&>label]:rounded-medium [&>label]:border-2 [&>label]:border-white [&>label]:bg-transparent [&>label]:focus-within:ring-0 [&>label]:hover:bg-white/25"
+                  endpoint="imageUploader"
+                  onUploadBegin={() => {
+                    setUploading(true);
+                  }}
+                  onClientUploadComplete={(res) => {
+                    setImage(res[0]?.url ?? "");
+                    setUploading(false);
+                  }}
+                />
+              ) : (
+                <Input
+                  value={image}
+                  onValueChange={setImage}
+                  label="Фото добычи"
+                  placeholder="Введите ссылку на фото"
+                />
+              )}
             </div>
             <Input
               variant="underlined"
