@@ -204,9 +204,7 @@ export default function Tickets() {
   const filteredTickets = tickets?.filter(
     (t) =>
       t.name.includes(search) ||
-      t.messages?.some(
-        (m) => m.content.includes(search) || m.name.includes(search),
-      ),
+      t.messages?.some((m) => m.content.includes(search)),
   );
 
   const formatDate = (date: Date) => {
