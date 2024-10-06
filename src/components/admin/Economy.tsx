@@ -1,6 +1,7 @@
 import { Tabs, Tab } from "@nextui-org/react";
 import BankAccounts from "./economy/BankAccounts";
 import Companies from "./economy/Companies";
+import Transactions from "./Transactions";
 
 export default function Economy() {
   return (
@@ -37,6 +38,16 @@ export default function Economy() {
         }
       >
         <Companies />
+      </Tab>
+      <Tab
+        key={"transactions"}
+        title={
+          <div className="flex items-center space-x-2">
+            <span>Переводы</span>
+          </div>
+        }
+      >
+        <Transactions />
       </Tab>
     </Tabs>
   );

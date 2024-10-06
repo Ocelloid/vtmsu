@@ -40,6 +40,8 @@ export type BankAccount = {
 
 export type Transaction = {
   id: number;
+  accountFromAddress: string;
+  accountToAddress: string;
   accountFromId: number;
   accountToId: number;
   amount: number;
@@ -210,6 +212,53 @@ export const econRouter = createTRPCRouter({
           },
         },
       });
+    }),
+
+  getAllTransactions: protectedProcedure
+    .input(
+      z.object({
+        accountFromAddress: z.string().optional(),
+        accountToAddress: z.string().optional(),
+        characterFromId: z.number().optional(),
+        characterToId: z.number().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const allAccounts = await ctx.db.bankAccount.findMany({
+        include: { character: true },
+      });
+      const transactions = await ctx.db.transaction.findMany({
+        where: {
+          OR: [
+            { accountFromId: { in: allAccounts.map((a) => a.id) } },
+            { accountToId: { in: allAccounts.map((a) => a.id) } },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      return transactions
+        .map((t) => ({
+          ...t,
+          characterFrom: allAccounts.find((a) => a.id === t.accountFromId)
+            ?.character,
+          characterTo: allAccounts.find((a) => a.id === t.accountToId)
+            ?.character,
+        }))
+        .filter(
+          (t) =>
+            (input.accountFromAddress
+              ? t.accountFromAddress === input.accountFromAddress
+              : true) &&
+            (input.accountToAddress
+              ? t.accountToAddress === input.accountToAddress
+              : true) &&
+            (input.characterFromId
+              ? (t.characterFrom?.id ?? 0) === input.characterFromId
+              : true) &&
+            (input.characterToId
+              ? (t.characterTo?.id ?? 0) === input.characterToId
+              : true),
+        );
     }),
 
   transferByAddress: protectedProcedure

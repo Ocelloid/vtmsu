@@ -18,6 +18,7 @@ import ForceEffects from "~/components/admin/ForceEffects";
 import Containers from "~/components/admin/Containers";
 import GeoPoints from "~/components/admin/items/GeoPoints";
 import Coupons from "~/components/admin/items/Coupons";
+import Transactions from "~/components/admin/Transactions";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -251,14 +252,14 @@ export default function Admin() {
                   <Tickets />
                 </Tab>
                 <Tab
-                  key={"controls"}
+                  key={"transactions"}
                   title={
                     <div className="flex items-center space-x-2">
-                      <span>Контроль</span>
+                      <span>Переводы</span>
                     </div>
                   }
                 >
-                  <Controls />
+                  <Transactions />
                 </Tab>
                 <Tab
                   key={"force_effects"}
@@ -269,6 +270,16 @@ export default function Admin() {
                   }
                 >
                   <ForceEffects />
+                </Tab>
+                <Tab
+                  key={"controls"}
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Контроль</span>
+                    </div>
+                  }
+                >
+                  <Controls />
                 </Tab>
               </Tabs>
             </Tab>
