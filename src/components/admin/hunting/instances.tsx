@@ -3,6 +3,8 @@ import {
   Button,
   Select,
   SelectItem,
+  Autocomplete,
+  AutocompleteItem,
   Input,
   Modal,
   ModalBody,
@@ -215,25 +217,29 @@ const Instances = () => {
               value={expires}
               onChange={setExpires}
             />
-            <Select
+            <Autocomplete
               size="sm"
-              variant="underlined"
+              variant="bordered"
               placeholder="Выберите добычу"
-              aria-label="Добыча"
-              selectedKeys={[targetId ?? 0]}
-              onChange={(e) => setTargetId(Number(e.target.value))}
+              aria-label="characters"
+              className="w-full rounded-sm"
+              selectedKey={targetId ? targetId.toString() : undefined}
+              onSelectionChange={(e) => {
+                const targetId = Number(e);
+                setTargetId(targetId);
+              }}
             >
               {targets.map((target) => (
-                <SelectItem
-                  key={target.id ?? ""}
-                  value={target.id}
+                <AutocompleteItem
+                  key={target.id?.toString() ?? ""}
+                  value={target.id?.toString() ?? ""}
                   textValue={target.name}
                 >
                   <p>{target.name}</p>
                   <p className="text-xs">{target.descs![0]!.content}</p>
-                </SelectItem>
+                </AutocompleteItem>
               ))}
-            </Select>
+            </Autocomplete>
           </ModalBody>
           <ModalFooter>
             <Button

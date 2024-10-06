@@ -857,72 +857,70 @@ export default function Tickets() {
                 Заявка закрыта
               </p>
             )}
-            {!selectedTicket?.isResolved && (
-              <div className="flex flex-row items-center gap-2">
-                <Textarea
-                  maxRows={3}
-                  color="warning"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.ctrlKey && event.key === "Enter") {
-                      event.preventDefault(); // Prevent default newline behavior
-                      if (
-                        !(
-                          (tooManyTickets && !selectedTicket) ||
-                          isNewTicketPending ||
-                          isPending ||
-                          !newMessage ||
-                          (!newName && !selectedTicket)
-                        )
-                      ) {
-                        if (!selectedTicket) handleAddTicket();
-                        else handleSendMessage();
-                      }
+            <div className="flex flex-row items-center gap-2">
+              <Textarea
+                maxRows={3}
+                color="warning"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(event) => {
+                  if (event.ctrlKey && event.key === "Enter") {
+                    event.preventDefault(); // Prevent default newline behavior
+                    if (
+                      !(
+                        (tooManyTickets && !selectedTicket) ||
+                        isNewTicketPending ||
+                        isPending ||
+                        !newMessage ||
+                        (!newName && !selectedTicket)
+                      )
+                    ) {
+                      if (!selectedTicket) handleAddTicket();
+                      else handleSendMessage();
                     }
-                  }}
-                  variant="underlined"
-                  label="Сообщение"
-                  placeholder="Введите сообщение"
-                />
-                <div className="flex h-full flex-col gap-2">
-                  {!!selectedTicket && (
-                    <Button
-                      variant="light"
-                      color="warning"
-                      className="text-md h-full min-w-10 text-black dark:text-warning"
-                      onClick={() => handleCloseTicket()}
-                    >
-                      {isCloseTicketPending ? (
-                        <LoadingSpinner width={24} height={24} />
-                      ) : (
-                        <FaCheck size={24} />
-                      )}
-                    </Button>
-                  )}
+                  }
+                }}
+                variant="underlined"
+                label="Сообщение"
+                placeholder="Введите сообщение"
+              />
+              <div className="flex h-full flex-col gap-2">
+                {!!selectedTicket && (
                   <Button
                     variant="light"
                     color="warning"
                     className="text-md h-full min-w-10 text-black dark:text-warning"
-                    isDisabled={
-                      isNewTicketPending ||
-                      isPending ||
-                      !newMessage ||
-                      (!newName && !selectedTicket)
-                    }
-                    onClick={() =>
-                      !!selectedTicket ? handleSendMessage() : handleAddTicket()
-                    }
+                    onClick={() => handleCloseTicket()}
                   >
-                    {isNewTicketPending || isPending ? (
+                    {isCloseTicketPending ? (
                       <LoadingSpinner width={24} height={24} />
                     ) : (
-                      <MdSend size={24} />
+                      <FaCheck size={24} />
                     )}
                   </Button>
-                </div>
+                )}
+                <Button
+                  variant="light"
+                  color="warning"
+                  className="text-md h-full min-w-10 text-black dark:text-warning"
+                  isDisabled={
+                    isNewTicketPending ||
+                    isPending ||
+                    !newMessage ||
+                    (!newName && !selectedTicket)
+                  }
+                  onClick={() =>
+                    !!selectedTicket ? handleSendMessage() : handleAddTicket()
+                  }
+                >
+                  {isNewTicketPending || isPending ? (
+                    <LoadingSpinner width={24} height={24} />
+                  ) : (
+                    <MdSend size={24} />
+                  )}
+                </Button>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
