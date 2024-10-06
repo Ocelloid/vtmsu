@@ -451,7 +451,7 @@ export const econRouter = createTRPCRouter({
         data: { isActive: !company.isActive },
       });
 
-      if (company.isActive)
+      if (company.isActive) {
         await ctx.db.ticket.create({
           data: {
             name: "Саботаж предприятия",
@@ -464,6 +464,37 @@ export const econRouter = createTRPCRouter({
             },
           },
         });
+        const huntData = await ctx.db.huntingData.create({
+          data: {
+            name: "Погром",
+            descs: {
+              createMany: {
+                data: [
+                  {
+                    content:
+                      "Разбитые витрины, сломанная мебель, горящие машины и прочие следы насилия",
+                  },
+                ],
+              },
+            },
+          },
+        });
+        const newInstance = await ctx.db.huntingInstance.create({
+          data: {
+            coordX: company.coordX,
+            coordY: company.coordY,
+            targetId: huntData.id,
+          },
+        });
+        await ctx.db.hunt.create({
+          data: {
+            instanceId: newInstance.id,
+            characterId: input.charId,
+            createdById: ctx.session.user.id,
+            status: "masq_failure",
+          },
+        });
+      }
 
       return {
         message: company.isActive

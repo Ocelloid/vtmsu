@@ -325,18 +325,20 @@ export default function City({
               <p>Вам удалось узнать следующее:</p>
             )}
             {!!auspexData && (
-              <p className="text-justify text-sm">{auspexData}</p>
+              <p className="text-justify text-sm">{`Прорицание: "${auspexData}"`}</p>
             )}
             {!!animalismData && (
-              <p className="text-justify text-sm">{animalismData}</p>
+              <p className="text-justify text-sm">
+                {`Анимализм: "${animalismData}"`}
+              </p>
             )}
             {!!hackerData && (
-              <p className="text-justify text-sm">{hackerData}</p>
+              <p className="text-justify text-sm">{`Хакерство: "${hackerData}"`}</p>
             )}
             {!!hackerImage && (
               <Image
                 src={hackerImage}
-                className="aspect-square h-full w-full max-w-80 border-2 border-success object-cover sm:max-w-96"
+                className="ml-auto aspect-square h-full w-full border-2 border-success object-cover sm:max-w-96"
                 height={8}
                 width={8}
                 quality={(violationId % 25) + 25}
