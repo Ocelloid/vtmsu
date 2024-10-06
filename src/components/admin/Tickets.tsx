@@ -59,7 +59,7 @@ export default function Tickets() {
 
   const { data: appData } = api.util.getAppData.useQuery();
   const { data: ticketsData, refetch: refetchTickets } =
-    api.util.getAllTickets.useQuery(undefined, { refetchInterval: 60000 });
+    api.util.getAllTickets.useQuery({ search }, { refetchInterval: 60000 });
   const { data: messages, refetch: refetchMessages } =
     api.util.getMessagesByTicketId.useQuery(
       { ticketId: selectedTicket?.id ?? 0 },
@@ -200,14 +200,6 @@ export default function Tickets() {
       },
     );
   };
-
-  const filteredTickets = tickets?.filter(
-    (t) =>
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.Message?.some((m) =>
-        m.content?.toLowerCase().includes(search.toLowerCase()),
-      ),
-  );
 
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, "0");
@@ -633,7 +625,7 @@ export default function Tickets() {
         </Button>
         <div className="flex h-full max-h-[calc(100svh-375px)] flex-row gap-1 pt-2 md:max-h-[calc(100svh-300px)]">
           <div className="flex w-full flex-col gap-2 overflow-y-auto md:hidden">
-            {filteredTickets
+            {tickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -661,7 +653,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {filteredTickets
+            {tickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -688,7 +680,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {filteredTickets
+            {tickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) && t.isResolved,
@@ -727,7 +719,7 @@ export default function Tickets() {
             >
               <p className="text-sm font-semibold">Новая заявка</p>
             </Button>
-            {filteredTickets
+            {tickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -754,7 +746,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {filteredTickets
+            {tickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) &&
@@ -780,7 +772,7 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
-            {filteredTickets
+            {tickets
               ?.filter(
                 (t) =>
                   (!!char ? t.characterId === char?.id : true) && t.isResolved,

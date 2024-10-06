@@ -307,21 +307,36 @@ export const utilRouter = createTRPCRouter({
       });
     }),
 
-  getAllTickets: protectedProcedure.query(async ({ ctx }) => {
-    const tickets = await ctx.db.ticket.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        character: { include: { faction: true, clan: true } },
-        Message: true,
-      },
-    });
-    const players = await ctx.db.user.findMany();
-    return tickets.map((t) => ({
-      ...t,
-      player: players.find((p) => p.id === t.character.playerId),
-      isAnswered: t.Message[t.Message.length - 1]?.isAdmin ?? false,
-    }));
-  }),
+  getAllTickets: protectedProcedure
+    .input(z.object({ search: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const tickets = await ctx.db.ticket.findMany({
+        orderBy: { createdAt: "desc" },
+        include: {
+          character: { include: { faction: true, clan: true } },
+          Message: true,
+        },
+      });
+      const filteredTickets = tickets?.filter(
+        (t) =>
+          t.name.toLowerCase().includes(input.search.toLowerCase()) ||
+          t.Message?.some((m) =>
+            m.content?.toLowerCase().includes(input.search.toLowerCase()),
+          ),
+      );
+      const players = await ctx.db.user.findMany();
+      return filteredTickets.map((t) => ({
+        id: t.id,
+        name: t.name,
+        characterId: t.characterId,
+        isResolved: t.isResolved,
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt,
+        character: t.character,
+        player: players.find((p) => p.id === t.character.playerId),
+        isAnswered: t.Message[t.Message.length - 1]?.isAdmin ?? false,
+      }));
+    }),
   getMessagesByTicketId: protectedProcedure
     .input(z.object({ ticketId: z.number() }))
     .query(async ({ ctx, input }) => {
