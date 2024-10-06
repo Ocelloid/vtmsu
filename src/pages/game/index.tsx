@@ -263,7 +263,7 @@ export default function Game() {
                       href="/characters"
                     >
                       <FaArrowLeft size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         Назад
                       </span>
                     </Link>
@@ -275,7 +275,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <CgShapeRhombus size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         Вампиризм
                       </span>
                     </div>
@@ -298,7 +298,7 @@ export default function Game() {
                       key="disciplines"
                       title={
                         <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                          <span className="text-lg font-semibold">
+                          <span className="text-md font-semibold">
                             Дисциплины
                           </span>
                         </div>
@@ -312,7 +312,7 @@ export default function Game() {
                         key="ogham"
                         title={
                           <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                            <span className="text-lg font-semibold">Охам</span>
+                            <span className="text-md font-semibold">Охам</span>
                           </div>
                         }
                         className="flex flex-col gap-2"
@@ -324,7 +324,7 @@ export default function Game() {
                       key="rituals"
                       title={
                         <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                          <span className="text-lg font-semibold">Ритуалы</span>
+                          <span className="text-md font-semibold">Ритуалы</span>
                         </div>
                       }
                       className="flex flex-col gap-2"
@@ -340,7 +340,7 @@ export default function Game() {
                       <div className="rounded-full border-2 border-red-900 p-0.5 dark:border-red-700">
                         <CgInfinity size={14} />
                       </div>
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         Эффекты
                       </span>
                     </div>
@@ -354,7 +354,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <FaMap size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         Город
                       </span>
                     </div>
@@ -368,7 +368,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <GiLightBackpack size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         Предметы
                       </span>
                     </div>
@@ -382,7 +382,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <FaShoppingBasket size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         Магазин
                       </span>
                     </div>
@@ -396,7 +396,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <GiMoneyStack size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         Бизнес
                       </span>
                     </div>
@@ -419,7 +419,7 @@ export default function Game() {
                       key="companies"
                       title={
                         <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                          <span className="text-lg font-semibold">
+                          <span className="text-md font-semibold">
                             Предприятия
                           </span>
                         </div>
@@ -432,7 +432,7 @@ export default function Game() {
                       key="accounts"
                       title={
                         <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
-                          <span className="text-lg font-semibold">Счета</span>
+                          <span className="text-md font-semibold">Счета</span>
                         </div>
                       }
                       className="flex flex-col gap-2"
@@ -462,7 +462,7 @@ export default function Game() {
                         }}
                       >
                         <IoMdChatboxes size={24} />
-                        <span className="hidden text-lg font-bold lg:flex">
+                        <span className="text-md hidden font-bold lg:flex">
                           Заявки
                         </span>
                       </Badge>
@@ -477,7 +477,7 @@ export default function Game() {
                   title={
                     <div className="flex flex-row items-center gap-1 text-red-900 dark:text-red-700">
                       <FaQrcode size={24} />
-                      <span className="hidden text-lg font-bold lg:flex">
+                      <span className="text-md hidden font-bold lg:flex">
                         QR-код
                       </span>
                     </div>

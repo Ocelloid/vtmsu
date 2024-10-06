@@ -12,7 +12,6 @@ import {
   ModalHeader,
   ModalContent,
   ModalBody,
-  ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
 import { LoadingSpinner } from "../Loading";
@@ -133,14 +132,14 @@ export default function Tickets({ char }: { char: Character }) {
             {!selectedTicket ? "Новая заявка" : selectedTicket.name}
           </ModalHeader>
           <ModalBody>
-            <div
-              className={`${
-                selectedTicket?.isResolved
-                  ? "max-h-[calc(100vh-140px)]"
-                  : "max-h-[calc(100vh-240px)]"
-              } flex h-full w-full flex-col gap-2`}
-            >
-              <div className={` flex flex-col-reverse gap-2 overflow-y-auto`}>
+            <div className={`flex h-full w-full flex-col gap-2`}>
+              <div
+                className={`flex flex-col-reverse gap-2 ${
+                  selectedTicket?.isResolved
+                    ? "max-h-[calc(100vh-140px)]"
+                    : "max-h-[calc(100vh-240px)]"
+                } overflow-y-auto`}
+              >
                 {messages?.map((m) => (
                   <div
                     key={m.id}
