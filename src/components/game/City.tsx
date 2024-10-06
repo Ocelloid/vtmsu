@@ -536,6 +536,15 @@ export default function City({
                   key={(instance?.id ?? "") + "_instance"}
                   className="flex flex-col gap-1"
                 >
+                  {!!instance?.target?.image && (
+                    <Image
+                      src={instance?.target?.image}
+                      className="ml-auto aspect-square h-full w-full border-2 border-success object-cover sm:max-w-96"
+                      height={256}
+                      width={256}
+                      alt="hunting-image"
+                    />
+                  )}
                   <div className="flex flex-row items-center gap-1 text-lg">
                     <GiHumanTarget
                       size={32}
