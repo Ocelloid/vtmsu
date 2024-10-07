@@ -13,6 +13,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import QRCode from "qrcode";
+import type { Container } from "~/server/api/routers/item";
 
 export default function Containers() {
   const {
@@ -31,12 +32,13 @@ export default function Containers() {
     void refetchContainers();
   };
 
-  const generateQRCode = (url: string) => {
+  const generateQRCode = (container: Container) => {
+    const url = `https://vtm.su/container/${container.id}`;
     QRCode.toDataURL(url, { width: 1024, margin: 2 }, (err, url) => {
       if (err) throw err;
       const aEl = document.createElement("a");
       aEl.href = url;
-      aEl.download = "QR_Code.png";
+      aEl.download = `${container.name}.png`;
       document.body.appendChild(aEl);
       aEl.click();
       document.body.removeChild(aEl);
@@ -61,9 +63,7 @@ export default function Containers() {
               size="sm"
               variant="light"
               className="w-10 min-w-10"
-              onClick={() =>
-                generateQRCode(`https://vtm.su/container/${container.id}`)
-              }
+              onClick={() => generateQRCode(container)}
             >
               <FaDownload />
             </Button>
