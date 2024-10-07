@@ -241,6 +241,11 @@ const CharacterTraits = () => {
                 <p className="whitespace-break-spaces text-sm">
                   {trait.content}
                 </p>
+                {cs.type === "Ritual" && (
+                  <p className="whitespace-break-spaces pt-2 text-sm">
+                    Рецепт: {(trait as Ritual).recipe}
+                  </p>
+                )}
               </div>
             ))}
           </div>

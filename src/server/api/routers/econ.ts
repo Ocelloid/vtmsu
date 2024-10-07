@@ -486,14 +486,21 @@ export const econRouter = createTRPCRouter({
       if (!character) return { message: "Не найден персонаж" };
       if (!character.bankAccount.length)
         return { message: "Не найден счет для персонажа" };
-
-      if (
-        (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
-        company.level * 960 - 480
-      )
+      const accountToUse = character.bankAccount.sort((a, b) => a.id - b.id)[0];
+      if ((accountToUse?.balance ?? 0) < company.level * 960 - 480)
         return {
-          message: `Недостаточно средств на счёте ${character.bankAccount.sort((a, b) => a.id - b.id)[0]?.address}`,
+          message: `Недостаточно средств на счёте ${accountToUse?.address}`,
         };
+      else {
+        await ctx.db.bankAccount.update({
+          where: {
+            id: accountToUse?.id,
+          },
+          data: {
+            balance: (accountToUse?.balance ?? 0) - company.level * 960 - 480,
+          },
+        });
+      }
 
       await ctx.db.company.update({
         where: { id: company.id },
@@ -575,13 +582,21 @@ export const econRouter = createTRPCRouter({
       if (!character.bankAccount.length)
         return { message: "Не найден счет для персонажа" };
 
-      if (
-        (character.bankAccount.sort((a, b) => a.id - b.id)[0]?.balance ?? 0) <
-        (company.level - 1) * 3840 + 1920
-      )
+      const accountToUse = character.bankAccount.sort((a, b) => a.id - b.id)[0];
+      if ((accountToUse?.balance ?? 0) < company.level * 3840 + 1920)
         return {
-          message: `Недостаточно средств на счёте ${character.bankAccount.sort((a, b) => a.id - b.id)[0]?.address}`,
+          message: `Недостаточно средств на счёте ${accountToUse?.address}`,
         };
+      else {
+        await ctx.db.bankAccount.update({
+          where: {
+            id: accountToUse?.id,
+          },
+          data: {
+            balance: (accountToUse?.balance ?? 0) - company.level * 3840 + 1920,
+          },
+        });
+      }
 
       await ctx.db.ticket.create({
         data: {
