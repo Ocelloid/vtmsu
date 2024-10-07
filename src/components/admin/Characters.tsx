@@ -17,6 +17,7 @@ import CharacterCard from "~/components/CharacterCard";
 export default function Characters() {
   const router = useRouter();
   const { data: sessionData } = useSession();
+  const [noPic, setNoPic] = useState(false);
   const [chars, setChars] = useState<Character[]>([]);
   const [knowledgeIds, setKnowledgeIds] = useState<number[]>([]);
   const [knowledges, setKnowledges] = useState<Knowledge[]>([]);
@@ -77,7 +78,7 @@ export default function Characters() {
     )
     .filter((c) =>
       !!hasNightmares
-        ? c.features?.find((f) => f.feature?.name === "Кошмары")
+        ? c.features?.find((f) => f.feature?.name.includes("Кошмары"))
         : true,
     );
 
@@ -100,24 +101,32 @@ export default function Characters() {
           <FaPlus />
           Добавить
         </Button>
-        {/* <p className="hidden justify-end py-1 sm:flex xl:col-span-1">Поиск:</p> */}
         <Checkbox
           isSelected={hasNightmares}
           onValueChange={setHasNightmares}
+          className="w-full min-w-20"
           color="warning"
         >
           Кошмары
         </Checkbox>
+        <Checkbox
+          isSelected={noPic}
+          onValueChange={setNoPic}
+          color="warning"
+          className="w-full min-w-20"
+        >
+          Без фото
+        </Checkbox>
         <Input
           size="sm"
           variant="bordered"
-          className="min-w-24 max-w-80"
+          className="w-full min-w-20"
           aria-label="Имя"
           placeholder="Имя"
           value={name}
           onValueChange={setName}
         />
-        <div className="flex w-full min-w-64 flex-row gap-2">
+        <div className="flex w-full min-w-48 flex-row gap-2">
           <Select
             size="sm"
             variant="bordered"
@@ -165,59 +174,62 @@ export default function Characters() {
             ))}
           </Select>
         </div>
-        <Select
-          size="sm"
-          variant="bordered"
-          placeholder="Дополнения"
-          aria-label="Дополнения"
-          selectionMode="multiple"
-          selectedKeys={featureIds.map((f) => f.toString())}
-          onChange={(e) => {
-            setFeatureIds(
-              !!e.target.value
-                ? e.target.value.split(",").map((s) => Number(s))
-                : [],
-            );
-          }}
-        >
-          {features.map((feature) => (
-            <SelectItem
-              key={feature.id}
-              value={feature.id}
-              textValue={feature.name}
-            >
-              {feature.name}
-            </SelectItem>
-          ))}
-        </Select>
-        <Select
-          size="sm"
-          variant="bordered"
-          placeholder="Знания"
-          aria-label="Знания"
-          selectionMode="multiple"
-          selectedKeys={knowledgeIds.map((f) => f.toString())}
-          onChange={(e) => {
-            setKnowledgeIds(
-              !!e.target.value
-                ? e.target.value.split(",").map((s) => Number(s))
-                : [],
-            );
-          }}
-        >
-          {knowledges.map((knowledge) => (
-            <SelectItem
-              key={knowledge.id}
-              value={knowledge.id}
-              textValue={knowledge.name}
-            >
-              {knowledge.name}
-            </SelectItem>
-          ))}
-        </Select>
+        <div className="flex w-full min-w-48 flex-row gap-2">
+          <Select
+            size="sm"
+            variant="bordered"
+            placeholder="Дополнения"
+            aria-label="Дополнения"
+            selectionMode="multiple"
+            selectedKeys={featureIds.map((f) => f.toString())}
+            onChange={(e) => {
+              setFeatureIds(
+                !!e.target.value
+                  ? e.target.value.split(",").map((s) => Number(s))
+                  : [],
+              );
+            }}
+          >
+            {features.map((feature) => (
+              <SelectItem
+                key={feature.id}
+                value={feature.id}
+                textValue={feature.name}
+              >
+                {feature.name}
+              </SelectItem>
+            ))}
+          </Select>
+          <Select
+            size="sm"
+            variant="bordered"
+            placeholder="Знания"
+            aria-label="Знания"
+            selectionMode="multiple"
+            selectedKeys={knowledgeIds.map((f) => f.toString())}
+            onChange={(e) => {
+              setKnowledgeIds(
+                !!e.target.value
+                  ? e.target.value.split(",").map((s) => Number(s))
+                  : [],
+              );
+            }}
+          >
+            {knowledges.map((knowledge) => (
+              <SelectItem
+                key={knowledge.id}
+                value={knowledge.id}
+                textValue={knowledge.name}
+              >
+                {knowledge.name}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
       </div>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {filteredSorted
+          .filter((c) => !c.image || !noPic)
           .filter((c) => !c.verified && c.pending)
           .map((char) => (
             <CharacterCard
@@ -235,6 +247,7 @@ export default function Characters() {
             />
           ))}
         {filteredSorted
+          .filter((c) => !c.image || !noPic)
           .filter((c) => !c.verified && !c.pending)
           .map((char) => (
             <CharacterCard
@@ -252,6 +265,7 @@ export default function Characters() {
             />
           ))}
         {filteredSorted
+          .filter((c) => !c.image || !noPic)
           .filter((c) => c.verified)
           .map((char) => (
             <CharacterCard

@@ -22,6 +22,13 @@ const DynamicHunts = dynamic(() => import("~/components/admin/hunting/hunts"), {
   ssr: false,
 });
 
+const DynamicLookAround = dynamic(
+  () => import("~/components/admin/hunting/lookAround"),
+  {
+    ssr: false,
+  },
+);
+
 const Hunting = () => {
   return (
     <>
@@ -91,6 +98,17 @@ const Hunting = () => {
           }
         >
           <DynamicHunts />
+        </Tab>
+        <Tab
+          key={"lookaround"}
+          className="flex flex-col gap-8 md:gap-2"
+          title={
+            <div className="flex items-center space-x-2">
+              <span>Осмотреться</span>
+            </div>
+          }
+        >
+          <DynamicLookAround />
         </Tab>
       </Tabs>
     </>
