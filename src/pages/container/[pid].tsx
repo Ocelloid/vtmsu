@@ -2,29 +2,8 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import type { Container } from "~/server/api/routers/item";
-import {
-  DndContext,
-  DragOverlay,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  type DragStartEvent,
-  type DragEndEvent,
-  type DragOverEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  rectSwappingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-} from "@dnd-kit/sortable";
-import { createPortal } from "react-dom";
-import { CSS } from "@dnd-kit/utilities";
-import { useEffect, useState, useMemo, type ReactNode } from "react";
-import { Button, Select, SelectItem } from "@nextui-org/react";
+import { useEffect, useState } from "react";
+import { Button, Select, SelectItem, Checkbox } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { LoadingPage } from "~/components/Loading";
 import Image from "next/image";
@@ -160,30 +139,7 @@ function Inventory({
       data: Item;
     }>
   >([]);
-  const itemsIds = useMemo(() => items.map((item) => item.id), [items]);
-  const [activeItem, setActiveItem] = useState<{
-    id: number;
-    name: string;
-    description: string;
-    box: number;
-    data: Item;
-  } | null>(null);
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 150,
-        tolerance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
+  const [inHand, setInHand] = useState<number[]>([]);
 
   const { mutate: takeItemsFromContainer, isPending: isTakeItemsPending } =
     api.item.takeItemsFromContainer.useMutation();
@@ -216,86 +172,31 @@ function Inventory({
       );
   }, [container.Item]);
 
-  const handleDragStart = (e: DragStartEvent) => {
-    if (e.active.data.current?.type === "item") {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      setActiveItem(e.active.data.current.item);
-      return;
-    }
-  };
-
-  const handleDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
-    if (!over) return;
-    if (active.id === over.id) return;
-    setItems((items) => {
-      const activeItemIndex = items.findIndex((item) => item.id === active.id);
-      const overItemIndex = items.findIndex((item) => item.id === over.id);
-      return arrayMove(items, activeItemIndex, overItemIndex);
-    });
-    setActiveItem(null);
-  };
-
-  const handleDragOver = (e: DragOverEvent) => {
-    const { active, over } = e;
-    if (!over) return;
-    if (active.id === over.id) return;
-    const isActiveCard = active.data.current?.type === "item";
-    const isOverItem = over.data.current?.type === "item";
-    const isOverBox = over.data.current?.type === "box";
-    if (!isActiveCard) return;
-
-    if (isActiveCard && isOverItem) {
-      setItems((items) => {
-        const activeItemIndex = items.findIndex(
-          (item) => item.id === active.id,
-        );
-        const overItemIndex = items.findIndex((item) => item.id === over.id);
-        items[activeItemIndex]!.box = items[overItemIndex]!.box;
-        return arrayMove(items, activeItemIndex, overItemIndex);
-      });
-    }
-
-    if (isActiveCard && isOverBox) {
-      setItems((items) => {
-        const activeItemIndex = items.findIndex(
-          (item) => item.id === active.id,
-        );
-        items[activeItemIndex]!.box = Number(over.id);
-        return arrayMove(items, activeItemIndex, activeItemIndex);
-      });
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4 pb-4">
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragOver={handleDragOver}
-      >
-        <SortableContext items={itemsIds} strategy={rectSwappingStrategy}>
-          <ItemBox id={0}>
-            {items
-              .filter((item) => item.box === 0)
-              .map((item) => (
-                <Item key={item.id} item={item} />
-              ))}
-          </ItemBox>
-          <ItemBox id={-1}>
-            {items
-              .filter((item) => item.box === -1)
-              .map((item) => (
-                <Item key={item.id} item={item} />
-              ))}
-          </ItemBox>
-        </SortableContext>
-        {createPortal(
-          <DragOverlay>{activeItem && <Item item={activeItem} />}</DragOverlay>,
-          document.body,
-        )}
-      </DndContext>
+      {items
+        .filter((item) => item.box === -1)
+        .map((item) => (
+          <div
+            key={item.id}
+            className={`flex w-full flex-col rounded border p-2 transition hover:shadow-md hover:brightness-[1.2]`}
+          >
+            <Checkbox
+              className="w-full"
+              isSelected={inHand.includes(item.id)}
+              onValueChange={() => {
+                if (inHand.includes(item.id)) {
+                  setInHand(inHand.filter((i) => i !== item.id));
+                } else {
+                  setInHand([...inHand, item.id]);
+                }
+              }}
+            >
+              {inHand.includes(item.id) ? "В руке" : "Взять в руку"}
+            </Checkbox>
+            <Content item={item.data} />
+          </div>
+        ))}
       <div className="flex flex-col">
         <Button
           variant="ghost"
@@ -311,86 +212,6 @@ function Inventory({
     </div>
   );
 }
-
-const ItemBox = ({ id, children }: { id: number; children: ReactNode }) => {
-  const { setNodeRef, attributes, listeners } = useSortable({
-    id: id,
-    disabled: true,
-    data: { type: "box" },
-  });
-  return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      className={`grid min-h-8 cursor-default grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4 ${
-        !!id ? "h-auto border-2 border-dashed border-warning p-2" : "h-auto"
-      }`}
-    >
-      {!!id && (
-        <p className="text-center text-warning md:col-span-2 xl:col-span-4">
-          В руке
-        </p>
-      )}
-      {children}
-    </div>
-  );
-};
-
-const Item = ({
-  item,
-}: {
-  item: {
-    id: number;
-    name: string;
-    description: string;
-    box: number;
-    data: Item;
-  };
-}) => {
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: item.id,
-    data: { type: "item", item },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className="relative flex w-full cursor-move flex-col rounded border border-primary p-2 opacity-50"
-      >
-        <Content item={item.data} />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`relative flex w-full cursor-move flex-col rounded border p-2 transition hover:shadow-md hover:brightness-[1.2]`}
-    >
-      <Content item={item.data} />
-    </div>
-  );
-};
 
 const Content = ({ item }: { item: Item }) => {
   return (
