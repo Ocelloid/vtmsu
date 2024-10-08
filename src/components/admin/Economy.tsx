@@ -2,6 +2,7 @@ import { Tabs, Tab } from "@nextui-org/react";
 import BankAccounts from "./economy/BankAccounts";
 import Companies from "./economy/Companies";
 import Transactions from "./Transactions";
+import Total from "./economy/Total";
 
 export default function Economy() {
   return (
@@ -48,6 +49,16 @@ export default function Economy() {
         }
       >
         <Transactions />
+      </Tab>
+      <Tab
+        key={"total"}
+        title={
+          <div className="flex items-center space-x-2">
+            <span>Всего</span>
+          </div>
+        }
+      >
+        <Total />
       </Tab>
     </Tabs>
   );

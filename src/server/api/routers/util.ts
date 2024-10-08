@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -213,6 +214,141 @@ export const utilRouter = createTRPCRouter({
       focus: items.find((i) => i.id === h.focusId),
     }));
   }),
+
+  removeExpertAbilities: protectedProcedure
+    .input(
+      z.object({
+        selectedClans: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const clans = await ctx.db.clan.findMany({
+        where: { id: { in: input.selectedClans } },
+      });
+      await ctx.db.characterAbilities.deleteMany({
+        where: {
+          abilitiy: { expertise: true },
+          Char: { clanId: { in: input.selectedClans } },
+        },
+      });
+      return {
+        message: `Убраны экспертные дисциплины у кланов: ${clans.map((c) => c.name).join(", ")}`,
+      };
+    }),
+
+  giveExpertAbilities: protectedProcedure
+    .input(
+      z.object({
+        selectedClans: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const characters = await ctx.db.char.findMany({
+        where: { clanId: { in: input.selectedClans } },
+      });
+      const expertAbilities = await ctx.db.ability.findMany({
+        where: { expertise: true },
+        include: {
+          AbilityAvailable: { include: { clan: true, ability: true } },
+        },
+      });
+      const charactersWithAvailableAbilities = characters.map((c) => {
+        const availableAbilities = expertAbilities.filter((a) =>
+          a.AbilityAvailable.some((aa) => aa.clanId === c.clanId),
+        );
+        return {
+          name: c.name,
+          charId: c.id,
+          clanId: c.clanId,
+          abilitiesToGive: availableAbilities
+            .map((a) =>
+              a.AbilityAvailable.map((aa) => ({
+                id: aa.abilityId,
+                name: aa.ability.name,
+              })),
+            )
+            .flat(),
+        };
+      });
+      for (let i = 0; i < charactersWithAvailableAbilities.length; i++) {
+        const char = charactersWithAvailableAbilities[i];
+        if (!!char)
+          await ctx.db.characterAbilities.createMany({
+            data: char.abilitiesToGive.map((a) => {
+              return { characterId: char.charId, abilityId: a.id };
+            }),
+          });
+      }
+      return {
+        message: `Выданы экспертные дисциплины персонажам ${charactersWithAvailableAbilities
+          .map(
+            (c) =>
+              `\n${
+                c.name
+              }: (${c.abilitiesToGive.map((a) => a.name).join(", ")})`,
+          )
+          .join("\n")}`,
+      };
+    }),
+
+  removeClanCurse: protectedProcedure
+    .input(
+      z.object({
+        selectedClans: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const characters = await ctx.db.char.findMany({
+        where: { clanId: { in: input.selectedClans } },
+      });
+      await ctx.db.characterEffects.createMany({
+        data: characters.map((c) => ({
+          characterId: c.id,
+          effectId: 74,
+        })),
+      });
+      return {
+        message: `Убрано клановое проклятье у персонажей ${characters.map((c) => `${c.name}`).join(", ")}`,
+      };
+    }),
+
+  giveClanCurse: protectedProcedure
+    .input(
+      z.object({
+        selectedClans: z.array(z.number()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const characters = await ctx.db.char.findMany({
+        where: { clanId: { in: input.selectedClans } },
+      });
+      const availableEffects: Record<number, number> = {
+        9: 75,
+        6: 76,
+        4: 77,
+        5: 78,
+        10: 79,
+        8: 80,
+        7: 81,
+        3: 82,
+        13: 83,
+      };
+      const effectsToGive = characters.map((c) => ({
+        characterId: c.id,
+        effectId: availableEffects[c.clanId] ?? 74,
+      }));
+      await ctx.db.characterEffects.createMany({
+        data: effectsToGive,
+      });
+      return {
+        message: `Выданы клановые проклятья персонажам ${characters
+          .map(
+            (c) =>
+              `\n${c.name}: ${effectsToGive.map((e) => e.effectId).join(", ")}`,
+          )
+          .join(", ")}`,
+      };
+    }),
 
   setHeart: protectedProcedure
     .input(

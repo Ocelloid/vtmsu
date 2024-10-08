@@ -32,7 +32,8 @@ export default function EffectsPage({
   if (!char) return <LoadingPage />;
 
   const activeEffects = filterUniqueEffects(
-    char.effects?.filter((e) => (e.expires ?? new Date()) > new Date()) ?? [],
+    char.effects?.filter((e) => (e.expires ? e.expires > new Date() : true)) ??
+      [],
   );
 
   return (
