@@ -172,6 +172,63 @@ export const utilRouter = createTRPCRouter({
   //       },
   //     });
   //   }),
+
+  getHeart: publicProcedure.query(async ({ ctx }) => {
+    const ashesContainer = await ctx.db.container.findFirst({
+      where: { id: "cm20bsyip00057ajhnmubnnc3" },
+      include: { Item: true },
+    });
+    const focusContainer = await ctx.db.container.findFirst({
+      where: { id: "cm20btcot00067ajhrz2quog4" },
+      include: { Item: true },
+    });
+    return { ashesContainer, focusContainer };
+  }),
+
+  setHeart: protectedProcedure
+    .input(
+      z.object({
+        mode: z.string(),
+        focusId: z.number(),
+        ashesId: z.number(),
+        characterId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const focus = await ctx.db.item.findUnique({
+        where: { id: input.focusId },
+      });
+      if (!focus) {
+        return {
+          message:
+            "Отсутствует фокус. Биение сердца обращается назад. Последний эффект отменён.",
+        };
+      }
+
+      const ashes = await ctx.db.item.findUnique({
+        where: { id: input.ashesId },
+      });
+      if (!ashes)
+        return {
+          message:
+            "Отсутствует прах. Сердце голодно и поглощает вас. Ваш персонаж встречает финальную смерть и обращается в прах.",
+        };
+
+      switch (input.mode) {
+        case "ascent":
+          break;
+        case "descent":
+          break;
+        case "bless":
+          break;
+        case "curse":
+          break;
+        default:
+          break;
+      }
+      return null;
+    }),
+
   getTopDonate: publicProcedure.query(async ({ ctx }) => {
     const transactions = await ctx.db.transaction.findMany({
       where: { accountToAddress: "58400810" },

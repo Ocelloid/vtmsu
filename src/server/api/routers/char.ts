@@ -356,6 +356,21 @@ export const charRouter = createTRPCRouter({
       });
     }),
 
+  finalDeath: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const char = await ctx.db.char.findUnique({
+        where: { id: input.id },
+      });
+      if (!char) return;
+      await ctx.db.char.update({
+        where: { id: input.id },
+        data: {
+          alive: false,
+        },
+      });
+    }),
+
   applyAbility: protectedProcedure
     .input(z.object({ id: z.number(), charId: z.number() }))
     .mutation(async ({ ctx, input }) => {

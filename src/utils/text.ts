@@ -69,7 +69,7 @@ export function calculateDistance(
   lat2: number,
   lon2: number,
 ): number {
-  const R = 6371; // Radius of the Earth in kilometers
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const lat1Rad = (lat1 * Math.PI) / 180;
@@ -82,8 +82,7 @@ export function calculateDistance(
       Math.cos(lat1Rad) *
       Math.cos(lat2Rad);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c * 1000; // Convert to meters
-  console.log(distance);
+  const distance = R * c * 1000;
   return distance;
 }
 
