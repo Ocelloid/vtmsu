@@ -19,6 +19,7 @@ import Containers from "~/components/admin/Containers";
 import GeoPoints from "~/components/admin/items/GeoPoints";
 import Coupons from "~/components/admin/items/Coupons";
 import Transactions from "~/components/admin/Transactions";
+import Heart from "~/components/admin/Heart";
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -270,6 +271,16 @@ export default function Admin() {
                   }
                 >
                   <ForceEffects />
+                </Tab>
+                <Tab
+                  key={"heart"}
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Сердце</span>
+                    </div>
+                  }
+                >
+                  <Heart />
                 </Tab>
                 <Tab
                   key={"controls"}

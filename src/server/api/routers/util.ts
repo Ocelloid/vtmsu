@@ -149,6 +149,17 @@ export type Donator = {
   amount: number;
 };
 
+export type HeartEffects = {
+  id: number;
+  content: string;
+  focusId: number;
+  focusName: string;
+  ashesId: number;
+  ashesName: string;
+  charId: number;
+  char: Character;
+};
+
 export const utilRouter = createTRPCRouter({
   // updateLocation: protectedProcedure
   //   .input(
@@ -185,6 +196,23 @@ export const utilRouter = createTRPCRouter({
     return { ashesContainer, focusContainer };
   }),
 
+  getHeartUsage: protectedProcedure.query(async ({ ctx }) => {
+    const heart = await ctx.db.heartEffects.findMany({
+      include: { char: true },
+    });
+    const items = await ctx.db.item.findMany({
+      include: {
+        type: true,
+        createdBy: true,
+      },
+    });
+    return heart.map((h) => ({
+      ...h,
+      ashes: items.find((i) => i.id === h.ashesId),
+      focus: items.find((i) => i.id === h.focusId),
+    }));
+  }),
+
   setHeart: protectedProcedure
     .input(
       z.object({
@@ -200,7 +228,7 @@ export const utilRouter = createTRPCRouter({
       const ashes = await ctx.db.item.findUnique({
         where: { id: input.ashesId },
       });
-      if (!ashes) {
+      if (!ashes || (ashes.typeId !== 10 && ashes.typeId !== 19)) {
         message =
           "Отсутствует прах. Сердце голодно и поглощает вас. Ваш персонаж встречает финальную смерть и обращается в прах.";
         await ctx.db.char.update({

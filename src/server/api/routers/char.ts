@@ -369,6 +369,19 @@ export const charRouter = createTRPCRouter({
           alive: false,
         },
       });
+      await ctx.db.item.create({
+        data: {
+          name: `Прах персонажа ${char.name}`,
+          content: `Прах персонажа ${char.name}`,
+          image:
+            "https://utfs.io/f/28c0bf61-c337-4e70-95d6-d03061f2a81e-1jfoo4.png",
+          usage: 0,
+          typeId: 19,
+          ownedById: input.id,
+          lastOwnedById: input.id,
+          createdById: ctx.session.user.id,
+        },
+      });
     }),
 
   applyAbility: protectedProcedure

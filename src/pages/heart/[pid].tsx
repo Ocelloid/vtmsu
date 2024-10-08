@@ -77,6 +77,7 @@ export default function Heart() {
           {
             onSuccess(e) {
               if (e?.message) alert(e.message);
+              void refetch();
             },
           },
         );
@@ -123,6 +124,21 @@ export default function Heart() {
             ᚛ᚌ ᚑ ᚏ ᚑ ᚇ ᚐ ᚜
           </h1>
           <div className="flex w-full flex-col gap-2">
+            <Button
+              variant="solid"
+              color="danger"
+              className="mx-auto flex h-32 w-32 items-center justify-center text-[128px] font-bold"
+              onClick={handleMutateHeart}
+              isDisabled={!characterId || !heartMode}
+            >
+              {heartMode === "ascend"
+                ? "🜂"
+                : heartMode === "descend"
+                  ? "🜁"
+                  : heartMode === "bless"
+                    ? "🜄"
+                    : "🜃"}
+            </Button>
             {ashesContainer && (
               <div className="flex w-full flex-col gap-2">
                 <p className="text-center font-semibold">
@@ -141,21 +157,6 @@ export default function Heart() {
                 </p>
               </div>
             )}
-            <Button
-              variant="solid"
-              color="danger"
-              className="mx-auto flex h-32 w-32 items-center justify-center text-[128px] font-bold"
-              onClick={handleMutateHeart}
-              isDisabled={!characterId || !heartMode}
-            >
-              {heartMode === "ascend"
-                ? "🜂"
-                : heartMode === "descend"
-                  ? "🜁"
-                  : heartMode === "bless"
-                    ? "🜄"
-                    : "🜃"}
-            </Button>
           </div>
         </div>
       </main>
