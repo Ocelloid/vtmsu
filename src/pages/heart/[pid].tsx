@@ -16,7 +16,11 @@ export default function Heart() {
   const [characterId, setCharacterId] = useState<number>(0);
   const [ashesContainer, setAshesContainer] = useState<Container>();
   const [focusContainer, setFocusContainer] = useState<Container>();
-  const { data: heartData, isLoading } = api.util.getHeart.useQuery(undefined, {
+  const {
+    data: heartData,
+    isLoading,
+    refetch,
+  } = api.util.getHeart.useQuery(undefined, {
     refetchInterval: 5000,
   });
   const { data: characters, isLoading: isCharactersLoading } =
@@ -37,6 +41,18 @@ export default function Heart() {
   }, [heartData]);
 
   const handleMutateHeart = () => {
+    const confirmed = confirm(
+      `Вы желаете прикоснуться к сердцу города?${
+        !focusContainer?.Item?.[0]?.id
+          ? "\n\nОтсутствует фокус.\nВы уверены, что желаете прикоснуться к сердцу без фокуса?"
+          : ""
+      }${
+        !ashesContainer?.Item?.[0]?.id
+          ? "\n\nОтсутствует прах.\nВы уверены, что желаете прикоснуться к сердцу без праха?"
+          : ""
+      }`,
+    );
+    if (!confirmed) return;
     if (!!window && !!window.navigator && !!window.navigator.geolocation)
       window.navigator.geolocation.getCurrentPosition((pos) => {
         const distance = calculateDistance(
@@ -110,7 +126,6 @@ export default function Heart() {
             {ashesContainer && (
               <div className="flex w-full flex-col gap-2">
                 <p className="text-center font-semibold">
-                  Прах:{" "}
                   {!!ashesContainer.Item?.length
                     ? `Прах: ${ashesContainer.Item[0]?.name}`
                     : "Отсутствует прах"}
@@ -120,7 +135,6 @@ export default function Heart() {
             {focusContainer && (
               <div className="flex w-full flex-col gap-2">
                 <p className="text-center font-semibold">
-                  Фокус:{" "}
                   {!!focusContainer.Item?.length
                     ? `Фокус: ${focusContainer.Item[0]?.name}`
                     : "Отсутствует фокус"}

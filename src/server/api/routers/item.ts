@@ -710,7 +710,7 @@ export const itemRouter = createTRPCRouter({
       });
       await ctx.db.item.create({
         data: {
-          name: "Витэ",
+          name: `Витэ персонажа ${char.name}`,
           content: `Витэ персонажа ${char.name}`,
           image:
             "https://utfs.io/f/49b78d7d-4bd0-4ebe-b8f4-4be4eb593fe3-1ut81x.png",

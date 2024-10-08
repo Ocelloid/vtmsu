@@ -162,13 +162,13 @@ model BankAccount {
 }
 
 model Transaction {
-  id            Int      @id @default(autoincrement())
-  accountFromId Int
-  accountFromAddress String @default("")
-  accountToId   Int
-  accountToAddress String @default("")
-  amount        Int
-  createdAt     DateTime @default(now())
+  id                 Int      @id @default(autoincrement())
+  accountFromId      Int
+  accountFromAddress String   @default("")
+  accountToId        Int
+  accountToAddress   String   @default("")
+  amount             Int
+  createdAt          DateTime @default(now())
 }
 
 model GeoPoint {
@@ -406,6 +406,18 @@ model CouponItem {
   item     Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }
 
+model HeartEffects {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.LongText
+  createdAt DateTime @default(now())
+  ashesId   Int
+  ashesName String
+  focusId   Int
+  focusName String
+  charId    Int
+  char      Char     @relation(fields: [charId], references: [id])
+}
+
 model Char {
   id                  Int                   @id @default(autoincrement())
   name                String
@@ -462,6 +474,7 @@ model Char {
   Company             Company[]
   Item                Item[]
   Ticket              Ticket[]
+  HeartEffects        HeartEffects[]
 }
 
 model CharacterEffects {

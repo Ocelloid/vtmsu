@@ -195,38 +195,106 @@ export const utilRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const focus = await ctx.db.item.findUnique({
-        where: { id: input.focusId },
-      });
-      if (!focus) {
-        return {
-          message:
-            "Отсутствует фокус. Биение сердца обращается назад. Последний эффект отменён.",
-        };
-      }
+      let message = "";
 
       const ashes = await ctx.db.item.findUnique({
         where: { id: input.ashesId },
       });
-      if (!ashes)
-        return {
-          message:
-            "Отсутствует прах. Сердце голодно и поглощает вас. Ваш персонаж встречает финальную смерть и обращается в прах.",
-        };
+      if (!ashes) {
+        message =
+          "Отсутствует прах. Сердце голодно и поглощает вас. Ваш персонаж встречает финальную смерть и обращается в прах.";
+        await ctx.db.char.update({
+          where: { id: input.characterId },
+          data: { alive: false, bloodAmount: 0, health: 0 },
+        });
+      }
+
+      const focus = await ctx.db.item.findUnique({
+        where: { id: input.focusId },
+      });
+      if (!focus) {
+        message =
+          "Отсутствует фокус. Биение сердца обращается назад. Последний эффект отменён.";
+        await ctx.db.heartEffects.create({
+          data: {
+            charId: input.characterId,
+            content: "Последний эффект отменён.",
+            focusId: 0,
+            focusName: "Нет фокуса",
+            ashesId: ashes?.id ?? 0,
+            ashesName: ashes?.name ?? "Нет праха",
+          },
+        });
+        return { message };
+      }
 
       switch (input.mode) {
-        case "ascent":
+        case "ascend":
+          message = message + "\nПерсонажи получают экспертные дисциплины";
+          await ctx.db.heartEffects.create({
+            data: {
+              charId: input.characterId,
+              content: "Персонажи получают экспертные дисциплины",
+              focusId: focus?.id ?? 0,
+              focusName: focus?.name ?? "Нет фокуса",
+              ashesId: ashes?.id ?? 0,
+              ashesName: ashes?.name ?? "Нет праха",
+            },
+          });
           break;
-        case "descent":
+        case "descend":
+          message = message + "\nПерсонажи теряют экспертные дисциплины";
+          await ctx.db.heartEffects.create({
+            data: {
+              charId: input.characterId,
+              content: "Персонажи теряют экспертные дисциплины",
+              focusId: focus?.id ?? 0,
+              focusName: focus?.name ?? "Нет фокуса",
+              ashesId: ashes?.id ?? 0,
+              ashesName: ashes?.name ?? "Нет праха",
+            },
+          });
           break;
         case "bless":
+          message = message + "\nПерсонажи теряют клановое проклятье";
+          await ctx.db.heartEffects.create({
+            data: {
+              charId: input.characterId,
+              content: "Персонажи теряют клановое проклятье",
+              focusId: focus?.id ?? 0,
+              focusName: focus?.name ?? "Нет фокуса",
+              ashesId: ashes?.id ?? 0,
+              ashesName: ashes?.name ?? "Нет праха",
+            },
+          });
           break;
         case "curse":
+          message = message + "\nПерсонажи получают клановое проклятье";
+          await ctx.db.heartEffects.create({
+            data: {
+              charId: input.characterId,
+              content: "Персонажи получают клановое проклятье",
+              focusId: focus?.id ?? 0,
+              focusName: focus?.name ?? "Нет фокуса",
+              ashesId: ashes?.id ?? 0,
+              ashesName: ashes?.name ?? "Нет праха",
+            },
+          });
           break;
         default:
           break;
       }
-      return null;
+      if (!!focus)
+        await ctx.db.item.update({
+          where: { id: focus.id },
+          data: { containerId: null },
+        });
+      if (!!ashes)
+        await ctx.db.item.update({
+          where: { id: ashes.id },
+          data: { containerId: null },
+        });
+      return { message };
     }),
 
   getTopDonate: publicProcedure.query(async ({ ctx }) => {
