@@ -3,6 +3,7 @@ import {
   GiFangs,
   GiFangsCircle,
   GiRestingVampire,
+  GiDeathSkull,
 } from "react-icons/gi";
 import { BsDroplet, BsDropletFill } from "react-icons/bs";
 import type { Character } from "~/server/api/routers/char";
@@ -30,7 +31,13 @@ export default function BloodMeter({ char }: { char: Character }) {
           ),
         )}
       </div>
-      {amount === 0 ? (
+      {!char.alive ? (
+        <div className="mx-auto -mt-8 mb-1 flex flex-row items-center gap-2 text-lg brightness-125">
+          <GiDeathSkull size={20} />
+          Погиб
+          <GiDeathSkull size={20} />
+        </div>
+      ) : amount === 0 ? (
         <div className="mx-auto -mt-8 mb-1 flex flex-row items-center gap-2 text-lg brightness-125">
           <GiRestingVampire size={20} />
           Торпор
