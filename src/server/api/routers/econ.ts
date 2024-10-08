@@ -487,7 +487,10 @@ export const econRouter = createTRPCRouter({
       if (!character.bankAccount.length)
         return { message: "Не найден счет для персонажа" };
       const accountToUse = character.bankAccount.sort((a, b) => a.id - b.id)[0];
-      if ((accountToUse?.balance ?? 0) < company.level * 960 - 480)
+      if (
+        (accountToUse?.balance ?? 0) < company.level * 960 - 480 &&
+        character.factionId !== 7
+      )
         return {
           message: `Недостаточно средств на счёте ${accountToUse?.address}`,
         };
@@ -497,7 +500,10 @@ export const econRouter = createTRPCRouter({
             id: accountToUse?.id,
           },
           data: {
-            balance: (accountToUse?.balance ?? 0) - company.level * 960 - 480,
+            balance:
+              character.factionId !== 7
+                ? (accountToUse?.balance ?? 0) - company.level * 960 - 480
+                : accountToUse?.balance ?? 0,
           },
         });
       }

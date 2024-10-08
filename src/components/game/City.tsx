@@ -205,7 +205,7 @@ export default function City({
       `Вы хотите ${
         company.isActive ? "атаковать" : "восстановить"
       } ${company.name}? Это будет стоить вам ${
-        company.level * 1000 - 500
+        char.factionId === 7 ? 0 : company.level * 1000 - 500
       } ОВ. ${
         company.isActive
           ? "Владелец узнает о случившемся, но не будет знать, кто это сделал."
