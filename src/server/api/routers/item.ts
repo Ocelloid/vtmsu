@@ -177,8 +177,7 @@ export const itemRouter = createTRPCRouter({
         data: {
           containerId: input.containerId,
           lastOwnedById: input.itemOwnerId,
-          ownedById: undefined,
-          ownedBy: undefined,
+          ownedById: null,
         },
       });
     }),
@@ -191,14 +190,18 @@ export const itemRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return await ctx.db.item.updateMany({
+      await ctx.db.item.updateMany({
         where: { id: { in: input.itemIds } },
         data: {
           containerId: input.containerId,
-          lastOwnedById: undefined,
-          ownedById: undefined,
+          lastOwnedById: null,
+          ownedById: null,
         },
       });
+      const newItems = await ctx.db.item.findMany({
+        where: { id: { in: input.itemIds } },
+      });
+      return newItems;
     }),
 
   takeItemFromContainer: protectedProcedure
