@@ -6,9 +6,9 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Select,
-  SelectItem,
   Textarea,
+  Autocomplete,
+  AutocompleteItem,
 } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FaDropbox } from "react-icons/fa";
@@ -17,6 +17,7 @@ import { type ReactNode, useState, useEffect } from "react";
 import DefaultEditor from "~/components/editors/DefaultEditor";
 import { UploadButton } from "~/utils/uploadthing";
 import Image from "next/image";
+import CharacterCard from "~/components/CharacterCard";
 
 const ItemForm = ({
   editId,
@@ -219,32 +220,40 @@ const ItemForm = ({
                 onValueChange={(v) => setCoordY(Number(v))}
               />
             </div>
-            <Select
-              label="Персонаж"
-              selectedKeys={
-                selectedCharacter ? [selectedCharacter.toString()] : []
+            <Autocomplete
+              size="md"
+              variant="bordered"
+              placeholder="Выберите персонажа"
+              aria-label="characters"
+              className="w-full rounded-sm"
+              selectedKey={
+                selectedCharacter ? selectedCharacter.toString() : undefined
               }
-              onChange={(e) => {
-                setSelectedCharacter(
-                  !!e.target.value ? Number(e.target.value) : selectedCharacter,
-                );
+              onSelectionChange={(e) => {
+                setSelectedCharacter(!!e ? Number(e) : selectedCharacter);
               }}
             >
               {!!characterData?.length
                 ? characterData.map((c) => (
-                    <SelectItem key={c.id} value={c.id.toString()}>
-                      {c.name}
-                    </SelectItem>
+                    <AutocompleteItem
+                      key={c.id.toString()}
+                      value={c.id.toString()}
+                      textValue={c.name}
+                    >
+                      <CharacterCard character={c} isSelect={true} />
+                    </AutocompleteItem>
                   ))
                 : []}
-            </Select>
-            <Select
-              label="Тип предмета"
-              selectedKeys={selectedType ? [selectedType.toString()] : []}
-              onChange={(e) => {
-                const newType = !!e.target.value
-                  ? Number(e.target.value)
-                  : selectedType;
+            </Autocomplete>
+            <Autocomplete
+              size="md"
+              variant="bordered"
+              placeholder="Выберите тип предмета"
+              aria-label="characters"
+              className="w-full rounded-sm"
+              selectedKey={selectedType ? selectedType.toString() : undefined}
+              onSelectionChange={(e) => {
+                const newType = !!e ? Number(e) : selectedType;
                 setSelectedType(newType);
                 setTitle(itemTypes?.find((t) => t.id === newType)?.name ?? "");
                 setDescription(
@@ -256,12 +265,16 @@ const ItemForm = ({
             >
               {!!itemTypes?.length
                 ? itemTypes.map((c) => (
-                    <SelectItem key={c.id} value={c.id.toString()}>
+                    <AutocompleteItem
+                      key={c.id.toString()}
+                      value={c.id.toString()}
+                      textValue={c.name}
+                    >
                       {c.name}
-                    </SelectItem>
+                    </AutocompleteItem>
                   ))
                 : []}
-            </Select>
+            </Autocomplete>
           </ModalBody>
           <ModalFooter>
             <Button
