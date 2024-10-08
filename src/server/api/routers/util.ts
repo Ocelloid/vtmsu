@@ -199,6 +199,7 @@ export const utilRouter = createTRPCRouter({
   getHeartUsage: protectedProcedure.query(async ({ ctx }) => {
     const heart = await ctx.db.heartEffects.findMany({
       include: { char: true },
+      orderBy: { createdAt: "desc" },
     });
     const items = await ctx.db.item.findMany({
       include: {
