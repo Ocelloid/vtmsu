@@ -13,19 +13,16 @@ export default function QRCodes() {
     refetch: refetchItemList,
   } = api.item.getAll.useQuery();
   const generateQRCode = (address: string) => {
-    QRCode.toDataURL(
-      `https://vtm.su/qr/${address}`,
-      { width: 1024, margin: 2 },
-      (err) => {
-        if (err) throw err;
-        const aEl = document.createElement("a");
-        aEl.href = `https://vtm.su/qr/${address}`;
-        aEl.download = `${address}.png`;
-        document.body.appendChild(aEl);
-        aEl.click();
-        document.body.removeChild(aEl);
-      },
-    );
+    const url = `https://vtm.su/qr/${address}`;
+    QRCode.toDataURL(url, { width: 1024, margin: 2 }, (err, url) => {
+      if (err) throw err;
+      const aEl = document.createElement("a");
+      aEl.href = url;
+      aEl.download = `${address}.png`;
+      document.body.appendChild(aEl);
+      aEl.click();
+      document.body.removeChild(aEl);
+    });
   };
   if (isItemListLoading) return <LoadingPage />;
 
