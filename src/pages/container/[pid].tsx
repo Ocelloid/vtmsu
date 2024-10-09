@@ -200,9 +200,7 @@ function Inventory({
           variant="ghost"
           color="warning"
           onClick={handleTakeItemsFromContainer}
-          isDisabled={
-            !items.filter((i) => i.box === -1).length || isTakeItemsPending
-          }
+          isDisabled={!inHand.length || isTakeItemsPending}
         >
           Забрать
         </Button>
