@@ -24,6 +24,7 @@ import {
   useDisclosure,
   Autocomplete,
   AutocompleteItem,
+  Checkbox,
 } from "@nextui-org/react";
 import { LoadingSpinner, LoadingPage } from "../Loading";
 import CharacterCard from "../CharacterCard";
@@ -57,10 +58,16 @@ export default function Tickets() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [tickets, setTickets] = useState<filteredTicket[]>([]);
   const [editId, setEditId] = useState<number>();
+  const [showTransactionTickets, setShowTransactionTickets] = useState(false);
 
   const { data: appData } = api.util.getAppData.useQuery();
   const { data: ticketsData, refetch: refetchTickets } =
     api.util.getAllTickets.useQuery({ search }, { refetchInterval: 60000 });
+  const { data: transactionTicketsData } =
+    api.util.getAllTransactionTickets.useQuery(undefined, {
+      refetchInterval: 60000,
+      enabled: showTransactionTickets,
+    });
   const { data: messages, refetch: refetchMessages } =
     api.util.getMessagesByTicketId.useQuery(
       { ticketId: selectedTicket?.id ?? 0 },
@@ -613,6 +620,13 @@ export default function Tickets() {
             <FaBan size={24} />
           </Button>
         </div>
+        <Checkbox
+          size="sm"
+          isSelected={showTransactionTickets}
+          onValueChange={setShowTransactionTickets}
+        >
+          Переводы, саботажи, рэкеты
+        </Checkbox>
         <Button
           variant="bordered"
           size="sm"
@@ -709,6 +723,27 @@ export default function Tickets() {
                   </p>
                 </Button>
               ))}
+            {showTransactionTickets &&
+              transactionTicketsData?.map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
+                    onOpen();
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  {t.isResolved && <FaCheck size={16} />}
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
           </div>
           <div className="hidden max-h-[calc(100svh-206px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
             <Button
@@ -791,6 +826,26 @@ export default function Tickets() {
                   onClick={() => {
                     setSelectedTicket(t);
                     setChar(t?.character);
+                  }}
+                >
+                  <p className="w-full truncate text-start text-sm">{t.name}</p>
+                  {t.isResolved && <FaCheck size={16} />}
+                  <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                    {formatDate(t.createdAt)}
+                  </p>
+                </Button>
+              ))}
+            {showTransactionTickets &&
+              transactionTicketsData?.map((t) => (
+                <Button
+                  key={t.id}
+                  variant="faded"
+                  color="warning"
+                  className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                    t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedTicket(t);
                   }}
                 >
                   <p className="w-full truncate text-start text-sm">{t.name}</p>

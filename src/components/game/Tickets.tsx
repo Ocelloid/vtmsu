@@ -45,9 +45,14 @@ export default function Tickets({ char }: { char: Character }) {
       { enabled: !!selectedTicket },
     );
   const { data: transactionTickets, refetch: refetchTransactionTickets } =
-    api.util.getMyTransactionTickets.useQuery({
-      characterId: char.id,
-    });
+    api.util.getMyTransactionTickets.useQuery(
+      {
+        characterId: char.id,
+      },
+      {
+        enabled: showTransactionTickets,
+      },
+    );
   const { mutate: newTicket, isPending: isNewTicketPending } =
     api.util.newTicket.useMutation();
   const { mutate: sendMessage, isPending } = api.util.sendMessage.useMutation();
