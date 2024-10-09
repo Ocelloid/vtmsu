@@ -174,29 +174,27 @@ function Inventory({
 
   return (
     <div className="flex flex-col gap-4 pb-4">
-      {items
-        .filter((item) => item.box === -1)
-        .map((item) => (
-          <div
-            key={item.id}
-            className={`flex w-full flex-col rounded border p-2 transition hover:shadow-md hover:brightness-[1.2]`}
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className={`flex w-full flex-col rounded border p-2 transition hover:shadow-md hover:brightness-[1.2]`}
+        >
+          <Checkbox
+            className="w-full"
+            isSelected={inHand.includes(item.id)}
+            onValueChange={() => {
+              if (inHand.includes(item.id)) {
+                setInHand(inHand.filter((i) => i !== item.id));
+              } else {
+                setInHand([...inHand, item.id]);
+              }
+            }}
           >
-            <Checkbox
-              className="w-full"
-              isSelected={inHand.includes(item.id)}
-              onValueChange={() => {
-                if (inHand.includes(item.id)) {
-                  setInHand(inHand.filter((i) => i !== item.id));
-                } else {
-                  setInHand([...inHand, item.id]);
-                }
-              }}
-            >
-              {inHand.includes(item.id) ? "В руке" : "Взять в руку"}
-            </Checkbox>
-            <Content item={item.data} />
-          </div>
-        ))}
+            {inHand.includes(item.id) ? "В руке" : "Взять в руку"}
+          </Checkbox>
+          <Content item={item.data} />
+        </div>
+      ))}
       <div className="flex flex-col">
         <Button
           variant="ghost"
