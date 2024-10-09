@@ -16,10 +16,17 @@ import Controls from "~/components/admin/Controls";
 import Tickets from "~/components/admin/Tickets";
 import ForceEffects from "~/components/admin/ForceEffects";
 import Containers from "~/components/admin/Containers";
-import GeoPoints from "~/components/admin/items/GeoPoints";
 import Coupons from "~/components/admin/items/Coupons";
 import Transactions from "~/components/admin/Transactions";
 import Heart from "~/components/admin/Heart";
+import dynamic from "next/dynamic";
+
+const DynamicGeoPoints = dynamic(
+  () => import("~/components/admin/items/GeoPoints"),
+  {
+    ssr: false,
+  },
+);
 
 export default function Admin() {
   const { data: sessionData } = useSession();
@@ -207,7 +214,7 @@ export default function Admin() {
                     </div>
                   }
                 >
-                  <GeoPoints />
+                  <DynamicGeoPoints />
                 </Tab>
               </Tabs>
             </Tab>
