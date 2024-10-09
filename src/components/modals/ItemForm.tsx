@@ -30,14 +30,23 @@ const ItemForm = ({
 }) => {
   const { data: characterData, isLoading: isCharactersLoading } =
     api.char.getAll.useQuery();
+  const { data: containerData, isLoading: isContainersLoading } =
+    api.item.getAllContainers.useQuery();
   const { data: itemTypes, isLoading: isTypesLoading } =
     api.item.getAllTypes.useQuery();
-  const [selectedCharacter, setSelectedCharacter] = useState<number>();
+  const [selectedCharacter, setSelectedCharacter] = useState<
+    number | null | undefined
+  >();
+  const [selectedContainer, setSelectedContainer] = useState<
+    string | null | undefined
+  >();
   const [selectedType, setSelectedType] = useState<number>(1);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [auspexData, setAuspexData] = useState("");
+  const [hackerData, setHackerData] = useState("");
+  const [animalismData, setAnimalismData] = useState("");
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [usage, setUsage] = useState(-1);
@@ -58,6 +67,8 @@ const ItemForm = ({
   const resetForm = () => {
     setTitle("");
     setAuspexData("");
+    setHackerData("");
+    setAnimalismData("");
     setDescription("");
     setImage("");
     setUsage(-1);
@@ -70,11 +81,14 @@ const ItemForm = ({
     if (!!itemData) {
       setTitle(itemData?.name ?? "");
       setAuspexData(itemData?.auspexData ?? "");
+      setHackerData(itemData?.hackerData ?? "");
+      setAnimalismData(itemData.animalismData ?? "");
       setDescription(itemData?.content ?? "");
       setImage(itemData?.image ?? "");
       setUsage(itemData?.usage ?? -1);
       setSelectedType(itemData?.typeId ?? 1);
-      setSelectedCharacter(itemData?.ownedById ?? 1);
+      setSelectedContainer(itemData?.containerId);
+      setSelectedCharacter(itemData?.ownedById);
       setCoordX(itemData?.coordX ?? 0);
       setCoordY(itemData?.coordY ?? 0);
     }
@@ -92,7 +106,10 @@ const ItemForm = ({
           coordY,
           typeId: selectedType,
           auspexData,
-          ownedById: selectedCharacter ?? 1,
+          animalismData,
+          hackerData,
+          ownedById: selectedCharacter ?? undefined,
+          containerId: selectedContainer ?? undefined,
         },
         {
           onSuccess() {
@@ -114,7 +131,10 @@ const ItemForm = ({
           coordY,
           typeId: selectedType,
           auspexData,
-          ownedById: selectedCharacter,
+          animalismData,
+          hackerData,
+          ownedById: selectedCharacter ?? undefined,
+          containerId: selectedContainer ?? undefined,
         },
         {
           onSuccess(e) {
@@ -127,7 +147,12 @@ const ItemForm = ({
       );
   };
 
-  if (isItemLoading || isCharactersLoading || isTypesLoading)
+  if (
+    isItemLoading ||
+    isCharactersLoading ||
+    isTypesLoading ||
+    isContainersLoading
+  )
     return <LoadingSpinner width={24} height={24} />;
 
   return (
@@ -194,6 +219,20 @@ const ItemForm = ({
               value={auspexData}
               onValueChange={setAuspexData}
             />
+            <Textarea
+              size="sm"
+              variant="underlined"
+              label="Информация для хакерства"
+              value={hackerData}
+              onValueChange={setHackerData}
+            />
+            <Textarea
+              size="sm"
+              variant="underlined"
+              label="Информация для анимализма"
+              value={animalismData}
+              onValueChange={setAnimalismData}
+            />
             <Input
               size="sm"
               type="number"
@@ -220,6 +259,29 @@ const ItemForm = ({
                 onValueChange={(v) => setCoordY(Number(v))}
               />
             </div>
+            <Autocomplete
+              size="md"
+              variant="bordered"
+              placeholder="Выберите контейнер"
+              aria-label="containers"
+              className="w-full rounded-sm"
+              selectedKey={selectedContainer ? selectedContainer : undefined}
+              onSelectionChange={(e) => {
+                setSelectedContainer(!!e ? e.toString() : selectedContainer);
+              }}
+            >
+              {!!containerData?.length
+                ? containerData.map((c) => (
+                    <AutocompleteItem
+                      key={c.id.toString()}
+                      value={c.id.toString()}
+                      textValue={c.name}
+                    >
+                      {c.name}
+                    </AutocompleteItem>
+                  ))
+                : []}
+            </Autocomplete>
             <Autocomplete
               size="md"
               variant="bordered"

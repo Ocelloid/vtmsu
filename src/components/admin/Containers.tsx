@@ -1,5 +1,5 @@
 import { api } from "~/utils/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LoadingPage } from "~/components/Loading";
 import { FaPencilAlt, FaTrashAlt, FaDownload } from "react-icons/fa";
 import {
@@ -102,6 +102,17 @@ function ContainerForm({
   const { mutate: createContainer, isPending: isCreateContainerPending } =
     api.item.createContainer.useMutation();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { data: containerData } = api.item.getContainerById.useQuery(
+    { id: editId! },
+    { enabled: !!editId && isOpen },
+  );
+
+  useEffect(() => {
+    if (!!containerData) {
+      setName(containerData?.name ?? "");
+      setContent(containerData?.content ?? "");
+    }
+  }, [containerData]);
 
   const handleSubmit = () => {
     if (!editId) {

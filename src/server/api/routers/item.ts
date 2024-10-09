@@ -605,7 +605,7 @@ export const itemRouter = createTRPCRouter({
           usage: input.usage,
           coordX: input.coordX,
           coordY: input.coordY,
-          ownedById: input.ownedById ?? 89,
+          ownedById: input.ownedById,
           auspexData: input.auspexData,
           containerId: input.containerId,
           animalismData: input.animalismData,
