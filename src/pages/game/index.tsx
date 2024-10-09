@@ -87,7 +87,6 @@ export default function Game() {
       const activeEffects = char.effects.filter(
         (e) => (e.expires ?? new Date()) > new Date(),
       );
-      console.log(activeEffects);
       if (
         activeEffects.some((e) => e.effect.name === "Таудроновое похмелье") &&
         !activeEffects.some((e) => e.effect.name === "Таудрон") &&

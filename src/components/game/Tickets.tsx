@@ -13,6 +13,7 @@ import {
   ModalContent,
   ModalBody,
   useDisclosure,
+  Checkbox,
 } from "@nextui-org/react";
 import { LoadingSpinner } from "../Loading";
 
@@ -22,6 +23,7 @@ export default function Tickets({ char }: { char: Character }) {
   const [newMessage, setNewMessage] = useState<string>("");
   const [newName, setNewName] = useState<string>("");
   const [timeoutUntil, setTimeoutUntil] = useState<Date>();
+  const [showTransactionTickets, setShowTransactionTickets] = useState(false);
 
   useEffect(() => {
     if (char.timeout && char.timeoutAt && char.timeoutDuration) {
@@ -42,6 +44,10 @@ export default function Tickets({ char }: { char: Character }) {
       { ticketId: selectedTicket?.id ?? 0 },
       { enabled: !!selectedTicket },
     );
+  const { data: transactionTickets, refetch: refetchTransactionTickets } =
+    api.util.getMyTransactionTickets.useQuery({
+      characterId: char.id,
+    });
   const { mutate: newTicket, isPending: isNewTicketPending } =
     api.util.newTicket.useMutation();
   const { mutate: sendMessage, isPending } = api.util.sendMessage.useMutation();
@@ -57,6 +63,7 @@ export default function Tickets({ char }: { char: Character }) {
           setNewName("");
           onClose();
           void refetchTickets();
+          void refetchTransactionTickets();
         },
       },
     );
@@ -90,6 +97,7 @@ export default function Tickets({ char }: { char: Character }) {
         onSuccess: (t) => {
           onClose();
           void refetchTickets();
+          void refetchTransactionTickets();
           setSelectedTicket(t);
         },
       },
@@ -292,6 +300,13 @@ export default function Tickets({ char }: { char: Character }) {
           >
             <p className="text-sm font-semibold">Новая заявка</p>
           </Button>
+          <Checkbox
+            size="sm"
+            isSelected={showTransactionTickets}
+            onValueChange={setShowTransactionTickets}
+          >
+            Переводы, саботажи, рэкеты
+          </Checkbox>
           {tickets
             ?.filter((t) => !t.isResolved)
             .map((t) => (
@@ -336,8 +351,36 @@ export default function Tickets({ char }: { char: Character }) {
                 </p>
               </Button>
             ))}
+          {showTransactionTickets &&
+            transactionTickets?.map((t) => (
+              <Button
+                key={t.id}
+                variant="faded"
+                color="warning"
+                className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                }`}
+                onClick={() => {
+                  setSelectedTicket(t);
+                  onOpen();
+                }}
+              >
+                <p className="w-full truncate text-start text-sm">{t.name}</p>
+                {t.isResolved && <FaCheck size={16} />}
+                <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                  {formatDate(t.createdAt)}
+                </p>
+              </Button>
+            ))}
         </div>
         <div className="hidden max-h-[calc(100svh-296px)] w-80 flex-col gap-2 overflow-y-auto md:flex">
+          <Checkbox
+            size="sm"
+            isSelected={showTransactionTickets}
+            onValueChange={setShowTransactionTickets}
+          >
+            Переводы, саботажи, рэкеты
+          </Checkbox>
           <Button
             variant="bordered"
             color="warning"
@@ -372,6 +415,26 @@ export default function Tickets({ char }: { char: Character }) {
           {tickets
             ?.filter((t) => t.isResolved)
             .map((t) => (
+              <Button
+                key={t.id}
+                variant="faded"
+                color="warning"
+                className={`h-10 min-h-10 justify-between gap-2 rounded-lg bg-red-950 p-2 transition hover:bg-red-900/75 hover:brightness-125 ${
+                  t.id === selectedTicket?.id ? "bg-red-900/75" : ""
+                }`}
+                onClick={() => {
+                  setSelectedTicket(t);
+                }}
+              >
+                <p className="w-full truncate text-start text-sm">{t.name}</p>
+                {t.isResolved && <FaCheck size={16} />}
+                <p className="h-8 w-8 text-wrap text-xs opacity-50">
+                  {formatDate(t.createdAt)}
+                </p>
+              </Button>
+            ))}
+          {showTransactionTickets &&
+            transactionTickets?.map((t) => (
               <Button
                 key={t.id}
                 variant="faded"

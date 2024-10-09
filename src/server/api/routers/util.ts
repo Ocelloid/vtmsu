@@ -638,7 +638,31 @@ export const utilRouter = createTRPCRouter({
     .input(z.object({ characterId: z.number() }))
     .query(async ({ ctx, input }) => {
       return ctx.db.ticket.findMany({
-        where: { characterId: input.characterId },
+        where: {
+          characterId: input.characterId,
+          NOT: {
+            OR: [
+              { name: { contains: "Перевод ОВ" } },
+              { name: { contains: "Саботаж предприятия" } },
+              { name: { contains: "Рэкет предприятия" } },
+            ],
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }),
+  getMyTransactionTickets: protectedProcedure
+    .input(z.object({ characterId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.ticket.findMany({
+        where: {
+          characterId: input.characterId,
+          OR: [
+            { name: { contains: "Перевод ОВ" } },
+            { name: { contains: "Саботаж предприятия" } },
+            { name: { contains: "Рэкет предприятия" } },
+          ],
+        },
         orderBy: { createdAt: "desc" },
       });
     }),

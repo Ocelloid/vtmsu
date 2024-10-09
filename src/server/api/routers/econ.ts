@@ -424,7 +424,6 @@ export const econRouter = createTRPCRouter({
       });
       if (!company) return { message: "Не найдено предприятие" };
       const upgradeCost = company.level * 960 - 480;
-      console.log(upgradeCost);
       if (company.level >= 10)
         return { message: "Предприятие уже вышло на 10 уровень" };
       const bankAccount = await ctx.db.bankAccount.findFirst({

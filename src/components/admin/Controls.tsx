@@ -13,17 +13,6 @@ export default function Controls() {
     api.util.sunrise.useMutation();
   const { data: appData, isLoading: isAppDataLoading } =
     api.util.getAppData.useQuery();
-  const { data: companyBalances } = api.util.pushCompanyBalances.useQuery(
-    undefined,
-    {
-      enabled: !!allowPush,
-      refetchInterval: 90000,
-    },
-  );
-
-  useEffect(() => {
-    console.log(companyBalances);
-  }, [companyBalances]);
 
   const [data, setData] = useState<AppData>({
     id: 0,
