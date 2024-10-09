@@ -49,6 +49,8 @@ export type Message = {
   id: number;
   ticketId: number;
   content: string | null;
+  createdBy?: User | null;
+  createdById?: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -260,14 +262,10 @@ export const utilRouter = createTRPCRouter({
           name: c.name,
           charId: c.id,
           clanId: c.clanId,
-          abilitiesToGive: availableAbilities
-            .map((a) =>
-              a.AbilityAvailable.map((aa) => ({
-                id: aa.abilityId,
-                name: aa.ability.name,
-              })),
-            )
-            .flat(),
+          abilitiesToGive: availableAbilities.map((aa) => ({
+            id: aa.AbilityAvailable[0]?.abilityId ?? 0,
+            name: aa.AbilityAvailable[0]?.ability.name,
+          })),
         };
       });
       for (let i = 0; i < charactersWithAvailableAbilities.length; i++) {
@@ -632,6 +630,7 @@ export const utilRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.db.message.findMany({
         where: { ticketId: input.ticketId },
+        include: { createdBy: true },
         orderBy: { createdAt: "desc" },
       });
     }),
@@ -661,6 +660,7 @@ export const utilRouter = createTRPCRouter({
           ticketId: input.ticketId,
           content: input.content,
           isAdmin: input.isAdmin ?? false,
+          createdById: ctx.session.user.id,
         },
       });
     }),

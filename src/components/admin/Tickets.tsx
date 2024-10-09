@@ -818,6 +818,7 @@ export default function Tickets() {
                     <div className="flex w-full flex-col text-sm">
                       <p className="flex w-full flex-col text-lg">
                         {m.isAdmin ? "Рассказчик:" : char?.name + ":"}
+                        <span className="text-xs">{m.createdBy?.name}</span>
                       </p>
                       {m.content}
                     </div>
