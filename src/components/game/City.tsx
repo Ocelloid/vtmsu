@@ -205,7 +205,7 @@ export default function City({
       `Вы хотите ${
         company.isActive ? "атаковать" : "восстановить"
       } ${company.name}? Это будет стоить вам ${
-        char.factionId === 7 ? 0 : company.level * 1000 - 500
+        char.factionId === 7 ? 0 : company.level * 9600 - 4800
       } ОВ. ${
         company.isActive
           ? "Владелец узнает о случившемся, но не будет знать, кто это сделал."
@@ -230,7 +230,7 @@ export default function City({
   const handleRacket = (company: Company) => {
     const confirmed = confirm(
       `Вы хотите захватить ${company.name}? Это будет стоить вам ${
-        (company.level - 1) * 4000 + 2000
+        (company.level - 1) * 38400 + 19200
       } ОВ. Владелец узнает, что это сделали вы.`,
     );
     if (!confirmed) return;

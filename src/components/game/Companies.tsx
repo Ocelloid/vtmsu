@@ -378,7 +378,7 @@ function CompanyForm({
                 {!!companyData?.isActive && (
                   <p>
                     Стоимость повышения уровня предприятия:{" "}
-                    {(companyData?.level ?? 0) * 960 - 480} ОВ
+                    {(companyData?.level ?? 0) * 9600 - 4800} ОВ
                   </p>
                 )}
                 {!!companyData?.isActive && (

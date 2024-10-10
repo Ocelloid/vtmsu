@@ -423,7 +423,7 @@ export const econRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (!company) return { message: "Не найдено предприятие" };
-      const upgradeCost = company.level * 960 - 480;
+      const upgradeCost = company.level * 9600 - 4800;
       if (company.level >= 10)
         return { message: "Предприятие уже вышло на 10 уровень" };
       const bankAccount = await ctx.db.bankAccount.findFirst({
@@ -487,7 +487,7 @@ export const econRouter = createTRPCRouter({
         return { message: "Не найден счет для персонажа" };
       const accountToUse = character.bankAccount.sort((a, b) => a.id - b.id)[0];
       if (
-        (accountToUse?.balance ?? 0) < company.level * 960 - 480 &&
+        (accountToUse?.balance ?? 0) < company.level * 9600 - 4800 &&
         character.factionId !== 7
       )
         return {
@@ -501,7 +501,7 @@ export const econRouter = createTRPCRouter({
           data: {
             balance:
               character.factionId !== 7
-                ? (accountToUse?.balance ?? 0) - company.level * 960 - 480
+                ? (accountToUse?.balance ?? 0) - company.level * 9600 - 4800
                 : accountToUse?.balance ?? 0,
           },
         });
@@ -588,7 +588,7 @@ export const econRouter = createTRPCRouter({
         return { message: "Не найден счет для персонажа" };
 
       const accountToUse = character.bankAccount.sort((a, b) => a.id - b.id)[0];
-      if ((accountToUse?.balance ?? 0) < company.level * 3840 + 1920)
+      if ((accountToUse?.balance ?? 0) < company.level * 38400 + 19200)
         return {
           message: `Недостаточно средств на счёте ${accountToUse?.address}`,
         };
